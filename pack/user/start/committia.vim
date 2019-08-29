@@ -1,0 +1,1 @@
+../../../bundle/committia.vim/

@@ -1,0 +1,45 @@
+[submodule "bundle/ale"]
+	path = bundle/ale
+	url = https://github.com/dense-analysis/ale
+[submodule "bundle/committia.vim"]
+	path = bundle/committia.vim
+	url = https://github.com/rhysd/committia.vim
+[submodule "bundle/fzf.vim"]
+	path = bundle/fzf.vim
+	url = https://github.com/junegunn/fzf.vim
+[submodule "bundle/gist-vim"]
+	path = bundle/gist-vim
+	url = https://github.com/mattn/gist-vim
+[submodule "bundle/goyo.vim"]
+	path = bundle/goyo.vim
+	url = https://github.com/junegunn/goyo.vim
+[submodule "bundle/lexima.vim"]
+	path = bundle/lexima.vim
+	url = https://github.com/cohama/lexima.vim
+[submodule "bundle/loupe"]
+	path = bundle/loupe
+	url = https://github.com/wincent/loupe
+[submodule "bundle/neoformat"]
+	path = bundle/neoformat
+	url = https://github.com/sbdchd/neoformat
+[submodule "bundle/nerdtree"]
+	path = bundle/nerdtree
+	url = https://github.com/scrooloose/nerdtree
+[submodule "bundle/rainbow"]
+	path = bundle/rainbow
+	url = https://github.com/luochen1990/rainbow
+[submodule "bundle/vim-airline-themes"]
+	path = bundle/vim-airline-themes
+	url = https://github.com/vim-airline/vim-airline-themes
+[submodule "bundle/vim-airline"]
+	path = bundle/vim-airline
+	url = https://github.com/vim-airline/vim-airline
+[submodule "bundle/vim-jsdoc"]
+	path = bundle/vim-jsdoc
+	url = https://github.com/heavenshell/vim-jsdoc
+[submodule "bundle/vim-rspec"]
+	path = bundle/vim-rspec
+	url = https://github.com/thoughtbot/vim-rspec
+[submodule "bundle/webapi-vim"]
+	path = bundle/webapi-vim
+	url = https://github.com/mattn/webapi-vim

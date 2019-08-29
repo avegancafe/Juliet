@@ -1,0 +1,1 @@
+../../../bundle/lexima.vim/
