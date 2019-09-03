@@ -1,0 +1,38 @@
+[alias]
+	co = checkout
+	cp = cherry-pick
+	clean-merged = "!git branch --merged | grep -v \\* | xargs git branch -D "
+	clean-branches = "!git branch | grep -v \\* | xargs git branch -D "
+	a = add
+	ad = add
+	diff-branch = !git diff $(git merge-base --fork-point master)
+	com = commit
+	aa = add -A
+	staged = diff --staged
+[push]
+	default = current
+[commit]
+	template = /Users/kyle/.gitmessage
+[core]
+	excludesfile = /Users/kyle/.global_gitignore
+	autocrlf = false
+[github]
+	user = keyboard-clacker
+[format]
+	pretty = format:%C(yellow)%h %C(cyan)%ad%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08 %C(red)%an%Cgreen%d %Creset%s
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[rebase]
+	autosquash = true
+[diff]
+	colorMoved = zebra
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[fetch]
+	prune = true
+[user]
+	email = kylelholzinger@gmail.com
+	name = kyle
