@@ -2,41 +2,17 @@ set -gx PATH "/usr/local/bin" $PATH
 set -gx CLOUDINARY_CLOUD_NAME "view-the-space"
 set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@10/bin"
-set -gx PATH $PATH "~/.local/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
 set -U FZF_LEGACY_KEYBINDINGS 0
-set -gx RUBIES "~/.rubies/*"
+set PATH $HOME/.rbenv/shims $PATH
+set fish_color_command 69f0ad
 # set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 
-# rbenv
-set --universal fish_user_paths $fish_user_paths ~/.rbenv/shims
-function __fish_rbenv_needs_command
-  set cmd (commandline -opc)
-  if [ (count $cmd) -eq 1 -a $cmd[1] = 'rbenv' ]
-    return 0
-  end
-  return 1
-end
-
-function __fish_rbenv_using_command
-  set cmd (commandline -opc)
-  if [ (count $cmd) -gt 1 ]
-    if [ $argv[1] = $cmd[2] ]
-      return 0
-    end
-  end
-  return 1
-end
-
-complete -f -c rbenv -n '__fish_rbenv_needs_command' -a '(rbenv commands)'
-for cmd in (rbenv commands)
-  complete -f -c rbenv -n "__fish_rbenv_using_command $cmd" -a \
-    "(rbenv completions (commandline -opc)[2..-1])"
-end
-
-# [endof rbenv]
-
 set -gx TERM "xterm-256color"
+
+function fish_greeting
+  fortune
+end
 
 function gut
   git $argv
@@ -139,3 +115,6 @@ end
 function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
+
+rbenv rehash >/dev/null ^&1
+eval (starship init fish)
