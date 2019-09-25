@@ -6,6 +6,7 @@ filetype indent on
 syntax on
 set mouse=a
 set relativenumber
+set noswapfile
 set number
 set numberwidth=3
 hi Directory guifg=#FF0000 ctermfg=red
