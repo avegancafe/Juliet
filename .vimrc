@@ -43,15 +43,15 @@ set tabstop=2
 "   \   '--single-quote',
 "   \ ],
 "   \}
-" let g:neoformat_javascript_prettier = {
-"   \ 'exe': 'prettier',
-"   \ 'args': [
-"   \   '--trailing-comma es5',
-"   \   '--no-semi',
-"   \   '--single-quote',
-"   \   '--print-width 80',
-"   \ ],
-"   \}
+let g:neoformat_javascript_prettier = {
+  \ 'exe': 'prettier',
+  \ 'args': [
+  \   '--trailing-comma es5',
+  \   '--no-semi',
+  \   '--single-quote',
+  \   '--print-width 80',
+  \ ],
+  \}
 let g:neoformat_enabled_javascript = ['prettier']
 let g:neoformat_try_formatprg = 1
 " Ale

@@ -1,14 +1,17 @@
 set -gx PATH "/usr/local/bin" $PATH
-set -gx CLOUDINARY_CLOUD_NAME "view-the-space"
 set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@10/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
+set -gx USE_PSEUDOLOCALIZATION "false"
 set -U FZF_LEGACY_KEYBINDINGS 0
 set PATH $HOME/.rbenv/shims $PATH
 set fish_color_command 69f0ad
 # set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 
 set -gx TERM "xterm-256color"
+
+# fzf
+fzf_key_bindings
 
 function fish_greeting
   fortune
