@@ -1,4 +1,5 @@
 set -gx PATH "/usr/local/bin" $PATH
+set -gx PATH "$HOME/.local/bin" $PATH
 set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@10/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
@@ -104,7 +105,7 @@ function ga
 end
 
 function gl
-  git log -10
+  git log -10 $argv
 end
 
 function rs
