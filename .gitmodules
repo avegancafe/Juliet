@@ -61,3 +61,6 @@
 [submodule "bundle/yajs.vim"]
 	path = bundle/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
+[submodule "bundle/oceanic-next"]
+	path = bundle/oceanic-next
+	url = ssh://git@github.com/mhartington/oceanic-next

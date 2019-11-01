@@ -1,6 +1,6 @@
 set rtp+=/usr/local/opt/fzf
 " Defaults
-syntax on
+syntax enable
 filetype plugin indent on
 set mouse=a
 set relativenumber
@@ -20,6 +20,12 @@ let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
 autocmd InsertEnter * set cul
 autocmd InsertLeave * set nocul
+
+" theme
+if (has("termguicolors"))
+  set termguicolors
+endif
+colorscheme OceanicNext
 
 " fish
 if &shell =~# 'fish$'
