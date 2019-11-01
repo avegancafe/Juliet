@@ -1,9 +1,7 @@
 set rtp+=/usr/local/opt/fzf
 " Defaults
-filetype on
-filetype plugin on
-filetype indent on
 syntax on
+filetype plugin indent on
 set mouse=a
 set relativenumber
 set noswapfile
@@ -22,6 +20,11 @@ let $NVIM_TUI_ENABLE_TRUE_COLOR=1
 let $NVIM_TUI_ENABLE_CURSOR_SHAPE = 1
 autocmd InsertEnter * set cul
 autocmd InsertLeave * set nocul
+
+" fish
+if &shell =~# 'fish$'
+    set shell=sh
+endif
 
 " Indentation
 set expandtab
@@ -65,6 +68,9 @@ let g:ale_linters = {
 augroup FiletypeGroup
     autocmd!
     au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+    au FileType fish compiler fish
+    au FileType fish setlocal textwidth=79
+    au FileType fish setlocal foldmethod=expr
 augroup END
 
 highlight MatchParen cterm=bold ctermfg=white ctermbg=black

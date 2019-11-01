@@ -55,3 +55,6 @@
 [submodule "bundle/vim-fish"]
 	path = bundle/vim-fish
 	url = https://github.com/dag/vim-fish
+[submodule "bundle/auto-pairs"]
+	path = bundle/auto-pairs
+	url = ssh://git@github.com/jiangmiao/auto-pairs
