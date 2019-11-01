@@ -58,3 +58,6 @@
 [submodule "bundle/auto-pairs"]
 	path = bundle/auto-pairs
 	url = ssh://git@github.com/jiangmiao/auto-pairs
+[submodule "bundle/yajs.vim"]
+	path = bundle/yajs.vim
+	url = ssh://git@github.com/othree/yajs.vim
