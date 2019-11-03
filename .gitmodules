@@ -43,9 +43,6 @@
 [submodule "bundle/webapi-vim"]
 	path = bundle/webapi-vim
 	url = https://github.com/mattn/webapi-vim
-[submodule "bundle/vim-jsx"]
-	path = bundle/vim-jsx
-	url = https://github.com/mxw/vim-jsx
 [submodule "bundle/vim-less"]
 	path = bundle/vim-less
 	url = https://github.com/groenewege/vim-less
@@ -64,3 +61,6 @@
 [submodule "bundle/oceanic-next"]
 	path = bundle/oceanic-next
 	url = ssh://git@github.com/mhartington/oceanic-next
+[submodule "bundle/vim-jsx-pretty"]
+	path = bundle/vim-jsx-pretty
+	url = ssh://git@github.com/MaxMEllon/vim-jsx-pretty
