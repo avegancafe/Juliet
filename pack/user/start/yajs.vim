@@ -1,1 +1,1 @@
-bundle/yajs.vim/
+../../../bundle/yajs.vim/
