@@ -122,3 +122,5 @@ end
 
 rbenv rehash >/dev/null ^&1
 eval (starship init fish)
+
+ssh-add -A 2> /dev/null
