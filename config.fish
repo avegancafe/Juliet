@@ -52,6 +52,10 @@ function update
   end
 end
 
+function vim
+  nvim $argv
+end
+
 function fish_greeting
   fortune
 end
