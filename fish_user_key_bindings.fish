@@ -32,5 +32,6 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
   echo
 
   git checkout $target
+  echo
   commandline -f repaint
 end
