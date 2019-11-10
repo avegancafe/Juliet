@@ -38,7 +38,7 @@ function update
   echo
   info "Updating installed node modules..."
   echo
-  yarn install --color=always | sed 's/^/  /'
+  yarn install | sed 's/^/  /'
   if test "$status" != "0"
     return 1
   end
