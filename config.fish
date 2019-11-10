@@ -1,7 +1,7 @@
 set -gx PATH "/usr/local/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx EDITOR "vim"
-set -gx PATH $PATH "/usr/local/opt/postgresql@10/bin"
+set -gx PATH $PATH "/usr/local/opt/postgresql@11/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
 set -gx USE_PSEUDOLOCALIZATION "false"
 set -U FZF_LEGACY_KEYBINDINGS 0
