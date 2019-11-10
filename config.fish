@@ -14,6 +14,44 @@ set -gx TERM "xterm-256color"
 # fzf
 fzf_key_bindings
 
+function info
+  printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
+end
+
+function update
+  echo
+  info "Pulling from git..."
+  echo
+  git pull | sed 's/^/  /'
+  if test "$status" != "0"
+    return 1
+  end
+
+  echo
+  info "Updating installed gems..."
+  echo
+  bundle install | sed 's/^/  /'
+  if test "$status" != "0"
+    return 1
+  end
+
+  echo
+  info "Updating installed node modules..."
+  echo
+  yarn install --color=always | sed 's/^/  /'
+  if test "$status" != "0"
+    return 1
+  end
+
+  echo
+  info "Running database migrations..."
+  echo
+  bundle exec rake db:migrate | sed 's/^/  /'
+  if test "$status" != "0"
+    return 1
+  end
+end
+
 function fish_greeting
   fortune
 end
