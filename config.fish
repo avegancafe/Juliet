@@ -50,6 +50,9 @@ function update
   if test "$status" != "0"
     return 1
   end
+
+  echo
+  info "Done!"
 end
 
 function vim
