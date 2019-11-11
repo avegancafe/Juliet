@@ -8,6 +8,7 @@ function fish_user_key_bindings
   bind \cb 'fco_preview'
 end
 
+source ~/.config/fish/functions/fzf_key_bindings.fish
 fzf_key_bindings
 
 function fco -d "Fuzzy-find and checkout a branch"
