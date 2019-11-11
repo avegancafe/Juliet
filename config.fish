@@ -13,9 +13,6 @@ set fish_color_command 69f0ad
 
 set -gx TERM "xterm-256color"
 
-# fzf
-fzf_key_bindings
-
 function info
   printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
 end
