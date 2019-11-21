@@ -21,7 +21,7 @@ function update
   echo
   info "Pulling from git..."
   echo
-  git pull | sed 's/^/  /'
+  git pull -r | sed 's/^/  /'
   if test "$status" != "0"
     return 1
   end

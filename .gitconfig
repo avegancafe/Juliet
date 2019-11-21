@@ -19,7 +19,7 @@
 [github]
 	user = keyboard-clacker
 [format]
-	pretty = format:%C(yellow)%h %C(cyan)%ad%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08 %C(red)%an%Cgreen%d %Creset%s
+	pretty = format:%C(yellow)%h %C(cyan)%ad%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08 %C(red)%<(20)%an%Cgreen%d %Creset%<(120,trunc)%s
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

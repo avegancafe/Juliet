@@ -13,7 +13,7 @@ let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 set clipboard=unnamed
-set shell=bash
+set shell=zsh
 set fdm=syntax
 set foldlevelstart=20
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
@@ -52,17 +52,18 @@ set tabstop=2
 "   \   '--single-quote',
 "   \ ],
 "   \}
-let g:neoformat_javascript_prettier = {
-  \ 'exe': 'prettier',
-  \ 'args': [
-  \   '--trailing-comma es5',
-  \   '--no-semi',
-  \   '--single-quote',
-  \   '--print-width 80',
-  \ ],
-  \}
+" let g:neoformat_javascript_prettier = {
+"   \ 'exe': 'prettier',
+"   \ 'args': [
+"   \   '--trailing-comma es5',
+"   \   '--no-semi',
+"   \   '--single-quote',
+"   \   '--print-width 80',
+"   \ ],
+"   \}
 let g:neoformat_enabled_javascript = ['prettier']
-let g:neoformat_try_formatprg = 1
+
+" let g:neoformat_try_formatprg = 1
 " Ale
 let g:ale_fixers = {
 \   'javascript': ['prettier'],
