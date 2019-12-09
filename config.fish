@@ -78,6 +78,10 @@ function rspec
   bundle exec rspec $argv
 end
 
+function dc
+  docker-compose $argv
+end
+
 function rake
   bundle exec rake $argv
 end
