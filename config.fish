@@ -21,40 +21,41 @@ function log
   printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
 end
 
+function padlines
+  echo
+  $argv
+  echo
+end
+
+function indent
+  $argv | sed 's/^/  /'
+end
+
 function update
-  echo
-  info "Pulling from git..."
-  echo
-  git pull -r | sed 's/^/  /'
+  padlines info "Pulling from git..."
+  indent git pull -r
   if test "$status" != "0"
     return 1
   end
 
-  echo
-  info "Updating installed gems..."
-  echo
-  bundle install | sed 's/^/  /'
+  padlines info "Updating installed gems..."
+  indent bundle install
   if test "$status" != "0"
     return 1
   end
 
-  echo
-  info "Updating installed node modules..."
-  echo
-  yarn install | sed 's/^/  /'
+  padlines info "Updating installed node modules..."
+  indent yarn install
   if test "$status" != "0"
     return 1
   end
 
-  echo
-  info "Running database migrations..."
-  echo
-  bundle exec rake db:migrate | sed 's/^/  /'
+  padlines info "Running database migrations..."
+  indent bundle exec rake db:migrate
   if test "$status" != "0"
     return 1
   end
 
-  echo
   info "Done!"
 end
 
