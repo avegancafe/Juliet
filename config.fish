@@ -34,64 +34,41 @@ function indent
   return $tmp_status
 end
 
-function update
+
+function update --description "Sync ruby/js project with git"
   argparse --name="update" 'd/debug' -- $argv
-  if test -n "$_flag_debug"
-    _debug_update
-  else
-    _short_update
-  end
-end
 
-function _debug_update
-  padlines log "Pulling from git..."
-  git pull -r
-  if test "$status" != "0"
-    return 1
+  function run_command --inherit-variable _flag_d
+    if test -n "$_flag_d"
+      $argv
+    else
+      $argv > /dev/null
+    end
+
+    return $status
   end
 
-  padlines info "Updating installed gems..."
-  bundle install
-  if test "$status" != "0"
-    return 1
-  end
-
-  padlines info "Updating installed node modules..."
-  yarn install
-  if test "$status" != "0"
-    return 1
-  end
-
-  padlines log "Running database migrations..."
-  bundle exec rake db:migrate
-  if test "$status" != "0"
-    return 1
-  end
-
-  info "Done!"
-end
-
-function _short_update
   log "Pulling from git..."
-  git pull -r > /dev/null
+  run_command git pull -r
+
   if test "$status" != "0"
     return 1
   end
 
   info "Updating installed gems..."
-  bundle install > /dev/null
+  run_command bundle install
   if test "$status" != "0"
     return 1
   end
 
   info "Updating installed node modules..."
-  yarn install > /dev/null
+  run_command yarn install
   if test "$status" != "0"
     return 1
   end
 
   log "Running database migrations..."
-  bundle exec rake db:migrate > /dev/null
+  run_command bundle exec rake db:migrate
   if test "$status" != "0"
     return 1
   end
