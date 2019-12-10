@@ -1,7 +1,3 @@
-function info
-  printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
-end
-
 function fish_user_key_bindings
   bind \cl 'echo \e\]1337\;ClearScrollback\x7; clear; commandline -f repaint'
   bind \cc 'commandline ""'

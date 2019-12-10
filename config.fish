@@ -14,6 +14,10 @@ set fish_color_command 69f0ad
 set -gx TERM "xterm-256color"
 
 function info
+  printf (tput setaf 2)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
+end
+
+function log
   printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
 end
 
