@@ -21,6 +21,10 @@ function log
   printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
 end
 
+function error
+  printf (tput setaf 1)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
+end
+
 function padlines
   echo
   $argv
@@ -38,39 +42,39 @@ end
 function update --description "Sync ruby/js project with git"
   argparse --name="update" 'd/debug' -- $argv
 
-  function run_command --inherit-variable _flag_d
-    if test -n "$_flag_d"
-      $argv
-    else
-      $argv > /dev/null
-    end
+  set -l out_stream
+  if test -n "$_flag_d"
+    set out_stream /dev/tty
+  else
+    set out_stream /dev/null
+  end
 
-    return $status
+  function fail
+    error "Fail :("
   end
 
   log "Pulling from git..."
-  run_command git pull -r
-
-  if test "$status" != "0"
-    return 1
+  git pull -r > $out_stream || begin;
+    fail
+    return
   end
 
   info "Updating installed gems..."
-  run_command bundle install
-  if test "$status" != "0"
-    return 1
+  bundle install > $out_stream || begin;
+    fail
+    return
   end
 
   info "Updating installed node modules..."
-  run_command yarn install
-  if test "$status" != "0"
-    return 1
+  yarn install > $out_stream || begin;
+    fail
+    return
   end
 
   log "Running database migrations..."
-  run_command bundle exec rake db:migrate
-  if test "$status" != "0"
-    return 1
+  bundle exec rake db:migrate > $out_stream || begin;
+    fail
+    return
   end
 
   info "Done!"
