@@ -62,6 +62,7 @@ set tabstop=2
 "   \ ],
 "   \}
 let g:neoformat_enabled_javascript = ['prettier']
+let g:neoformat_enabled_ruby = ['prettier']
 
 " let g:neoformat_try_formatprg = 1
 " Ale
