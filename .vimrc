@@ -41,30 +41,6 @@ set autoindent
 set smartindent
 set tabstop=2
 
-" Neoformat
-" let g:neoformat_javascript_prettier = {
-"   \ 'exe': 'prettier',
-"   \ 'args': [
-"   \   '--semi',
-"   \   '--print-width 100',
-"   \   '--arrow-parens always',
-"   \   '--trailing-comma es5',
-"   \   '--single-quote',
-"   \ ],
-"   \}
-" let g:neoformat_javascript_prettier = {
-"   \ 'exe': 'prettier',
-"   \ 'args': [
-"   \   '--trailing-comma es5',
-"   \   '--no-semi',
-"   \   '--single-quote',
-"   \   '--print-width 80',
-"   \ ],
-"   \}
-let g:neoformat_enabled_javascript = ['prettier']
-let g:neoformat_enabled_ruby = ['prettier']
-
-" let g:neoformat_try_formatprg = 1
 " Ale
 let g:ale_fixers = {
 \   'javascript': ['prettier'],
@@ -101,7 +77,8 @@ nnoremap cw :let @*=expand("%")<cr>
 nnoremap <silent> <c-g> :FZFMru<cr>
 nnoremap <silent> <c-f> :Goyo<cr>
 nnoremap <silent> <c-h> <c-w>h
-nnoremap <silent> <leader>f :Neoformat<cr>
+" nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
+nnoremap <silent> <leader>f :PrettierAsync<cr>
 nnoremap <leader>s :call RunNearestSpec()<cr>
 nnoremap <c-e> :ALEFix<cr>
 command! -bang -nargs=? -complete=dir GFiles

@@ -19,9 +19,6 @@
 [submodule "bundle/loupe"]
 	path = bundle/loupe
 	url = https://github.com/wincent/loupe
-[submodule "bundle/neoformat"]
-	path = bundle/neoformat
-	url = https://github.com/sbdchd/neoformat
 [submodule "bundle/nerdtree"]
 	path = bundle/nerdtree
 	url = https://github.com/scrooloose/nerdtree
@@ -64,3 +61,6 @@
 [submodule "bundle/vim-jsx-pretty"]
 	path = bundle/vim-jsx-pretty
 	url = ssh://git@github.com/MaxMEllon/vim-jsx-pretty
+[submodule "bundle/vim-prettier"]
+	path = bundle/vim-prettier
+	url = https://github.com/prettier/vim-prettier

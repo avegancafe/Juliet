@@ -77,7 +77,7 @@ function update --description "Sync ruby/js project with git"
     return
   end
 
-  info "Done!"
+  log "Done!"
 end
 
 function vim

@@ -28,10 +28,26 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
   set target (echo $raw_target | awk '{print $2}')
 
   echo
-  info "Checking out $target..."
+  log "Checking out $target..."
   echo
 
   git checkout $target
   echo
   commandline -f repaint
+end
+
+function fkill -d "Fuzzy-find process and kill it"
+  set -l fzf_args --reverse --height 40% --no-hscroll -n 8 --ansi --multi
+  set -l pid
+
+  if test (id -u) -eq 0
+    set pid (ps -f -u $UID | sed 1d | fzf $fzf_args | awk '{print $2}')
+  else
+    set pid (ps -ef | sed 1d | fzf $fzf_args | awk '{print $2}')
+  end
+
+  set -l process_name (ps -o command= -p $pid)
+
+  log "Killing '$process_name'..."
+  echo $pid | xargs kill -9
 end
