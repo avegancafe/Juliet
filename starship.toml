@@ -1,2 +1,5 @@
 [package]
 disabled = true
+
+[nodejs]
+disabled = true

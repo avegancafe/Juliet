@@ -2,6 +2,7 @@ source ~/.config/fish/env.fish 2> /dev/null
 
 set -gx PATH "/usr/local/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
+set -gx PATH "$HOME/.config/yarn/global/node_modules/bin" $PATH
 set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@11/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
@@ -9,7 +10,7 @@ set -gx USE_PSEUDOLOCALIZATION "false"
 set -U FZF_LEGACY_KEYBINDINGS 0
 set PATH $HOME/.rbenv/shims $PATH
 set fish_color_command 69f0ad
-# set -gx FZF_DEFAULT_COMMAND "ag -g ''"
+set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 
 set -gx TERM "xterm-256color"
 
@@ -153,10 +154,10 @@ function migrate
   switch (echo $argv[1])
   case "up"
     echo "Migrating "(echo $version_number)" "(echo $argv[1])"..."
-    bundle exec rake data:migrate:up VERSION=$version_number
+    bundle exec rake db:migrate:up VERSION=$version_number
   case "down"
     echo "Migrating "(echo $version_number)" "(echo $argv[1])"..."
-    bundle exec rake data:migrate:down VERSION=$version_number
+    bundle exec rake db:migrate:down VERSION=$version_number
   case "*"
     echo "Usage: migrate [up|down] /path/to/migration_file"
   end

@@ -64,3 +64,6 @@
 [submodule "bundle/vim-prettier"]
 	path = bundle/vim-prettier
 	url = https://github.com/prettier/vim-prettier
+[submodule "bundle/vim-surround"]
+	path = bundle/vim-surround
+	url = https://github.com/tpope/vim-surround

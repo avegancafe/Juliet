@@ -9,6 +9,8 @@
 	com = commit
 	aa = add -A
 	staged = diff --staged
+	up = push
+	down = pull
 [push]
 	default = current
 [commit]
