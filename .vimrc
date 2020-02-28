@@ -52,6 +52,7 @@ let g:ale_linters = {
 augroup FiletypeGroup
     autocmd!
     au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+    au BufRead,BufNewFile *.md setlocal textwidth=80
     au FileType fish compiler fish
     au FileType fish setlocal textwidth=79
     au FileType fish setlocal foldmethod=expr
@@ -63,6 +64,8 @@ highlight MatchParen cterm=bold ctermfg=white ctermbg=black
 nnoremap K <nop>
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
+" nnoremap <leader>t :put =strftime('%FT%T%z')<cr>
+nmap <leader>t i<C-R>=strftime("%FT%T%z")<CR><Esc>
 nnoremap <leader>' viw<esc>a"<esc>bi"<esc>el
 nnoremap H ^
 nnoremap L g$

@@ -7,6 +7,7 @@ set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@11/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
 set -gx USE_PSEUDOLOCALIZATION "false"
+set -gx GPG_TTY (tty)
 set -U FZF_LEGACY_KEYBINDINGS 0
 set PATH $HOME/.rbenv/shims $PATH
 set fish_color_command 69f0ad
