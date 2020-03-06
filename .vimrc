@@ -52,6 +52,7 @@ let g:ale_linters = {
 augroup FiletypeGroup
     autocmd!
     au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+    au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
     au BufRead,BufNewFile *.md setlocal textwidth=80
     au FileType fish compiler fish
     au FileType fish setlocal textwidth=79
@@ -60,32 +61,34 @@ augroup END
 
 highlight MatchParen cterm=bold ctermfg=white ctermbg=black
 
+let g:fzf_command_prefix = 'Fzf'
+
 " Normal mappings
 nnoremap K <nop>
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 " nnoremap <leader>t :put =strftime('%FT%T%z')<cr>
-nmap <leader>t i<C-R>=strftime("%FT%T%z")<CR><Esc>
+nmap <leader>t a<C-R>=strftime("%Y-%m-%d")<CR><Esc>
 nnoremap <leader>' viw<esc>a"<esc>bi"<esc>el
 nnoremap H ^
 nnoremap L g$
 nnoremap q: <nop>
 nnoremap <leader>d :g/;;/d<cr>
 nnoremap <silent> <leader>l :exec &number == 0 ? "set number norelativenumber" : "set relativenumber nonumber"<cr>
-nnoremap <silent> <c-p> :GFiles<cr>
-nnoremap <silent> <c-b> :Buffers<cr>
+nnoremap <silent> <c-p> :FzfFiles<cr>
+nnoremap <silent> <c-b> :FzfBuffers<cr>
 nnoremap <c-o> :w<cr>
 nnoremap cq :let @*=expand("%:p")<cr>
 nnoremap cw :let @*=expand("%")<cr>
-nnoremap <silent> <c-g> :FZFMru<cr>
+nnoremap <silent> <c-g> :History<cr>
 nnoremap <silent> <c-f> :Goyo<cr>
 nnoremap <silent> <c-h> <c-w>h
 " nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
 nnoremap <silent> <leader>f :PrettierAsync<cr>
 nnoremap <leader>s :call RunNearestSpec()<cr>
 nnoremap <c-e> :ALEFix<cr>
-command! -bang -nargs=? -complete=dir GFiles
-  \ call fzf#vim#gitfiles(<q-args>, fzf#vim#with_preview(), <bang>0)
+command! -bang -nargs=? -complete=dir FzfFiles
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
 " nmap <silent> <leader>l ?function<cr>:noh<cr><Plug>(jsdoc)
 " nmap <silent> <leader>d <Plug>(jsdoc)
 
