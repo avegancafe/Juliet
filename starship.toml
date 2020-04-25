@@ -3,3 +3,6 @@ disabled = true
 
 [nodejs]
 disabled = true
+
+[character]
+symbol = "λ"
