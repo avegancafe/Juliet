@@ -1,5 +1,9 @@
 #! /bin/bash
 
+setup_git() {
+  [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.vim/.gitconfig ~/
+}
+
 setup_dependencies() {
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   brew bundle
@@ -10,10 +14,18 @@ setup_fzf() {
 }
 
 setup_vim() {
-  ln -sfv ~/.vim/.vimrc ~/
-  ln -sfv ~/.vim ~/.config/nvim
+  [[ ! -f ~/.vimrc ]] && ln -sfv ~/.vim/.vimrc ~/
+  [[ ! -d ~/.config/nvim ]] && ln -sfv ~/.vim ~/.config/nvim
 }
 
+setup_fish() {
+  ln -sfv ~/.vim/fish/config.fish ~/.config/fish/
+  mkdir -p ~/.config/fish/functions
+  ln -sfv ~/.vim/fish/fish_user_key_bindings.fish ~/.config/fish/functions
+}
+
+setup_git
 setup_dependencies
 setup_fzf
 setup_vim
+setup_fish

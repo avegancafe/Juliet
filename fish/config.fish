@@ -15,23 +15,7 @@ set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 
 set -gx TERM "xterm-256color"
 
-function info
-  printf (tput setaf 2)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
-end
-
-function log
-  printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
-end
-
-function error
-  printf (tput setaf 1)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
-end
-
-function padlines
-  echo
-  $argv
-  echo
-end
+source ~/.vim/fish/_util.fish
 
 function indent
   set -l output ($argv)
@@ -200,6 +184,8 @@ function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
 
+status --is-interactive; and source (rbenv init -|psub)
+source ~/.vim/fish/auto-install-ruby-with-rbenv.fish
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null
