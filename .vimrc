@@ -80,7 +80,7 @@ nnoremap <silent> <c-b> :FzfBuffers<cr>
 nnoremap <c-o> :w<cr>
 nnoremap cq :let @*=expand("%:p")<cr>
 nnoremap cw :let @*=expand("%")<cr>
-nnoremap <silent> <c-g> :History<cr>
+nnoremap <silent> <c-g> :FzfHistory<cr>
 nnoremap <silent> <c-f> :Goyo<cr>
 nnoremap <silent> <c-h> <c-w>h
 " nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
@@ -106,14 +106,15 @@ cnoreabbrev gist Gist
 cnoreabbrev lc lclose
 cnoreabbrev lo lopen
 cnoreabbrev qf q!
-cnoreabbrev ag Ag
+cnoreabbrev ag FzfAg
 
 " Insert Mappings
 inoremap <c-c> <Esc>
 
 " NERDtree
-nmap <c-n> :NERDTreeToggle<cr>
-nmap <c-l> :NERDTreeFind<cr>
+nnoremap <c-n> :NERDTree<cr>
+nnoremap <c-m> :NERDTreeClose<cr>
+nnoremap <c-\> :NERDTreeFind<cr>
 
 " airline
 let g:airline#extensions#ale#enabled = 1

@@ -86,6 +86,10 @@ function vim
   nvim $argv
 end
 
+function follower
+  heroku pg:psql FOLLOWER_DATABASE_URL -a vts-private-us-east
+end
+
 function fish_greeting
   fortune
 end
