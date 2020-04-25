@@ -67,3 +67,6 @@
 [submodule "bundle/vim-surround"]
 	path = bundle/vim-surround
 	url = https://github.com/tpope/vim-surround
+[submodule "etc/iterm2-material-design"]
+	path = etc/iterm2-material-design
+	url = https://github.com/MartinSeeler/iterm2-material-design

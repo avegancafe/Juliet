@@ -200,7 +200,6 @@ function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
 
-rbenv rehash >/dev/null ^&1
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null

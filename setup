@@ -1,0 +1,19 @@
+#! /bin/bash
+
+setup_dependencies() {
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  brew bundle
+}
+
+setup_fzf() {
+  /usr/local/opt/fzf/install
+}
+
+setup_vim() {
+  ln -sfv ~/.vim/.vimrc ~/
+  ln -sfv ~/.vim ~/.config/nvim
+}
+
+setup_dependencies
+setup_fzf
+setup_vim
