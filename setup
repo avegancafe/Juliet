@@ -25,8 +25,13 @@ setup_fish() {
   ln -sfv ~/.vim/starship.toml ~/.config/
 }
 
+setup_gpg() {
+  echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+}
+
 setup_git
 setup_dependencies
 setup_fzf
 setup_vim
 setup_fish
+setup_gpg
