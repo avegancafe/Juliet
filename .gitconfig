@@ -15,13 +15,15 @@
 	default = current
 [commit]
 	template = /Users/kyle/.gitmessage
+	gpgsign = true
 [core]
 	excludesfile = /Users/kyle/.global_gitignore
 	autocrlf = false
 [github]
 	user = keyboard-clacker
 [format]
-	pretty = format:%C(yellow)%h %C(cyan)%ad%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08%x08 %C(red)%<(20)%an%Cgreen%d %Creset%<(120,trunc)%s
+  # the %x08's are delete characters
+	pretty = format:%C(yellow)%h %Creset-- %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08 %Creset-- %C(red)%<(15)%an %Creset%<(100,trunc)%s
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
@@ -38,3 +40,4 @@
 [user]
 	email = kylelholzinger@gmail.com
 	name = kyle
+	signingkey = AFDE3DEEE90823D8
