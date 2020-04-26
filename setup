@@ -22,6 +22,7 @@ setup_fish() {
   ln -sfv ~/.vim/fish/config.fish ~/.config/fish/
   mkdir -p ~/.config/fish/functions
   ln -sfv ~/.vim/fish/fish_user_key_bindings.fish ~/.config/fish/functions
+  ln -sfv ~/.vim/starship.toml ~/.config/
 }
 
 setup_git

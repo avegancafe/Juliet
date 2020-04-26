@@ -3,6 +3,7 @@ brew 'rbenv'
 brew 'nodenv'
 brew 'starship'
 brew 'fortune'
+brew 'postgresql'
 
 # applications
 tap "homebrew/cask"

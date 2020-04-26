@@ -4,7 +4,7 @@ set -gx PATH "/usr/local/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/.config/yarn/global/node_modules/bin" $PATH
 set -gx EDITOR "vim"
-set -gx PATH $PATH "/usr/local/opt/postgresql@11/bin"
+set -gx PATH $PATH "/usr/local/opt/postgresql@12/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
 set -gx USE_PSEUDOLOCALIZATION "false"
 set -gx GPG_TTY (tty)
