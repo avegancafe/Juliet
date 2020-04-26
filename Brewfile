@@ -4,7 +4,8 @@ brew 'nodenv'
 brew 'starship'
 brew 'fortune'
 brew 'postgresql'
-brew 'gpg'
+brew 'gnupg'
+brew 'pinentry-mac'
 
 # applications
 tap "homebrew/cask"
