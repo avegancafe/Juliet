@@ -189,3 +189,6 @@ source ~/.vim/fish/auto-install-ruby-with-rbenv.fish
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null
+
+# opam configuration
+source /Users/kyle/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true

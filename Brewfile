@@ -15,5 +15,7 @@ cask 'google-chrome'
 cask 'brave-browser'
 cask 'slack'
 cask 'visual-studio-code'
+cask 'github'
+cask 'sourcetree'
 
 brew 'fzf'

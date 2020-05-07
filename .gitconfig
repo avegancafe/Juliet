@@ -17,7 +17,7 @@
 	template = /Users/kyle/.gitmessage
 	gpgsign = true
 [core]
-	excludesfile = /Users/kyle/.global_gitignore
+	excludesfile = /Users/kyle/.gitignore_global
 	autocrlf = false
 [github]
 	user = keyboard-clacker
@@ -41,3 +41,9 @@
 	email = kylelholzinger@gmail.com
 	name = kyle
 	signingkey = AFDE3DEEE90823D8
+[difftool "sourcetree"]
+	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+	path = 
+[mergetool "sourcetree"]
+	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	trustExitCode = true
