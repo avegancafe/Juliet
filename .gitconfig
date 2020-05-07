@@ -16,6 +16,8 @@
 [commit]
 	template = /Users/kyle/.gitmessage
 	gpgsign = true
+[gpg]
+  program = /usr/local/MacGPG2/bin/gpg
 [core]
 	excludesfile = /Users/kyle/.gitignore_global
 	autocrlf = false
