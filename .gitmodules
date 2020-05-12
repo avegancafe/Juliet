@@ -1,72 +1,75 @@
-[submodule "bundle/ale"]
-	path = bundle/ale
+[submodule "pack/user/start/ale"]
+	path = pack/user/start/ale
 	url = https://github.com/dense-analysis/ale
-[submodule "bundle/committia.vim"]
-	path = bundle/committia.vim
+[submodule "pack/user/start/committia.vim"]
+	path = pack/user/start/committia.vim
 	url = https://github.com/rhysd/committia.vim
-[submodule "bundle/fzf.vim"]
-	path = bundle/fzf.vim
+[submodule "pack/user/start/fzf.vim"]
+	path = pack/user/start/fzf.vim
 	url = https://github.com/junegunn/fzf.vim
-[submodule "bundle/gist-vim"]
-	path = bundle/gist-vim
+[submodule "pack/user/start/gist-vim"]
+	path = pack/user/start/gist-vim
 	url = https://github.com/mattn/gist-vim
-[submodule "bundle/goyo.vim"]
-	path = bundle/goyo.vim
+[submodule "pack/user/start/goyo.vim"]
+	path = pack/user/start/goyo.vim
 	url = https://github.com/junegunn/goyo.vim
-[submodule "bundle/lexima.vim"]
-	path = bundle/lexima.vim
+[submodule "pack/user/start/lexima.vim"]
+	path = pack/user/start/lexima.vim
 	url = https://github.com/cohama/lexima.vim
-[submodule "bundle/loupe"]
-	path = bundle/loupe
+[submodule "pack/user/start/loupe"]
+	path = pack/user/start/loupe
 	url = https://github.com/wincent/loupe
-[submodule "bundle/nerdtree"]
-	path = bundle/nerdtree
+[submodule "pack/user/start/nerdtree"]
+	path = pack/user/start/nerdtree
 	url = https://github.com/scrooloose/nerdtree
-[submodule "bundle/rainbow"]
-	path = bundle/rainbow
+[submodule "pack/user/start/rainbow"]
+	path = pack/user/start/rainbow
 	url = https://github.com/luochen1990/rainbow
-[submodule "bundle/vim-airline-themes"]
-	path = bundle/vim-airline-themes
+[submodule "pack/user/start/vim-airline-themes"]
+	path = pack/user/start/vim-airline-themes
 	url = https://github.com/vim-airline/vim-airline-themes
-[submodule "bundle/vim-airline"]
-	path = bundle/vim-airline
+[submodule "pack/user/start/vim-airline"]
+	path = pack/user/start/vim-airline
 	url = https://github.com/vim-airline/vim-airline
-[submodule "bundle/vim-jsdoc"]
-	path = bundle/vim-jsdoc
+[submodule "pack/user/start/vim-jsdoc"]
+	path = pack/user/start/vim-jsdoc
 	url = https://github.com/heavenshell/vim-jsdoc
-[submodule "bundle/vim-rspec"]
-	path = bundle/vim-rspec
+[submodule "pack/user/start/vim-rspec"]
+	path = pack/user/start/vim-rspec
 	url = https://github.com/thoughtbot/vim-rspec
-[submodule "bundle/webapi-vim"]
-	path = bundle/webapi-vim
+[submodule "pack/user/start/webapi-vim"]
+	path = pack/user/start/webapi-vim
 	url = https://github.com/mattn/webapi-vim
-[submodule "bundle/vim-less"]
-	path = bundle/vim-less
+[submodule "pack/user/start/vim-less"]
+	path = pack/user/start/vim-less
 	url = https://github.com/groenewege/vim-less
-[submodule "bundle/vim-exchange"]
-	path = bundle/vim-exchange
+[submodule "pack/user/start/vim-exchange"]
+	path = pack/user/start/vim-exchange
 	url = https://github.com/tommcdo/vim-exchange
-[submodule "bundle/vim-fish"]
-	path = bundle/vim-fish
+[submodule "pack/user/start/vim-fish"]
+	path = pack/user/start/vim-fish
 	url = https://github.com/dag/vim-fish
-[submodule "bundle/auto-pairs"]
-	path = bundle/auto-pairs
+[submodule "pack/user/start/auto-pairs"]
+	path = pack/user/start/auto-pairs
 	url = ssh://git@github.com/jiangmiao/auto-pairs
-[submodule "bundle/yajs.vim"]
-	path = bundle/yajs.vim
+[submodule "pack/user/start/yajs.vim"]
+	path = pack/user/start/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
-[submodule "bundle/oceanic-next"]
-	path = bundle/oceanic-next
+[submodule "pack/user/start/oceanic-next"]
+	path = pack/user/start/oceanic-next
 	url = ssh://git@github.com/mhartington/oceanic-next
-[submodule "bundle/vim-jsx-pretty"]
-	path = bundle/vim-jsx-pretty
+[submodule "pack/user/start/vim-jsx-pretty"]
+	path = pack/user/start/vim-jsx-pretty
 	url = ssh://git@github.com/MaxMEllon/vim-jsx-pretty
-[submodule "bundle/vim-prettier"]
-	path = bundle/vim-prettier
+[submodule "pack/user/start/vim-prettier"]
+	path = pack/user/start/vim-prettier
 	url = https://github.com/prettier/vim-prettier
-[submodule "bundle/vim-surround"]
-	path = bundle/vim-surround
+[submodule "pack/user/start/vim-surround"]
+	path = pack/user/start/vim-surround
 	url = https://github.com/tpope/vim-surround
 [submodule "etc/iterm2-material-design"]
 	path = etc/iterm2-material-design
 	url = https://github.com/MartinSeeler/iterm2-material-design
+[submodule "pack/user/start/indentLine"]
+	path = pack/user/start/indentLine
+	url = https://github.com/Yggdroot/indentLine

@@ -17,5 +17,6 @@ cask 'slack'
 cask 'visual-studio-code'
 cask 'github'
 cask 'sourcetree'
+cask 'vlc'
 
 brew 'fzf'
