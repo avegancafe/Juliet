@@ -192,3 +192,6 @@ ssh-add -A 2> /dev/null
 
 # opam configuration
 source /Users/kyle/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
+
+# nodenv config
+status --is-interactive; and source (nodenv init -|psub)

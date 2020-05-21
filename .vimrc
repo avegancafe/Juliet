@@ -64,11 +64,15 @@ highlight MatchParen cterm=bold ctermfg=white ctermbg=black
 let g:fzf_command_prefix = 'Fzf'
 
 " Normal mappings
+map <leader>t :call RunCurrentSpecFile()<CR>
+map <leader>s :call RunNearestSpec()<CR>
+map <leader>r :call RunLastSpec()<CR>
+
 nnoremap K <nop>
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 " nnoremap <leader>t :put =strftime('%FT%T%z')<cr>
-nmap <leader>t a<C-R>=strftime("%Y-%m-%d")<CR><Esc>
+" nmap <leader>t a<C-R>=strftime("%Y-%m-%d")<CR><Esc>
 nnoremap <leader>' viw<esc>a"<esc>bi"<esc>el
 nnoremap H ^
 nnoremap L g$
@@ -169,6 +173,13 @@ function! g:committia_hooks.edit_open(info)
 endfunction
 " gist.vim
 let g:gist_show_privates = 1
+
+" indentLines
+let g:indentLine_char_list = ['|', '¦', '┆', '┊']
+
+" rspec
+let g:rspec_command = "!bundle exec rspec --drb {spec}"
+
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
 let s:opam_share_dir = system("opam config var share")
 let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')

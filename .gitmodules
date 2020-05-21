@@ -73,3 +73,6 @@
 [submodule "pack/user/start/indentLine"]
 	path = pack/user/start/indentLine
 	url = https://github.com/Yggdroot/indentLine
+[submodule "pack/user/start/tern_for_vim"]
+	path = pack/user/start/tern_for_vim
+	url = https://github.com/ternjs/tern_for_vim
