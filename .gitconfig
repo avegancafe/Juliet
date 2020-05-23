@@ -16,8 +16,6 @@
 [commit]
 	template = /Users/kyle/.gitmessage
 	gpgsign = true
-[gpg]
-  program = /usr/local/MacGPG2/bin/gpg
 [core]
 	excludesfile = /Users/kyle/.gitignore_global
 	autocrlf = false
@@ -42,7 +40,7 @@
 [user]
 	email = kylelholzinger@gmail.com
 	name = kyle
-	signingkey = AFDE3DEEE90823D8
+	signingkey = B3363C81FBAA76D1
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 

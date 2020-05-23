@@ -1,15 +1,17 @@
 source ~/.config/fish/env.fish 2> /dev/null
 
 set -gx PATH "/usr/local/bin" $PATH
-set -gx PATH "$HOME/.local/bin" $PATH
-set -gx PATH "$HOME/.config/yarn/global/node_modules/bin" $PATH
+# set -gx PATH "$HOME/.local/bin" $PATH
+set -gx PATH "$HOME/.yarn/bin" $PATH
 set -gx EDITOR "vim"
-set -gx PATH $PATH "/usr/local/opt/postgresql@12/bin"
+# set -gx PATH $PATH "/usr/local/opt/postgresql@12/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
 set -gx USE_PSEUDOLOCALIZATION "false"
 set -gx GPG_TTY (tty)
 set -U FZF_LEGACY_KEYBINDINGS 0
-set PATH $HOME/.rbenv/shims $PATH
+# set PATH $HOME/.rbenv/bin $PATH
+# set PATH $HOME/.rbenv/shims $PATH
+set PATH $HOME/.nodenv/bin $PATH
 set fish_color_command 69f0ad
 set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 
@@ -40,25 +42,25 @@ function update --description "Sync ruby/js project with git"
   end
 
   log "Pulling from git..."
-  git pull -r > $out_stream || begin;
+  git pull -r > $out_stream ; or begin;
     fail
     return
   end
 
   info "Updating installed gems..."
-  bundle install > $out_stream || begin;
+  bundle install > $out_stream ; or begin;
     fail
     return
   end
 
   info "Updating installed node modules..."
-  yarn install > $out_stream || begin;
+  yarn install > $out_stream ; or begin;
     fail
     return
   end
 
   log "Running database migrations..."
-  bundle exec rake db:migrate > $out_stream || begin;
+  bundle exec rake db:migrate > $out_stream ; or begin;
     fail
     return
   end
@@ -83,7 +85,7 @@ function gut
 end
 
 function ch
-  yarn lint && yarn test --runInBand && bundle exec rubocop && yarn lint:ruby && bundle exec rspec && echo -e "\033[41m\033[37m\nGREAT SUCCESS\n\033[0m"
+  yarn lint ; and yarn test --runInBand ; and bundle exec rubocop ; and yarn lint:ruby ; and bundle exec rspec ; and echo -e "\033[41m\033[37m\nGREAT SUCCESS\n\033[0m"
 end
 
 function rails
@@ -184,14 +186,14 @@ function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
 
-status --is-interactive; and source (rbenv init -|psub)
-source ~/.vim/fish/auto-install-ruby-with-rbenv.fish
+# status --is-interactive; and source (rbenv init -|psub)
+# source ~/.vim/fish/auto-install-ruby-with-rbenv.fish
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null
 
 # opam configuration
-source /Users/kyle/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
+# source /Users/kyle/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
 
 # nodenv config
-status --is-interactive; and source (nodenv init -|psub)
+# status --is-interactive; and source (nodenv init -|psub)

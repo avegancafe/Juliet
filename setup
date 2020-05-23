@@ -19,6 +19,7 @@ setup_vim() {
 }
 
 setup_fish() {
+  curl -fsSL https://starship.rs/install.sh | bash
   ln -sfv ~/.vim/fish/config.fish ~/.config/fish/
   mkdir -p ~/.config/fish/functions
   ln -sfv ~/.vim/fish/fish_user_key_bindings.fish ~/.config/fish/functions
@@ -30,8 +31,8 @@ setup_gpg() {
 }
 
 setup_git
-setup_dependencies
-setup_fzf
+# setup_dependencies
+# setup_fzf
 setup_vim
 setup_fish
-setup_gpg
+# setup_gpg

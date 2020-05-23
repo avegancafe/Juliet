@@ -1,1 +1,1 @@
-/Users/kyle/.vim/.vimrc
+/home/kyle/.vim/.vimrc
