@@ -34,9 +34,6 @@
 [submodule "pack/user/start/vim-jsdoc"]
 	path = pack/user/start/vim-jsdoc
 	url = https://github.com/heavenshell/vim-jsdoc
-[submodule "pack/user/start/vim-rspec"]
-	path = pack/user/start/vim-rspec
-	url = https://github.com/thoughtbot/vim-rspec
 [submodule "pack/user/start/webapi-vim"]
 	path = pack/user/start/webapi-vim
 	url = https://github.com/mattn/webapi-vim
@@ -76,3 +73,9 @@
 [submodule "pack/user/start/tern_for_vim"]
 	path = pack/user/start/tern_for_vim
 	url = https://github.com/ternjs/tern_for_vim
+[submodule "pack/user/start/vim-test"]
+	path = pack/user/start/vim-test
+	url = https://github.com/vim-test/vim-test
+[submodule "pack/user/start/neoterm"]
+	path = pack/user/start/neoterm
+	url = https://github.com/kassio/neoterm

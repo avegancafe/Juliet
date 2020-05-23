@@ -1,4 +1,9 @@
 set rtp+=/usr/local/opt/fzf
+
+filetype off
+set nocompatible
+let &runtimepath.=',~/.vim/pack/user/start/neoterm'
+
 " Defaults
 syntax enable
 filetype plugin indent on
@@ -13,7 +18,7 @@ let &t_SI = "\<Esc>]50;CursorShape=1\x7"
 let &t_SR = "\<Esc>]50;CursorShape=2\x7"
 let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 set clipboard=unnamed
-set shell=zsh
+set shell=fish
 set fdm=syntax
 set foldlevelstart=20
 let $NVIM_TUI_ENABLE_TRUE_COLOR=1
@@ -26,11 +31,6 @@ if (has("termguicolors"))
   set termguicolors
 endif
 colorscheme OceanicNext
-
-" fish
-if &shell =~# 'fish$'
-    set shell=sh
-endif
 
 " Indentation
 set expandtab
@@ -64,9 +64,10 @@ highlight MatchParen cterm=bold ctermfg=white ctermbg=black
 let g:fzf_command_prefix = 'Fzf'
 
 " Normal mappings
-map <leader>t :call RunCurrentSpecFile()<CR>
-map <leader>s :call RunNearestSpec()<CR>
-map <leader>r :call RunLastSpec()<CR>
+map t<leader>f :TestFile<cr>
+map t<leader>l :TestLast<cr>
+
+map <leader>t :Tnew<cr>
 
 nnoremap K <nop>
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
@@ -89,7 +90,6 @@ nnoremap <silent> <c-f> :Goyo<cr>
 nnoremap <silent> <c-h> <c-w>h
 " nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
 nnoremap <silent> <leader>f :PrettierAsync<cr>
-nnoremap <leader>s :call RunNearestSpec()<cr>
 nnoremap <c-e> :ALEFix<cr>
 command! -bang -nargs=? -complete=dir FzfFiles
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
@@ -179,6 +179,11 @@ let g:indentLine_char_list = ['|', '¦', '┆', '┊']
 
 " rspec
 let g:rspec_command = "!bundle exec rspec --drb {spec}"
+
+" vim-test
+let test#strategy = "neoterm"
+let g:neoterm_default_mod = 'rightbelow'
+let g:neoterm_autoinsert = 1
 
 " ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
 let s:opam_share_dir = system("opam config var share")
