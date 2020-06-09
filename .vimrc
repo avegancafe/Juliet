@@ -69,7 +69,7 @@ map t<leader>l :TestLast<cr>
 
 map <leader>t :Tnew<cr>
 
-nnoremap K <nop>
+nnoremap <silent> K :call LanguageClient_contextMenu()<CR>
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 " nnoremap <leader>t :put =strftime('%FT%T%z')<cr>
@@ -171,6 +171,7 @@ function! g:committia_hooks.edit_open(info)
     nmap <buffer><c-n> <Plug>(committia-scroll-diff-down-half)
     nmap <buffer><c-u> <Plug>(committia-scroll-diff-up-half)
 endfunction
+
 " gist.vim
 let g:gist_show_privates = 1
 
@@ -185,38 +186,15 @@ let test#strategy = "neoterm"
 let g:neoterm_default_mod = 'rightbelow'
 let g:neoterm_autoinsert = 1
 
-" ## added by OPAM user-setup for vim / base ## 93ee63e278bdfc07d1139a748ed3fff2 ## you can edit, but keep this line
-let s:opam_share_dir = system("opam config var share")
-let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
-
-let s:opam_configuration = {}
-
-function! OpamConfOcpIndent()
-  execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
-endfunction
-let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
-
-function! OpamConfOcpIndex()
-  execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
-endfunction
-let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
-
-function! OpamConfMerlin()
-  let l:dir = s:opam_share_dir . "/merlin/vim"
-  execute "set rtp+=" . l:dir
-endfunction
-let s:opam_configuration['merlin'] = function('OpamConfMerlin')
-
-let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
-let s:opam_check_cmdline = ["opam list --installed --short --safe --color=never"] + s:opam_packages
-let s:opam_available_tools = split(system(join(s:opam_check_cmdline)))
-for tool in s:opam_packages
-  " Respect package order (merlin should be after ocp-index)
-  if count(s:opam_available_tools, tool) > 0
-    call s:opam_configuration[tool]()
-  endif
-endfor
-" ## end of OPAM user-setup addition for vim / base ## keep this line
-
-let g:opamshare = substitute(system('opam config var share'),'\n$','','''')
-execute "set rtp+=" . g:opamshare . "/merlin/vim"
+" LanguageClient
+let g:LanguageClient_autoStart = 1
+let g:LanguageClient_serverCommands = {
+    \ 'javascript': ['javascript-typescript-stdio'],
+    \ 'typescript': ['typescript-language-server', '--stdio'],
+    \ 'typescriptreact': ['typescript-language-server', '--stdio'],
+    \ }
+augroup filetype_ts
+    autocmd!
+    autocmd BufReadPost *.ts setlocal filetype=typescript
+    autocmd BufReadPost *.tsx setlocal filetype=typescriptreact
+augroup END

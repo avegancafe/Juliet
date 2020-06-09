@@ -17,14 +17,6 @@ set -gx TERM "xterm-256color"
 
 source ~/.vim/fish/_util.fish
 
-function indent
-  set -l output ($argv)
-  set -l tmp_status $status
-  string join \n $output | sed 's/^/  /'
-  return $tmp_status
-end
-
-
 function update --description "Sync ruby/js project with git"
   argparse --name="update" 'd/debug' -- $argv
 
@@ -39,7 +31,7 @@ function update --description "Sync ruby/js project with git"
     error "Fail :("
   end
 
-  log "Pulling from git..."
+  info "Pulling from git..."
   git pull -r > $out_stream || begin;
     fail
     return
