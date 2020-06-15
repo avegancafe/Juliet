@@ -196,5 +196,5 @@ let g:LanguageClient_serverCommands = {
 augroup filetype_ts
     autocmd!
     autocmd BufReadPost *.ts setlocal filetype=typescript
-    autocmd BufReadPost *.tsx setlocal filetype=typescriptreact
+    autocmd BufReadPost *.tsx setlocal filetype=typescriptreact syntax=typescript
 augroup END
