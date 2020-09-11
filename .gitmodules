@@ -85,3 +85,6 @@
 [submodule "pack/user/start/fzf.vim"]
 	path = pack/user/start/fzf.vim
 	url = git@github.com:junegunn/fzf.vim
+[submodule "pack/user/start/vim-gist"]
+	path = pack/user/start/vim-gist
+	url = git@github.com:mattn/vim-gist
