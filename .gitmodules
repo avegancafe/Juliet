@@ -85,3 +85,6 @@
 [submodule "pack/user/start/vim-gist"]
 	path = pack/user/start/vim-gist
 	url = git@github.com:mattn/vim-gist
+[submodule "pack/user/start/goyo.vim"]
+	path = pack/user/start/goyo.vim
+	url = git@github.com:junegunn/goyo.vim
