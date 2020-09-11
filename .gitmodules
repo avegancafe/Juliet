@@ -25,9 +25,6 @@
 [submodule "pack/user/start/yajs.vim"]
 	path = pack/user/start/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
-[submodule "pack/user/start/oceanic-next"]
-	path = pack/user/start/oceanic-next
-	url = ssh://git@github.com/mhartington/oceanic-next
 [submodule "pack/user/start/vim-jsx-pretty"]
 	path = pack/user/start/vim-jsx-pretty
 	url = ssh://git@github.com/MaxMEllon/vim-jsx-pretty
