@@ -82,3 +82,6 @@
 [submodule "pack/user/start/vim-jsx-pretty"]
 	path = pack/user/start/vim-jsx-pretty
 	url = git@github.com:MaxMEllon/vim-jsx-pretty
+[submodule "pack/user/start/vim-less"]
+	path = pack/user/start/vim-less
+	url = git@github.com:groenewege/vim-less
