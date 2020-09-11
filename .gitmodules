@@ -1,9 +1,6 @@
 [submodule "pack/user/start/webapi-vim"]
 	path = pack/user/start/webapi-vim
 	url = https://github.com/mattn/webapi-vim
-[submodule "pack/user/start/vim-less"]
-	path = pack/user/start/vim-less
-	url = https://github.com/groenewege/vim-less
 [submodule "pack/user/start/yajs.vim"]
 	path = pack/user/start/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
