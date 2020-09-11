@@ -82,3 +82,6 @@
 [submodule "pack/user/start/vim-fish"]
 	path = pack/user/start/vim-fish
 	url = git@github.com:dag/vim-fish
+[submodule "pack/user/start/vim-jsdoc"]
+	path = pack/user/start/vim-jsdoc
+	url = git@github.com:heavenshell/vim-jsdoc
