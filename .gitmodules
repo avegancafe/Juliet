@@ -7,9 +7,6 @@
 [submodule "pack/user/start/yajs.vim"]
 	path = pack/user/start/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
-[submodule "pack/user/start/vim-jsx-pretty"]
-	path = pack/user/start/vim-jsx-pretty
-	url = ssh://git@github.com/MaxMEllon/vim-jsx-pretty
 [submodule "pack/user/start/vim-prettier"]
 	path = pack/user/start/vim-prettier
 	url = https://github.com/prettier/vim-prettier
