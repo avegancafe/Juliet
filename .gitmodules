@@ -82,3 +82,6 @@
 [submodule "pack/user/start/vim-surround"]
 	path = pack/user/start/vim-surround
 	url = git@github.com:tpope/vim-surround
+[submodule "pack/user/start/webapi-vim"]
+	path = pack/user/start/webapi-vim
+	url = git@github.com:mattn/webapi-vim
