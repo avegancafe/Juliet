@@ -85,3 +85,6 @@
 [submodule "pack/user/start/typescript-vim"]
 	path = pack/user/start/typescript-vim
 	url = https://github.com/leafgarland/typescript-vim
+[submodule "pack/user/start/vim-open-github"]
+	path = pack/user/start/vim-open-github
+	url = git@github.com:k0kubun/vim-open-github
