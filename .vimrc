@@ -121,6 +121,8 @@ nnoremap <c-m> :NERDTreeClose<cr>
 nnoremap <c-\> :NERDTreeFind<cr>
 
 " airline
+let g:airline#extensions#tabline#show_splits = 0
+let g:airline#extensions#tabline#show_buffers = 0
 let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#tabline#enabled = 1
 set laststatus=2

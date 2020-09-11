@@ -3,8 +3,6 @@ brew 'rbenv'
 brew 'nodenv'
 brew 'starship'
 brew 'fortune'
-brew 'postgresql'
-brew 'gnupg'
 brew 'pinentry-mac'
 
 # applications
