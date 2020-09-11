@@ -82,3 +82,6 @@
 [submodule "pack/user/start/goyo.vim"]
 	path = pack/user/start/goyo.vim
 	url = git@github.com:junegunn/goyo.vim
+[submodule "pack/user/start/loupe"]
+	path = pack/user/start/loupe
+	url = git@github.com:wincent/loupe
