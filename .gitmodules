@@ -85,3 +85,6 @@
 [submodule "pack/user/start/ale"]
 	path = pack/user/start/ale
 	url = git@github.com:dense-analysis/ale
+[submodule "pack/user/start/auto-pairs"]
+	path = pack/user/start/auto-pairs
+	url = git@github.com:jiangmiao/auto-pairs
