@@ -82,3 +82,6 @@
 [submodule "pack/user/start/loupe"]
 	path = pack/user/start/loupe
 	url = git@github.com:wincent/loupe
+[submodule "pack/user/start/nerdtree"]
+	path = pack/user/start/nerdtree
+	url = git@github.com:preservim/nerdtree
