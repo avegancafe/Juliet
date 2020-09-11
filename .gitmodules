@@ -43,9 +43,6 @@
 [submodule "pack/user/start/vim-fish"]
 	path = pack/user/start/vim-fish
 	url = https://github.com/dag/vim-fish
-[submodule "pack/user/start/auto-pairs"]
-	path = pack/user/start/auto-pairs
-	url = ssh://git@github.com/jiangmiao/auto-pairs
 [submodule "pack/user/start/yajs.vim"]
 	path = pack/user/start/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
