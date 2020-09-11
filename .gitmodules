@@ -82,3 +82,6 @@
 [submodule "pack/user/start/oceanic-next"]
 	path = pack/user/start/oceanic-next
 	url = git@github.com:mhartington/oceanic-next
+[submodule "pack/user/start/rainbow"]
+	path = pack/user/start/rainbow
+	url = git@github.com:luochen1990/rainbow
