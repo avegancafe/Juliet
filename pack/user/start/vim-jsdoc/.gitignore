@@ -1,5 +1,0 @@
-*.swp
-*~
-.DS_Store
-tags
-tests/vader.vim
