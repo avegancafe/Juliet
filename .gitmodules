@@ -7,9 +7,6 @@
 [submodule "pack/user/start/vim-less"]
 	path = pack/user/start/vim-less
 	url = https://github.com/groenewege/vim-less
-[submodule "pack/user/start/vim-exchange"]
-	path = pack/user/start/vim-exchange
-	url = https://github.com/tommcdo/vim-exchange
 [submodule "pack/user/start/vim-fish"]
 	path = pack/user/start/vim-fish
 	url = https://github.com/dag/vim-fish
