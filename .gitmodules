@@ -4,9 +4,6 @@
 [submodule "pack/user/start/yajs.vim"]
 	path = pack/user/start/yajs.vim
 	url = ssh://git@github.com/othree/yajs.vim
-[submodule "pack/user/start/vim-surround"]
-	path = pack/user/start/vim-surround
-	url = https://github.com/tpope/vim-surround
 [submodule "etc/iterm2-material-design"]
 	path = etc/iterm2-material-design
 	url = https://github.com/MartinSeeler/iterm2-material-design
