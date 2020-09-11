@@ -85,3 +85,6 @@
 [submodule "pack/user/start/vim-open-github"]
 	path = pack/user/start/vim-open-github
 	url = git@github.com:k0kubun/vim-open-github
+[submodule "pack/user/start/ale"]
+	path = pack/user/start/ale
+	url = git@github.com:dense-analysis/ale
