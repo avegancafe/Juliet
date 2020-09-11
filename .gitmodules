@@ -85,3 +85,6 @@
 [submodule "pack/user/start/auto-pairs"]
 	path = pack/user/start/auto-pairs
 	url = git@github.com:jiangmiao/auto-pairs
+[submodule "pack/user/start/committia.vim"]
+	path = pack/user/start/committia.vim
+	url = git@github.com:rhysd/committia.vim
