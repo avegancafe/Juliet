@@ -13,9 +13,6 @@
 [submodule "pack/user/start/neoterm"]
 	path = pack/user/start/neoterm
 	url = https://github.com/kassio/neoterm
-[submodule "pack/user/start/LanguageClient-neovim"]
-	path = pack/user/start/LanguageClient-neovim
-	url = https://github.com/autozimu/LanguageClient-neovim
 [submodule "pack/user/start/typescript-vim"]
 	path = pack/user/start/typescript-vim
 	url = https://github.com/leafgarland/typescript-vim

@@ -194,7 +194,7 @@ let g:LanguageClient_serverCommands = {
     \ 'typescript': ['typescript-language-server', '--stdio'],
     \ 'typescript.tsx': ['typescript-language-server', '--stdio'],
     \ 'typescriptreact': ['typescript-language-server', '--stdio'],
-    \ 'typescript.tsx': ['typescript-language-server', '--stdio'],
+    \ 'ruby': ['solargraph', 'stdio'],
     \ }
 augroup filetype_ts
     autocmd!
