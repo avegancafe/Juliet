@@ -1,4 +1,5 @@
 set rtp+=/usr/local/opt/fzf
+set rtp+=~/.vim/pack/user/start/LanguageClient-neovim
 
 set nocompatible
 let &runtimepath.=',~/.vim/pack/user/start/neoterm'
@@ -29,7 +30,11 @@ autocmd InsertLeave * set nocul
 if (has("termguicolors"))
   set termguicolors
 endif
-colorscheme OceanicNext
+if (has('nvim'))
+  let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
+endif
+let g:material_theme_style = 'default'
+colorscheme material
 
 " Indentation
 set expandtab
@@ -68,7 +73,7 @@ map t<leader>l :TestLast<cr>
 
 map <leader>t :Tnew<cr>
 
-nnoremap <silent> K :call LanguageClient_contextMenu()<CR>
+nmap <silent> K <Plug>(lcn-menu)
 nnoremap <leader>ev :tabe $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 " nnoremap <leader>t :put =strftime('%FT%T%z')<cr>
@@ -91,7 +96,7 @@ nnoremap <silent> <c-h> <c-w>h
 nnoremap <silent> <leader>f :PrettierAsync<cr>
 nnoremap <c-e> :ALEFix<cr>
 command! -bang -nargs=? -complete=dir FzfFiles
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse']}), <bang>0)
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--margin=1,4']}), <bang>0)
 " nmap <silent> <leader>l ?function<cr>:noh<cr><Plug>(jsdoc)
 " nmap <silent> <leader>d <Plug>(jsdoc)
 
@@ -189,6 +194,11 @@ let g:neoterm_autoinsert = 1
 
 " LanguageClient
 let g:LanguageClient_autoStart = 1
+let g:LanguageClient_selectionUI = "fzf"
+let g:LanguageClient_usePopupHover = 1
+let g:LanguageClient_hoverPreview = "Always"
+let g:LanguageClient_useFloatingHover = 1
+
 let g:LanguageClient_serverCommands = {
     \ 'javascript': ['javascript-typescript-stdio'],
     \ 'typescript': ['typescript-language-server', '--stdio'],

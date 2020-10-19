@@ -82,3 +82,9 @@
 [submodule "pack/user/start/yajs.vim"]
 	path = pack/user/start/yajs.vim
 	url = git@github.com:othree/yajs.vim
+[submodule "pack/user/start/LanguageClient-neovim"]
+	path = pack/user/start/LanguageClient-neovim
+	url = git@github.com:autozimu/LanguageClient-neovim
+[submodule "pack/user/start/material.vim"]
+	path = pack/user/start/material.vim
+	url = git@github.com:kaicataldo/material.vim
