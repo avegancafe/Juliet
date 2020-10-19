@@ -1,6 +1,5 @@
 set rtp+=/usr/local/opt/fzf
 
-filetype off
 set nocompatible
 let &runtimepath.=',~/.vim/pack/user/start/neoterm'
 
@@ -92,7 +91,7 @@ nnoremap <silent> <c-h> <c-w>h
 nnoremap <silent> <leader>f :PrettierAsync<cr>
 nnoremap <c-e> :ALEFix<cr>
 command! -bang -nargs=? -complete=dir FzfFiles
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
+  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse']}), <bang>0)
 " nmap <silent> <leader>l ?function<cr>:noh<cr><Plug>(jsdoc)
 " nmap <silent> <leader>d <Plug>(jsdoc)
 
@@ -193,11 +192,12 @@ let g:LanguageClient_autoStart = 1
 let g:LanguageClient_serverCommands = {
     \ 'javascript': ['javascript-typescript-stdio'],
     \ 'typescript': ['typescript-language-server', '--stdio'],
+    \ 'typescript.tsx': ['typescript-language-server', '--stdio'],
     \ 'typescriptreact': ['typescript-language-server', '--stdio'],
     \ 'typescript.tsx': ['typescript-language-server', '--stdio'],
     \ }
 augroup filetype_ts
     autocmd!
     autocmd BufReadPost *.ts setlocal filetype=typescript
-    autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescript.tsx syntax=typescript
+    autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx syntax=typescript.tsx
 augroup END
