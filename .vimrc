@@ -1,5 +1,7 @@
 set rtp+=/usr/local/opt/fzf
 set rtp+=~/.vim/pack/user/start/LanguageClient-neovim
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
 set nocompatible
 let &runtimepath.=',~/.vim/pack/user/start/neoterm'
@@ -27,13 +29,12 @@ autocmd InsertEnter * set cul
 autocmd InsertLeave * set nocul
 
 " theme
-if (has("termguicolors"))
-  set termguicolors
-endif
+" if (has("termguicolors"))
+"   set termguicolors
+" endif
 if (has('nvim'))
   let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
 endif
-let g:material_theme_style = 'default'
 colorscheme material
 
 " Indentation
@@ -99,6 +100,37 @@ command! -bang -nargs=? -complete=dir FzfFiles
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--margin=1,4']}), <bang>0)
 " nmap <silent> <leader>l ?function<cr>:noh<cr><Plug>(jsdoc)
 " nmap <silent> <leader>d <Plug>(jsdoc)
+
+" Make ci( work like quotes do
+function! New_cib()
+    if search("(","bn") == line(".")
+        sil exe "normal! f)ci("
+        sil exe "normal! l"
+        startinsert
+    else
+        sil exe "normal! f(ci("
+        sil exe "normal! l"
+        startinsert
+    endif
+endfunction
+
+" And for curly brackets
+function! New_ciB()
+    if search("{","bn") == line(".")
+        sil exe "normal! f}ci{"
+        sil exe "normal! l"
+        startinsert
+    else
+        sil exe "normal! f{ci{"
+        sil exe "normal! l"
+        startinsert
+    endif
+endfunction
+
+nnoremap ci( :call New_cib()<CR>
+nnoremap cib :call New_cib()<CR>
+nnoremap ci{ :call New_ciB()<CR>
+nnoremap ciB :call New_ciB()<CR>
 
 if has("nvim")
   " tnoremap <esc> <c-\><c-n>
@@ -211,3 +243,5 @@ augroup filetype_ts
     autocmd BufReadPost *.ts setlocal filetype=typescript
     autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx syntax=typescript.tsx
 augroup END
+
+source ~/.vim/statusline.vim

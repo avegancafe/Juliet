@@ -88,3 +88,6 @@
 [submodule "pack/user/start/material.vim"]
 	path = pack/user/start/material.vim
 	url = git@github.com:kaicataldo/material.vim
+[submodule "pack/user/start/lightline.vim"]
+	path = pack/user/start/lightline.vim
+	url = git@github.com:itchyny/lightline.vim
