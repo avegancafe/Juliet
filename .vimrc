@@ -94,7 +94,7 @@ nnoremap <silent> <c-g> :FzfHistory<cr>
 nnoremap <silent> <c-f> :Goyo<cr>
 nnoremap <silent> <c-h> <c-w>h
 " nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
-nnoremap <silent> <leader>f :PrettierAsync<cr>
+nnoremap <silent> <leader>f :Prettier<cr>
 nnoremap <c-e> :ALEFix<cr>
 command! -bang -nargs=? -complete=dir FzfFiles
   \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--margin=1,4']}), <bang>0)
@@ -233,6 +233,7 @@ let g:LanguageClient_useFloatingHover = 1
 
 let g:LanguageClient_serverCommands = {
     \ 'javascript': ['javascript-typescript-stdio'],
+    \ 'ruby': ['solargraph', 'stdio'],
     \ 'typescript': ['typescript-language-server', '--stdio'],
     \ 'typescript.tsx': ['typescript-language-server', '--stdio'],
     \ 'typescriptreact': ['typescript-language-server', '--stdio'],
@@ -241,7 +242,7 @@ let g:LanguageClient_serverCommands = {
 augroup filetype_ts
     autocmd!
     autocmd BufReadPost *.ts setlocal filetype=typescript
-    autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx syntax=typescript.tsx
+    autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact syntax=typescript.tsx
 augroup END
 
 source ~/.vim/statusline.vim
