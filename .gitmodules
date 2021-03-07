@@ -91,3 +91,6 @@
 [submodule "pack/user/start/lightline.vim"]
 	path = pack/user/start/lightline.vim
 	url = git@github.com:itchyny/lightline.vim
+[submodule "pack/user/start/vim-solidity"]
+	path = pack/user/start/vim-solidity
+	url = git@github.com:tomlion/vim-solidity
