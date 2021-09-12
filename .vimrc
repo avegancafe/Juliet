@@ -1,7 +1,14 @@
-set rtp+=/usr/local/opt/fzf
-set rtp+=~/.vim/pack/user/start/LanguageClient-neovim
+set rtp+=/opt/homebrew/opt/fzf
+set rtp+=~/.local/share/nvim/site/pack/packer/start/LanguageClient-neovim
+set encoding=UTF-8
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
+let g:WebDevIconsUnicodeDecorateFolderNodes = 1
+let g:DevIconsEnableFoldersOpenClose = 1
+
+let g:DevIconsDefaultFolderOpenSymbol='' " symbol for open folder (f07c)
+let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol='' " symbol for closed folder (f07b)
 
 set nocompatible
 let &runtimepath.=',~/.vim/pack/user/start/neoterm'
@@ -85,8 +92,8 @@ nnoremap L g$
 nnoremap q: <nop>
 nnoremap <leader>d :g/;;/d<cr>
 nnoremap <silent> <leader>l :exec &number == 0 ? "set number norelativenumber" : "set relativenumber nonumber"<cr>
-nnoremap <silent> <c-p> :FzfFiles<cr>
-nnoremap <silent> <c-b> :FzfBuffers<cr>
+nnoremap <silent> <c-p> :Telescope find_files<cr>
+nnoremap <silent> <c-b> :Telescope buffers<cr>
 nnoremap <c-o> :w<cr>
 nnoremap cq :let @*=expand("%:p")<cr>
 nnoremap cw :let @*=expand("%")<cr>
@@ -221,12 +228,12 @@ let g:rspec_command = "!bundle exec rspec --drb {spec}"
 
 " vim-test
 let test#strategy = "neoterm"
+let g:test#javascript#runner = 'truffle test'
 let g:neoterm_default_mod = 'rightbelow'
 let g:neoterm_autoinsert = 1
 
 " LanguageClient
 let g:LanguageClient_autoStart = 1
-let g:LanguageClient_selectionUI = "fzf"
 let g:LanguageClient_usePopupHover = 1
 let g:LanguageClient_hoverPreview = "Always"
 let g:LanguageClient_useFloatingHover = 1
@@ -244,4 +251,7 @@ augroup filetype_ts
     autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact syntax=typescript.tsx
 augroup END
 
-source ~/.vim/statusline.vim
+" source ~/.vim/statusline.vim
+
+lua require('plugins')
+

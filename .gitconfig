@@ -19,6 +19,7 @@
 [core]
 	excludesfile = /Users/kyle/.gitignore_global
 	autocrlf = false
+	editor = nvim
 [github]
 	user = keyboard-clacker
 [format]
@@ -40,6 +41,7 @@
 [user]
 	email = kylelholzinger@gmail.com
 	name = kyle
+	signingkey = 3E3FA4CF130F6178
 [include]
   path = ~/.gitconfig__local
 [difftool "sourcetree"]
@@ -48,3 +50,5 @@
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[gpg]
+	program = /usr/local/bin/gpg

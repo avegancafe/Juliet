@@ -1,3 +1,4 @@
+eval (/opt/homebrew/bin/brew shellenv)
 source ~/.config/fish/env.fish 2> /dev/null
 
 set -gx PATH "/usr/local/bin" $PATH
@@ -12,10 +13,16 @@ set -U FZF_LEGACY_KEYBINDINGS 0
 set PATH $HOME/.rbenv/shims $PATH
 set fish_color_command 69f0ad
 set -gx FZF_DEFAULT_COMMAND "ag -g ''"
+set -gx RUBY_CFLAGS "-DUSE_FFI_CLOSURE_ALLOC"
+set -gx DYLD_LIBRARY_PATH "/opt/homebrew/lib"
 
 set -gx TERM "xterm-256color"
 
 source ~/.vim/fish/_util.fish
+
+function h
+  npx hardhat $argv
+end
 
 function update --description "Sync ruby/js project with git"
   argparse --name="update" 'd/debug' -- $argv
@@ -87,7 +94,7 @@ function rspec
 end
 
 function dc
-  docker-compose $argv
+  docker compose $argv
 end
 
 function rake
