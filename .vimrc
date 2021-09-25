@@ -36,13 +36,10 @@ autocmd InsertEnter * set cul
 autocmd InsertLeave * set nocul
 
 " theme
-" if (has("termguicolors"))
-"   set termguicolors
-" endif
-if (has('nvim'))
-  let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
-endif
-colorscheme material
+set termguicolors
+let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
+packadd! space-nvim
+colorscheme space-nvim
 
 " Indentation
 set expandtab
@@ -158,10 +155,10 @@ cnoreabbrev ag FzfAg
 " Insert Mappings
 inoremap <c-c> <Esc>
 
-" NERDtree
-nnoremap <c-n> :NERDTree<cr>
-nnoremap <c-m> :NERDTreeClose<cr>
-nnoremap <c-\> :NERDTreeFind<cr>
+" nvim-tree
+nnoremap <C-n> :NvimTreeToggle<CR>
+nnoremap <leader>r :NvimTreeRefresh<CR>
+nnoremap <leader>n :NvimTreeFindFile<CR>
 
 " airline
 let g:airline#extensions#tabline#show_splits = 0
