@@ -175,7 +175,7 @@ gls.left[15] = {
 -- Right side
 gls.right[1] = {
   FileFormat = {
-    provider = function() return vim.bo.filetype end,
+    provider = function() return ' ' .. vim.bo.filetype end,
     highlight = {colors.fg, colors.section_bg},
     separator = '',
     separator_highlight = {colors.section_bg, colors.bg}
