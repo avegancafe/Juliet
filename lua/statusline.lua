@@ -7,7 +7,7 @@ gl.short_line_list = {'defx', 'packager', 'vista'}
 
 -- Colors
 local colors = {
-  bg = '#292b2e',
+  bg = '#282a2e',
   fg = '#f8f8f2',
   section_bg = '#38393f',
   yellow = '#f1fa8c',

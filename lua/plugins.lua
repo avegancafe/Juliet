@@ -6,11 +6,6 @@ return require('packer').startup(function()
       require('nvim-tree').setup()
     end
   }
-  use {
-    'autozimu/LanguageClient-neovim',
-    run = 'bash install.sh',
-    requires = { 'ternjs/tern_for_vim' }
-  }
   use 'dense-analysis/ale'
   use 'jiangmiao/auto-pairs'
   use 'rhysd/committia.vim'

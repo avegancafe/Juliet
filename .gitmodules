@@ -1,3 +1,6 @@
 [submodule "etc/iterm2-material-design"]
 	path = etc/iterm2-material-design
 	url = https://github.com/MartinSeeler/iterm2-material-design
+[submodule "pack/user/start/packer.nvim"]
+	path = pack/user/start/packer.nvim
+	url = git@github.com:wbthomason/packer.nvim

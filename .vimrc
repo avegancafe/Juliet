@@ -40,8 +40,8 @@ autocmd InsertLeave * set nocul
 " theme
 set termguicolors
 let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
-" packadd! space-nvim
-" colorscheme space-nvim
+packadd! space-nvim
+colorscheme space-nvim
 
 nnoremap <D-1> :tabnext 1<cr>
 nnoremap <D-2> :tabnext 2<cr>
