@@ -1,4 +1,3 @@
-set rtp+=/opt/homebrew/opt/fzf
 set rtp+=~/.local/share/nvim/site/pack/packer/start/LanguageClient-neovim
 set encoding=UTF-8
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
@@ -93,8 +92,6 @@ augroup END
 
 highlight MatchParen cterm=bold ctermfg=white ctermbg=black
 
-let g:fzf_command_prefix = 'Fzf'
-
 " Custom commands
 function! LanguageClientRestart()
   LanguageClientStop
@@ -135,14 +132,11 @@ nnoremap <silent> <c-b> :Telescope buffers<cr>
 nnoremap <c-o> :w<cr>
 nnoremap cq :let @*=expand("%:p")<cr>
 nnoremap cw :let @*=expand("%")<cr>
-nnoremap <silent> <c-g> :FzfHistory<cr>
 nnoremap <silent> <c-f> :Goyo<cr>
 nnoremap <silent> <c-h> <c-w>h
 " nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
 nnoremap <silent> <leader>f :Prettier<cr>
 nnoremap <c-e> :ALEFix<cr>
-command! -bang -nargs=? -complete=dir FzfFiles
-  \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--margin=1,4']}), <bang>0)
 " nmap <silent> <leader>l ?function<cr>:noh<cr><Plug>(jsdoc)
 " nmap <silent> <leader>d <Plug>(jsdoc)
 
@@ -160,7 +154,6 @@ cnoreabbrev gist Gist
 cnoreabbrev lc lclose
 cnoreabbrev lo lopen
 cnoreabbrev qf q!
-cnoreabbrev ag FzfAg
 
 " Insert Mappings
 inoremap <c-c> <Esc>
@@ -170,32 +163,6 @@ inoremap <silent> <D-v> <c-r>*
 nnoremap <C-n> :NvimTreeToggle<CR>
 nnoremap <leader>r :NvimTreeRefresh<CR>
 nnoremap <leader>n :NvimTreeFindFile<CR>
-
-" airline
-let g:airline#extensions#tabline#show_splits = 0
-let g:airline#extensions#tabline#show_buffers = 0
-let g:airline#extensions#ale#enabled = 1
-let g:airline#extensions#tabline#enabled = 1
-set laststatus=2
-set t_Co=256
-if !exists('g:airline_symbols')
-  let g:airline_symbols = {}
-end
-let g:airline_left_sep = ''
-let g:airline_left_sep = ''
-let g:airline_right_sep = ''
-let g:airline_right_sep = ''
-let g:airline_symbols.linenr = '␊'
-let g:airline_symbols.linenr = '␤'
-let g:airline_symbols.linenr = '¶'
-let g:airline_symbols.branch = '⎇'
-let g:airline_symbols.paste = 'ρ'
-let g:airline_symbols.paste = 'Þ'
-let g:airline_symbols.paste = '∥'
-let g:airline_symbols.whitespace = 'Ξ'
-let g:loaded_airline_themes = 1
-let g:airline_theme='minimalist'
-let g:airline#extensions#tabline#formatter = 'unique_tail'
 
 let g:quantum_italics = 1
 
