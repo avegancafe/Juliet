@@ -13,6 +13,8 @@ let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol='' " symbol for clos
 set nocompatible
 let &runtimepath.=',~/.vim/pack/user/start/neoterm'
 
+set guifont=Pragmata\ Pro,FiraCode\ Nerd\ Font\ Mono:h18
+
 " Defaults
 syntax enable
 filetype plugin indent on
@@ -41,6 +43,20 @@ let $NVIM_TUI_ENABLE_TRUE_COLOR = 1
 packadd! space-nvim
 colorscheme space-nvim
 
+nnoremap <D-1> :tabnext 1<cr>
+nnoremap <D-2> :tabnext 2<cr>
+nnoremap <D-3> :tabnext 3<cr>
+nnoremap <D-4> :tabnext 4<cr>
+nnoremap <D-5> :tabnext 5<cr>
+nnoremap <D-6> :tabnext 6<cr>
+nnoremap <D-7> :tabnext 7<cr>
+nnoremap <D-8> :tabnext 8<cr>
+nnoremap <D-9> :tabnext 9<cr>
+nnoremap <D-0> :tablast<cr>
+nnoremap <D-{> :tabprevious<cr>
+nnoremap <D-}> :tabnext<cr>
+nnoremap <D-w> :q<cr>
+
 " Indentation
 set expandtab
 set shiftwidth=2
@@ -51,6 +67,13 @@ set smartindent
 set tabstop=2
 
 " Ale
+highlight clear SpellBad
+highlight SpellBad cterm=underline
+highlight clear ALEError
+highlight ALEError cterm=underline
+highlight clear ALEWarning
+highlight ALEWarning cterm=underline
+
 let g:ale_fixers = {
 \   'javascript': ['prettier'],
 \}
@@ -72,7 +95,25 @@ highlight MatchParen cterm=bold ctermfg=white ctermbg=black
 
 let g:fzf_command_prefix = 'Fzf'
 
+" Custom commands
+function! LanguageClientRestart()
+  LanguageClientStop
+  sleep 500m
+  LanguageClientStart
+endfunction
+command! LanguageClientRestart call LanguageClientRestart()
+
 " Normal mappings
+function! SynStack ()
+    for i1 in synstack(line("."), col("."))
+        let i2 = synIDtrans(i1)
+        let n1 = synIDattr(i1, "name")
+        let n2 = synIDattr(i2, "name")
+        echo n1 "->" n2
+    endfor
+endfunction
+map gn :call SynStack()<CR>
+ 
 map t<leader>f :TestFile<cr>
 map t<leader>l :TestLast<cr>
 
@@ -105,37 +146,6 @@ command! -bang -nargs=? -complete=dir FzfFiles
 " nmap <silent> <leader>l ?function<cr>:noh<cr><Plug>(jsdoc)
 " nmap <silent> <leader>d <Plug>(jsdoc)
 
-" Make ci( work like quotes do
-function! New_cib()
-    if search("(","bn") == line(".")
-        sil exe "normal! f)ci("
-        sil exe "normal! l"
-        startinsert
-    else
-        sil exe "normal! f(ci("
-        sil exe "normal! l"
-        startinsert
-    endif
-endfunction
-
-" And for curly brackets
-function! New_ciB()
-    if search("{","bn") == line(".")
-        sil exe "normal! f}ci{"
-        sil exe "normal! l"
-        startinsert
-    else
-        sil exe "normal! f{ci{"
-        sil exe "normal! l"
-        startinsert
-    endif
-endfunction
-
-nnoremap ci( :call New_cib()<CR>
-nnoremap cib :call New_cib()<CR>
-nnoremap ci{ :call New_ciB()<CR>
-nnoremap ciB :call New_ciB()<CR>
-
 if has("nvim")
   " tnoremap <esc> <c-\><c-n>
   tnoremap <c-[> <c-\><c-n>
@@ -154,6 +164,7 @@ cnoreabbrev ag FzfAg
 
 " Insert Mappings
 inoremap <c-c> <Esc>
+inoremap <silent> <D-v> <c-r>*
 
 " nvim-tree
 nnoremap <C-n> :NvimTreeToggle<CR>
@@ -225,8 +236,7 @@ let g:rspec_command = "!bundle exec rspec --drb {spec}"
 
 " vim-test
 let test#strategy = "neoterm"
-let g:test#javascript#runner = 'truffle test'
-let g:neoterm_default_mod = 'rightbelow'
+let g:neoterm_default_mod = 'vertical'
 let g:neoterm_autoinsert = 1
 
 " LanguageClient
@@ -234,6 +244,7 @@ let g:LanguageClient_autoStart = 1
 let g:LanguageClient_usePopupHover = 1
 let g:LanguageClient_hoverPreview = "Always"
 let g:LanguageClient_useFloatingHover = 1
+let g:LanguageClient_hideVirtualTextsOnInsert = 1
 
 let g:LanguageClient_serverCommands = {
     \ 'javascript': ['javascript-typescript-stdio'],
@@ -242,13 +253,13 @@ let g:LanguageClient_serverCommands = {
     \ 'typescriptreact': ['typescript-language-server', '--stdio'],
     \ 'ruby': ['solargraph', 'stdio'],
     \ }
+
 augroup filetype_ts
     autocmd!
-    autocmd BufReadPost *.ts setlocal filetype=typescript
-    autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact syntax=typescript.tsx
+    " autocmd BufReadPost *.ts setlocal filetype=typescript
+    autocmd BufNewFile,BufRead *.tsx,*.jsx,*.ts set filetype=typescriptreact syntax=typescript.tsx
 augroup END
 
-" source ~/.vim/statusline.vim
-
+let g:neovide_cursor_vfx_mode = "pixiedust"
 lua require('plugins')
 

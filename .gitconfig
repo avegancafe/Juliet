@@ -34,8 +34,8 @@
 	autosquash = true
 [diff]
 	colorMoved = zebra
-[url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
+[url "https://github.com/"]
+  insteadOf = ssh://git@github.com/
 [fetch]
 	prune = true
 [user]
@@ -50,5 +50,5 @@
 [mergetool "sourcetree"]
 	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
-[gpg]
-	program = /usr/local/bin/gpg
+[pull]
+	rebase = true

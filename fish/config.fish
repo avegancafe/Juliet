@@ -1,6 +1,7 @@
 eval (/opt/homebrew/bin/brew shellenv)
 source ~/.config/fish/env.fish 2> /dev/null
 
+set -gx NeovideMultiGrid "true"
 set -gx PATH "/usr/local/bin" $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/.config/yarn/global/node_modules/.bin" $PATH
@@ -57,12 +58,37 @@ function update --description "Sync ruby/js project with git"
   end
 
   log "Running database migrations..."
-  bundle exec rake db:migrate > $out_stream || begin;
+  bundle exec rake db:migrate db:test:prepare > $out_stream || begin;
     fail
     return
   end
 
   log "Done!"
+end
+
+function nv
+  neovide --multiGrid $argv
+end
+
+function current-truva-sha
+  git log origin/master -1 --format="short" | sed -E 's/^commit[[:space:]]([^[[:space:]]]*)/\1/' | head -n 1
+end
+
+function watch-truva
+  git fetch 2>&1 > /dev/null
+
+  set ORIGINAL_COMMIT (current-truva-sha)
+  info "Polling viewthespace/truva for new commits... original commit is $ORIGINAL_COMMIT"
+
+  for x in (seq 20)
+    git fetch 2>&1 > /dev/null
+    if test "$ORIGINAL_COMMIT" != (current-truva-sha)
+      terminal-notifier -message 'WARNING: new commit detected'
+      error "WARNING: new commit detected "(current-truva-sha)
+    end
+
+    sleep 30
+  end
 end
 
 function vim
@@ -194,3 +220,7 @@ source /Users/kyle/.opam/opam-init/init.fish > /dev/null 2> /dev/null; or true
 
 # nodenv config
 status --is-interactive; and source (nodenv init -|psub)
+
+if status --is-login
+  set -gx PATH $HOME/.nodenv/bin $PATH
+end
