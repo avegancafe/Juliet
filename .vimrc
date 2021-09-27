@@ -133,7 +133,6 @@ nnoremap <c-o> :w<cr>
 nnoremap cq :let @*=expand("%:p")<cr>
 nnoremap cw :let @*=expand("%")<cr>
 nnoremap <silent> <c-f> :Goyo<cr>
-nnoremap <silent> <c-h> <c-w>h
 " nnoremap <silent> <leader>p :!yarn prettier --write %<cr>
 nnoremap <silent> <leader>f :Prettier<cr>
 nnoremap <c-e> :ALEFix<cr>

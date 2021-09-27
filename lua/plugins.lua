@@ -24,6 +24,13 @@ return require('packer').startup(function()
   use {
     'nvim-telescope/telescope.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', 'nvim-lua/plenary.nvim' },
+    config = function()
+      require('telescope').setup({
+        defaults = {
+          path_display = { 'smart' }
+        }
+      })
+    end
   }
   use 'frazrepo/vim-rainbow'
   use 'dag/vim-fish'
