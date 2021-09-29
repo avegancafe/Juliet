@@ -1,3 +1,10 @@
+vim.cmd([[
+augroup filetype_ts
+    autocmd!
+    autocmd BufNewFile,BufRead *.tsx,*.jsx,*.ts set filetype=typescriptreact syntax=typescript.tsx
+augroup END
+]])
+
 local nvim_lsp = require('lspconfig')
 
 -- Use an on_attach function to only map the following keys

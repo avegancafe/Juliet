@@ -10,4 +10,10 @@ function M.has_width_gt(cols)
     return vim.fn.winwidth(0) / 2 > cols
 end
 
+function M.merge(a, b)
+  for k,v in pairs(b) do
+    a[k] = v
+  end
+end
+
 return M
