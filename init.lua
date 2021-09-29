@@ -29,8 +29,7 @@ vim.cmd('autocmd InsertLeave * set nocursorline')
 
 -- theme
 vim.opt.termguicolors = true
-vim.cmd('packadd! space-nvim')
-vim.cmd('colorscheme space-nvim')
+vim.cmd('colorscheme void')
 
 -- indentation
 vim.opt.shiftwidth = 2

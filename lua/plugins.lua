@@ -53,4 +53,5 @@ return require('packer').startup(function()
   }
   use 'Th3Whit3Wolf/space-nvim'
   use 'neovim/nvim-lspconfig'
+  use 'Yggdroot/indentLine'
 end)
