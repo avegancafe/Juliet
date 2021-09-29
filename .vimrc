@@ -5,6 +5,7 @@ let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
 let g:WebDevIconsUnicodeDecorateFolderNodes = 1
 let g:DevIconsEnableFoldersOpenClose = 1
+let g:startify_change_to_vcs_root = 1
 
 let g:DevIconsDefaultFolderOpenSymbol='' " symbol for open folder (f07c)
 let g:WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol='' " symbol for closed folder (f07b)
@@ -228,4 +229,5 @@ augroup END
 
 let g:neovide_cursor_vfx_mode = "pixiedust"
 lua require('plugins')
+lua require('initializers.index')
 
