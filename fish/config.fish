@@ -1,4 +1,4 @@
-eval (/usr/local/bin/brew shellenv)
+eval (/opt/homebrew/bin/brew shellenv)
 source ~/.config/fish/env.fish 2> /dev/null
 
 set -gx NeovideMultiGrid "true"
