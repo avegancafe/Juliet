@@ -66,10 +66,6 @@ function update --description "Sync ruby/js project with git"
   log "Done!"
 end
 
-function nv
-  neovide --multiGrid $argv
-end
-
 function current-truva-sha
   git log origin/master -1 --format="short" | sed -E 's/^commit[[:space:]]([^[[:space:]]]*)/\1/' | head -n 1
 end
@@ -95,20 +91,12 @@ function vim
   nvim $argv
 end
 
-function follower
-  heroku pg:psql FOLLOWER_DATABASE_URL -a vts-private-us-east
-end
-
 function fish_greeting
   fortune
 end
 
 function gut
   git $argv
-end
-
-function ch
-  yarn lint && yarn test --runInBand && bundle exec rubocop && yarn lint:ruby && bundle exec rspec && echo -e "\033[41m\033[37m\nGREAT SUCCESS\n\033[0m"
 end
 
 function rails
@@ -131,20 +119,8 @@ function s
   git status -s
 end
 
-function ss
-  git status
-end
-
-function kill_rspec
-  kill (ps aux | grep '[r]spec' | awk '{print $2}')
-end
-
 function alert
   terminal-notifier -title "Command finished" -activate com.googlecode.iterm
-end
-
-function resource
-  source ~/.config/fish/config.fish
 end
 
 function sudo
@@ -175,10 +151,6 @@ function migrate
   case "*"
     echo "Usage: migrate [up|down] /path/to/migration_file"
   end
-end
-
-function gb
-  git branch | sed 's/[\* ]//g' | fzf | read -l selected_branch; and git co $selected_branch
 end
 
 function gfg
