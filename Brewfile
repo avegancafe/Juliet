@@ -4,6 +4,7 @@ brew 'nodenv'
 brew 'starship'
 brew 'fortune'
 brew 'pinentry-mac'
+brew 'fd'
 
 # applications
 tap "homebrew/cask"
