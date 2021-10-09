@@ -34,10 +34,10 @@ normal_map('cq', ':let @*=expand("%:p")<cr>')
 normal_map('cw', ':let @*=expand("%")<cr>')
 normal_map('<c-f>', ':Goyo<cr>', { silent = true })
 normal_map('<leader>f', ':Prettier<cr>')
-normal_map('<c-n>', ':NvimTreeToggle<cr>')
-normal_map('<leader>r', ':NvimTreeRefresh<cr>')
-normal_map('<leader>n', ':NvimTreeFindFile<cr>')
-normal_map('<leader>x', '<Plug>(LoupeClearHighlight)')
+normal_map('<c-n>', ':NvimTreeToggle<CR>')
+normal_map('<leader>r', ':NvimTreeRefresh<CR>')
+normal_map('<leader>n', ':NvimTreeFindFile<CR>')
+normal_map('<leader>x', ':noh<cr>')
 
 -- terminal mappings --
 
