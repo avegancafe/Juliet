@@ -1,3 +1,10 @@
+vim.cmd([[
+augroup packer_user_config
+  autocmd!
+  autocmd BufWritePost plugins.lua source <afile> | PackerCompile | echo "done!"
+augroup end
+]])
+
 return require('packer').startup(function()
   use {
     'glepnir/galaxyline.nvim',

@@ -54,6 +54,6 @@ augroup END
 
 vim.cmd('highlight MatchParen cterm=bold ctermfg=white ctermbg=black')
 
-require('mappings')
 require('plugins')
+require('mappings')
 require('initializers.index')
