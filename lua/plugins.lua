@@ -32,9 +32,19 @@ return require('packer').startup(function()
     'nvim-telescope/telescope.nvim',
     requires = { 'kyazdani42/nvim-web-devicons', 'nvim-lua/plenary.nvim' },
     config = function()
+      local actions = require "telescope.actions"
       require('telescope').setup({
         defaults = {
           path_display = { 'smart' }
+        },
+        pickers = {
+          buffers = {
+            mappings = {
+              i = {
+                ["<c-q>"] = actions.delete_buffer + actions.move_to_top,
+              }
+            }
+          }
         }
       })
     end
@@ -61,4 +71,5 @@ return require('packer').startup(function()
   use 'Th3Whit3Wolf/space-nvim'
   use 'neovim/nvim-lspconfig'
   use 'Yggdroot/indentLine'
+  use 'habamax/vim-godot'
 end)

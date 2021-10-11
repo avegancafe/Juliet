@@ -26,6 +26,7 @@ vim.opt.fdm = 'syntax'
 vim.opt.foldlevelstart = 20
 vim.cmd('autocmd InsertEnter * set cursorline')
 vim.cmd('autocmd InsertLeave * set nocursorline')
+vim.cmd('set completeopt-=preview')
 
 -- theme
 vim.opt.termguicolors = true

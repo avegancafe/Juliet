@@ -204,7 +204,7 @@ gls.right[3] = {
 -- Short status line
 gls.short_line_left[1] = {
   BufferType = {
-    provider = 'FileTypeName',
+    provider = 'FileName',
     highlight = {colors.fg, colors.section_bg},
     separator = ' ',
     separator_highlight = {colors.section_bg, colors.bg}
@@ -215,7 +215,7 @@ gls.short_line_right[1] = {
   BufferIcon = {
     provider = 'BufferIcon',
     highlight = {colors.yellow, colors.section_bg},
-    separator = ' ',
+    separator = '',
     separator_highlight = {colors.section_bg, colors.bg}
   }
 }
