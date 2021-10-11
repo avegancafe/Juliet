@@ -1,6 +1,6 @@
-utils = require('utils')
+local utils = require('utils')
 
-function create_map_func(mode)
+local function create_map_func(mode)
   return function(binding, command, opts)
     opts = opts or {}
     final_opts = { noremap = true }
@@ -13,7 +13,7 @@ end
 
 -- normal mappings --
 
-normal_map = create_map_func('n')
+local normal_map = create_map_func('n')
 
 normal_map('t<leader>f', ':TestFile<cr>')
 normal_map('t<leader>l', ':TestLast<cr>')
@@ -41,21 +41,20 @@ normal_map('<leader>x', ':noh<cr>')
 
 -- terminal mappings --
 
-terminal_map = create_map_func('t')
+local terminal_map = create_map_func('t')
+
 terminal_map('<c-[>', '<c-\\><c-n>')
 
 -- command mappings --
 
-command_map = create_map_func('c')
+local command_map = create_map_func('c')
 
 command_map('X', 'x')
-command_map('lc', 'lclose')
-command_map('lo', 'lopen')
-command_map('qf', 'q!')
+command_map('ag', 'Telescope live_grep')
 
 -- insert mappings --
 
-insert_map = create_map_func('i')
+local insert_map = create_map_func('i')
 
 insert_map('<c-c>', '<esc>')
 insert_map('<d-v>', '<c-r>*', { silent = true })

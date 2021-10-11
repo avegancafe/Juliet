@@ -90,6 +90,9 @@ gls.left[5] = {
     provider = function()
       local vcs = require('galaxyline.provider_vcs')
       local branch_name = vcs.get_git_branch()
+      if (branch_name == nil) then
+        branch_name = "HEAD"
+      end
       if (string.len(branch_name) > 28) then
         return string.sub(branch_name, 1, 25) .. "..."
       end
