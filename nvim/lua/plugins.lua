@@ -69,7 +69,11 @@ return require('packer').startup(function()
     end
   }
   use 'Th3Whit3Wolf/space-nvim'
-  use 'neovim/nvim-lspconfig'
+  use {
+    'neovim/nvim-lspconfig',
+    requires = 'williamboman/nvim-lsp-installer'
+  }
   use 'Yggdroot/indentLine'
   use 'habamax/vim-godot'
+  use 'sbdchd/neoformat'
 end)
