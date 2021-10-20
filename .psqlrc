@@ -1,3 +1,4 @@
-\x auto
-\pset null 'Ø'
+\pset null '∅'
 \set HISTCONTROL ignoredups
+\set VERBOSITY verbose
+\x auto

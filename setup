@@ -30,9 +30,14 @@ setup_gpg() {
   echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
 }
 
+setup_psql() {
+  [[ ! -f ~/.psqlrc ]] && ln -sfv ~/.config/Juliet/.psqlrc
+}
+
 setup_git
 setup_dependencies
 setup_fzf
 setup_vim
 setup_fish
 setup_gpg
+setup_psql
