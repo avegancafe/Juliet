@@ -1,7 +1,9 @@
 #! /bin/bash
 
+source ~/.config/Juliet/_util.bash
+
 setup_git() {
-  [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.vim/.gitconfig ~/
+  [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.config/Juliet/.gitconfig ~/
 }
 
 setup_dependencies() {
@@ -14,15 +16,14 @@ setup_fzf() {
 }
 
 setup_vim() {
-  [[ ! -f ~/.vimrc ]] && ln -sfv ~/.vim/.vimrc ~/
-  [[ ! -d ~/.config/nvim ]] && ln -sfv ~/.vim ~/.config/nvim
+  [[ ! -d ~/.config/nvim ]] && ln -sfv ~/.config/Juliet/nvim ~/.config/nvim
 }
 
 setup_fish() {
-  ln -sfv ~/.vim/fish/config.fish ~/.config/fish/
+  ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish/
   mkdir -p ~/.config/fish/functions
-  ln -sfv ~/.vim/fish/fish_user_key_bindings.fish ~/.config/fish/functions
-  ln -sfv ~/.vim/starship.toml ~/.config/
+  ln -sfv ~/.config/Juliet/fish/fish_user_key_bindings.fish ~/.config/fish/functions
+  ln -sfv ~/.config/Juliet/starship.toml ~/.config/
 }
 
 setup_gpg() {
