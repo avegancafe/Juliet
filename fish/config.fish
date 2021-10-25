@@ -19,7 +19,7 @@ set -gx DYLD_LIBRARY_PATH "/opt/homebrew/lib"
 
 set -gx TERM "xterm-256color"
 
-source ~/.vim/fish/_util.fish
+source ~/.config/Juliet/fish/_util.fish
 
 function h
   npx hardhat $argv
@@ -182,7 +182,7 @@ function @curl
 end
 
 status --is-interactive; and source (rbenv init -|psub)
-source ~/.vim/fish/auto-install-ruby-with-rbenv.fish
+source ~/.config/Juliet/fish/auto-install-ruby-with-rbenv.fish
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null
