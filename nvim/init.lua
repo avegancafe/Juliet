@@ -26,6 +26,9 @@ vim.g.dashboard_custom_header = {
   '     │  │   ',
   '     │  │   '
 }
+vim.g.dashboard_custom_footer = {
+  'λ Hack away λ'
+}
 
 vim.g.dashboard_custom_shortcut = {
   last_session = '      ',
