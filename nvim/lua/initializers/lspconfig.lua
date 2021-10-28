@@ -32,7 +32,7 @@ local servers = {
   "cssls",
   "html",
   -- "jsonls",
-  -- "tailwindcss",
+  "tailwindcss",
   "tsserver",
 }
 

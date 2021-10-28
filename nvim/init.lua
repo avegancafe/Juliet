@@ -6,6 +6,22 @@ vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
 vim.g.DevIconsDefaultFolderOpenSymbol = ''
 vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
+vim.g.dashboard_default_executive = 'telescope'
+
+vim.g.dashboard_custom_header = {
+  '    ↑↑↓↓    ',
+  '   ←→←→AB   ',
+  '   ┌────┐   ',
+  '   │    ├┐  ',
+  '   │┌ ┌ └│  ',
+  '   │ ╘  └┘  ',
+  '   │    │   ',
+  '   │╙─  │   ',
+  '   │    │   ',
+  '   └──┘ │   ',
+  '     │  │   ',
+  '     │  │   '
+}
 
 vim.opt.runtimepath = vim.opt.runtimepath + ',~/.vim/pack/user/start/neoterm'
 

@@ -77,9 +77,18 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/auto-pairs"
   },
+  ["bufferline.nvim"] = {
+    config = { "\27LJ\2\n8\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\15bufferline\frequire\0" },
+    loaded = true,
+    path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/bufferline.nvim"
+  },
   ["committia.vim"] = {
     loaded = true,
     path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/committia.vim"
+  },
+  ["dashboard-nvim"] = {
+    loaded = true,
+    path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/dashboard-nvim"
   },
   ["galaxyline.nvim"] = {
     config = { "\27LJ\2\n*\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\15statusline\frequire\0" },
@@ -94,10 +103,6 @@ _G.packer_plugins = {
   ["goyo.vim"] = {
     loaded = true,
     path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/goyo.vim"
-  },
-  indentLine = {
-    loaded = true,
-    path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/indentLine"
   },
   loupe = {
     loaded = true,
@@ -181,10 +186,6 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/vim-solidity"
   },
-  ["vim-startify"] = {
-    loaded = true,
-    path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/vim-startify"
-  },
   ["vim-surround"] = {
     loaded = true,
     path = "/Users/kyle/.local/share/nvim/site/pack/packer/start/vim-surround"
@@ -200,6 +201,10 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
+-- Config for: nvim-tree.lua
+time([[Config for nvim-tree.lua]], true)
+try_loadstring("\27LJ\2\n7\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\14nvim-tree\frequire\0", "config", "nvim-tree.lua")
+time([[Config for nvim-tree.lua]], false)
 -- Config for: telescope.nvim
 time([[Config for telescope.nvim]], true)
 try_loadstring("\27LJ\2\n†\2\0\0\n\0\20\0\0266\0\0\0'\2\1\0B\0\2\0026\1\0\0'\3\2\0B\1\2\0029\1\3\0015\3\a\0005\4\5\0005\5\4\0=\5\6\4=\4\b\0035\4\17\0005\5\15\0005\6\r\0005\a\v\0009\b\t\0009\t\n\0 \b\t\b=\b\f\a=\a\14\6=\6\16\5=\5\18\4=\4\19\3B\1\2\1K\0\1\0\fpickers\fbuffers\1\0\0\rmappings\1\0\0\6i\1\0\0\n<c-q>\1\0\0\16move_to_top\18delete_buffer\rdefaults\1\0\0\17path_display\1\0\0\1\2\0\0\nsmart\nsetup\14telescope\22telescope.actions\frequire\0", "config", "telescope.nvim")
@@ -208,10 +213,10 @@ time([[Config for telescope.nvim]], false)
 time([[Config for galaxyline.nvim]], true)
 try_loadstring("\27LJ\2\n*\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\15statusline\frequire\0", "config", "galaxyline.nvim")
 time([[Config for galaxyline.nvim]], false)
--- Config for: nvim-tree.lua
-time([[Config for nvim-tree.lua]], true)
-try_loadstring("\27LJ\2\n7\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\14nvim-tree\frequire\0", "config", "nvim-tree.lua")
-time([[Config for nvim-tree.lua]], false)
+-- Config for: bufferline.nvim
+time([[Config for bufferline.nvim]], true)
+try_loadstring("\27LJ\2\n8\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\15bufferline\frequire\0", "config", "bufferline.nvim")
+time([[Config for bufferline.nvim]], false)
 -- Config for: gitsigns.nvim
 time([[Config for gitsigns.nvim]], true)
 try_loadstring("\27LJ\2\n6\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\rgitsigns\frequire\0", "config", "gitsigns.nvim")

@@ -38,6 +38,8 @@ normal_map('<c-n>', ':NvimTreeToggle<CR>')
 normal_map('<leader>r', ':NvimTreeRefresh<CR>')
 normal_map('<leader>n', ':NvimTreeFindFile<CR>')
 normal_map('<leader>x', ':noh<cr>')
+normal_map('<tab>', ':BufferLineCyclePrev<cr>')
+normal_map('<s-tab>', ':BufferLineCycleNext<cr>')
 
 -- terminal mappings --
 

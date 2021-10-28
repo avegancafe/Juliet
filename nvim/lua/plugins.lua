@@ -60,7 +60,7 @@ return require('packer').startup(function()
   use 'vim-test/vim-test'
   use 'othree/yajs.vim'
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-  use 'mhinz/vim-startify'
+  -- use 'mhinz/vim-startify'
   use {
     'lewis6991/gitsigns.nvim',
     requires = { 'nvim-lua/plenary.nvim' },
@@ -73,7 +73,14 @@ return require('packer').startup(function()
     'neovim/nvim-lspconfig',
     requires = 'williamboman/nvim-lsp-installer'
   }
-  use 'Yggdroot/indentLine'
   use 'habamax/vim-godot'
   use 'sbdchd/neoformat'
+  use {
+    'akinsho/bufferline.nvim',
+    requires = 'kyazdani42/nvim-web-devicons',
+    config = function()
+      require('bufferline').setup()
+    end
+  }
+  use 'glepnir/dashboard-nvim'
 end)
