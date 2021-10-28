@@ -18,7 +18,7 @@ local normal_map = create_map_func('n')
 normal_map('t<leader>f', ':TestFile<cr>')
 normal_map('t<leader>l', ':TestLast<cr>')
 normal_map('<leader>t', ':Tnew<cr>')
-normal_map('<leader>ev', ':tabe ~/.vim<cr>')
+normal_map('<leader>ev', ':tabe ~/.config/Juliet/nvim/init.lua<cr>')
 normal_map('<leader>sv', ':source $MYVIMRC<cr>')
 normal_map('<leader>it', ':put =strftime(\'%FT%T%z\')<cr>')
 normal_map('<leader>id', 'a<C-R>=strftime("%Y-%m-%d")<CR><Esc>')
@@ -40,6 +40,8 @@ normal_map('<leader>n', ':NvimTreeFindFile<CR>')
 normal_map('<leader>x', ':noh<cr>')
 normal_map('<tab>', ':BufferLineCyclePrev<cr>')
 normal_map('<s-tab>', ':BufferLineCycleNext<cr>')
+normal_map('<leader>ss', ':SessionSave<cr>')
+normal_map('<leader>sl', ':SessionLoad<cr>')
 
 -- terminal mappings --
 
