@@ -1,5 +1,5 @@
-vim.opt.runtimepath = vim.opt.runtimepath + ',~/.local/share/nvim/site/pack/packer/start/LanguageClient-neovim'
 vim.opt.encoding = 'UTF-8'
+vim.cmd('set noswapfile')
 
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
@@ -28,12 +28,12 @@ vim.g.dashboard_custom_footer = {
 }
 
 vim.g.dashboard_custom_shortcut = {
-  last_session = '      ',
+  last_session = ' \\ s l',
   find_history = '      ',
   find_file = 'CTRL p',
   new_file = '      ',
   change_colorscheme = '      ',
-  find_word = '      ',
+  find_word = '   :ag',
   book_marks = '      ',
 }
 

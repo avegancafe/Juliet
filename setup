@@ -4,6 +4,7 @@ source ~/.config/Juliet/_util.bash
 
 setup_git() {
   [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.config/Juliet/.gitconfig ~/
+  [[ ! -f ~/.gitmessage ]] && ln -sfv ~/.config/Juliet/.gitmessage ~/
 }
 
 setup_dependencies() {

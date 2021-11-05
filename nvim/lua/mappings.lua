@@ -54,7 +54,11 @@ terminal_map('<c-[>', '<c-\\><c-n>')
 local command_map = create_map_func('c')
 
 command_map('X', 'x')
-command_map('ag', 'Telescope live_grep')
+function TelescopeGrep()
+  vim.cmd("Telescope live_grep")
+end
+
+vim.cmd(":ab ag call v:lua.TelescopeGrep()")
 
 -- insert mappings --
 
