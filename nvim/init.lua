@@ -46,7 +46,6 @@ vim.g.dashboard_custom_shortcut = {
 
 vim.opt.guifont = 'Pragmata Pro, FiraCode Nerd Font Mono:h18'
 
-vim.cmd('syntax enable')
 vim.cmd('filetype plugin indent on')
 
 vim.opt.mouse = 'a'

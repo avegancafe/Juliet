@@ -28,7 +28,12 @@ return require('packer').startup({
     use 'junegunn/goyo.vim'
     use 'wincent/loupe'
     use 'kaicataldo/material.vim'
-    use 'kassio/neoterm'
+    use {
+      'kassio/neoterm',
+      config = function()
+        vim.cmd('syntax enable')
+      end
+    }
     use {
       'nvim-telescope/telescope.nvim',
       requires = { 'kyazdani42/nvim-web-devicons', 'nvim-lua/plenary.nvim' },
