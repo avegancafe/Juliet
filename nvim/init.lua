@@ -1,5 +1,12 @@
 vim.opt.encoding = 'UTF-8'
 vim.cmd('set noswapfile')
+vim.opt.switchbuf = 'uselast'
+vim.cmd([[
+augroup quickfix
+  autocmd!
+  au FileType qf wincmd J
+augroup END
+]])
 
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
