@@ -44,8 +44,6 @@ vim.g.dashboard_custom_shortcut = {
   book_marks = '      ',
 }
 
-vim.opt.runtimepath = vim.opt.runtimepath + ',~/.vim/pack/user/start/neoterm'
-
 vim.opt.guifont = 'Pragmata Pro, FiraCode Nerd Font Mono:h18'
 
 vim.cmd('syntax enable')
