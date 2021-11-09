@@ -34,6 +34,7 @@ local servers = {
   -- "jsonls",
   "tailwindcss",
   "tsserver",
+  "gopls",
 }
 
 function UninstallLspServers()

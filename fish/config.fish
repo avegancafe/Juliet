@@ -11,7 +11,6 @@ set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
 set -gx USE_PSEUDOLOCALIZATION "false"
 set -gx GPG_TTY (tty)
 set -U FZF_LEGACY_KEYBINDINGS 0
-set PATH $HOME/.rbenv/shims $PATH
 set fish_color_command 69f0ad
 set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 set -gx RUBY_CFLAGS "-DUSE_FFI_CLOSURE_ALLOC"
@@ -181,8 +180,6 @@ function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
 
-status --is-interactive; and source (rbenv init -|psub)
-source ~/.config/Juliet/fish/auto-install-ruby-with-rbenv.fish
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null

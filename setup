@@ -13,7 +13,7 @@ setup_dependencies() {
 }
 
 setup_fzf() {
-  /usr/local/opt/fzf/install
+  /opt/homebrew/opt/fzf/install
 }
 
 setup_vim() {
@@ -28,6 +28,8 @@ setup_fish() {
 }
 
 setup_gpg() {
+  mkdir ~/.gnupg
+  touch ~/.gnupg/gpg-agent.conf
   echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
 }
 

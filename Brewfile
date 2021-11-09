@@ -1,10 +1,12 @@
 # command line tools
-brew 'rbenv'
 brew 'nodenv'
 brew 'starship'
 brew 'fortune'
 brew 'pinentry-mac'
 brew 'fd'
+brew 'go'
+brew 'fish'
+brew 'neovim'
 
 # applications
 tap "homebrew/cask"
