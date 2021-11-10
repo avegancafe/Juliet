@@ -2,8 +2,7 @@ eval (/opt/homebrew/bin/brew shellenv)
 source ~/.config/fish/env.fish 2> /dev/null
 
 set -gx NeovideMultiGrid "true"
-set -gx PATH "/usr/local/bin" $PATH
-set -gx PATH "$HOME/.local/bin" $PATH
+set -gx PATH "/usr/local/bin" $PATH set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/.config/yarn/global/node_modules/.bin" $PATH
 set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@12/bin"
@@ -192,4 +191,8 @@ status --is-interactive; and source (nodenv init -|psub)
 
 if status --is-login
   set -gx PATH $HOME/.nodenv/bin $PATH
+end
+
+if test -e ~/.config/fish/config__local.fish
+  source ~/.config/fish/config__local.fish
 end

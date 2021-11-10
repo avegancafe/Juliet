@@ -7,6 +7,7 @@ brew 'fd'
 brew 'go'
 brew 'fish'
 brew 'neovim'
+brew 'the_silver_searcher'
 
 # applications
 tap "homebrew/cask"
