@@ -74,7 +74,13 @@ return require('packer').startup({
         require('gitsigns').setup()
       end
     }
-    use 'Th3Whit3Wolf/space-nvim'
+    use {
+      'Th3Whit3Wolf/space-nvim',
+      config = function()
+        void = require('void')
+        require('space-nvim')(void['highlight_group_normal'], void['highlight_groups'], void['terminal_ansi_colors'])
+      end
+    }
     use {
       'neovim/nvim-lspconfig',
       requires = 'williamboman/nvim-lsp-installer'
