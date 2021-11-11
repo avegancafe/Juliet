@@ -1,0 +1,14 @@
+windows:
+  - name: relay
+    root: ~/workspace
+    layout: main-vertical
+    panes:
+      - commands:
+        - cd api-v2-frontend
+        - npm run local
+      - commands:
+        - cd api-v2
+        - relay-run server
+      - commands:
+        - cd api-v2-backend
+        - relay-run server

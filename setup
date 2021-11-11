@@ -7,8 +7,15 @@ setup_git() {
   [[ ! -f ~/.gitmessage ]] && ln -sfv ~/.config/Juliet/.gitmessage ~/
 }
 
+setup_itermocil() {
+  mkdir -p /opt/homeberw/Library/Taps/keyboard-clacker
+  git clone https://github.com/keyboard-clacker/homebrew-brews /opt/homeberw/Library/Taps/keyboard-clacker/homebrew-brews
+  ln -sfv ~/.config/Juliet/.itermocil ~/
+}
+
 setup_dependencies() {
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  setup_itermocil
   brew bundle
 }
 

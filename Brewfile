@@ -8,6 +8,7 @@ brew 'go'
 brew 'fish'
 brew 'neovim'
 brew 'the_silver_searcher'
+brew 'keyboard-clacker/brews/itermocil'
 
 # applications
 tap "homebrew/cask"
