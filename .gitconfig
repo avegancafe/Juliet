@@ -11,6 +11,7 @@
 	staged = diff --staged
 	up = push
 	down = pull
+	t = ticket
 [push]
 	default = current
 [commit]

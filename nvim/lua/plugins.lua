@@ -41,7 +41,11 @@ return require('packer').startup({
         local actions = require "telescope.actions"
         require('telescope').setup({
           defaults = {
-            path_display = { 'smart' }
+            layout_config = {
+              prompt_position = 'bottom'
+            },
+            layout_strategy = 'bottom_pane',
+            path_display = { 'smart' },
           },
           pickers = {
             buffers = {
@@ -103,6 +107,7 @@ return require('packer').startup({
       end
     }
     use 'tikhomirov/vim-glsl'
+    use 'iloginow/vim-stylus'
   end,
   auto_reload_compiled = true,
 })
