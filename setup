@@ -9,15 +9,18 @@ setup_git() {
 }
 
 setup_itermocil() {
-  mkdir -p /opt/homeberw/Library/Taps/keyboard-clacker
+  sudo mkdir -p /opt/homeberw/Library/Taps/keyboard-clacker
   git clone https://github.com/keyboard-clacker/homebrew-brews /opt/homeberw/Library/Taps/keyboard-clacker/homebrew-brews
   ln -sfv ~/.config/Juliet/.itermocil ~/
 }
 
 setup_dependencies() {
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/kyle/.zprofile
+  eval "$(/opt/homebrew/bin/brew shellenv)"
   setup_itermocil
-  brew bundle
+  brew bundle --file ~/.config/Juliet/Brewfile
+  ln -sfv ~/.config/Juliet/karabiner ~/.config/
 }
 
 setup_fzf() {
@@ -29,10 +32,13 @@ setup_vim() {
 }
 
 setup_fish() {
+  sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
+  mkdir -p ~/.config/fish
   ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish/
   mkdir -p ~/.config/fish/functions
   ln -sfv ~/.config/Juliet/fish/fish_user_key_bindings.fish ~/.config/fish/functions
   ln -sfv ~/.config/Juliet/starship.toml ~/.config/
+  chsh -s /opt/homebrew/bin/fish `whoami`
 }
 
 setup_gpg() {
@@ -45,6 +51,10 @@ setup_psql() {
   [[ ! -f ~/.psqlrc ]] && ln -sfv ~/.config/Juliet/.psqlrc ~/
 }
 
+setup_other() {
+  touch ~/.hushlogin
+}
+
 setup_git
 setup_dependencies
 setup_fzf
@@ -52,3 +62,5 @@ setup_vim
 setup_fish
 setup_gpg
 setup_psql
+
+setup_other

@@ -530,7 +530,7 @@
     },
     "tap": {
       "homebrew/cask": {
-        "revision": "c34abf8eb8d0e6a7d9dca122d9207876f0943d9a"
+        "revision": "2886a694eec33e46b3580b58e778a8830d515e83"
       }
     },
     "cask": {
@@ -554,6 +554,14 @@
         "CLT": "12.5.1.0.1.1623191612",
         "Xcode": "12.5.1",
         "macOS": "11.5.1"
+      },
+      "monterey": {
+        "HOMEBREW_VERSION": "3.3.5",
+        "HOMEBREW_PREFIX": "/opt/homebrew",
+        "Homebrew/homebrew-core": "ba74ef6663baa398034869fb1e7cddb44ed85eb7",
+        "CLT": "13.1.0.0.1.1633545042",
+        "Xcode": "13.1",
+        "macOS": "12.0.1"
       }
     }
   }

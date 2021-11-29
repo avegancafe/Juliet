@@ -10,6 +10,7 @@ brew 'fish'
 brew 'neovim'
 brew 'the_silver_searcher'
 brew 'keyboard-clacker/brews/itermocil'
+brew 'gpg-suite'
 
 # applications
 tap "homebrew/cask"
