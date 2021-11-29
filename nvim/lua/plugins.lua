@@ -108,6 +108,7 @@ return require('packer').startup({
     }
     use 'tikhomirov/vim-glsl'
     use 'iloginow/vim-stylus'
+    use 'cespare/vim-toml'
   end,
   auto_reload_compiled = true,
 })
