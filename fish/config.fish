@@ -101,20 +101,8 @@ function gut
   git $argv
 end
 
-function rails
-  bundle exec rails $argv
-end
-
-function rspec
-  bundle exec rspec $argv
-end
-
 function dc
   docker compose $argv
-end
-
-function rake
-  bundle exec rake $argv
 end
 
 function s
@@ -135,10 +123,6 @@ end
 
 function l
   ls -pG1 $argv
-end
-
-function be
-  bundle exec $argv
 end
 
 function migrate
@@ -169,10 +153,6 @@ end
 
 function gl
   git log -10 $argv
-end
-
-function rs
-  bundle exec rails s
 end
 
 function ys
