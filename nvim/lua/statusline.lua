@@ -74,7 +74,7 @@ gls.left[3] = {
   FileName = {
     provider = 'FileName',
     highlight = {colors.fg, colors.section_bg},
-    separator = " ",
+    separator = " ",
     separator_highlight = {colors.section_bg, colors.bg}
   }
 }
@@ -128,7 +128,7 @@ gls.left[8] = {
 }
 gls.left[9] = {
   LeftEnd = {
-    provider = function() return '' end,
+    provider = function() return '' end,
     highlight = {colors.section_bg, colors.bg}
   }
 }
@@ -170,7 +170,7 @@ gls.left[15] = {
     provider = 'DiagnosticInfo',
     icon = '  ',
     highlight = {colors.blue, colors.section_bg},
-    separator = ' ',
+    separator = ' ',
     separator_highlight = {colors.section_bg, colors.bg}
   }
 }
@@ -180,7 +180,7 @@ gls.right[1] = {
   FileFormat = {
     provider = function() return ' ' .. vim.bo.filetype end,
     highlight = {colors.fg, colors.section_bg},
-    separator = '',
+    separator = '',
     separator_highlight = {colors.section_bg, colors.bg}
   }
 }
