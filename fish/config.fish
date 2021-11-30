@@ -183,6 +183,16 @@ function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
 
+function ls
+  set -l LS_CMD (which ls)
+
+  if type -q "lsd"
+    set LS_CMD "lsd"
+  end
+
+  $LS_CMD $argv
+end
+
 eval (starship init fish)
 
 ssh-add -A 2> /dev/null

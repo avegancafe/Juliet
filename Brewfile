@@ -11,6 +11,7 @@ brew 'neovim'
 brew 'the_silver_searcher'
 brew 'keyboard-clacker/brews/itermocil'
 brew 'gpg-suite'
+brew 'lsd'
 
 # applications
 tap "homebrew/cask"
