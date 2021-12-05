@@ -56,7 +56,7 @@ function SyncLsps()
 
     if server_available then
       if not requested_server:is_installed() then
-        print "not installed"
+        print("Installing lsp: " .. requested_server.name)
         requested_server:install()
       end
     end
