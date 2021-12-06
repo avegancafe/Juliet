@@ -8,6 +8,11 @@ augroup quickfix
 augroup END
 ]])
 
+vim.cmd([[
+let g:opamshare = substitute(system('opam var share'),'\n$','','''')
+execute "set rtp+=" . g:opamshare . "/merlin/vim"
+]])
+
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
@@ -89,6 +94,7 @@ augroup END
 ]])
 
 vim.cmd('highlight MatchParen cterm=bold ctermfg=white ctermbg=black')
+vim.cmd('source ~/.config/Juliet/nvim/_init.vim')
 
 require('plugins')
 require('mappings')

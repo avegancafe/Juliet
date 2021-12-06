@@ -87,7 +87,10 @@ return require('packer').startup({
     }
     use {
       'neovim/nvim-lspconfig',
-      requires = 'williamboman/nvim-lsp-installer'
+      requires = 'williamboman/nvim-lsp-installer',
+      config = function()
+        require('lspconfig').ocamllsp.setup{}
+      end
     }
     use 'habamax/vim-godot'
     use 'sbdchd/neoformat'
