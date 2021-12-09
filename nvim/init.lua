@@ -35,9 +35,17 @@ vim.g.dashboard_custom_header = {
   '     │  │   ',
   '     │  │   '
 }
-vim.g.dashboard_custom_footer = {
-  'λ Hack away λ'
-}
+
+local socket = io.popen("fortune")
+local fortune = socket:read("*a")
+socket:close()
+
+local footer = {}
+for s in fortune:gmatch("[^\r\n]+") do
+  table.insert(footer, s)
+end
+
+vim.g.dashboard_custom_footer = footer
 
 vim.g.dashboard_custom_shortcut = {
   last_session = ' \\ s l',

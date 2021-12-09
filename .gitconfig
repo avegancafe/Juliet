@@ -40,15 +40,15 @@
 [fetch]
 	prune = true
 [user]
-	email = kylelholzinger@gmail.com
-	name = kyle
+	email = kyle@relaypayments.com
+	name = Kyle Holzinger
 [include]
   path = ~/.gitconfig__local
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
-	cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+	cmd = /private/var/folders/_h/nwf_f_3n3pv_h1vtcsk884m00000gn/T/AppTranslocation/1A826C32-6DA2-4A7F-AFAA-E76AE090E475/d/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
 [pull]
 	rebase = true

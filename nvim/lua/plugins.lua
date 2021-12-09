@@ -112,6 +112,12 @@ return require('packer').startup({
     use 'tikhomirov/vim-glsl'
     use 'iloginow/vim-stylus'
     use 'cespare/vim-toml'
+    use {
+      'folke/trouble.nvim',
+      config = function()
+        require("trouble").setup{}
+      end
+    }
   end,
   auto_reload_compiled = true,
 })
