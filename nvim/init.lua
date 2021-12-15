@@ -121,7 +121,7 @@ augroup END
 ]])
 
 vim.cmd('highlight MatchParen cterm=bold ctermfg=white ctermbg=black')
-vim.cmd('source ~/.config/Juliet/nvim/_init.vim')
+-- vim.cmd('source ~/.config/Juliet/nvim/_init.vim')
 
 require('plugins')
 require('mappings')
