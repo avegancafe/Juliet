@@ -118,6 +118,7 @@ return require('packer').startup({
         require("trouble").setup{}
       end
     }
+    use 'fatih/vim-go'
   end,
   auto_reload_compiled = true,
 })
