@@ -119,6 +119,8 @@ return require('packer').startup({
       end
     }
     use 'fatih/vim-go'
+    use 'reasonml-editor/vim-reason-plus'
+    use 'jordwalke/vim-reasonml'
   end,
   auto_reload_compiled = true,
 })
