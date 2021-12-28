@@ -21,6 +21,9 @@ lsp_installer.on_server_ready(function(server)
     on_attach = on_attach,
     flags = {
       debounce_text_changes = 150,
+    },
+    handlers = {
+      ["textDocument/hover"] =  vim.lsp.with(vim.lsp.handlers.hover, {border = 'rounded'}),
     }
   }
 
@@ -35,7 +38,7 @@ local servers = {
   -- "jsonls",
   "tailwindcss",
   "tsserver",
-  "ocamlls",
+  -- "ocamlls",
 }
 
 function UninstallLspServers()

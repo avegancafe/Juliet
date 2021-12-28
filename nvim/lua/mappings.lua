@@ -67,3 +67,9 @@ local insert_map = create_map_func('i')
 
 insert_map('<c-c>', '<esc>')
 insert_map('<d-v>', '<c-r>*', { silent = true })
+
+vim.cmd [[
+nnoremap <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
+\ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
+\ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
+]]

@@ -198,7 +198,8 @@ local highlight_groups = {
     MoreMsg = {fg = yellow1}, -- more-prompt
     NonText = {fg = grey}, -- '~' and '@' at the end of the window, characters from 'showbreak' and other characters that do not really exist in the text (e.g., ">" displayed when a double-wide character doesn't fit at the end of the line).
     Normal = normal, -- normal text
-    Pmenu = {fg = fg0, bg = purple4}, -- Popup menu: normal item.
+    Pmenu = {fg = fg0, bg = bg0}, -- Popup menu: normal item.
+    FloatBorder = {fg = fg0, bg = bg0},
     PmenuSel = {fg = fg0, bg = fg5}, -- Popup menu: selected item.
     PmenuSbar = {fg = fg0, bg = bg1}, -- Popup menu: scrollbar.
     PmenuThumb = {fg = fg0, bg = purple3}, -- Popup menu: Thumb of the scrollbar.
