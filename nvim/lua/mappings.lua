@@ -15,8 +15,8 @@ end
 
 local normal_map = create_map_func('n')
 
-normal_map('t<leader>f', ':TestFile<cr>')
-normal_map('t<leader>l', ':TestLast<cr>')
+normal_map('<leader>tf', ':TestFile<cr>')
+normal_map('<leader>tl', ':TestLast<cr>')
 normal_map('<leader>t', ':Tnew<cr>')
 normal_map('<leader>ev', ':tabe ~/.config/Juliet/nvim/init.lua<cr>')
 normal_map('<leader>sv', ':source $MYVIMRC<cr>')
@@ -27,7 +27,13 @@ normal_map('L', 'g$')
 normal_map('q:', '<nop>')
 normal_map('<leader>c', ':g/;;/d<cr>')
 normal_map('<leader>d', ':TroubleToggle<cr>')
-normal_map('<leader>l', ':exec &number == 0 ? "set number norelativenumber" : "set relativenumber nonumber"<cr>', { silent = true })
+
+function ToggleNumbers()
+  vim.cmd('exec &number == 0 ? "set number norelativenumber" : "set relativenumber nonumber"')
+end
+
+vim.cmd(":command ToggleNumbers call v:lua.ToggleNumbers()")
+
 normal_map('<c-p>', ':Telescope find_files<cr>', { silent = true })
 normal_map('<c-b>', ':Telescope buffers<cr>', { silent = true })
 normal_map('<c-o>', ':w<cr>')
@@ -36,7 +42,8 @@ normal_map('cw', ':let @*=expand("%")<cr>')
 normal_map('<c-f>', ':Goyo<cr>', { silent = true })
 normal_map('<leader>f', ':Neoformat<cr>')
 normal_map('<c-n>', ':NvimTreeToggle<CR>')
-normal_map('<leader>r', ':NvimTreeRefresh<CR>')
+normal_map('<leader>nt', ':NvimTreeToggle<CR>')
+normal_map('<leader>nr', ':NvimTreeRefresh<CR>')
 normal_map('<leader>n', ':NvimTreeFindFile<CR>')
 normal_map('<leader>x', ':noh<cr>')
 normal_map('<tab>', ':BufferLineCycleNext<cr>')

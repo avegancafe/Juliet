@@ -121,6 +121,7 @@ return require('packer').startup({
     use 'fatih/vim-go'
     use 'reasonml-editor/vim-reason-plus'
     use 'jordwalke/vim-reasonml'
+    use 'tpope/vim-fugitive'
   end,
   auto_reload_compiled = true,
 })
