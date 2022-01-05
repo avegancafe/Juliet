@@ -18,5 +18,6 @@ tap "homebrew/cask"
 cask_args appdir: "/Applications"
 
 cask 'vlc'
+cask 'keycastr'
 
 brew 'fzf'
