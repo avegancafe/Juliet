@@ -118,7 +118,6 @@ return require('packer').startup({
         require("trouble").setup{}
       end
     }
-    use 'fatih/vim-go'
     use 'reasonml-editor/vim-reason-plus'
     use 'jordwalke/vim-reasonml'
     use 'tpope/vim-fugitive'

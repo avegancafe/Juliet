@@ -41,6 +41,7 @@ local servers = {
   -- "jsonls",
   "tailwindcss",
   "tsserver",
+  "gopls",
   -- "ocamlls",
 }
 
