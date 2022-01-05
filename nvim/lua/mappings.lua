@@ -27,6 +27,7 @@ normal_map('L', 'g$')
 normal_map('q:', '<nop>')
 normal_map('<leader>c', ':g/;;/d<cr>')
 normal_map('<leader>d', ':TroubleToggle<cr>')
+normal_map('<leader>l5', ':TroubleRefresh<cr>')
 
 function ToggleNumbers()
   vim.cmd('exec &number == 0 ? "set number norelativenumber" : "set relativenumber nonumber"')
