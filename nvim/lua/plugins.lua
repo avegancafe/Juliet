@@ -1,7 +1,7 @@
 vim.cmd([[
 augroup packer_user_config
-autocmd!
-autocmd BufWritePost plugins.lua source <afile> | PackerCompile | echo "done!"
+  autocmd!
+  autocmd BufWritePost plugins.lua source <afile> | PackerCompile
 augroup end
 ]])
 
@@ -116,7 +116,10 @@ return require('packer').startup({
     use {
       'terrortylor/nvim-comment',
       config = function()
-        require('nvim_comment').setup()
+        require('nvim_comment').setup({
+          line_mapping = "<leader>cc",
+          operator_mapping = "<leader>c",
+        })
       end
     }
     use 'tikhomirov/vim-glsl'
