@@ -25,7 +25,7 @@ normal_map('<leader>id', 'a<C-R>=strftime("%Y-%m-%d")<CR><Esc>')
 normal_map('H', '^')
 normal_map('L', 'g$')
 normal_map('q:', '<nop>')
-normal_map('<leader>d', ':TroubleToggle<cr>')
+normal_map('<leader>d', ':TroubleToggle document_diagnostics<cr>')
 normal_map('<leader>l5', ':TroubleRefresh<cr>')
 
 function ToggleNumbers()
@@ -50,6 +50,9 @@ normal_map('<tab>', ':BufferLineCycleNext<cr>')
 normal_map('<s-tab>', ':BufferLineCyclePrev<cr>')
 normal_map('<leader>ss', ':SessionSave<cr>')
 normal_map('<leader>sl', ':SessionLoad<cr>')
+normal_map('<leader>b', ':BufferLinePick<cr>')
+normal_map('<leader>bb', ':BufferLinePick<cr>')
+normal_map('<leader>bc', ':BufferLinePickClose<cr>')
 
 -- terminal mappings --
 
