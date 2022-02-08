@@ -40,7 +40,6 @@
 [fetch]
 	prune = true
 [user]
-	email = kyle@relaypayments.com
 	name = Kyle Holzinger
 [include]
   path = ~/.gitconfig__local

@@ -1,2 +1,3 @@
 [user]
 	signingkey = <gpg --list-secret-keys --keyid-format=long>
+	email = kylelholzinger@gmail.com
