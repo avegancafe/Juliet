@@ -1,0 +1,16 @@
+windows:
+  - name: relay-sync
+    root: ~/workspace
+    layout: main-vertical
+    panes:
+      - commands:
+        - cd api-v2-frontend
+        - git switch master
+        - relay-sync
+      - commands:
+        - cd api-v2
+        - git switch master
+        - relay-sync
+        - cd ../api-v2-backend
+        - git switch master
+        - relay-sync
