@@ -1,7 +1,7 @@
 vim.cmd([[
 augroup packer_user_config
   autocmd!
-  autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+	autocmd BufWritePost plugins.lua luafile <afile>
 augroup end
 ]])
 
@@ -157,6 +157,7 @@ return require('packer').startup({
 		use 'jordwalke/vim-reasonml'
 		use 'tpope/vim-fugitive'
 		use 'tpope/vim-sleuth'
+		use 'fatih/vim-go'
 	end,
 	auto_reload_compiled = true,
 })
