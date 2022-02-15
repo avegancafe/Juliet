@@ -20,6 +20,7 @@ vim.g.DevIconsDefaultFolderOpenSymbol = ''
 vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
 vim.g.dashboard_default_executive = 'telescope'
 vim.g.indentLine_fileTypeExclude = { 'dashboard' }
+vim.g.go_fmt_command = "goimports"
 
 vim.g.dashboard_custom_header = {
   '    ↑↑↓↓    ',

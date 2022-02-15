@@ -79,85 +79,106 @@ return require('packer').startup({
 		use 'tpope/vim-surround'
 		use 'vim-test/vim-test'
 		use 'othree/yajs.vim'
-		use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-		-- use 'mhinz/vim-startify'
 		use {
-			'lewis6991/gitsigns.nvim',
-			requires = { 'nvim-lua/plenary.nvim' },
+			'nvim-treesitter/nvim-treesitter',
+			run = ':TSUpdate',
 			config = function()
-				require('gitsigns').setup()
-			end
-		}
-		use {
-			'Th3Whit3Wolf/space-nvim',
-			config = function()
-				void = require('void')
-				require('space-nvim')(void['highlight_group_normal'], void['highlight_groups'], void['terminal_ansi_colors'])
-			end
-		}
-		use {
-			'neovim/nvim-lspconfig',
-			requires = 'williamboman/nvim-lsp-installer',
-			config = function()
-				require('lspconfig').ocamllsp.setup{}
-			end
-		}
-		use 'habamax/vim-godot'
-		use 'sbdchd/neoformat'
-		use {
-			'akinsho/bufferline.nvim',
-			requires = 'kyazdani42/nvim-web-devicons',
-			config = function()
-				require('bufferline').setup {
-					options = {
-						diagnostics = "nvim_lsp",
-						diagnostics_indicator = function(count, level, diagnostics_dict, context)
-							local s = " "
-							for e, n in pairs(diagnostics_dict) do
-								local sym = e == "error" and " "
-								or (e == "warning" and " " or "" )
-								s = s .. n .. sym
-							end
-							return s
-						end,
-						separator_style = "slant",
-						offsets = {
-							{
-								filetype = "NvimTree",
-								text = "File Explorer",
-								highlight = "Directory",
-								text_align = "left"
+				require("nvim-treesitter.configs").setup(
+				{
+					ensure_installed = {
+						"javascript",
+						"typescript",
+						"go",
+						"bash",
+						"lua",
+						"vim"
+					},
+					ignore_install = {},
+					highlight = {
+						enable = true,
+						additional_vim_regex_highlighting = false
+					}
+				}
+				)
+			end}
+			-- use 'mhinz/vim-startify'
+			use {
+				'lewis6991/gitsigns.nvim',
+				requires = { 'nvim-lua/plenary.nvim' },
+				config = function()
+					require('gitsigns').setup()
+				end
+			}
+			use {
+				'Th3Whit3Wolf/space-nvim',
+				config = function()
+					void = require('void')
+					require('space-nvim')(void['highlight_group_normal'], void['highlight_groups'], void['terminal_ansi_colors'])
+				end
+			}
+			use {
+				'neovim/nvim-lspconfig',
+				requires = 'williamboman/nvim-lsp-installer',
+				config = function()
+					require('lspconfig').ocamllsp.setup{}
+				end
+			}
+			use 'habamax/vim-godot'
+			use 'sbdchd/neoformat'
+			use {
+				'akinsho/bufferline.nvim',
+				requires = 'kyazdani42/nvim-web-devicons',
+				config = function()
+					require('bufferline').setup {
+						options = {
+							diagnostics = "nvim_lsp",
+							diagnostics_indicator = function(count, level, diagnostics_dict, context)
+								local s = " "
+								for e, n in pairs(diagnostics_dict) do
+									local sym = e == "error" and " "
+									or (e == "warning" and " " or "" )
+									s = s .. n .. sym
+								end
+								return s
+							end,
+							separator_style = "slant",
+							offsets = {
+								{
+									filetype = "NvimTree",
+									text = "File Explorer",
+									highlight = "Directory",
+									text_align = "left"
+								}
 							}
 						}
 					}
-				}
-			end
-		}
-		use 'glepnir/dashboard-nvim'
-		use 'Yggdroot/indentLine'
-		use {
-			'terrortylor/nvim-comment',
-			config = function()
-				require('nvim_comment').setup({
-					line_mapping = "<leader>cc",
-					operator_mapping = "<leader>c",
-				})
-			end
-		}
-		use 'tikhomirov/vim-glsl'
-		use 'iloginow/vim-stylus'
-		use 'cespare/vim-toml'
-		use {
-			'folke/trouble.nvim',
-			config = function()
-				require("trouble").setup{}
-			end
-		}
-		use 'reasonml-editor/vim-reason-plus'
-		use 'jordwalke/vim-reasonml'
-		use 'tpope/vim-fugitive'
-		use 'tpope/vim-sleuth'
-		use 'fatih/vim-go'
-	end,
-	auto_reload_compiled = true,
-})
+				end
+			}
+			use 'glepnir/dashboard-nvim'
+			use 'Yggdroot/indentLine'
+			use {
+				'terrortylor/nvim-comment',
+				config = function()
+					require('nvim_comment').setup({
+						line_mapping = "<leader>cc",
+						operator_mapping = "<leader>c",
+					})
+				end
+			}
+			use 'tikhomirov/vim-glsl'
+			use 'iloginow/vim-stylus'
+			use 'cespare/vim-toml'
+			use {
+				'folke/trouble.nvim',
+				config = function()
+					require("trouble").setup{}
+				end
+			}
+			use 'reasonml-editor/vim-reason-plus'
+			use 'jordwalke/vim-reasonml'
+			use 'tpope/vim-fugitive'
+			use 'tpope/vim-sleuth'
+			use 'fatih/vim-go'
+		end,
+		auto_reload_compiled = true,
+	})
