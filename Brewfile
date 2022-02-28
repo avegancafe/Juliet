@@ -12,6 +12,7 @@ brew 'the_silver_searcher'
 brew 'keyboard-clacker/brews/itermocil'
 brew 'gpg-suite'
 brew 'lsd'
+brew 'pgcli'
 
 # applications
 tap "homebrew/cask"
