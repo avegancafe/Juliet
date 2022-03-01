@@ -46,7 +46,7 @@ local servers = {
   "tsserver",
   "gopls",
   -- "ocamlls",
-  "solang",
+  "solidity_ls",
 }
 
 function UninstallLspServers()
