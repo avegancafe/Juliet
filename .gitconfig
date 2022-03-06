@@ -25,7 +25,7 @@
 	user = keyboard-clacker
 [format]
   # the %x08's are delete characters
-	pretty = format:%C(yellow)%h %Creset— %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08 %Creset— %C(red)%<(15)%an %Creset%<(85,trunc)%s
+	pretty = format:%C(yellow)%h %Creset— %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08 %Creset— %C(red)%<(20,trunc)%an %Creset%<(80,trunc)%s
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
