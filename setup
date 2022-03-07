@@ -49,6 +49,7 @@ setup_gpg() {
 
 setup_psql() {
   [[ ! -f ~/.psqlrc ]] && ln -sfv ~/.config/Juliet/.psqlrc ~/
+  [[ ! -f ~/.pgclirc ]] && ln -sfv ~/.config/Juliet/.pgclirc ~/
 }
 
 setup_other() {
