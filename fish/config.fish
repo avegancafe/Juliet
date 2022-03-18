@@ -18,6 +18,7 @@ set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 set -gx RUBY_CFLAGS "-DUSE_FFI_CLOSURE_ALLOC"
 set -gx DYLD_LIBRARY_PATH "/opt/homebrew/lib"
 set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
+set -gx RELAY_FZF_OPTS "--reverse --height 40%"
 
 ulimit -n 8096
 
