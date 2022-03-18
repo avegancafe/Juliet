@@ -52,6 +52,10 @@ setup_psql() {
   [[ ! -f ~/.pgclirc ]] && ln -sfv ~/.config/Juliet/.pgclirc ~/
 }
 
+setup_lua() {
+  cargo install stylua
+}
+
 setup_other() {
   touch ~/.hushlogin
 }
@@ -63,5 +67,6 @@ setup_vim
 setup_fish
 setup_gpg
 setup_psql
+setup_lua
 
 setup_other

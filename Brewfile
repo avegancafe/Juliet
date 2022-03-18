@@ -1,24 +1,49 @@
-# command line tools
-brew 'nodenv'
-brew 'starship'
-brew 'fortune'
-brew 'pinentry-mac'
-brew 'fd'
-brew 'ripgrep'
-brew 'go'
-brew 'fish'
-brew 'neovim'
-brew 'the_silver_searcher'
-brew 'keyboard-clacker/brews/itermocil'
-brew 'gpg-suite'
-brew 'lsd'
-brew 'pgcli'
-
-# applications
+tap "homebrew/bundle"
 tap "homebrew/cask"
-cask_args appdir: "/Applications"
-
-cask 'vlc'
-cask 'keycastr'
-
-brew 'fzf'
+tap "homebrew/core"
+tap "keyboard-clacker/brews"
+brew "awscli"
+brew "cmake"
+brew "coreutils"
+brew "docker"
+brew "docker-compose"
+brew "fd"
+brew "guile"
+brew "unbound"
+brew "gnutls"
+brew "gobject-introspection"
+brew "harfbuzz"
+brew "ffmpeg"
+brew "fish"
+brew "fortune"
+brew "fzf"
+brew "git"
+brew "go"
+brew "golangci-lint"
+brew "irssi"
+brew "jq"
+brew "libpq"
+brew "lsd"
+brew "luarocks"
+brew "neovim"
+brew "node"
+brew "newman"
+brew "node-build"
+brew "nodenv"
+brew "ocaml"
+brew "opam"
+brew "pgcli"
+brew "pinentry-mac"
+brew "qt"
+brew "poppler"
+brew "ripgrep"
+brew "rust"
+brew "starship"
+brew "the_silver_searcher"
+brew "tree"
+brew "vips"
+brew "yarn"
+brew "keyboard-clacker/brews/itermocil"
+cask "gpg-suite"
+cask "keycastr"
+cask "vlc", args: { appdir: "/Applications" }

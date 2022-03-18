@@ -6,6 +6,7 @@ set -gx PATH "/usr/local/bin" $PATH set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$HOME/.config/yarn/global/node_modules/.bin" $PATH
 set -gx GOPATH "$HOME/go"
 set -gx PATH "$GOPATH/bin" $PATH
+set -gx PATH "$HOME/.cargo/bin" $PATH
 set -gx EDITOR "vim"
 set -gx PATH $PATH "/usr/local/opt/postgresql@12/bin"
 set -gx LSCOLORS "bxfxcxdxbxegedabagacad"
@@ -16,6 +17,7 @@ set fish_color_command 69f0ad
 set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 set -gx RUBY_CFLAGS "-DUSE_FFI_CLOSURE_ALLOC"
 set -gx DYLD_LIBRARY_PATH "/opt/homebrew/lib"
+set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
 
 ulimit -n 8096
 
