@@ -78,94 +78,47 @@ gls.left[3] = {
     separator_highlight = {colors.section_bg, colors.bg}
   }
 }
+
 gls.left[4] = {
-  GitIcon = {
-    provider = function() return '  ' end,
-    condition = condition.check_git_workspace,
-    highlight = {colors.red, colors.bg}
-  }
-}
-gls.left[5] = {
-  GitBranch = {
-    provider = function()
-      local vcs = require('galaxyline.provider_vcs')
-      local branch_name = vcs.get_git_branch()
-      if (branch_name == nil) then
-        branch_name = "HEAD"
-      end
-      if (string.len(branch_name) > 28) then
-        return string.sub(branch_name, 1, 25) .. "..."
-      end
-      return branch_name .. " "
-    end,
-    condition = condition.check_git_workspace,
-    highlight = {colors.fg, colors.bg}
-  }
-}
-gls.left[6] = {
-  DiffAdd = {
-    provider = 'DiffAdd',
-    condition = condition.check_git_workspace,
-    icon = ' ',
-    highlight = {colors.green, colors.bg}
-  }
-}
-gls.left[7] = {
-  DiffModified = {
-    provider = 'DiffModified',
-    condition = condition.check_git_workspace,
-    icon = ' ',
-    highlight = {colors.orange, colors.bg}
-  }
-}
-gls.left[8] = {
-  DiffRemove = {
-    provider = 'DiffRemove',
-    condition = condition.check_git_workspace,
-    icon = ' ',
-    highlight = {colors.red, colors.bg}
-  }
-}
-gls.left[9] = {
   LeftEnd = {
     provider = function() return '' end,
     highlight = {colors.section_bg, colors.bg}
   }
 }
-gls.left[10] = {
+gls.left[5] = {
   DiagnosticError = {
     provider = 'DiagnosticError',
     icon = '  ',
     highlight = {colors.red, colors.section_bg}
   }
 }
-gls.left[11] = {
+gls.left[6] = {
   Space = {
     provider = function() return ' ' end,
     highlight = {colors.section_bg, colors.section_bg}
   }
 }
-gls.left[12] = {
+gls.left[7] = {
   DiagnosticWarn = {
     provider = 'DiagnosticWarn',
     icon = '  ',
     highlight = {colors.orange, colors.section_bg}
   }
 }
-gls.left[13] = {
+gls.left[8] = {
   DiagnosticHint = {
     provider = 'DiagnosticHint',
     icon = '  ',
     highlight = {colors.fg, colors.section_bg}
   }
 }
-gls.left[14] = {
+gls.left[9] = {
   Space = {
     provider = function() return ' ' end,
     highlight = {colors.section_bg, colors.section_bg}
   }
 }
-gls.left[15] = {
+gls.left[10] = {
   DiagnosticInfo = {
     provider = 'DiagnosticInfo',
     icon = '  ',
@@ -183,14 +136,6 @@ gls.right[1] = {
     separator = '',
     separator_highlight = {colors.section_bg, colors.bg}
   }
-}
-gls.right[2] = {
-  LineInfo = {
-    provider = 'LineColumn',
-    highlight = { colors.fg, colors.section_bg },
-    separator = ' | ',
-    separator_highlight = { colors.bg, colors.section_bg },
-  },
 }
 gls.right[3] = {
   Heart = {
