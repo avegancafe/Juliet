@@ -55,7 +55,12 @@ return require("packer").startup({
 							prompt_position = "bottom",
 						},
 						layout_strategy = "bottom_pane",
-						path_display = { "smart" },
+						path_display = {
+							shorten = {
+								len = 2,
+								exclude = { -1, -2 },
+							},
+						},
 					},
 					pickers = {
 						buffers = {
