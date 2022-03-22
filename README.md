@@ -1,7 +1,7 @@
 To set up Juliet, run `git clone --recursive
 git@github.com:keyboard-clacker/Juliet ~/.config/Juliet && ~/.config/Juliet/setup`
 
-## Fonts
+## Downloads
 
 - [NerdFont](https://www.nerdfonts.com/) (this is also in `etc/`)
 - [Jetbrains Mono](https://www.jetbrains.com/lp/mono/)
