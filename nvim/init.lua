@@ -8,11 +8,6 @@ augroup quickfix
 augroup END
 ]])
 
-vim.cmd([[
-let g:opamshare = substitute(system('opam var share'),'\n$','','''')
-execute "set rtp+=" . g:opamshare . "/merlin/vim"
-]])
-
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
@@ -79,7 +74,7 @@ vim.g.dashboard_custom_shortcut = {
   book_marks = '      ',
 }
 
-vim.opt.guifont = 'Pragmata Pro, FiraCode Nerd Font Mono:h18'
+vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h18'
 
 vim.cmd('filetype plugin indent on')
 
@@ -96,6 +91,7 @@ vim.opt.foldlevelstart = 20
 vim.cmd('autocmd InsertEnter * set cursorline')
 vim.cmd('autocmd InsertLeave * set nocursorline')
 vim.cmd('set completeopt-=preview')
+vim.cmd('set noshowmode')
 
 -- theme
 vim.opt.termguicolors = true

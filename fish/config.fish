@@ -93,7 +93,7 @@ function watch-truva
 end
 
 function vim
-  nvim $argv
+  nvim --startuptime ~/vim.log $argv 
 end
 
 function fish_greeting
