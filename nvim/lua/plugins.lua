@@ -227,7 +227,7 @@ return require("packer").startup({
 				require("lualine").setup({
 					options = {
 						component_separators = { left = "", right = "" },
-						section_separators = { left = " ", right = "" },
+						section_separators = { left = "", right = "" },
 						theme = require("lualine_theme"),
 					},
 					sections = {

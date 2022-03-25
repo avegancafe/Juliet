@@ -1,6 +1,6 @@
 return {
 	bg = "#282a2e",
-	fg = "#f8f8f2",
+	fg = "#cdcdcd",
 	section_bg = "#38393f",
 	yellow = "#f1fa8c",
 	cyan = "#8be9fd",
