@@ -106,13 +106,14 @@ vim.opt.hidden = true
 
 vim.cmd([[
 augroup FiletypeGroup
-    autocmd!
-    au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
-    au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
-    au BufRead,BufNewFile *.md setlocal textwidth=80
-    au FileType fish compiler fish
-    au FileType fish setlocal textwidth=79
-    au FileType fish setlocal foldmethod=expr
+  autocmd!
+  au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+  au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
+  au BufRead,BufNewFile *.md setlocal textwidth=80
+  au FileType fish compiler fish
+  au FileType fish setlocal textwidth=79
+  au FileType fish setlocal foldmethod=expr
+  autocmd BufNewFile,BufRead Brewfile set filetype=ruby
 augroup END
 ]])
 
