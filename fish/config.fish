@@ -112,20 +112,12 @@ function s
   git status -s
 end
 
-function alert
-  terminal-notifier -title "Command finished" -activate com.googlecode.iterm
-end
-
 function sudo
   if test "$argv" = !!
     eval command sudo $history[1]
   else
     command sudo $argv
   end
-end
-
-function l
-  ls -pG1 $argv
 end
 
 function migrate
