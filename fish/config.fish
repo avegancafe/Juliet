@@ -232,3 +232,5 @@ end
 if test -e ~/.config/fish/config__local.fish
   source ~/.config/fish/config__local.fish
 end
+
+export PATH="$PATH:/Users/kyle/.foundry/bin"
