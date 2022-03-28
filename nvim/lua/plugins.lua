@@ -17,7 +17,6 @@ return require("packer").startup({
 		use("dense-analysis/ale")
 		use("jiangmiao/auto-pairs")
 		use("rhysd/committia.vim")
-		use("junegunn/goyo.vim")
 		use("wincent/loupe")
 		use("kaicataldo/material.vim")
 		use({
@@ -196,12 +195,33 @@ return require("packer").startup({
 		use("tpope/vim-sleuth")
 		use("fatih/vim-go")
 		use({
+			"folke/zen-mode.nvim",
+			config = function()
+				require("zen-mode").setup({
+					window = {
+						backdrop = 1,
+						height = 0.5,
+						options = {
+							number = false,
+							relativenumber = false,
+						},
+					},
+				})
+			end,
+		})
+		use({
 			"nvim-neorg/neorg",
+			requires = { "folke/zen-mode.nvim" },
 			config = function()
 				require("neorg").setup({
 					load = {
 						["core.defaults"] = {},
-						["core.presenter"] = {},
+						["core.norg.concealer"] = {},
+						["core.presenter"] = {
+							config = {
+								zen_mode = "zen-mode",
+							},
+						},
 						["core.norg.dirman"] = {
 							config = {
 								workspaces = {
@@ -215,14 +235,8 @@ return require("packer").startup({
 			end,
 		})
 		use({
-			"folke/zen-mode.nvim",
-			config = function()
-				require("zen-mode").setup({})
-			end,
-		})
-		use({
 			"nvim-lualine/lualine.nvim",
-			requires = { "kyazdani42/nvim-web-devicons" },
+			requires = { "nvim-web-devicons" },
 			config = function()
 				require("lualine").setup({
 					options = {
