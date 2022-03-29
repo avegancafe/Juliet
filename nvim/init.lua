@@ -16,6 +16,7 @@ vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
 vim.g.dashboard_default_executive = 'telescope'
 vim.g.indentLine_fileTypeExclude = { 'dashboard' }
 vim.g.go_fmt_command = "goimports"
+vim.opt.timeoutlen = 500
 
 vim.g.dashboard_custom_header = {
   '    ↑↑↓↓    ',
@@ -101,6 +102,7 @@ vim.cmd('colorscheme void')
 vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
 vim.opt.tabstop = 2
+vim.opt.foldmethod = 'indent'
 
 vim.opt.hidden = true
 
