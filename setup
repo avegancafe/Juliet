@@ -11,7 +11,7 @@ setup_git() {
 setup_itermocil() {
   sudo mkdir -p /opt/homeberw/Library/Taps/keyboard-clacker
   git clone https://github.com/keyboard-clacker/homebrew-brews /opt/homeberw/Library/Taps/keyboard-clacker/homebrew-brews
-  ln -sfv ~/.config/Juliet/.itermocil ~/
+  [[ ! -d ~/.itermocil ]] && ln -sfv ~/.config/Juliet/.itermocil ~/
 }
 
 setup_dependencies() {
@@ -20,7 +20,7 @@ setup_dependencies() {
   eval "$(/opt/homebrew/bin/brew shellenv)"
   setup_itermocil
   brew bundle --file ~/.config/Juliet/Brewfile
-  ln -sfv ~/.config/Juliet/karabiner ~/.config/
+  [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config/
 }
 
 setup_fzf() {
@@ -34,10 +34,11 @@ setup_vim() {
 setup_fish() {
   sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
   mkdir -p ~/.config/fish
-  ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish/
+  [[ ! -f ~/.config/fish/config.fish ]] && ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish/
+
   mkdir -p ~/.config/fish/functions
-  ln -sfv ~/.config/Juliet/fish/fish_user_key_bindings.fish ~/.config/fish/functions
-  ln -sfv ~/.config/Juliet/starship.toml ~/.config/
+  [[ ! -f ~/.config/fish/functions/fish_user_key_bindings.fish ]] && ln -sfv ~/.config/Juliet/fish/fish_user_key_bindings.fish ~/.config/fish/functions
+  [[ ! -f ~/.config/starship.toml ]] && ln -sfv ~/.config/Juliet/starship.toml ~/.config/
   chsh -s /opt/homebrew/bin/fish `whoami`
 }
 
@@ -56,6 +57,15 @@ setup_lua() {
   cargo install stylua
 }
 
+setup_kitty() {
+  curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+  [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin/
+
+  mkdir -p ~/.config/kitty
+  [[ ! -f ~/.config/kitty/kitty.conf ]] && ln -sfv ~/.config/Juliet/kitty/kitty.conf ~/.config/kitty/
+  [[ ! -f ~/.config/kitty/current-theme.conf ]] && ln -sfv ~/.config/Juliet/kitty/current-theme.conf ~/.config/kitty/
+}
+
 setup_other() {
   touch ~/.hushlogin
 }
@@ -68,5 +78,6 @@ setup_fish
 setup_gpg
 setup_psql
 setup_lua
+setup_kitty
 
 setup_other
