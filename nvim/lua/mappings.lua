@@ -15,9 +15,7 @@ end
 
 local normal_map = create_map_func('n')
 
-normal_map('<leader>tf', ':TestFile<cr>')
-normal_map('<leader>tl', ':TestLast<cr>')
-normal_map('<leader>t', ':Tnew<cr>')
+normal_map('<leader>t', ':lua require("cmds/switch_bufferline_mode")()<cr>')
 normal_map('<leader>ev', ':tabe ~/.config/Juliet/nvim/init.lua<cr>')
 normal_map('<leader>sv', ':source $MYVIMRC<cr>')
 normal_map('<leader>it', ':put =strftime(\'%FT%T%z\')<cr>')

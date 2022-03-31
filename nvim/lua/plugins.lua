@@ -5,6 +5,8 @@ autocmd BufWritePost plugins.lua luafile <afile>
 augroup end
 ]])
 
+buffer_current_tabmode = "buffers"
+
 return require("packer").startup({
 	function()
 		use({
@@ -147,28 +149,7 @@ return require("packer").startup({
 			"akinsho/bufferline.nvim",
 			requires = "kyazdani42/nvim-web-devicons",
 			config = function()
-				require("bufferline").setup({
-					options = {
-						diagnostics = "nvim_lsp",
-						diagnostics_indicator = function(count, level, diagnostics_dict, context)
-							local s = " "
-							for e, n in pairs(diagnostics_dict) do
-								local sym = e == "error" and " " or (e == "warning" and " " or "")
-								s = s .. n .. sym
-							end
-							return s
-						end,
-						separator_style = "slant",
-						offsets = {
-							{
-								filetype = "NvimTree",
-								text = "File Explorer",
-								highlight = "Directory",
-								text_align = "left",
-							},
-						},
-					},
-				})
+				require("cmds/setup_bufferline").setup("buffers")
 			end,
 		})
 		use("glepnir/dashboard-nvim")
@@ -267,9 +248,9 @@ return require("packer").startup({
 					},
 					inactive_sections = {
 						lualine_a = {},
-						lualine_b = { "diff" },
-						lualine_c = {},
-						lualine_x = { "encoding" },
+						lualine_b = {},
+						lualine_c = { "filename" },
+						lualine_x = { "location" },
 						lualine_y = {},
 						lualine_z = {},
 					},
