@@ -181,7 +181,7 @@ return require("packer").startup({
 				require("zen-mode").setup({
 					window = {
 						backdrop = 1,
-						height = 0.5,
+						height = 0.73,
 						options = {
 							number = false,
 							relativenumber = false,
