@@ -174,7 +174,6 @@ return require("packer").startup({
 		})
 		use("tpope/vim-fugitive")
 		use("tpope/vim-sleuth")
-		use("fatih/vim-go")
 		use({
 			"folke/zen-mode.nvim",
 			config = function()
