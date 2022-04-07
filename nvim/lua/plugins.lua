@@ -9,6 +9,7 @@ buffer_current_tabmode = "buffers"
 
 return require("packer").startup({
 	function()
+		use("MaxMEllon/vim-jsx-pretty")
 		use({
 			"kyazdani42/nvim-tree.lua",
 			requires = "kyazdani42/nvim-web-devicons",
@@ -17,10 +18,8 @@ return require("packer").startup({
 			end,
 		})
 		use("dense-analysis/ale")
-		use("jiangmiao/auto-pairs")
 		use("rhysd/committia.vim")
 		use("wincent/loupe")
-		use("kaicataldo/material.vim")
 		use({
 			"kassio/neoterm",
 			config = function()
@@ -68,14 +67,15 @@ return require("packer").startup({
 			end,
 		})
 		use("frazrepo/vim-rainbow")
-		use("dag/vim-fish")
-		use("heavenshell/vim-jsdoc")
-		use("MaxMEllon/vim-jsx-pretty")
-		use("groenewege/vim-less")
-		use("prettier/vim-prettier")
-		use("tomlion/vim-solidity")
+		use({
+			"dag/vim-fish",
+			ft = "fish",
+		})
+		use({
+			"tomlion/vim-solidity",
+			ft = "sol"
+		})
 		use("tpope/vim-surround")
-		use("vim-test/vim-test")
 		use("othree/yajs.vim")
 		use({
 			"nvim-treesitter/nvim-treesitter",
@@ -118,7 +118,6 @@ return require("packer").startup({
 				})
 			end,
 		})
-		-- use 'mhinz/vim-startify'
 		use({
 			"lewis6991/gitsigns.nvim",
 			requires = { "nvim-lua/plenary.nvim" },
@@ -163,16 +162,12 @@ return require("packer").startup({
 				})
 			end,
 		})
-		use("tikhomirov/vim-glsl")
-		use("iloginow/vim-stylus")
-		use("cespare/vim-toml")
 		use({
 			"folke/trouble.nvim",
 			config = function()
 				require("trouble").setup({})
 			end,
 		})
-		use("tpope/vim-fugitive")
 		use("tpope/vim-sleuth")
 		use({
 			"folke/zen-mode.nvim",
