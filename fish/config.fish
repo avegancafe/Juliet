@@ -154,6 +154,10 @@ function ys
   yarn start $argv
 end
 
+function ns
+  npm start $argv
+end
+
 function @curl
   curl -w "@$HOME/.curl-format.txt" -o /dev/null -s $argv
 end
