@@ -11,6 +11,8 @@ local lsp_installer_servers = require("nvim-lsp-installer.servers")
 
 lsp_installer.on_server_ready(function(server)
   local on_attach = function(client, bufnr)
+    require "lsp_signature".on_attach()
+
     local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
     local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
     buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
@@ -41,11 +43,9 @@ local servers = {
   "bashls",
   "cssls",
   "html",
-  -- "jsonls",
   "tailwindcss",
   "tsserver",
   "gopls",
-  -- "ocamlls",
   "solidity_ls",
 }
 

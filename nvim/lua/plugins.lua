@@ -9,6 +9,7 @@ buffer_current_tabmode = "buffers"
 
 return require("packer").startup({
 	function()
+		use("wbthomason/packer.nvim")
 		use("MaxMEllon/vim-jsx-pretty")
 		use({
 			"kyazdani42/nvim-tree.lua",
@@ -69,11 +70,10 @@ return require("packer").startup({
 		use("frazrepo/vim-rainbow")
 		use({
 			"dag/vim-fish",
-			ft = "fish",
 		})
 		use({
 			"tomlion/vim-solidity",
-			ft = "sol"
+			ft = "sol",
 		})
 		use("tpope/vim-surround")
 		use("othree/yajs.vim")
@@ -253,6 +253,7 @@ return require("packer").startup({
 				})
 			end,
 		})
+		use("ray-x/lsp_signature.nvim")
 	end,
 	auto_reload_compiled = true,
 })
