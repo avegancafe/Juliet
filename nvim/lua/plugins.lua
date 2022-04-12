@@ -71,10 +71,7 @@ return require("packer").startup({
 		use({
 			"dag/vim-fish",
 		})
-		use({
-			"tomlion/vim-solidity",
-			ft = "sol",
-		})
+		use("tomlion/vim-solidity")
 		use("tpope/vim-surround")
 		use("othree/yajs.vim")
 		use({
