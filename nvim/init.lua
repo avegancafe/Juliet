@@ -8,6 +8,12 @@ augroup quickfix
 augroup END
 ]])
 
+vim.cmd([[
+augroup lint
+  au InsertLeave <buffer> lua require('lint').try_lint()
+augroup END
+]])
+
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
@@ -17,6 +23,7 @@ vim.g.dashboard_default_executive = 'telescope'
 vim.g.indentLine_fileTypeExclude = { 'dashboard' }
 vim.g.go_fmt_command = "goimports"
 vim.opt.timeoutlen = 500
+-- vim.g.ale_go_golangci_lint_options = "--config ~/workspace/api-v2-backend/.build/scripts/.golangci.yml"
 
 vim.g.dashboard_custom_header = {
   '    ↑↑↓↓    ',

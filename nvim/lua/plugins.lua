@@ -18,8 +18,15 @@ return require("packer").startup({
 				require("nvim-tree").setup()
 			end,
 		})
-		use("dense-analysis/ale")
 		use("rhysd/committia.vim")
+		use({
+			"mfussenegger/nvim-lint",
+			config = function()
+				require("lint").linters_by_ft = {
+					go = { "golangcilint" },
+				}
+			end,
+		})
 		use("wincent/loupe")
 		use({
 			"kassio/neoterm",
