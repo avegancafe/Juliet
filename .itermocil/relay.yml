@@ -5,7 +5,7 @@ windows:
     panes:
       - commands:
         - cd api-v2-frontend
-        - npm run local
+        - npm run local:hot
       - commands:
         - cd api-v2
         - relay-run server
