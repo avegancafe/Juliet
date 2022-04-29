@@ -25,6 +25,18 @@ return require("packer").startup({
 				require("lint").linters_by_ft = {
 					go = { "golangcilint" },
 				}
+				local golangcilint = require("lint.linters.golangcilint")
+
+				golangcilint.append_fname = true
+				golangcilint.stream = "both"
+
+				golangcilint.args = {
+					"run",
+					"--out-format",
+					"json",
+					"--config",
+					"~/workspace/api-v2-backend/.build/scripts/.golangci.yml",
+				}
 			end,
 		})
 		use("wincent/loupe")
