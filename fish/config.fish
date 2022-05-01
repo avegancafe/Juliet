@@ -39,6 +39,10 @@ function r
     itermocil $profile --here
 end
 
+function watch
+  /opt/homebrew/bin/watch -n 5 --color $argv
+end
+
 function h
     npx hardhat $argv
 end
