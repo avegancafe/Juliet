@@ -270,6 +270,7 @@ return require("packer").startup({
 			end,
 		})
 		use("ray-x/lsp_signature.nvim")
+		use("numToStr/FTerm.nvim")
 	end,
 	auto_reload_compiled = true,
 })
