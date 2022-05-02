@@ -125,6 +125,8 @@ return require("packer").startup({
 						"lua",
 						"vim",
 						"norg",
+						-- need this for brewfiles
+						"ruby"
 					},
 					ignore_install = {},
 					highlight = {
