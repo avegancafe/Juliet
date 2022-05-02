@@ -28,7 +28,6 @@ return require("packer").startup({
 				local golangcilint = require("lint.linters.golangcilint")
 
 				golangcilint.append_fname = true
-				golangcilint.stream = "both"
 
 				golangcilint.args = {
 					"run",
