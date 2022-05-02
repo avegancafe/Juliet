@@ -22,6 +22,17 @@ function M.setup(buf_mode)
 					text_align = "left",
 				},
 			},
+			groups = {
+				items = {
+					{
+						name = "tests",
+						priority = 1,
+						matcher = function(buf)
+							return buf.name:match("%_test.go")
+						end,
+					},
+				},
+			},
 		},
 	})
 end
