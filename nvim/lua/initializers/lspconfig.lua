@@ -46,7 +46,7 @@ local servers = {
   "tailwindcss",
   "tsserver",
   "gopls",
-  "solidity_ls",
+  "solidity_ls"
 }
 
 function UninstallLspServers()

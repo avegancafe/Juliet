@@ -272,6 +272,7 @@ return require("packer").startup({
 		})
 		use("ray-x/lsp_signature.nvim")
 		use("numToStr/FTerm.nvim")
+		use("vim-scripts/dbext.vim")
 	end,
 	auto_reload_compiled = true,
 })
