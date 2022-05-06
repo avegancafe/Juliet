@@ -25,14 +25,6 @@ vim.g.go_fmt_command = "goimports"
 vim.opt.timeoutlen = 500
 -- vim.g.ale_go_golangci_lint_options = "--config ~/workspace/api-v2-backend/.build/scripts/.golangci.yml"
 vim.g.dbext_default_profile_myPSQL = 'user=kyle'
-vim.cmd([[
-augroup project1
-  au!
-  " Automatically choose the correct dbext profile
-  autocmd BufRead */workspace/api-v2-backend/* DBSetOption profile=myPSQL
-  autocmd BufRead */workspace/api-v2/* DBSetOption profile=myPSQL
-augroup end
-]])
 
 vim.g.dashboard_custom_header = {
   '    ↑↑↓↓    ',

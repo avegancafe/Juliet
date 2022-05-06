@@ -2,6 +2,11 @@ local M = {}
 
 function M.setup(buf_mode)
 	require("bufferline").setup({
+		highlights = {
+			buffer_selected = {
+				gui = "underline"
+			},
+		},
 		options = {
 			mode = buf_mode,
 			diagnostics = "nvim_lsp",
@@ -13,7 +18,7 @@ function M.setup(buf_mode)
 				end
 				return s
 			end,
-			separator_style = "slant",
+			separator_style = "slanted",
 			offsets = {
 				{
 					filetype = "NvimTree",

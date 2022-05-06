@@ -39,7 +39,7 @@ normal_map('<c-o>', ':w<cr>')
 normal_map('<leader>cp', ':let @*=expand("%:p")<cr>')
 normal_map('<leader>cf', ':let @*=expand("%")<cr>')
 normal_map('<c-f>', ':ZenMode<cr>', { silent = true })
-normal_map('<leader>f', ':lua require("FTerm").toggle()<cr>')
+normal_map('<leader>f', ':Neoformat<cr>')
 normal_map('<c-n>', ':NvimTreeToggle<CR>')
 normal_map('<leader>nt', ':NvimTreeToggle<CR>')
 normal_map('<leader>nr', ':NvimTreeRefresh<CR>')
@@ -52,7 +52,6 @@ normal_map('<leader>sl', ':SessionLoad<cr>')
 normal_map('<leader>b', ':BufferLinePick<cr>')
 normal_map('<leader>bb', ':BufferLinePick<cr>')
 normal_map('<leader>bc', ':BufferLinePickClose<cr>')
-normal_map('<leader>bf', ':Neoformat<cr>')
 
 -- terminal mappings --
 
