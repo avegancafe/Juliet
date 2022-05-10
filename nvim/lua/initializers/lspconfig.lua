@@ -9,35 +9,34 @@ local nvim_lsp = require('lspconfig')
 local lsp_installer = require("nvim-lsp-installer")
 local lsp_installer_servers = require("nvim-lsp-installer.servers")
 
-lsp_installer.on_server_ready(function(server)
-  local on_attach = function(client, bufnr)
-    require "lsp_signature".on_attach()
+lsp_installer.setup({})
 
-    local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
-    local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
-    buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-    buf_set_keymap('n', 'K', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap=true, silent=true })
-    buf_set_keymap('n', '<leader>lh', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap=true, silent=true })
-    buf_set_keymap('n', '<leader>ld', '<CMD>Trouble lsp_definitions<CR>', { noremap=true, silent=true })
-    buf_set_keymap('n', '<leader>li', '<CMD>Trouble lsp_implementations<CR>', { noremap=true, silent=true })
-    buf_set_keymap('n', '<leader>lr', '<CMD>lua vim.lsp.buf.rename()<CR>', { noremap=true, silent=true })
-    buf_set_keymap('n', '<leader>la', '<CMD>lua vim.lsp.buf.code_action()<CR>', { noremap=true, silent=true })
-    buf_set_keymap('n', '<leader>lu', '<CMD>Trouble lsp_references<CR>', { noremap=true, silent=true })
-  end
+local on_attach = function(client, bufnr)
+  require "lsp_signature".on_attach()
 
-  local opts = {
-    on_attach = on_attach,
-    flags = {
-      debounce_text_changes = 150,
-    },
-    handlers = {
-      ["textDocument/hover"] =  vim.lsp.with(vim.lsp.handlers.hover, {border = 'rounded'}),
-    }
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
+  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
+  buf_set_keymap('n', 'K', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap=true, silent=true })
+  buf_set_keymap('n', '<leader>lh', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap=true, silent=true })
+  buf_set_keymap('n', '<leader>ld', '<CMD>Trouble lsp_definitions<CR>', { noremap=true, silent=true })
+  buf_set_keymap('n', '<leader>li', '<CMD>Trouble lsp_implementations<CR>', { noremap=true, silent=true })
+  buf_set_keymap('n', '<leader>lr', '<CMD>lua vim.lsp.buf.rename()<CR>', { noremap=true, silent=true })
+  buf_set_keymap('n', '<leader>la', '<CMD>lua vim.lsp.buf.code_action()<CR>', { noremap=true, silent=true })
+  buf_set_keymap('n', '<leader>lu', '<CMD>Trouble lsp_references<CR>', { noremap=true, silent=true })
+end
+
+local opts = {
+  on_attach = on_attach,
+  flags = {
+    debounce_text_changes = 150,
+  },
+  handlers = {
+    ["textDocument/hover"] =  vim.lsp.with(vim.lsp.handlers.hover, {border = 'rounded'}),
   }
+}
 
-  server:setup(opts)
-  vim.cmd [[ do User LspAttachBuffers ]]
-end)
+vim.cmd [[ do User LspAttachBuffers ]]
 
 local servers = {
   "bashls",
@@ -74,3 +73,7 @@ function SyncLsps()
 end
 
 vim.cmd(":abbreviate LspSync echo 'Installing servers...' | call v:lua.SyncLsps()")
+
+for _, name in pairs(servers) do
+  nvim_lsp[name].setup(opts)
+end

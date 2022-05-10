@@ -13,7 +13,7 @@ function M.setup(buf_mode)
 			diagnostics_indicator = function(count, level, diagnostics_dict, context)
 				local s = " "
 				for e, n in pairs(diagnostics_dict) do
-					local sym = e == "error" and " " or (e == "warning" and " " or "")
+					local sym = e == "error" and "x " or (e == "warning" and "w " or "i")
 					s = s .. n .. sym
 				end
 				return s
