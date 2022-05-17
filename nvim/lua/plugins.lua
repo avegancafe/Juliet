@@ -219,6 +219,7 @@ return require("packer").startup({
 								workspaces = {
 									frontend = "~/workspace/api-v2-frontend",
 									backend = "~/workspace/api-v2-backend",
+									notes = "~/workspace/notes",
 								},
 							},
 						},

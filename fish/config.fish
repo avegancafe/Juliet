@@ -109,6 +109,7 @@ function watch-repo
 end
 
 function vim
+    rm ~/vim.log
     nvim --startuptime ~/vim.log $argv
 end
 
