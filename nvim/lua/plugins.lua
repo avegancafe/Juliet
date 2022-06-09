@@ -116,18 +116,8 @@ return require("packer").startup({
 					},
 				}
 				require("nvim-treesitter.configs").setup({
-					ensure_installed = {
-						"javascript",
-						"typescript",
-						"go",
-						"bash",
-						"lua",
-						"vim",
-						"norg",
-						-- need this for brewfiles
-						"ruby"
-					},
-					ignore_install = {},
+					ensure_installed = "all",
+					ignore_install = { "phpdoc" },
 					highlight = {
 						enable = true,
 						additional_vim_regex_highlighting = false,

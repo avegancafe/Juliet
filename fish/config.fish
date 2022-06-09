@@ -7,6 +7,7 @@ set -gx PATH "$GOPATH/bin" $PATH
 set -gx PATH "$HOME/.cargo/bin" $PATH
 set -gx PATH $PATH "/Users/kyle/.foundry/bin"
 set -gx PATH "/opt/homebrew/opt/go@1.16/bin" $PATH 
+set -gx PATH (pyenv root)/shims $PATH
 set -gx GOPATH "$HOME/go"
 set -gx EDITOR vim
 set -gx LSCOLORS bxfxcxdxbxegedabagacad

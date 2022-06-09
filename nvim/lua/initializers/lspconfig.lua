@@ -33,7 +33,24 @@ local opts = {
   },
   handlers = {
     ["textDocument/hover"] =  vim.lsp.with(vim.lsp.handlers.hover, {border = 'rounded'}),
-  }
+  },
+  root_dir = nvim_lsp.util.root_pattern('.git'),
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+      },
+      diagnostics = {
+        globals = {'vim'},
+      },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
+      telemetry = {
+        enable = false,
+      },
+    },
+  },
 }
 
 vim.cmd [[ do User LspAttachBuffers ]]
@@ -45,7 +62,8 @@ local servers = {
   "tailwindcss",
   "tsserver",
   "gopls",
-  "solidity_ls"
+  "solidity_ls",
+  "sumneko_lua"
 }
 
 function UninstallLspServers()
