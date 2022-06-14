@@ -1,7 +1,8 @@
 vim.cmd([[
 augroup packer_user_config
 autocmd!
-autocmd BufWritePost plugins.lua luafile <afile>
+	autocmd BufWritePost plugins.lua luafile <afile>
+	autocmd BufWritePost plugins.lua PackerCompile
 augroup end
 ]])
 
@@ -158,7 +159,72 @@ return require("packer").startup({
 				require("cmds/setup_bufferline").setup("buffers")
 			end,
 		})
-		use("glepnir/dashboard-nvim")
+		use({
+			"glepnir/dashboard-nvim",
+			config = function()
+				local db = require("dashboard")
+
+				db.custom_header = {
+					"    ↑↑↓↓    ",
+					"   ←→←→AB   ",
+					"   ┌────┐   ",
+					"   │    ├┐  ",
+					"   │┌ ┌ └│  ",
+					"   │ ╘  └┘  ",
+					"   │    │   ",
+					"   │╙─  │   ",
+					"   │    │   ",
+					"   └──┘ │   ",
+					"     │  │   ",
+					"     │  │   ",
+				}
+
+				local utils = require("telescope.utils")
+				local set_var = vim.api.nvim_set_var
+
+				local git_root, ret = utils.get_os_command_output(
+					{ "git", "rev-parse", "--show-toplevel" },
+					vim.loop.cwd()
+				)
+
+				local function get_dashboard_git_status()
+					local git_cmd = { "git", "status", "-s", "--", "." }
+					local output = utils.get_os_command_output(git_cmd)
+					db.custom_footer = { "Git status", "", unpack(output) }
+				end
+
+				if ret ~= 0 then
+					local is_worktree = utils.get_os_command_output(
+						{ "git", "rev-parse", "--is-inside-work-tree" },
+						vim.loop.cwd()
+					)
+					if is_worktree[1] == "true" then
+						get_dashboard_git_status()
+					else
+						local socket = io.popen("fortune")
+						local fortune = socket:read("*a")
+						socket:close()
+
+						local footer = {}
+						for s in fortune:gmatch("[^\r\n]+") do
+							table.insert(footer, s)
+						end
+
+						db.custom_footer = footer
+					end
+				else
+					get_dashboard_git_status()
+				end
+
+				db.custom_center = {
+					{ desc = "Last Session" },
+					{ desc = "Find history" },
+					{ desc = "Find file" },
+					{ desc = "New file" },
+					{ desc = "Find word" },
+				}
+			end,
+		})
 		use("Yggdroot/indentLine")
 		use({
 			"terrortylor/nvim-comment",
