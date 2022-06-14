@@ -8,12 +8,6 @@ augroup quickfix
 augroup END
 ]])
 
-vim.cmd([[
-augroup lint
-  au InsertLeave <buffer> lua require('lint').try_lint()
-augroup END
-]])
-
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1

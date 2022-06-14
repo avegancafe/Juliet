@@ -37,6 +37,12 @@ return require("packer").startup({
 					"--config",
 					"~/workspace/api-v2-backend/.build/scripts/.golangci.yml",
 				}
+
+				vim.cmd([[
+					augroup lint
+						au InsertLeave <buffer> lua require('lint').try_lint()
+					augroup END
+				]])
 			end,
 		})
 		use("wincent/loupe")
