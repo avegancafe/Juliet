@@ -153,6 +153,7 @@ return require("packer").startup({
 					void["highlight_groups"],
 					void["terminal_ansi_colors"]
 				)
+				vim.cmd("colorscheme void")
 			end,
 		})
 		use({
@@ -165,7 +166,7 @@ return require("packer").startup({
 		use("sbdchd/neoformat")
 		use({
 			"akinsho/bufferline.nvim",
-			requires = "kyazdani42/nvim-web-devicons",
+			requires = { "kyazdani42/nvim-web-devicons", "Th3Whit3Wolf/space-nvim" },
 			config = function()
 				require("cmds/setup_bufferline").setup("buffers")
 			end,
@@ -324,7 +325,7 @@ return require("packer").startup({
 		})
 		use({
 			"nvim-lualine/lualine.nvim",
-			requires = { "nvim-web-devicons" },
+			requires = { "nvim-web-devicons", "Th3Whit3Wolf/space-nvim" },
 			config = function()
 				require("lualine").setup({
 					options = {

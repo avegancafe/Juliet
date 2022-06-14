@@ -45,7 +45,6 @@ vim.cmd('set noshowmode')
 
 -- theme
 vim.opt.termguicolors = true
-vim.cmd('colorscheme void')
 
 -- indentation
 vim.opt.shiftwidth = 2
