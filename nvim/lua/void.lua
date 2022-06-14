@@ -132,6 +132,14 @@ end)()
 
 -- This is where the rest of your highlights should go.
 local highlight_groups = {
+	----------------------------------------------------------------------
+	-- Dashboard Groups (descriptions and ordering from dashboard-nvim) --
+	----------------------------------------------------------------------
+
+	DashboardHeader = { fg = red1 },
+	DashboardCenterIcon = { fg = aqua },
+	DashboardShortCut = { fg = grey },
+	DashboardFooter = { fg = war },
 
 	-------------------------------------------------------------
 	-- Syntax Groups (descriptions and ordering from `:h w18`) --

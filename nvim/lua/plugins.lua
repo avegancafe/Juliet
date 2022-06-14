@@ -165,6 +165,8 @@ return require("packer").startup({
 				local db = require("dashboard")
 
 				db.custom_header = {
+					"            ",
+					"            ",
 					"    ↑↑↓↓    ",
 					"   ←→←→AB   ",
 					"   ┌────┐   ",
@@ -177,6 +179,9 @@ return require("packer").startup({
 					"   └──┘ │   ",
 					"     │  │   ",
 					"     │  │   ",
+					"            ",
+					"            ",
+					"            ",
 				}
 
 				local utils = require("telescope.utils")
@@ -190,7 +195,13 @@ return require("packer").startup({
 				local function get_dashboard_git_status()
 					local git_cmd = { "git", "status", "-s", "--", "." }
 					local output = utils.get_os_command_output(git_cmd)
-					db.custom_footer = { "Git status", "", unpack(output) }
+					local status = unpack(output)
+
+					if status == nil then
+						status = "No files changed"
+					end
+
+					db.custom_footer = { "", "", "Git status", "", status }
 				end
 
 				if ret ~= 0 then
@@ -217,11 +228,28 @@ return require("packer").startup({
 				end
 
 				db.custom_center = {
-					{ desc = "Last Session" },
-					{ desc = "Find history" },
-					{ desc = "Find file" },
-					{ desc = "New file" },
-					{ desc = "Find word" },
+					{
+						desc = "Last Session             ",
+						icon = " ",
+						shortcut = "\\ s s",
+						action = "SessionManager load_current_dir_session",
+					},
+					{
+						desc = "Find file               ",
+						icon = " ",
+						shortcut = "ctrl p",
+						action = "Telescope find_files",
+					},
+					{
+						desc = "New file                     ",
+						icon = " ",
+						action = "DashboardNewFile",
+					},
+					{
+						desc = "Find word                    ",
+						icon = " ",
+						action = "call v:lua.TelescopeGrep()",
+					},
 				}
 			end,
 		})
@@ -328,6 +356,16 @@ return require("packer").startup({
 			end,
 		})
 		use("ray-x/lsp_signature.nvim")
+		use({
+			"Shatur/neovim-session-manager",
+			config = function()
+				require("session_manager").setup({
+					autoload_mode = require("session_manager.config").AutoloadMode.Disabled,
+					max_path_length = 0,
+				})
+			end,
+		})
+		use("nvim-telescope/telescope-ui-select.nvim")
 	end,
 	auto_reload_compiled = true,
 })
