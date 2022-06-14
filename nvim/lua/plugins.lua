@@ -83,7 +83,18 @@ return require("packer").startup({
 							},
 						},
 					},
+					extensions = {
+						["ui-select"] = {
+							require("telescope.themes").get_dropdown({
+								layout_config = {
+									prompt_position = "top",
+								},
+							}),
+						},
+					},
 				})
+
+				require("telescope").load_extension("ui-select")
 			end,
 		})
 		use("frazrepo/vim-rainbow")
