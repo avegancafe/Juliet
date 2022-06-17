@@ -2,6 +2,7 @@ vim.cmd([[
 augroup packer_user_config
 autocmd!
 	autocmd BufWritePost plugins.lua luafile <afile>
+	autocmd BufWritePost plugins.lua PackerInstall
 	autocmd BufWritePost plugins.lua PackerCompile
 augroup end
 ]])
@@ -97,10 +98,17 @@ return require("packer").startup({
 								},
 							}),
 						},
+						file_browser = {
+							theme = "dropdown",
+							layout_config = {
+								prompt_position = "top",
+							},
+						},
 					},
 				})
 
 				require("telescope").load_extension("ui-select")
+				require("telescope").load_extension("file_browser")
 			end,
 		})
 		use("frazrepo/vim-rainbow")
@@ -384,6 +392,7 @@ return require("packer").startup({
 			end,
 		})
 		use("nvim-telescope/telescope-ui-select.nvim")
+		use("nvim-telescope/telescope-file-browser.nvim")
 	end,
 	auto_reload_compiled = true,
 })
