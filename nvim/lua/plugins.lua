@@ -106,9 +106,6 @@ return require("packer").startup({
 						},
 					},
 				})
-
-				require("telescope").load_extension("ui-select")
-				require("telescope").load_extension("file_browser")
 			end,
 		})
 		use("frazrepo/vim-rainbow")
@@ -391,8 +388,25 @@ return require("packer").startup({
 				})
 			end,
 		})
-		use("nvim-telescope/telescope-ui-select.nvim")
-		use("nvim-telescope/telescope-file-browser.nvim")
+		use({
+			"nvim-telescope/telescope-ui-select.nvim",
+			config = function()
+				require("telescope").load_extension("ui-select")
+			end,
+		})
+		use({
+			"nvim-telescope/telescope-file-browser.nvim",
+			config = function()
+				require("telescope").load_extension("file_browser")
+			end,
+		})
+		use({
+			"nvim-telescope/telescope-frecency.nvim",
+			config = function()
+				require("telescope").load_extension("frecency")
+			end,
+			requires = { "tami5/sqlite.lua" },
+		})
 	end,
 	auto_reload_compiled = true,
 })

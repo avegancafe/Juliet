@@ -33,7 +33,7 @@ end
 
 vim.cmd(":command ToggleNumbers call v:lua.ToggleNumbers()")
 
-normal_map("<c-p>", ":Telescope find_files<cr>", { silent = true })
+normal_map("<c-p>", ":Telescope frecency<cr>", { silent = true })
 normal_map("<c-b>", ":Telescope buffers<cr>", { silent = true })
 normal_map("<c-o>", ":w<cr>")
 normal_map("<leader>cp", ':let @*=expand("%:p")<cr>')
