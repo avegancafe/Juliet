@@ -103,7 +103,7 @@ return require("packer").startup({
 							layout_config = {
 								prompt_position = "top",
 							},
-						},
+						}
 					},
 				})
 			end,
@@ -399,13 +399,6 @@ return require("packer").startup({
 			config = function()
 				require("telescope").load_extension("file_browser")
 			end,
-		})
-		use({
-			"nvim-telescope/telescope-frecency.nvim",
-			config = function()
-				require("telescope").load_extension("frecency")
-			end,
-			requires = { "tami5/sqlite.lua" },
 		})
 	end,
 	auto_reload_compiled = true,
