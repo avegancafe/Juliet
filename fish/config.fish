@@ -229,6 +229,10 @@ function glo --description "open the URL of a file in gitlab"
     _gl $_flag_c $argv | xargs open
 end
 
+function changed_files
+    echo (git status --short | sed "s/[[:alnum:]][[:space:]]\(.*\)/\1/g")
+end
+
 eval (starship init fish)
 
 ssh-add -A 2>/dev/null

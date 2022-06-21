@@ -48,10 +48,18 @@ normal_map("<tab>", ":BufferLineCycleNext<cr>")
 normal_map("<s-tab>", ":BufferLineCyclePrev<cr>")
 normal_map("<leader>ss", ":SessionManager save_current_session<cr>")
 normal_map("<leader>sl", ":SessionManager load_current_dir_session<cr>")
+normal_map("<leader>sc", ":call v:lua.EditChangedFiles()<cr>")
 normal_map("<leader>b", ":BufferLinePick<cr>")
 normal_map("<leader>bb", ":BufferLinePick<cr>")
 normal_map("<leader>bc", ":BufferLinePickClose<cr>")
 normal_map("<leader>bf", ":Neoformat<cr>")
+
+function EditChangedFiles()
+	local files_output = vim.api.nvim_exec('!changed_files', true)
+	local changed_files = vim.split(files_output, '\n')[3]
+
+	vim.cmd('args' .. changed_files)
+end
 
 -- terminal mappings --
 
