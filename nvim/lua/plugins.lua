@@ -103,7 +103,7 @@ return require("packer").startup({
 							layout_config = {
 								prompt_position = "top",
 							},
-						}
+						},
 					},
 				})
 			end,
@@ -218,13 +218,12 @@ return require("packer").startup({
 				local function get_dashboard_git_status()
 					local git_cmd = { "git", "status", "-s", "--", "." }
 					local output = utils.get_os_command_output(git_cmd)
-					local status = unpack(output)
 
-					if status == nil then
-						status = "No files changed"
+					if #output == 0 then
+						db.custom_footer = { "", "", "Git status", "", "No files changed" }
+					else
+						db.custom_footer = { "", "", "Git status", "", unpack(output) }
 					end
-
-					db.custom_footer = { "", "", "Git status", "", status }
 				end
 
 				if ret ~= 0 then
