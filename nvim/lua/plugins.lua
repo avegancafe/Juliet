@@ -399,6 +399,7 @@ return require("packer").startup({
 				require("telescope").load_extension("file_browser")
 			end,
 		})
+		use("github/copilot.vim")
 	end,
 	auto_reload_compiled = true,
 })
