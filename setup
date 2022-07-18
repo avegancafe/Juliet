@@ -70,6 +70,10 @@ setup_other() {
   touch ~/.hushlogin
 }
 
+setup_hammerspoon() {
+  [[ ! -d ~/.hammerspoon ]] && ln -sfv ~/.config/Juliet/.hammerspoon ~/
+}
+
 setup_git
 setup_dependencies
 setup_fzf
@@ -79,5 +83,6 @@ setup_gpg
 setup_psql
 setup_lua
 setup_kitty
+setup_hammerspoon
 
 setup_other
