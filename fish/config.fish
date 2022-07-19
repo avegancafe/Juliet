@@ -126,7 +126,7 @@ function dc
     docker compose $argv
 end
 
-function s
+function st
     git status -s
 end
 
