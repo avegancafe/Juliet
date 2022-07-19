@@ -1,16 +1,14 @@
 [alias]
-	co = checkout
-	cp = cherry-pick
-	clean-merged = "!git branch --merged | grep -v \\* | xargs git branch -D "
-	clean-branches = "!git branch | grep -v \\* | xargs git branch -D "
 	a = add
 	ad = add
-	diff-branch = !git diff $(git merge-base --fork-point master)
+	clean-branches = "!git branch | grep -v \\* | xargs git branch -D "
+	clean-merged = "!git branch --merged | grep -v \\* | xargs git branch -D "
+	co = checkout
 	com = commit
-	aa = add -A
+	cp = cherry-pick
+	diff-branch = !git diff $(git merge-base --fork-point master)
+	s = switch
 	staged = diff --staged
-	up = push
-	down = pull
 	t = ticket
 [push]
 	default = current
