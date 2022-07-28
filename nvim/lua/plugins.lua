@@ -253,7 +253,7 @@ return require("packer").startup({
 					{
 						desc = "Last Session             ",
 						icon = " ",
-						shortcut = "\\ s s",
+						shortcut = "\\ s l",
 						action = "SessionManager load_current_dir_session",
 					},
 					{
