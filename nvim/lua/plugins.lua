@@ -263,12 +263,12 @@ return require("packer").startup({
 						action = "Telescope find_files",
 					},
 					{
-						desc = "New file                       ",
+						desc = "New file                     ",
 						icon = " ",
 						action = "DashboardNewFile",
 					},
 					{
-						desc = "Find word                      ",
+						desc = "Find word                    ",
 						icon = " ",
 						action = "call v:lua.TelescopeGrep()",
 					},
