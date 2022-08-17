@@ -5,7 +5,7 @@ function M.setup(buf_mode)
 	require("bufferline").setup({
 		highlights = {
 			buffer_selected = {
-				gui = "underline"
+				underline = true
 			},
 		},
 		options = {
