@@ -275,7 +275,12 @@ return require("packer").startup({
 				}
 			end,
 		})
-		use("Yggdroot/indentLine")
+		use({
+			"Yggdroot/indentLine",
+			config = function()
+				vim.g.indentLine_concealcursor = 'n'
+			end
+		})
 		use({
 			"terrortylor/nvim-comment",
 			config = function()
