@@ -1,3 +1,17 @@
+local fn = vim.fn
+local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
+if fn.empty(fn.glob(install_path)) > 0 then
+	packer_bootstrap = fn.system({
+		"git",
+		"clone",
+		"--depth",
+		"1",
+		"https://github.com/wbthomason/packer.nvim",
+		install_path,
+	})
+	vim.cmd([[packadd packer.nvim]])
+end
+
 vim.cmd([[
 augroup packer_user_config
 autocmd!
@@ -10,7 +24,7 @@ augroup end
 buffer_current_tabmode = "buffers"
 
 return require("packer").startup({
-	function()
+	function(use)
 		use("wbthomason/packer.nvim")
 		use("MaxMEllon/vim-jsx-pretty")
 		use({
@@ -278,8 +292,8 @@ return require("packer").startup({
 		use({
 			"Yggdroot/indentLine",
 			config = function()
-				vim.g.indentLine_concealcursor = 'n'
-			end
+				vim.g.indentLine_concealcursor = "n"
+			end,
 		})
 		use({
 			"terrortylor/nvim-comment",
@@ -440,7 +454,7 @@ return require("packer").startup({
 					}),
 					sources = cmp.config.sources({
 						{ name = "nvim_lsp" },
-						{ name = 'luasnip' },
+						{ name = "luasnip" },
 					}, {
 						{ name = "buffer" },
 					}),
