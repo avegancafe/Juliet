@@ -20,7 +20,7 @@
 	autocrlf = false
 	editor = nvim
 [github]
-	user = keyboard-clacker
+	user = avegancafe
 [format]
   # the %x08's are delete characters
 	pretty = format:%C(yellow)%h %Creset— %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08 %Creset— %C(red)%<(20,trunc)%an %Creset%<(80,trunc)%s
