@@ -26,7 +26,6 @@ buffer_current_tabmode = "buffers"
 return require("packer").startup({
 	function(use)
 		use("wbthomason/packer.nvim")
-		use("MaxMEllon/vim-jsx-pretty")
 		use({
 			"kyazdani42/nvim-tree.lua",
 			requires = "kyazdani42/nvim-web-devicons",
@@ -34,7 +33,10 @@ return require("packer").startup({
 				require("nvim-tree").setup()
 			end,
 		})
-		use("rhysd/committia.vim")
+		use({
+			"rhysd/committia.vim",
+			ft = "gitcommit",
+		})
 		use({
 			"mfussenegger/nvim-lint",
 			config = function()
@@ -61,12 +63,6 @@ return require("packer").startup({
 			end,
 		})
 		use("wincent/loupe")
-		use({
-			"kassio/neoterm",
-			config = function()
-				vim.cmd("syntax enable")
-			end,
-		})
 		use({
 			"nvim-telescope/telescope.nvim",
 			requires = { "kyazdani42/nvim-web-devicons", "nvim-lua/plenary.nvim" },
@@ -124,9 +120,9 @@ return require("packer").startup({
 		})
 		use("frazrepo/vim-rainbow")
 		use({
-			"dag/vim-fish",
+			"tomlion/vim-solidity",
+			ft = "solidity",
 		})
-		use("tomlion/vim-solidity")
 		use("tpope/vim-surround")
 		use("othree/yajs.vim")
 		use({
@@ -172,7 +168,8 @@ return require("packer").startup({
 		use({
 			"Th3Whit3Wolf/space-nvim",
 			config = function()
-				void = require("void")
+				local void = require("void")
+
 				require("space-nvim")(
 					void["highlight_group_normal"],
 					void["highlight_groups"],
@@ -321,32 +318,6 @@ return require("packer").startup({
 						options = {
 							number = false,
 							relativenumber = false,
-						},
-					},
-				})
-			end,
-		})
-		use({
-			"nvim-neorg/neorg",
-			requires = { "folke/zen-mode.nvim" },
-			config = function()
-				require("neorg").setup({
-					load = {
-						["core.defaults"] = {},
-						["core.norg.concealer"] = {},
-						["core.presenter"] = {
-							config = {
-								zen_mode = "zen-mode",
-							},
-						},
-						["core.norg.dirman"] = {
-							config = {
-								workspaces = {
-									frontend = "~/workspace/api-v2-frontend",
-									backend = "~/workspace/api-v2-backend",
-									notes = "~/workspace/notes",
-								},
-							},
 						},
 					},
 				})

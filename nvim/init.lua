@@ -13,7 +13,7 @@ vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
 vim.g.DevIconsDefaultFolderOpenSymbol = ""
 vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ""
-vim.g.indentLine_fileTypeExclude = { "dashboard" }
+vim.g.indentLine_fileTypeExclude = { "dashboard", "packer" }
 vim.g.go_fmt_command = "goimports"
 -- vim.lsp.set_log_level("debug")
 vim.opt.timeoutlen = 500
@@ -55,7 +55,6 @@ augroup FiletypeGroup
   au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
   au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
   au BufRead,BufNewFile *.md setlocal textwidth=80
-  au FileType fish compiler fish
   au FileType fish setlocal textwidth=79
   au FileType fish setlocal foldmethod=expr
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
