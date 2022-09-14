@@ -13,7 +13,6 @@ vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
 vim.g.DevIconsDefaultFolderOpenSymbol = ""
 vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ""
-vim.g.indentLine_fileTypeExclude = { "dashboard", "packer" }
 vim.g.go_fmt_command = "goimports"
 -- vim.lsp.set_log_level("debug")
 vim.opt.timeoutlen = 500

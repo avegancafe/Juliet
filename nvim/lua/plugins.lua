@@ -289,6 +289,7 @@ return require("packer").startup({
 		use({
 			"Yggdroot/indentLine",
 			config = function()
+				vim.g.indentLine_fileTypeExclude = { "dashboard", "packer" }
 				vim.g.indentLine_concealcursor = "n"
 			end,
 		})
