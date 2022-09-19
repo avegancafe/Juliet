@@ -14,7 +14,6 @@ set -gx LSCOLORS bxfxcxdxbxegedabagacad
 set -gx GPG_TTY (tty)
 set -U FZF_LEGACY_KEYBINDINGS 0
 set fish_color_command 69f0ad
-set -gx FZF_DEFAULT_COMMAND "ag -g ''"
 set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
 set -gx RELAY_FZF_OPTS "--reverse --height 40%"
 
