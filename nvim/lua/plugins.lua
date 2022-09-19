@@ -93,7 +93,7 @@ return require("packer").startup({
 					},
 					pickers = {
 						find_files = {
-							find_command = { "fd", "--hidden", "--glob", "" },
+							find_command = { "fd", "--hidden", "--glob", "", "--type", "file" },
 						},
 						buffers = {
 							mappings = {
@@ -116,9 +116,13 @@ return require("packer").startup({
 							layout_config = {
 								prompt_position = "top",
 							},
+							hidden = true,
+							respect_gitignore = true,
 						},
 					},
 				})
+
+				require("telescope").load_extension("file_browser")
 			end,
 		})
 		use("frazrepo/vim-rainbow")
@@ -382,12 +386,14 @@ return require("packer").startup({
 		})
 		use({
 			"nvim-telescope/telescope-ui-select.nvim",
+			requires = { "nvim-telescope/telescope.nvim" },
 			config = function()
 				require("telescope").load_extension("ui-select")
 			end,
 		})
 		use({
 			"nvim-telescope/telescope-file-browser.nvim",
+			requires = { "nvim-telescope/telescope.nvim" },
 			config = function()
 				require("telescope").load_extension("file_browser")
 			end,
