@@ -76,3 +76,4 @@ cask "gpg-suite"
 cask "hammerspoon"
 cask "keycastr"
 cask "vlc", args: { appdir: "/Applications" }
+cask "via"
