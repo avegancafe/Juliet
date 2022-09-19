@@ -27,6 +27,10 @@ setup_fzf() {
   /opt/homebrew/opt/fzf/install
 }
 
+setup_fd() {
+  [[ ! -f ~/.fdignore ]] && ln -sfv ~/.config/Juliet/.fdignore ~/
+}
+
 setup_vim() {
   [[ ! -d ~/.config/nvim ]] && ln -sfv ~/.config/Juliet/nvim ~/.config/nvim
 }
@@ -77,6 +81,7 @@ setup_hammerspoon() {
 setup_git
 setup_dependencies
 setup_fzf
+setup_fd
 setup_vim
 setup_fish
 setup_gpg
