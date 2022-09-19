@@ -75,6 +75,8 @@ return require("packer").startup({
 						mappings = {
 							i = {
 								["<c-d>"] = trouble.open_with_trouble,
+								["<c-j>"] = actions.move_selection_next,
+								["<c-k>"] = actions.move_selection_previous,
 							},
 							n = {
 								["<c-t>"] = trouble.open_with_trouble,
@@ -91,9 +93,25 @@ return require("packer").startup({
 							},
 						},
 					},
+					vimgrep_arguments = {
+						"rg",
+						"--no-heading",
+						"--with-filename",
+						"--line-number",
+						"--column",
+						"--hidden",
+						"--smart-case",
+					},
 					pickers = {
 						find_files = {
 							find_command = { "fd", "--hidden", "--glob", "", "--type", "file" },
+						},
+						live_grep = {
+							file_ignore_patterns = { 'node_modules', '.git' },
+							find_command = "rg",
+							additional_args = function()
+								return { "--hidden" }
+							end,
 						},
 						buffers = {
 							mappings = {
