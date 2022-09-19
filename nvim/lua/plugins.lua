@@ -92,6 +92,9 @@ return require("packer").startup({
 						},
 					},
 					pickers = {
+						find_files = {
+							find_command = { "fd", "--hidden", "--glob", "" },
+						},
 						buffers = {
 							mappings = {
 								i = {
