@@ -11,6 +11,10 @@
 	s = switch
 	staged = diff --staged
 	t = ticket
+	u = push
+	d = pull
+	down = pull
+	up = push
 [push]
 	default = current
 [commit]
