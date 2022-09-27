@@ -93,24 +93,22 @@ return require("packer").startup({
 							},
 						},
 					},
-					vimgrep_arguments = {
-						"rg",
-						"--no-heading",
-						"--with-filename",
-						"--line-number",
-						"--column",
-						"--hidden",
-						"--smart-case",
-					},
 					pickers = {
 						find_files = {
 							find_command = { "fd", "--hidden", "--glob", "", "--type", "file" },
 						},
 						live_grep = {
-							file_ignore_patterns = { 'node_modules', '.git' },
+							file_ignore_patterns = { "node_modules", ".git" },
 							find_command = "rg",
 							additional_args = function()
-								return { "--hidden" }
+								return {
+									"--no-heading",
+									"--with-filename",
+									"--line-number",
+									"--column",
+									"--hidden",
+									"--smart-case",
+								}
 							end,
 						},
 						buffers = {
