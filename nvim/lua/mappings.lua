@@ -36,8 +36,15 @@ vim.cmd(":command ToggleNumbers call v:lua.ToggleNumbers()")
 normal_map("<c-p>", ":Telescope find_files<cr>", { silent = true })
 normal_map("<c-b>", ":Telescope buffers<cr>", { silent = true })
 normal_map("<c-o>", ":w<cr>")
+
+function GitlabOpen()
+	local filepath = vim.trim(vim.fn.fnamemodify(vim.fn.expand("%"), ":~:."))
+	local command = "fish -c 'glo -c " .. filepath .. "'"
+
+	os.capture(command)
+	vim.cmd("mode")
+end
 normal_map("<leader>cp", ':let @*=expand("%:p")<cr>')
-normal_map("<leader>cf", ':let @*=expand("%")<cr>')
 normal_map("<c-f>", ":ZenMode<cr>", { silent = true })
 normal_map("<leader>f", ":NvimTreeToggle<CR>")
 normal_map("<leader>fr", ":NvimTreeRefresh<CR>")
@@ -53,6 +60,7 @@ normal_map("<leader>b", ":BufferLinePick<cr>")
 normal_map("<leader>bb", ":BufferLinePick<cr>")
 normal_map("<leader>bc", ":BufferLinePickClose<cr>")
 normal_map("<leader>bf", ":Neoformat<cr>")
+normal_map("<leader>bo", ":call v:lua.GitlabOpen()<cr>")
 normal_map("<leader>sc", ":let @a=@*<cr>")
 normal_map("<leader>sca", ":let @a=@*<cr>")
 normal_map("<leader>scb", ":let @b=@*<cr>")
@@ -60,10 +68,10 @@ normal_map("<leader>scc", ":let @c=@*<cr>")
 normal_map("<leader>scd", ":let @d=@*<cr>")
 
 function EditChangedFiles()
-	local files_output = vim.api.nvim_exec('!changed_files', true)
-	local changed_files = vim.split(files_output, '\n')[3]
+	local files_output = vim.api.nvim_exec("!changed_files", true)
+	local changed_files = vim.split(files_output, "\n")[3]
 
-	vim.cmd('args' .. changed_files)
+	vim.cmd("args" .. changed_files)
 end
 
 -- terminal mappings --
