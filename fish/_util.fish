@@ -1,4 +1,4 @@
-function info
+function rlog
   printf (tput setaf 2)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" $argv[1]
 end
 

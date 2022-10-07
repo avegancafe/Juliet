@@ -23,6 +23,15 @@ set -gx TERM xterm-256color
 
 source ~/.config/Juliet/fish/_util.fish
 
+function refsl
+    log 'Enabling spotlight indexing...'
+    sudo mdutil -Ea
+    log 'Clearing old spotlight cache...'
+    sudo mdutil -ai off
+    log 'Rebuilding spotlight cache...'
+    sudo mdutil -ai on
+end
+
 function r
     set -l profile
 
@@ -61,19 +70,19 @@ function update --description "Sync ruby/js project with git"
         error "Fail :("
     end
 
-    info "Pulling from git..."
+    rlog "Pulling from git..."
     git pull -r >$out_stream || begin
         fail
         return
     end
 
-    info "Updating installed gems..."
+    rlog "Updating installed gems..."
     bundle install >$out_stream || begin
         fail
         return
     end
 
-    info "Updating installed node modules..."
+    rlog "Updating installed node modules..."
     yarn install >$out_stream || begin
         fail
         return
@@ -96,7 +105,7 @@ function watch-repo
     git fetch 2>&1 >/dev/null
 
     set ORIGINAL_COMMIT (current-sha)
-    info "Polling for new commits... original commit is $ORIGINAL_COMMIT"
+    rlog "Polling for new commits... original commit is $ORIGINAL_COMMIT"
 
     for x in (seq 20)
         git fetch 2>&1 >/dev/null
