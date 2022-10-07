@@ -1,5 +1,7 @@
-To set up Juliet, run `git clone --recursive
-git@github.com:keyboard-clacker/Juliet ~/.config/Juliet && ~/.config/Juliet/setup`
+To set up Juliet, run: 
+```bash
+git clone --recursive git@github.com:avegancafe/Juliet ~/.config/Juliet && ~/.config/Juliet/setup
+```
 
 ## Downloads
 
