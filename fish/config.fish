@@ -16,6 +16,7 @@ set -U FZF_LEGACY_KEYBINDINGS 0
 set fish_color_command 69f0ad
 set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
 set -gx RELAY_FZF_OPTS "--reverse --height 40%"
+set -gx TERM "xterm-256color"
 
 ulimit -n 8096
 

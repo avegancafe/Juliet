@@ -19,6 +19,10 @@ augroup quickfix
 augroup END
 ]])
 
+vim.cmd([[
+set termguicolors
+]])
+
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
@@ -68,6 +72,7 @@ augroup FiletypeGroup
   au FileType fish setlocal textwidth=79
   au FileType fish setlocal foldmethod=expr
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
+  autocmd BufNewFile,BufRead Procfile set filetype=sh
 augroup END
 ]])
 

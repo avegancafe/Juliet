@@ -21,6 +21,7 @@ setup_dependencies() {
   setup_itermocil
   brew bundle --file ~/.config/Juliet/Brewfile
   [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config/
+  [[ ! -f ~/.prettierrc ]] && ln -sfv ~/.config/Juliet/.prettierrc ~
 }
 
 setup_fzf() {
@@ -28,7 +29,7 @@ setup_fzf() {
 }
 
 setup_fd() {
-  [[ ! -f ~/.fdignore ]] && ln -sfv ~/.config/Juliet/.fdignore ~/
+  [[ ! -f ~/.fdignore ]] && ln -sfv ~/.config/Juliet/.fdignore ~
 }
 
 setup_vim() {
@@ -38,7 +39,7 @@ setup_vim() {
 setup_fish() {
   sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
   mkdir -p ~/.config/fish
-  [[ ! -f ~/.config/fish/config.fish ]] && ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish/
+  [[ ! -f ~/.config/fish/config.fish ]] && ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish
 
   mkdir -p ~/.config/fish/functions
   [[ ! -f ~/.config/fish/functions/fish_user_key_bindings.fish ]] && ln -sfv ~/.config/Juliet/fish/fish_user_key_bindings.fish ~/.config/fish/functions
@@ -53,8 +54,8 @@ setup_gpg() {
 }
 
 setup_psql() {
-  [[ ! -f ~/.psqlrc ]] && ln -sfv ~/.config/Juliet/.psqlrc ~/
-  [[ ! -f ~/.pgclirc ]] && ln -sfv ~/.config/Juliet/.pgclirc ~/
+  [[ ! -f ~/.psqlrc ]] && ln -sfv ~/.config/Juliet/.psqlrc ~
+  [[ ! -f ~/.pgclirc ]] && ln -sfv ~/.config/Juliet/.pgclirc ~
 }
 
 setup_lua() {
@@ -63,11 +64,11 @@ setup_lua() {
 
 setup_kitty() {
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-  [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin/
+  [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin
 
   mkdir -p ~/.config/kitty
-  [[ ! -f ~/.config/kitty/kitty.conf ]] && ln -sfv ~/.config/Juliet/kitty/kitty.conf ~/.config/kitty/
-  [[ ! -f ~/.config/kitty/current-theme.conf ]] && ln -sfv ~/.config/Juliet/kitty/current-theme.conf ~/.config/kitty/
+  [[ ! -f ~/.config/kitty/kitty.conf ]] && ln -sfv ~/.config/Juliet/kitty/kitty.conf ~/.config/kitty
+  [[ ! -f ~/.config/kitty/current-theme.conf ]] && ln -sfv ~/.config/Juliet/kitty/current-theme.conf ~/.config/kitty
 }
 
 setup_other() {
@@ -75,7 +76,7 @@ setup_other() {
 }
 
 setup_hammerspoon() {
-  [[ ! -d ~/.hammerspoon ]] && ln -sfv ~/.config/Juliet/.hammerspoon ~/
+  [[ ! -d ~/.hammerspoon ]] && ln -sfv ~/.config/Juliet/.hammerspoon ~
 }
 
 setup_git

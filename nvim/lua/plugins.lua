@@ -456,6 +456,7 @@ return require("packer").startup({
 				})
 			end,
 		})
+		use('vimpostor/vim-tpipeline')
 	end,
 	auto_reload_compiled = true,
 })
