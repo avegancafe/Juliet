@@ -457,6 +457,7 @@ return require("packer").startup({
 			end,
 		})
 		use('vimpostor/vim-tpipeline')
+		use('dstein64/vim-startuptime')
 	end,
 	auto_reload_compiled = true,
 })
