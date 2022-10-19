@@ -24,6 +24,7 @@
 	excludesfile = /Users/kyle/.gitignore_global
 	autocrlf = false
 	editor = nvim
+	pager = less -x1,5
 [github]
 	user = avegancafe
 [format]
