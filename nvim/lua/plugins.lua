@@ -1,91 +1,94 @@
 local fn = vim.fn
-local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
+local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-	packer_bootstrap = fn.system({
-		"git",
-		"clone",
-		"--depth",
-		"1",
-		"https://github.com/wbthomason/packer.nvim",
-		install_path,
-	})
+	packer_bootstrap =
+		fn.system({
+			'git',
+			'clone',
+			'--depth',
+			'1',
+			'https://github.com/wbthomason/packer.nvim',
+			install_path,
+		})
 	vim.cmd([[packadd packer.nvim]])
 end
 
-vim.cmd([[
+vim.cmd(
+	[[
 augroup packer_user_config
 autocmd!
-	autocmd BufWritePost plugins.lua luafile <afile>
-	autocmd BufWritePost plugins.lua PackerInstall
-	autocmd BufWritePost plugins.lua PackerCompile
+autocmd BufWritePost plugins.lua luafile <afile>
+autocmd BufWritePost plugins.lua PackerInstall
+autocmd BufWritePost plugins.lua PackerCompile
 augroup end
-]])
+]]
+)
 
-buffer_current_tabmode = "buffers"
+buffer_current_tabmode = 'buffers'
 
-return require("packer").startup({
+return require('packer').startup({
+
+-- These two are optional and provide syntax highlighting
+-- for Neorg tables and the @document.meta tag
+-- REQUIRED - you must specify a snippet engine -- For `luasnip` users.
 	function(use)
-		use("wbthomason/packer.nvim")
+		use('wbthomason/packer.nvim')
 		use({
-			"kyazdani42/nvim-tree.lua",
-			requires = "kyazdani42/nvim-web-devicons",
+			'kyazdani42/nvim-tree.lua',
+			requires = 'kyazdani42/nvim-web-devicons',
 			config = function()
-				require("nvim-tree").setup()
+				require('nvim-tree').setup()
 			end,
 		})
+		use({ 'rhysd/committia.vim' })
 		use({
-			"rhysd/committia.vim",
-			ft = "gitcommit",
-		})
-		use({
-			"mfussenegger/nvim-lint",
+			'mfussenegger/nvim-lint',
 			config = function()
-				require("lint").linters_by_ft = {
-					go = { "golangcilint" },
+				require('lint').linters_by_ft = {
+					go = { 'golangcilint' },
 				}
-				local golangcilint = require("lint.linters.golangcilint")
+				local golangcilint = require('lint.linters.golangcilint')
 
 				golangcilint.append_fname = true
 
-				golangcilint.args = {
-					"run",
-					"--out-format",
-					"json",
-					"--config",
-					"~/workspace/api-v2-backend/.build/scripts/.golangci.yml",
-				}
+				golangcilint.args =
+					{
+						'run',
+						'--out-format',
+						'json',
+						'--config',
+						'~/workspace/api-v2-backend/.build/scripts/.golangci.yml',
+					}
 
-				vim.cmd([[
-					augroup lint
-						au InsertLeave <buffer> lua require('lint').try_lint()
-					augroup END
-				]])
+				vim.cmd(
+					[[
+				augroup lint
+				au InsertLeave <buffer> lua require('lint').try_lint()
+				augroup END
+				]]
+				)
 			end,
 		})
-		use("wincent/loupe")
+		use('wincent/loupe')
 		use({
-			"nvim-telescope/telescope.nvim",
-			requires = { "kyazdani42/nvim-web-devicons", "nvim-lua/plenary.nvim" },
+			'nvim-telescope/telescope.nvim',
+			requires = { 'kyazdani42/nvim-web-devicons', 'nvim-lua/plenary.nvim' },
 			config = function()
-				local actions = require("telescope.actions")
-				local trouble = require("trouble.providers.telescope")
+				local actions = require('telescope.actions')
+				local trouble = require('trouble.providers.telescope')
 
-				require("telescope").setup({
+				require('telescope').setup({
 					defaults = {
 						mappings = {
 							i = {
-								["<c-d>"] = trouble.open_with_trouble,
-								["<c-j>"] = actions.move_selection_next,
-								["<c-k>"] = actions.move_selection_previous,
+								['<c-d>'] = trouble.open_with_trouble,
+								['<c-j>'] = actions.move_selection_next,
+								['<c-k>'] = actions.move_selection_previous,
 							},
-							n = {
-								["<c-t>"] = trouble.open_with_trouble,
-							},
+							n = { ['<c-t>'] = trouble.open_with_trouble },
 						},
-						layout_config = {
-							prompt_position = "bottom",
-						},
-						layout_strategy = "bottom_pane",
+						layout_config = { prompt_position = 'bottom' },
+						layout_strategy = 'bottom_pane',
 						path_display = {
 							shorten = {
 								len = 2,
@@ -95,85 +98,84 @@ return require("packer").startup({
 					},
 					pickers = {
 						find_files = {
-							find_command = { "fd", "--hidden", "--glob", "", "--type", "file" },
+							find_command = {
+								'fd',
+								'--hidden',
+								'--glob',
+								'',
+								'--type',
+								'file',
+								'--no-ignore',
+							},
 						},
 						live_grep = {
-							file_ignore_patterns = { "node_modules", ".git" },
-							find_command = "rg",
+							file_ignore_patterns = { 'node_modules', '.git' },
+							find_command = 'rg',
 							additional_args = function()
 								return {
-									"--no-heading",
-									"--with-filename",
-									"--line-number",
-									"--column",
-									"--hidden",
-									"--smart-case",
+									'--no-heading',
+									'--with-filename',
+									'--line-number',
+									'--column',
+									'--hidden',
+									'--smart-case',
 								}
 							end,
 						},
 						buffers = {
 							mappings = {
-								i = {
-									["<c-q>"] = actions.delete_buffer + actions.move_to_top,
-								},
+								i = { ['<c-q>'] = actions.delete_buffer + actions.move_to_top },
 							},
 						},
 					},
 					extensions = {
-						["ui-select"] = {
-							require("telescope.themes").get_dropdown({
-								layout_config = {
-									prompt_position = "top",
-								},
-							}),
-						},
+						['ui-select'] = { require('telescope.themes').get_dropdown({
+							layout_config = { prompt_position = 'top' },
+						}) },
 						file_browser = {
-							theme = "dropdown",
-							layout_config = {
-								prompt_position = "top",
-							},
+							theme = 'dropdown',
+							layout_config = { prompt_position = 'top' },
 							hidden = true,
 							respect_gitignore = true,
 						},
 					},
 				})
 
-				require("telescope").load_extension("file_browser")
+				require('telescope').load_extension('file_browser')
 			end,
 		})
-		use("frazrepo/vim-rainbow")
+		use('frazrepo/vim-rainbow')
 		use({
-			"tomlion/vim-solidity",
-			ft = "solidity",
+			'tomlion/vim-solidity',
+			ft = 'solidity',
 		})
-		use("tpope/vim-surround")
-		use("othree/yajs.vim")
+		use('tpope/vim-surround')
+		use('othree/yajs.vim')
 		use({
-			"nvim-treesitter/nvim-treesitter",
-			run = ":TSUpdate",
+			'nvim-treesitter/nvim-treesitter',
+			run = ':TSUpdate',
 			config = function()
-				local parser_configs = require("nvim-treesitter.parsers").get_parser_configs()
+				local parser_configs =
+					require('nvim-treesitter.parsers').get_parser_configs()
 
-				-- These two are optional and provide syntax highlighting
-				-- for Neorg tables and the @document.meta tag
 				parser_configs.norg_meta = {
 					install_info = {
-						url = "https://github.com/nvim-neorg/tree-sitter-norg-meta",
-						files = { "src/parser.c" },
-						branch = "main",
+						url = 'https://github.com/nvim-neorg/tree-sitter-norg-meta',
+						files = { 'src/parser.c' },
+						branch = 'main',
 					},
 				}
 
 				parser_configs.norg_table = {
 					install_info = {
-						url = "https://github.com/nvim-neorg/tree-sitter-norg-table",
-						files = { "src/parser.c" },
-						branch = "main",
+						url = 'https://github.com/nvim-neorg/tree-sitter-norg-table',
+						files = { 'src/parser.c' },
+						branch = 'main',
 					},
 				}
-				require("nvim-treesitter.configs").setup({
-					ensure_installed = "all",
-					ignore_install = { "phpdoc" },
+				require('nvim-treesitter.configs').setup({
+					ensure_installed = 'all',
+					ignore_install = { 'phpdoc' },
 					highlight = {
 						enable = true,
 						additional_vim_regex_highlighting = false,
@@ -182,98 +184,101 @@ return require("packer").startup({
 			end,
 		})
 		use({
-			"lewis6991/gitsigns.nvim",
-			requires = { "nvim-lua/plenary.nvim" },
+			'lewis6991/gitsigns.nvim',
+			requires = { 'nvim-lua/plenary.nvim' },
 			config = function()
-				require("gitsigns").setup()
+				require('gitsigns').setup()
 			end,
 		})
 		use({
-			"Th3Whit3Wolf/space-nvim",
+			'Th3Whit3Wolf/space-nvim',
 			config = function()
-				local void = require("void")
+				local void = require('void')
 
-				require("space-nvim")(
-					void["highlight_group_normal"],
-					void["highlight_groups"],
-					void["terminal_ansi_colors"]
+				require('space-nvim')(
+					void['highlight_group_normal'],
+					void['highlight_groups'],
+					void['terminal_ansi_colors']
 				)
-				vim.cmd("colorscheme void")
+				vim.cmd('colorscheme void')
 			end,
 		})
 		use({
-			"neovim/nvim-lspconfig",
-			requires = { "williamboman/nvim-lsp-installer" },
+			'neovim/nvim-lspconfig',
+			requires = { 'williamboman/nvim-lsp-installer' },
 			config = function()
-				require("lspconfig").ocamllsp.setup({})
+				require('lspconfig').ocamllsp.setup({})
 			end,
 		})
-		use("sbdchd/neoformat")
+		use('sbdchd/neoformat')
 		use({
-			"akinsho/bufferline.nvim",
-			requires = { "kyazdani42/nvim-web-devicons", "Th3Whit3Wolf/space-nvim" },
+			'akinsho/bufferline.nvim',
+			requires = { 'kyazdani42/nvim-web-devicons', 'Th3Whit3Wolf/space-nvim' },
 			config = function()
-				require("cmds/setup_bufferline").setup("buffers")
+				require('cmds/setup_bufferline').setup('buffers')
 			end,
 		})
 		use({
-			"glepnir/dashboard-nvim",
+			'glepnir/dashboard-nvim',
 			config = function()
-				local db = require("dashboard")
+				local db = require('dashboard')
 
-				db.custom_header = {
-					"            ",
-					"            ",
-					"    ↑↑↓↓    ",
-					"   ←→←→AB   ",
-					"   ┌────┐   ",
-					"   │    ├┐  ",
-					"   │┌ ┌ └│  ",
-					"   │ ╘  └┘  ",
-					"   │    │   ",
-					"   │╙─  │   ",
-					"   │    │   ",
-					"   └──┘ │   ",
-					"     │  │   ",
-					"     │  │   ",
-					"            ",
-					"            ",
-					"            ",
-				}
+				db.custom_header =
+					{
+						'            ',
+						'            ',
+						'    ↑↑↓↓    ',
+						'   ←→←→AB   ',
+						'   ┌────┐   ',
+						'   │    ├┐  ',
+						'   │┌ ┌ └│  ',
+						'   │ ╘  └┘  ',
+						'   │    │   ',
+						'   │╙─  │   ',
+						'   │    │   ',
+						'   └──┘ │   ',
+						'     │  │   ',
+						'     │  │   ',
+						'            ',
+						'            ',
+						'            ',
+					}
 
-				local utils = require("telescope.utils")
+				local utils = require('telescope.utils')
 				local set_var = vim.api.nvim_set_var
 
-				local git_root, ret = utils.get_os_command_output(
-					{ "git", "rev-parse", "--show-toplevel" },
-					vim.loop.cwd()
-				)
+				local git_root, ret =
+					utils.get_os_command_output(
+						{ 'git', 'rev-parse', '--show-toplevel' },
+						vim.loop.cwd()
+					)
 
 				local function get_dashboard_git_status()
-					local git_cmd = { "git", "status", "-s", "--", "." }
+					local git_cmd = { 'git', 'status', '-s', '--', '.' }
 					local output = utils.get_os_command_output(git_cmd)
 
 					if #output == 0 then
-						db.custom_footer = { "", "", "Git status", "", "No files changed" }
+						db.custom_footer = { '', '', 'Git status', '', 'No files changed' }
 					else
-						db.custom_footer = { "", "", "Git status", "", unpack(output) }
+						db.custom_footer = { '', '', 'Git status', '', unpack(output) }
 					end
 				end
 
 				if ret ~= 0 then
-					local is_worktree = utils.get_os_command_output(
-						{ "git", "rev-parse", "--is-inside-work-tree" },
-						vim.loop.cwd()
-					)
-					if is_worktree[1] == "true" then
+					local is_worktree =
+						utils.get_os_command_output(
+							{ 'git', 'rev-parse', '--is-inside-work-tree' },
+							vim.loop.cwd()
+						)
+					if is_worktree[1] == 'true' then
 						get_dashboard_git_status()
 					else
-						local socket = io.popen("fortune")
-						local fortune = socket:read("*a")
+						local socket = io.popen('fortune')
+						local fortune = socket:read('*a')
 						socket:close()
 
 						local footer = {}
-						for s in fortune:gmatch("[^\r\n]+") do
+						for s in fortune:gmatch('[^\r\n]+') do
 							table.insert(footer, s)
 						end
 
@@ -283,59 +288,54 @@ return require("packer").startup({
 					get_dashboard_git_status()
 				end
 
-				db.custom_center = {
-					{
-						desc = "Last Session             ",
-						icon = " ",
-						shortcut = "\\ s l",
-						action = "SessionManager load_current_dir_session",
-					},
-					{
-						desc = "Find file               ",
-						icon = " ",
-						shortcut = "ctrl p",
-						action = "Telescope find_files",
-					},
-					{
-						desc = "New file                     ",
-						icon = " ",
-						action = "DashboardNewFile",
-					},
-					{
-						desc = "Find word                    ",
-						icon = " ",
-						action = "call v:lua.TelescopeGrep()",
-					},
-				}
+				db.custom_center = { {
+					desc = 'Last Session             ',
+					icon = ' ',
+					shortcut = '\\ s l',
+					action = 'SessionManager load_current_dir_session',
+				}, {
+					desc = 'Find file               ',
+					icon = ' ',
+					shortcut = 'ctrl p',
+					action = 'Telescope find_files',
+				}, {
+					desc = 'New file                     ',
+					icon = ' ',
+					action = 'DashboardNewFile',
+				}, {
+					desc = 'Find word                    ',
+					icon = ' ',
+					action = 'call v:lua.TelescopeGrep()',
+				} }
 			end,
 		})
 		use({
-			"Yggdroot/indentLine",
+			'Yggdroot/indentLine',
 			config = function()
-				vim.g.indentLine_fileTypeExclude = { "dashboard", "packer" }
-				vim.g.indentLine_concealcursor = "n"
+				vim.g.indentLine_fileTypeExclude = { 'dashboard', 'packer' }
+				vim.g.indentLine_concealcursor = 'n'
 			end,
 		})
 		use({
-			"terrortylor/nvim-comment",
+			'terrortylor/nvim-comment',
 			config = function()
-				require("nvim_comment").setup({
-					line_mapping = "<leader>cc",
-					operator_mapping = "<leader>c",
+				require('nvim_comment').setup({
+					line_mapping = '<leader>cc',
+					operator_mapping = '<leader>c',
 				})
 			end,
 		})
 		use({
-			"folke/trouble.nvim",
+			'folke/trouble.nvim',
 			config = function()
-				require("trouble").setup({})
+				require('trouble').setup({})
 			end,
 		})
-		use("tpope/vim-sleuth")
+		use('tpope/vim-sleuth')
 		use({
-			"folke/zen-mode.nvim",
+			'folke/zen-mode.nvim',
 			config = function()
-				require("zen-mode").setup({
+				require('zen-mode').setup({
 					window = {
 						backdrop = 1,
 						height = 0.73,
@@ -348,41 +348,44 @@ return require("packer").startup({
 			end,
 		})
 		use({
-			"nvim-lualine/lualine.nvim",
-			requires = { "nvim-web-devicons", "Th3Whit3Wolf/space-nvim" },
+			'nvim-lualine/lualine.nvim',
+			requires = { 'nvim-web-devicons', 'Th3Whit3Wolf/space-nvim' },
 			config = function()
-				require("lualine").setup({
+				require('lualine').setup({
 					options = {
-						component_separators = { left = "", right = "" },
-						section_separators = { left = "", right = "" },
-						theme = require("lualine_theme"),
+						component_separators = {
+							left = '',
+							right = '',
+						},
+						section_separators = {
+							left = '',
+							right = '',
+						},
+						theme = require('lualine_theme'),
 					},
 					sections = {
-						lualine_a = { "mode" },
-						lualine_b = { "filename" },
-						lualine_c = { "diagnostics" },
+						lualine_a = { 'mode' },
+						lualine_b = { 'filename' },
+						lualine_c = { 'diagnostics' },
 						lualine_x = {},
-						lualine_y = { "filetype" },
-						lualine_z = {
-							{
-								function()
-									return "|"
-								end,
-								color = { fg = require("void_colors").bg },
-							},
-							{
-								function()
-									return ""
-								end,
-								color = { fg = require("void_colors").red },
-							},
-						},
+						lualine_y = { 'filetype' },
+						lualine_z = { {
+							function()
+								return '|'
+							end,
+							color = { fg = require('void_colors').bg },
+						}, {
+							function()
+								return ''
+							end,
+							color = { fg = require('void_colors').red },
+						} },
 					},
 					inactive_sections = {
 						lualine_a = {},
 						lualine_b = {},
-						lualine_c = { "filename" },
-						lualine_x = { "location" },
+						lualine_c = { 'filename' },
+						lualine_x = { 'location' },
 						lualine_y = {},
 						lualine_z = {},
 					},
@@ -392,33 +395,39 @@ return require("packer").startup({
 			end,
 		})
 		use({
-			"Shatur/neovim-session-manager",
+			'Shatur/neovim-session-manager',
 			config = function()
-				require("session_manager").setup({
-					autoload_mode = require("session_manager.config").AutoloadMode.Disabled,
+				require('session_manager').setup({
+					autoload_mode = require(
+						'session_manager.config'
+					).AutoloadMode.Disabled,
 					max_path_length = 0,
 				})
 			end,
 		})
 		use({
-			"nvim-telescope/telescope-ui-select.nvim",
-			requires = { "nvim-telescope/telescope.nvim" },
+			'nvim-telescope/telescope-ui-select.nvim',
+			requires = { 'nvim-telescope/telescope.nvim' },
 			config = function()
-				require("telescope").load_extension("ui-select")
+				require('telescope').load_extension('ui-select')
 			end,
 		})
 		use({
-			"nvim-telescope/telescope-file-browser.nvim",
-			requires = { "nvim-telescope/telescope.nvim" },
+			'nvim-telescope/telescope-file-browser.nvim',
+			requires = { 'nvim-telescope/telescope.nvim' },
 			config = function()
-				require("telescope").load_extension("file_browser")
+				require('telescope').load_extension('file_browser')
 			end,
 		})
 		use({
-			"hrsh7th/nvim-cmp",
-			requires = { "hrsh7th/cmp-nvim-lsp", "neovim/nvim-lspconfig", "L3MON4D3/LuaSnip" },
+			'hrsh7th/nvim-cmp',
+			requires = {
+				'hrsh7th/cmp-nvim-lsp',
+				'neovim/nvim-lspconfig',
+				'L3MON4D3/LuaSnip',
+			},
 			config = function()
-				local cmp = require("cmp")
+				local cmp = require('cmp')
 
 				cmp.setup({
 					sorting = {
@@ -432,27 +441,22 @@ return require("packer").startup({
 							cmp.config.compare.order,
 						},
 					},
-					snippet = {
-						-- REQUIRED - you must specify a snippet engine
-						expand = function(args)
-							require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
-						end,
-					},
+					snippet = { expand = function(args)
+						require('luasnip').lsp_expand(args.body)
+					end },
 					window = {
 						completion = cmp.config.window.bordered(),
 						documentation = cmp.config.window.bordered(),
 					},
 					mapping = cmp.mapping.preset.insert({
-						["<C-e>"] = cmp.mapping.abort(),
-						["<CR>"] = cmp.mapping.confirm({ select = true }),
-						["<Tab>"] = cmp.mapping.confirm({ select = true }),
+						['<C-e>'] = cmp.mapping.abort(),
+						['<CR>'] = cmp.mapping.confirm({ select = true }),
+						['<Tab>'] = cmp.mapping.confirm({ select = true }),
 					}),
-					sources = cmp.config.sources({
-						{ name = "nvim_lsp" },
-						{ name = "luasnip" },
-					}, {
-						{ name = "buffer" },
-					}),
+					sources = cmp.config.sources(
+						{ { name = 'nvim_lsp' }, { name = 'luasnip' } },
+						{ { name = 'buffer' } }
+					),
 				})
 			end,
 		})
