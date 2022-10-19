@@ -16,13 +16,18 @@ set -U FZF_LEGACY_KEYBINDINGS 0
 set fish_color_command 69f0ad
 set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
 set -gx RELAY_FZF_OPTS "--reverse --height 40%"
-set -gx TERM "xterm-256color"
+set -gx TERM xterm-256color
+set -gx PATH (npm get prefix)/bin $PATH
 
 ulimit -n 8096
 
 set -gx TERM xterm-256color
 
 source ~/.config/Juliet/fish/_util.fish
+
+function p
+    pnpm $argv
+end
 
 function refsl
     log 'Enabling spotlight indexing...'
