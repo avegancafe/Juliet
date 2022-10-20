@@ -105,7 +105,6 @@ return require('packer').startup({
 								'',
 								'--type',
 								'file',
-								'--no-ignore',
 							},
 						},
 						live_grep = {
