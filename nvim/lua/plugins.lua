@@ -17,9 +17,8 @@ vim.cmd(
 	[[
 augroup packer_user_config
 autocmd!
-autocmd BufWritePost plugins.lua luafile <afile>
+autocmd BufWritePost plugins.lua source <afile> | PackerCompile
 autocmd BufWritePost plugins.lua PackerInstall
-autocmd BufWritePost plugins.lua PackerCompile
 augroup end
 ]]
 )
@@ -463,4 +462,15 @@ return require('packer').startup({
 		use('dstein64/vim-startuptime')
 	end,
 	auto_reload_compiled = true,
+	config = {
+		display = {
+			open_fn = function()
+				return require("packer.util").float({ border = "rounded" })
+			end
+		},
+		profile = {
+			enable = true,
+			threshold = 1, -- the amount in ms that a plugins load time must be over for it to be included in the profile
+		},
+	},
 })
