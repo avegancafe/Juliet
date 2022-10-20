@@ -3,15 +3,15 @@
 source ~/.config/Juliet/_util.bash
 
 setup_git() {
-  [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.config/Juliet/.gitconfig ~/
-  [[ ! -f ~/.gitconfig__local ]] && cp ~/.config/Juliet/.gitconfig__local ~/
-  [[ ! -f ~/.gitmessage ]] && ln -sfv ~/.config/Juliet/.gitmessage ~/
+  [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.config/Juliet/.gitconfig ~
+  [[ ! -f ~/.gitconfig__local ]] && cp ~/.config/Juliet/.gitconfig__local ~
+  [[ ! -f ~/.gitmessage ]] && ln -sfv ~/.config/Juliet/.gitmessage ~
 }
 
 setup_itermocil() {
   sudo mkdir -p /opt/homeberw/Library/Taps/keyboard-clacker
   git clone https://github.com/keyboard-clacker/homebrew-brews /opt/homeberw/Library/Taps/keyboard-clacker/homebrew-brews
-  [[ ! -d ~/.itermocil ]] && ln -sfv ~/.config/Juliet/.itermocil ~/
+  [[ ! -d ~/.itermocil ]] && ln -sfv ~/.config/Juliet/.itermocil ~
 }
 
 setup_dependencies() {
@@ -20,7 +20,7 @@ setup_dependencies() {
   eval "$(/opt/homebrew/bin/brew shellenv)"
   setup_itermocil
   brew bundle --file ~/.config/Juliet/Brewfile
-  [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config/
+  [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config
   [[ ! -f ~/.prettierrc ]] && ln -sfv ~/.config/Juliet/.prettierrc ~
 }
 
@@ -34,6 +34,7 @@ setup_fd() {
 
 setup_vim() {
   [[ ! -d ~/.config/nvim ]] && ln -sfv ~/.config/Juliet/nvim ~/.config/nvim
+  [[ ! -f ~/.stylua.toml ]] && ln -sfv ~/.config/Juliet/.stylua.toml ~
 }
 
 setup_fish() {
@@ -43,7 +44,7 @@ setup_fish() {
 
   mkdir -p ~/.config/fish/functions
   [[ ! -f ~/.config/fish/functions/fish_user_key_bindings.fish ]] && ln -sfv ~/.config/Juliet/fish/fish_user_key_bindings.fish ~/.config/fish/functions
-  [[ ! -f ~/.config/starship.toml ]] && ln -sfv ~/.config/Juliet/starship.toml ~/.config/
+  [[ ! -f ~/.config/starship.toml ]] && ln -sfv ~/.config/Juliet/starship.toml ~/.config
   chsh -s /opt/homebrew/bin/fish `whoami`
 }
 

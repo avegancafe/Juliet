@@ -1,27 +1,24 @@
 local fn = vim.fn
 local install_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(install_path)) > 0 then
-	packer_bootstrap =
-		fn.system({
-			'git',
-			'clone',
-			'--depth',
-			'1',
-			'https://github.com/wbthomason/packer.nvim',
-			install_path,
-		})
-	vim.cmd([[packadd packer.nvim]])
+	fn.system({
+		'git',
+		'clone',
+		'--depth',
+		'1',
+		'https://github.com/wbthomason/packer.nvim',
+		install_path,
+	})
+	vim.api.nvim_command('packadd packer.nvim')
 end
 
-vim.cmd(
-	[[
+vim.cmd([[
 augroup packer_user_config
 autocmd!
 autocmd BufWritePost plugins.lua source <afile> | PackerCompile
 autocmd BufWritePost plugins.lua PackerInstall
 augroup end
-]]
-)
+]])
 
 buffer_current_tabmode = 'buffers'
 
@@ -46,22 +43,19 @@ return require('packer').startup({
 
 				golangcilint.append_fname = true
 
-				golangcilint.args =
-					{
-						'run',
-						'--out-format',
-						'json',
-						'--config',
-						'~/workspace/api-v2-backend/.build/scripts/.golangci.yml',
-					}
+				golangcilint.args = {
+					'run',
+					'--out-format',
+					'json',
+					'--config',
+					'~/workspace/api-v2-backend/.build/scripts/.golangci.yml',
+				}
 
-				vim.cmd(
-					[[
+				vim.cmd([[
 				augroup lint
 				au InsertLeave <buffer> lua require('lint').try_lint()
 				augroup END
-				]]
-				)
+				]])
 			end,
 		})
 		use('wincent/loupe')
@@ -123,9 +117,11 @@ return require('packer').startup({
 						},
 					},
 					extensions = {
-						['ui-select'] = { require('telescope.themes').get_dropdown({
-							layout_config = { prompt_position = 'top' },
-						}) },
+						['ui-select'] = {
+							require('telescope.themes').get_dropdown({
+								layout_config = { prompt_position = 'top' },
+							}),
+						},
 						file_browser = {
 							theme = 'dropdown',
 							layout_config = { prompt_position = 'top' },
@@ -147,8 +143,7 @@ return require('packer').startup({
 			'nvim-treesitter/nvim-treesitter',
 			run = ':TSUpdate',
 			config = function()
-				local parser_configs =
-					require('nvim-treesitter.parsers').get_parser_configs()
+				local parser_configs = require('nvim-treesitter.parsers').get_parser_configs()
 
 				parser_configs.norg_meta = {
 					install_info = {
@@ -202,11 +197,13 @@ return require('packer').startup({
 				require('lspconfig').ocamllsp.setup({})
 			end,
 		})
-		use('sbdchd/neoformat')
+		use({
+			'sbdchd/neoformat',
+		})
 		use({
 			'akinsho/bufferline.nvim',
 			requires = { 'kyazdani42/nvim-web-devicons' },
-			after = "space-nvim",
+			after = 'space-nvim',
 			config = function()
 				require('cmds/setup_bufferline').setup('buffers')
 			end,
@@ -216,35 +213,31 @@ return require('packer').startup({
 			config = function()
 				local db = require('dashboard')
 
-				db.custom_header =
-					{
-						'            ',
-						'            ',
-						'    ↑↑↓↓    ',
-						'   ←→←→AB   ',
-						'   ┌────┐   ',
-						'   │    ├┐  ',
-						'   │┌ ┌ └│  ',
-						'   │ ╘  └┘  ',
-						'   │    │   ',
-						'   │╙─  │   ',
-						'   │    │   ',
-						'   └──┘ │   ',
-						'     │  │   ',
-						'     │  │   ',
-						'            ',
-						'            ',
-						'            ',
-					}
+				db.custom_header = {
+					'            ',
+					'            ',
+					'    ↑↑↓↓    ',
+					'   ←→←→AB   ',
+					'   ┌────┐   ',
+					'   │    ├┐  ',
+					'   │┌ ┌ └│  ',
+					'   │ ╘  └┘  ',
+					'   │    │   ',
+					'   │╙─  │   ',
+					'   │    │   ',
+					'   └──┘ │   ',
+					'     │  │   ',
+					'     │  │   ',
+					'            ',
+					'            ',
+					'            ',
+				}
 
 				local utils = require('telescope.utils')
 				local set_var = vim.api.nvim_set_var
 
 				local git_root, ret =
-					utils.get_os_command_output(
-						{ 'git', 'rev-parse', '--show-toplevel' },
-						vim.loop.cwd()
-					)
+					utils.get_os_command_output({ 'git', 'rev-parse', '--show-toplevel' }, vim.loop.cwd())
 
 				local function get_dashboard_git_status()
 					local git_cmd = { 'git', 'status', '-s', '--', '.' }
@@ -259,10 +252,7 @@ return require('packer').startup({
 
 				if ret ~= 0 then
 					local is_worktree =
-						utils.get_os_command_output(
-							{ 'git', 'rev-parse', '--is-inside-work-tree' },
-							vim.loop.cwd()
-						)
+						utils.get_os_command_output({ 'git', 'rev-parse', '--is-inside-work-tree' }, vim.loop.cwd())
 					if is_worktree[1] == 'true' then
 						get_dashboard_git_status()
 					else
@@ -281,25 +271,30 @@ return require('packer').startup({
 					get_dashboard_git_status()
 				end
 
-				db.custom_center = { {
-					desc = 'Last Session             ',
-					icon = ' ',
-					shortcut = '\\ s l',
-					action = 'SessionManager load_current_dir_session',
-				}, {
-					desc = 'Find file               ',
-					icon = ' ',
-					shortcut = 'ctrl p',
-					action = 'Telescope find_files',
-				}, {
-					desc = 'New file                     ',
-					icon = ' ',
-					action = 'DashboardNewFile',
-				}, {
-					desc = 'Find word                    ',
-					icon = ' ',
-					action = 'call v:lua.TelescopeGrep()',
-				} }
+				db.custom_center = {
+					{
+						desc = 'Last Session             ',
+						icon = ' ',
+						shortcut = '\\ s l',
+						action = 'SessionManager load_current_dir_session',
+					},
+					{
+						desc = 'Find file               ',
+						icon = ' ',
+						shortcut = 'ctrl p',
+						action = 'Telescope find_files',
+					},
+					{
+						desc = 'New file                     ',
+						icon = ' ',
+						action = 'DashboardNewFile',
+					},
+					{
+						desc = 'Find word                    ',
+						icon = ' ',
+						action = 'call v:lua.TelescopeGrep()',
+					},
+				}
 			end,
 		})
 		use({
@@ -362,17 +357,20 @@ return require('packer').startup({
 						lualine_c = { 'diagnostics' },
 						lualine_x = {},
 						lualine_y = { 'filetype' },
-						lualine_z = { {
-							function()
-								return '|'
-							end,
-							color = { fg = require('void_colors').bg },
-						}, {
-							function()
-								return ''
-							end,
-							color = { fg = require('void_colors').red },
-						} },
+						lualine_z = {
+							{
+								function()
+									return '|'
+								end,
+								color = { fg = require('void_colors').bg },
+							},
+							{
+								function()
+									return ''
+								end,
+								color = { fg = require('void_colors').red },
+							},
+						},
 					},
 					inactive_sections = {
 						lualine_a = {},
@@ -391,9 +389,7 @@ return require('packer').startup({
 			'Shatur/neovim-session-manager',
 			config = function()
 				require('session_manager').setup({
-					autoload_mode = require(
-						'session_manager.config'
-					).AutoloadMode.Disabled,
+					autoload_mode = require('session_manager.config').AutoloadMode.Disabled,
 					max_path_length = 0,
 				})
 			end,
@@ -407,7 +403,7 @@ return require('packer').startup({
 		})
 		use({
 			'nvim-telescope/telescope-file-browser.nvim',
-			after = "telescope.nvim",
+			after = 'telescope.nvim',
 			config = function()
 				require('telescope').load_extension('file_browser')
 			end,
@@ -434,9 +430,11 @@ return require('packer').startup({
 							cmp.config.compare.order,
 						},
 					},
-					snippet = { expand = function(args)
-						require('luasnip').lsp_expand(args.body)
-					end },
+					snippet = {
+						expand = function(args)
+							require('luasnip').lsp_expand(args.body)
+						end,
+					},
 					window = {
 						completion = cmp.config.window.bordered(),
 						documentation = cmp.config.window.bordered(),
@@ -460,8 +458,8 @@ return require('packer').startup({
 	config = {
 		display = {
 			open_fn = function()
-				return require("packer.util").float({ border = "rounded" })
-			end
+				return require('packer.util').float({ border = 'rounded' })
+			end,
 		},
 		profile = {
 			enable = true,

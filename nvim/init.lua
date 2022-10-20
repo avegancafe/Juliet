@@ -1,17 +1,19 @@
 function os.capture(cmd, raw)
-  local f = assert(io.popen(cmd, 'r'))
-  local s = assert(f:read('*a'))
-  f:close()
-  if raw then return s end
-  s = string.gsub(s, '^%s+', '')
-  s = string.gsub(s, '%s+$', '')
-  s = string.gsub(s, '[\n\r]+', ' ')
-  return s
+	local f = assert(io.popen(cmd, 'r'))
+	local s = assert(f:read('*a'))
+	f:close()
+	if raw then
+		return s
+	end
+	s = string.gsub(s, '^%s+', '')
+	s = string.gsub(s, '%s+$', '')
+	s = string.gsub(s, '[\n\r]+', ' ')
+	return s
 end
 
-vim.opt.encoding = "UTF-8"
-vim.cmd("set noswapfile")
-vim.opt.switchbuf = "uselast"
+vim.opt.encoding = 'UTF-8'
+vim.cmd('set noswapfile')
+vim.opt.switchbuf = 'uselast'
 vim.cmd([[
 augroup quickfix
   autocmd!
@@ -26,31 +28,31 @@ set termguicolors
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
 vim.g.startify_change_to_vcs_root = 1
-vim.g.DevIconsDefaultFolderOpenSymbol = ""
-vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ""
-vim.g.go_fmt_command = "goimports"
+vim.g.DevIconsDefaultFolderOpenSymbol = ''
+vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
+vim.g.go_fmt_command = 'goimports'
 -- vim.lsp.set_log_level("debug")
 vim.opt.timeoutlen = 500
 -- vim.g.ale_go_golangci_lint_options = "--config ~/workspace/api-v2-backend/.build/scripts/.golangci.yml"
-vim.g.dbext_default_profile_myPSQL = "user=kyle"
-vim.opt.guifont = "JetBrainsMono Nerd Font Mono:h18"
+vim.g.dbext_default_profile_myPSQL = 'user=kyle'
+vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h18'
 
-vim.cmd("filetype plugin indent on")
+vim.cmd('filetype plugin indent on')
 
-vim.opt.mouse = "a"
+vim.opt.mouse = 'a'
 vim.opt.relativenumber = true
 vim.opt.number = true
 vim.opt.numberwidth = 3
-vim.cmd("hi Directory guifg=#FF0000 ctermfg=red")
-vim.opt.backspace = "indent,eol,start"
-vim.opt.clipboard = "unnamed"
-vim.opt.shell = "fish"
-vim.opt.fdm = "syntax"
+vim.cmd('hi Directory guifg=#FF0000 ctermfg=red')
+vim.opt.backspace = 'indent,eol,start'
+vim.opt.clipboard = 'unnamed'
+vim.opt.shell = 'fish'
+vim.opt.fdm = 'syntax'
 vim.opt.foldlevelstart = 20
-vim.cmd("autocmd InsertEnter * set cursorline")
-vim.cmd("autocmd InsertLeave * set nocursorline")
-vim.cmd("set completeopt-=preview")
-vim.cmd("set noshowmode")
+vim.cmd('autocmd InsertEnter * set cursorline')
+vim.cmd('autocmd InsertLeave * set nocursorline')
+vim.cmd('set completeopt-=preview')
+vim.cmd('set noshowmode')
 
 -- theme
 vim.opt.termguicolors = true
@@ -59,7 +61,7 @@ vim.opt.termguicolors = true
 vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
 vim.opt.tabstop = 2
-vim.opt.foldmethod = "indent"
+vim.opt.foldmethod = 'indent'
 
 vim.opt.hidden = true
 
@@ -76,9 +78,9 @@ augroup FiletypeGroup
 augroup END
 ]])
 
-vim.cmd("highlight MatchParen cterm=bold ctermfg=white ctermbg=black")
+vim.cmd('highlight MatchParen cterm=bold ctermfg=white ctermbg=black')
 -- vim.cmd('source ~/.config/Juliet/nvim/_init.vim')
 
-require("plugins")
-require("mappings")
-require("initializers.index")
+require('plugins')
+require('mappings')
+require('initializers.index')
