@@ -26,10 +26,6 @@ augroup end
 buffer_current_tabmode = 'buffers'
 
 return require('packer').startup({
-
--- These two are optional and provide syntax highlighting
--- for Neorg tables and the @document.meta tag
--- REQUIRED - you must specify a snippet engine -- For `luasnip` users.
 	function(use)
 		use('wbthomason/packer.nvim')
 		use({
@@ -138,8 +134,6 @@ return require('packer').startup({
 						},
 					},
 				})
-
-				require('telescope').load_extension('file_browser')
 			end,
 		})
 		use('frazrepo/vim-rainbow')
@@ -211,7 +205,8 @@ return require('packer').startup({
 		use('sbdchd/neoformat')
 		use({
 			'akinsho/bufferline.nvim',
-			requires = { 'kyazdani42/nvim-web-devicons', 'Th3Whit3Wolf/space-nvim' },
+			requires = { 'kyazdani42/nvim-web-devicons' },
+			after = "space-nvim",
 			config = function()
 				require('cmds/setup_bufferline').setup('buffers')
 			end,
@@ -347,7 +342,7 @@ return require('packer').startup({
 		})
 		use({
 			'nvim-lualine/lualine.nvim',
-			requires = { 'nvim-web-devicons', 'Th3Whit3Wolf/space-nvim' },
+			requires = { 'nvim-web-devicons' },
 			config = function()
 				require('lualine').setup({
 					options = {
@@ -405,14 +400,14 @@ return require('packer').startup({
 		})
 		use({
 			'nvim-telescope/telescope-ui-select.nvim',
-			requires = { 'nvim-telescope/telescope.nvim' },
+			after = 'telescope.nvim',
 			config = function()
 				require('telescope').load_extension('ui-select')
 			end,
 		})
 		use({
 			'nvim-telescope/telescope-file-browser.nvim',
-			requires = { 'nvim-telescope/telescope.nvim' },
+			after = "telescope.nvim",
 			config = function()
 				require('telescope').load_extension('file_browser')
 			end,
