@@ -1,7 +1,3 @@
-require('initializers.ale')
 require('initializers.committia')
-require('initializers.goyo')
-require('initializers.godot')
 require('initializers.indentLines')
 require('initializers.lspconfig')
-require('initializers.vim_test')
