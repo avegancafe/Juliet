@@ -15,7 +15,8 @@ end
 vim.cmd([[
 augroup packer_user_config
 autocmd!
-autocmd BufWritePost plugins.lua source <afile> | PackerCompile
+autocmd BufWritePost plugins.lua luafile <afile>
+autocmd BufWritePost plugins.lua PackerCompile
 autocmd BufWritePost plugins.lua PackerInstall
 augroup end
 ]])
@@ -227,9 +228,7 @@ return require('packer').startup({
 				require('lspconfig').ocamllsp.setup({})
 			end,
 		})
-		use({
-			'sbdchd/neoformat',
-		})
+		use('sbdchd/neoformat')
 		use({
 			'akinsho/bufferline.nvim',
 			requires = { 'kyazdani42/nvim-web-devicons' },
@@ -264,10 +263,6 @@ return require('packer').startup({
 				}
 
 				local utils = require('telescope.utils')
-				local set_var = vim.api.nvim_set_var
-
-				local git_root, ret =
-					utils.get_os_command_output({ 'git', 'rev-parse', '--show-toplevel' }, vim.loop.cwd())
 
 				local function get_dashboard_git_status()
 					local git_cmd = { 'git', 'status', '-s', '--', '.' }
@@ -493,7 +488,6 @@ return require('packer').startup({
 		},
 		profile = {
 			enable = true,
-			threshold = 1, -- the amount in ms that a plugins load time must be over for it to be included in the profile
 		},
 	},
 })

@@ -3,7 +3,7 @@ local utils = require('utils')
 local function create_map_func(mode)
 	return function(binding, command, opts)
 		opts = opts or {}
-		final_opts = { noremap = true }
+		local final_opts = { noremap = true }
 
 		utils.merge(final_opts, opts)
 
