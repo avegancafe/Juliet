@@ -14,10 +14,10 @@ end
 
 vim.cmd([[
 augroup packer_user_config
-autocmd!
-autocmd BufWritePost plugins.lua luafile <afile>
-autocmd BufWritePost plugins.lua PackerCompile
-autocmd BufWritePost plugins.lua PackerInstall
+	autocmd!
+	autocmd BufWritePost plugins.lua luafile <afile>
+	autocmd BufWritePost plugins.lua PackerCompile
+	autocmd BufWritePost plugins.lua PackerInstall
 augroup end
 ]])
 
