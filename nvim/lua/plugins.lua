@@ -141,31 +141,61 @@ return require('packer').startup({
 		use('othree/yajs.vim')
 		use({
 			'nvim-treesitter/nvim-treesitter',
-			run = ':TSUpdate',
+			run = function()
+				require('nvim-treesitter.install').update({ with_sync = true })
+			end,
 			config = function()
-				local parser_configs = require('nvim-treesitter.parsers').get_parser_configs()
+				vim.api.nvim_create_autocmd({ 'BufEnter', 'BufAdd', 'BufNew', 'BufNewFile', 'BufWinEnter' }, {
+					group = vim.api.nvim_create_augroup('TS_FOLD_WORKAROUND', {}),
+					callback = function()
+						vim.opt.foldmethod = 'expr'
+						vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+					end,
+				})
 
-				parser_configs.norg_meta = {
-					install_info = {
-						url = 'https://github.com/nvim-neorg/tree-sitter-norg-meta',
-						files = { 'src/parser.c' },
-						branch = 'main',
-					},
-				}
-
-				parser_configs.norg_table = {
-					install_info = {
-						url = 'https://github.com/nvim-neorg/tree-sitter-norg-table',
-						files = { 'src/parser.c' },
-						branch = 'main',
-					},
-				}
 				require('nvim-treesitter.configs').setup({
-					ensure_installed = 'all',
-					ignore_install = { 'phpdoc' },
+					ensure_installed = {
+						'bash',
+						'cmake',
+						'comment',
+						'css',
+						'dockerfile',
+						'fish',
+						'gitignore',
+						'go',
+						'gomod',
+						'graphql',
+						'html',
+						'http',
+						'javascript',
+						'jsdoc',
+						'json',
+						'json5',
+						'latex',
+						'lua',
+						'make',
+						'markdown',
+						'ocaml',
+						'python',
+						'regex',
+						'ruby',
+						'rust',
+						'scss',
+						'solidity',
+						'sql',
+						'svelte',
+						'swift',
+						'todotxt',
+						'toml',
+						'tsx',
+						'typescript',
+						'vim',
+						'vue',
+						'yaml',
+					},
 					highlight = {
 						enable = true,
-						additional_vim_regex_highlighting = false,
+						additional_vim_regex_highlighting = true,
 					},
 				})
 			end,
