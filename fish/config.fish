@@ -19,6 +19,11 @@ set -gx RELAY_FZF_OPTS "--reverse --height 40%"
 set -gx TERM xterm-256color
 set -gx PATH (npm get prefix)/bin $PATH
 
+set -gx FOUNDRY_FMT_LINE_LENGTH 100
+set -gx FOUNDRY_FMT_TAB_WIDTH 2
+set -gx FOUNDRY_FMT_BRACKET_SPACING true
+set -gx FOUNDRY_FMT_QUOTE_STYLE 'single'
+
 ulimit -n 8096
 
 set -gx TERM xterm-256color
