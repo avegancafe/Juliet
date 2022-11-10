@@ -263,7 +263,7 @@ function glo --description "open the URL of a file in gitlab"
 end
 
 function changed_files
-    echo (git status --short | sed "s/[[:alnum:]][[:space:]]\(.*\)/\1/g")
+    echo (git status --short | sed "s/[[:alnum:]]\{1,2\}[[:space:]]\(.*\)/\1/g")
 end
 
 function rtb

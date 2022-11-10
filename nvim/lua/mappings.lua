@@ -61,17 +61,17 @@ normal_map('<leader>bb', ':BufferLinePick<cr>')
 normal_map('<leader>bc', ':BufferLinePickClose<cr>')
 normal_map('<leader>bf', ':Neoformat<cr>')
 normal_map('<leader>bo', ':call v:lua.GitlabOpen()<cr>')
-normal_map('<leader>sc', ':let @a=@*<cr>')
-normal_map('<leader>sca', ':let @a=@*<cr>')
-normal_map('<leader>scb', ':let @b=@*<cr>')
-normal_map('<leader>scc', ':let @c=@*<cr>')
-normal_map('<leader>scd', ':let @d=@*<cr>')
+normal_map('<leader>rs', ':let @a=@*<cr>')
+normal_map('<leader>rsa', ':let @a=@*<cr>')
+normal_map('<leader>rsb', ':let @b=@*<cr>')
+normal_map('<leader>rsc', ':let @c=@*<cr>')
+normal_map('<leader>rsd', ':let @d=@*<cr>')
 
 function EditChangedFiles()
 	local files_output = vim.api.nvim_exec('!changed_files', true)
 	local changed_files = vim.split(files_output, '\n')[3]
 
-	vim.cmd('args' .. changed_files)
+	vim.cmd('args ' .. changed_files)
 end
 
 -- terminal mappings --
