@@ -192,7 +192,6 @@ return require('packer').startup({
 						'typescript',
 						'vim',
 						'vue',
-						'yaml',
 					},
 					highlight = {
 						enable = true,
