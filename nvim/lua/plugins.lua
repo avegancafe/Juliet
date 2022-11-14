@@ -470,9 +470,7 @@ return require('packer').startup({
 						['<CR>'] = cmp.mapping.confirm({ select = true }),
 						['<Tab>'] = cmp.mapping.confirm({ select = true }),
 					}),
-					sources = cmp.config.sources(
-						{ { name = 'nvim_lsp' }, { name = 'luasnip' } }
-					),
+					sources = cmp.config.sources({ { name = 'nvim_lsp' }, { name = 'luasnip' } }),
 				})
 			end,
 		})
@@ -480,11 +478,27 @@ return require('packer').startup({
 		use('dstein64/vim-startuptime')
 
 		use({
+			'folke/todo-comments.nvim',
+			requires = 'nvim-lua/plenary.nvim',
+			config = function()
+				require('todo-comments').setup({
+					keywords = {
+						FIX = { color = "warning" }
+					},
+					highlight = {
+						pattern = [[.*<(KEYWORDS)\s*]],
+						keyword = "bg"
+					},
+				})
+			end,
+		})
+
+		use({
 			'folke/noice.nvim',
 			config = function()
 				require('noice').setup({
 					messages = {
-						view_search = false
+						view_search = false,
 					},
 					cmdline = {
 						format = {
