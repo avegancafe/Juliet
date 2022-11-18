@@ -176,6 +176,7 @@ return require('packer').startup({
 						'lua',
 						'make',
 						'markdown',
+						'markdown_inline',
 						'ocaml',
 						'python',
 						'regex',
@@ -440,6 +441,7 @@ return require('packer').startup({
 				'hrsh7th/cmp-nvim-lsp',
 				'neovim/nvim-lspconfig',
 				'L3MON4D3/LuaSnip',
+				'hrsh7th/cmp-buffer',
 			},
 			config = function()
 				local cmp = require('cmp')
@@ -447,13 +449,11 @@ return require('packer').startup({
 				cmp.setup({
 					sorting = {
 						comparators = {
-							cmp.config.compare.offset,
+							cmp.config.compare.locality,
 							cmp.config.compare.exact,
+							cmp.config.compare.offset,
 							cmp.config.compare.score,
-							cmp.config.compare.kind,
 							cmp.config.compare.sort_text,
-							cmp.config.compare.length,
-							cmp.config.compare.order,
 						},
 					},
 					snippet = {
@@ -470,7 +470,11 @@ return require('packer').startup({
 						['<CR>'] = cmp.mapping.confirm({ select = true }),
 						['<Tab>'] = cmp.mapping.confirm({ select = true }),
 					}),
-					sources = cmp.config.sources({ { name = 'nvim_lsp' }, { name = 'luasnip' } }),
+					sources = cmp.config.sources({
+						{ name = 'nvim_lsp' },
+						{ name = 'luasnip' },
+						{ name = 'buffer' },
+					}),
 				})
 			end,
 		})
@@ -483,11 +487,11 @@ return require('packer').startup({
 			config = function()
 				require('todo-comments').setup({
 					keywords = {
-						FIX = { color = "warning" }
+						FIX = { color = 'warning' },
 					},
 					highlight = {
 						pattern = [[.*<(KEYWORDS)\s*]],
-						keyword = "bg"
+						keyword = 'bg',
 					},
 				})
 			end,
@@ -545,7 +549,7 @@ return require('packer').startup({
 						bottom_search = true, -- use a classic bottom cmdline for search
 						command_palette = true, -- position the cmdline and popupmenu together
 						long_message_to_split = true, -- long messages will be sent to a split
-						inc_rename = false, -- enables an input dialog for inc-rename.nvim
+						inc_rename = true, -- enables an input dialog for inc-rename.nvim
 						lsp_doc_border = false, -- add a border to hover docs and signature help
 					},
 				})
