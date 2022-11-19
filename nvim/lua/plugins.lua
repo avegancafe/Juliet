@@ -276,10 +276,8 @@ return require('packer').startup({
 				end
 
 				if ret ~= 0 then
-					local is_worktree = utils.get_os_command_output(
-						{ 'git', 'rev-parse', '--is-inside-work-tree' },
-						vim.loop.cwd()
-					)
+					local is_worktree =
+						utils.get_os_command_output({ 'git', 'rev-parse', '--is-inside-work-tree' }, vim.loop.cwd())
 					if is_worktree[1] == 'true' then
 						get_dashboard_git_status()
 					else
@@ -498,6 +496,15 @@ return require('packer').startup({
 		})
 
 		use({
+			'smjonas/inc-rename.nvim',
+			config = function()
+				require('inc_rename').setup({
+					presets = { inc_rename = true },
+				})
+			end,
+		})
+
+		use({
 			'folke/noice.nvim',
 			config = function()
 				require('noice').setup({
@@ -556,6 +563,7 @@ return require('packer').startup({
 				require('telescope').load_extension('noice')
 			end,
 			requires = {
+				'smjonas/inc-rename.nvim',
 				'nvim-telescope/telescope.nvim',
 				-- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
 				'MunifTanjim/nui.nvim',
