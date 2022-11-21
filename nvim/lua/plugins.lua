@@ -71,7 +71,9 @@ return require('packer').startup({
 					defaults = {
 						mappings = {
 							i = {
-								['<c-d>'] = trouble.open_with_trouble,
+								['<c-o>'] = function(prompt_bufnr, _mode)
+									require('trouble.providers.telescope').open_with_trouble(prompt_bufnr, _mode)
+								end,
 								['<c-j>'] = actions.move_selection_next,
 								['<c-k>'] = actions.move_selection_previous,
 							},
@@ -140,6 +142,7 @@ return require('packer').startup({
 		})
 		use('tpope/vim-surround')
 		use('othree/yajs.vim')
+
 		use({
 			'nvim-treesitter/nvim-treesitter',
 			run = function()
@@ -572,6 +575,15 @@ return require('packer').startup({
 				--   If not available, we use `mini` as the fallback
 				'rcarriga/nvim-notify',
 			},
+		})
+		use({
+			'https://git.sr.ht/~whynothugo/lsp_lines.nvim',
+			config = function()
+				require('lsp_lines').setup()
+				vim.diagnostic.config({
+					virtual_text = false,
+				})
+			end,
 		})
 	end,
 	auto_reload_compiled = true,
