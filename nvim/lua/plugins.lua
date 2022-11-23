@@ -279,8 +279,10 @@ return require('packer').startup({
 				end
 
 				if ret ~= 0 then
-					local is_worktree =
-						utils.get_os_command_output({ 'git', 'rev-parse', '--is-inside-work-tree' }, vim.loop.cwd())
+					local is_worktree = utils.get_os_command_output(
+						{ 'git', 'rev-parse', '--is-inside-work-tree' },
+						vim.loop.cwd()
+					)
 					if is_worktree[1] == 'true' then
 						get_dashboard_git_status()
 					else
@@ -424,14 +426,12 @@ return require('packer').startup({
 		})
 		use({
 			'nvim-telescope/telescope-ui-select.nvim',
-			after = 'telescope.nvim',
 			config = function()
 				require('telescope').load_extension('ui-select')
 			end,
 		})
 		use({
 			'nvim-telescope/telescope-file-browser.nvim',
-			after = 'telescope.nvim',
 			config = function()
 				require('telescope').load_extension('file_browser')
 			end,
@@ -585,13 +585,21 @@ return require('packer').startup({
 				})
 			end,
 		})
-		
+
 		use({
-			"liuchengxu/vista.vim",
+			'liuchengxu/vista.vim',
 			config = function()
 				vim.g.vista_default_executive = 'nvim_lsp'
 				vim.g.vista_echo_cursor = 0
-			end
+			end,
+		})
+
+		use({
+			'nvim-telescope/telescope-fzf-native.nvim',
+			run = 'make',
+			config = function()
+				require('telescope').load_extension('fzf')
+			end,
 		})
 	end,
 	auto_reload_compiled = true,
