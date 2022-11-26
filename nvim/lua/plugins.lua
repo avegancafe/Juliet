@@ -224,13 +224,36 @@ return require('packer').startup({
 				vim.cmd('colorscheme void')
 			end,
 		})
+
 		use({
-			'neovim/nvim-lspconfig',
-			requires = { 'williamboman/nvim-lsp-installer' },
+			'williamboman/mason.nvim',
+			requires = { 'WhoIsSethDaniel/mason-tool-installer.nvim', 'williamboman/mason-lspconfig.nvim' },
 			config = function()
-				require('lspconfig').ocamllsp.setup({})
+				-- require('mason').setup()
+				-- require('mason-lspconfig').setup()
+				-- require('mason-tool-installer').setup({
+				-- 	ensure_installed = {
+				-- 		'bash-language-server',
+				-- 		'css-lsp',
+				-- 		'html-lsp',
+				-- 		'tailwindcss-language-server',
+				-- 		'typescript-language-server',
+				-- 		'gopls',
+				-- 		'solidity-ls',
+				-- 		'lua-language-server',
+				-- 	},
+				-- })
 			end,
 		})
+
+		-- use({
+		-- 	'neovim/nvim-lspconfig',
+		-- 	requires = { 'williamboman/nvim-lsp-installer' },
+		-- 	config = function()
+		-- 		require('lspconfig').ocamllsp.setup({})
+		-- 	end,
+		-- })
+
 		use('sbdchd/neoformat')
 		use({
 			'akinsho/bufferline.nvim',
@@ -598,7 +621,7 @@ return require('packer').startup({
 			'nvim-telescope/telescope-fzf-native.nvim',
 			run = 'make',
 			config = function()
-				require('telescope').load_extension('fzf')
+				-- require('telescope').load_extension('fzf')
 			end,
 		})
 	end,

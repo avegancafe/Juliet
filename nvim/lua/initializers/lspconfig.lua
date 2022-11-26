@@ -6,10 +6,6 @@ augroup END
 ]])
 
 local nvim_lsp = require('lspconfig')
-local lsp_installer = require('nvim-lsp-installer')
-local lsp_installer_servers = require('nvim-lsp-installer.servers')
-
-lsp_installer.setup({})
 
 local on_attach = function(client, bufnr)
 	local function buf_set_keymap(...)
@@ -68,36 +64,17 @@ local servers = {
 	'tailwindcss',
 	'tsserver',
 	'gopls',
-	'solidity_ls',
+	'solidity',
 	'sumneko_lua',
 }
 
-function UninstallLspServers()
-	vim.cmd('LspUninstallAll')
-end
-function InstallLspServers()
-	for _, name in pairs(servers) do
-		vim.cmd('LspInstall ' .. name)
-	end
-end
-vim.cmd(':abbreviate LSPI call v:lua.InstallLspServers()')
-vim.cmd(':abbreviate LSPU call v:lua.UninstallLspServers()')
+require('mason').setup()
+require('mason-lspconfig').setup({
+	ensure_installed = servers
+})
 
-function SyncLsps()
-	for _, name in pairs(servers) do
-		local server_available, requested_server = lsp_installer_servers.get_server(name)
-
-		if server_available then
-			if not requested_server:is_installed() then
-				print('Installing lsp: ' .. requested_server.name)
-				requested_server:install()
-			end
-		end
-	end
-end
-
-vim.cmd(":abbreviate LspSync echo 'Installing servers...' | call v:lua.SyncLsps()")
-
-for _, name in pairs(servers) do
-	nvim_lsp[name].setup(opts)
-end
+require('mason-lspconfig').setup_handlers({
+	function(server_name)
+		require('lspconfig')[server_name].setup(opts)
+	end,
+})

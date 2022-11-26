@@ -279,7 +279,7 @@ ssh-add -A 2>/dev/null
 status --is-interactive; and source (nodenv init -|psub)
 
 if status --is-login
-    set -gx PATH $HOME/.nodenv/bin $PATH
+    set -gx PATH $HOME/.nodenv/versions $PATH
 end
 
 if test -e ~/.config/fish/config__local.fish
