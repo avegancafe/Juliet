@@ -624,6 +624,9 @@ return require('packer').startup({
 				-- require('telescope').load_extension('fzf')
 			end,
 		})
+		
+		use("Eandrju/cellular-automaton.nvim")
+
 	end,
 	auto_reload_compiled = true,
 	config = {
