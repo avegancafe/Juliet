@@ -24,8 +24,6 @@ set -gx FOUNDRY_FMT_TAB_WIDTH 2
 set -gx FOUNDRY_FMT_BRACKET_SPACING true
 set -gx FOUNDRY_FMT_QUOTE_STYLE 'single'
 
-ulimit -n 8096
-
 set -gx TERM xterm-256color
 
 source ~/.config/Juliet/fish/_util.fish
