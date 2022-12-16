@@ -65,7 +65,6 @@ local servers = {
 	'tsserver',
 	'gopls',
 	'solidity',
-	'sumneko_lua',
 }
 
 require('mason').setup()
