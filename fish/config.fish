@@ -283,3 +283,7 @@ end
 if test -e ~/.config/fish/config__local.fish
     source ~/.config/fish/config__local.fish
 end
+
+# bun
+set --export BUN_INSTALL "$HOME/.bun"
+set --export PATH $BUN_INSTALL/bin $PATH
