@@ -40,7 +40,7 @@ vim.g.go_fmt_command = 'goimports'
 vim.opt.timeoutlen = 500
 -- vim.g.ale_go_golangci_lint_options = "--config ~/workspace/api-v2-backend/.build/scripts/.golangci.yml"
 vim.g.dbext_default_profile_myPSQL = 'user=kyle'
-vim.opt.guifont = 'JetBrainsMono Nerd Font Mono:h18'
+vim.opt.guifont = 'MonaLisa Source:h18'
 
 vim.cmd('filetype plugin indent on')
 
