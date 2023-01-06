@@ -22,11 +22,15 @@ set -gx PATH (npm get prefix)/bin $PATH
 set -gx FOUNDRY_FMT_LINE_LENGTH 100
 set -gx FOUNDRY_FMT_TAB_WIDTH 2
 set -gx FOUNDRY_FMT_BRACKET_SPACING true
-set -gx FOUNDRY_FMT_QUOTE_STYLE 'single'
+set -gx FOUNDRY_FMT_QUOTE_STYLE single
 
 set -gx TERM xterm-256color
 
 source ~/.config/Juliet/fish/_util.fish
+
+function update-kitty
+    curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+end
 
 function envsource
     for line in (cat $argv | grep -v '^#' | grep -v '^\s*$')
