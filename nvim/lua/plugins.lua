@@ -510,8 +510,15 @@ return require('packer').startup({
 		use({
 			'j-hui/fidget.nvim',
 			config = function()
-				require("fidget").setup()
-			end
+				require('fidget').setup({
+					text = {
+						spinner = 'dots',
+					},
+					timer = {
+						spinner_rate = 50,
+					}
+				})
+			end,
 		})
 
 		use({
@@ -572,7 +579,7 @@ return require('packer').startup({
 				})
 
 				require('nvim-test.runners.go-test'):setup({
-					command = "relay-test",
+					command = 'relay-test',
 					args = {},
 					env = {
 						RCORE_TEST_CONFIG = '/Users/kyle/workspace/dev-env/relay-rcore-testing.toml',
