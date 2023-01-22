@@ -279,10 +279,8 @@ return require('packer').startup({
 				end
 
 				if ret ~= 0 then
-					local is_worktree = utils.get_os_command_output(
-						{ 'git', 'rev-parse', '--is-inside-work-tree' },
-						vim.loop.cwd()
-					)
+					local is_worktree =
+						utils.get_os_command_output({ 'git', 'rev-parse', '--is-inside-work-tree' }, vim.loop.cwd())
 					if is_worktree[1] == 'true' then
 						get_dashboard_git_status()
 					else
@@ -513,10 +511,11 @@ return require('packer').startup({
 				require('fidget').setup({
 					text = {
 						spinner = 'dots',
+						done = '✓'
 					},
 					timer = {
 						spinner_rate = 50,
-					}
+					},
 				})
 			end,
 		})
