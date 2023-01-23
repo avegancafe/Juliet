@@ -588,6 +588,13 @@ return require('packer').startup({
 				})
 			end,
 		})
+
+		use({
+			'sotte/presenting.vim',
+			config = function()
+				vim.g.presenting_font_large = 'starwars'
+			end,
+		})
 	end,
 	auto_reload_compiled = true,
 	config = {
