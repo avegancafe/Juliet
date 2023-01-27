@@ -593,6 +593,7 @@ return require('packer').startup({
 			'sotte/presenting.vim',
 			config = function()
 				vim.g.presenting_font_large = 'starwars'
+				vim.g.presenting_font_small = 'speed'
 			end,
 		})
 	end,
