@@ -28,6 +28,10 @@ set -gx TERM xterm-256color
 
 source ~/.config/Juliet/fish/_util.fish
 
+function current-branch
+    git branch | grep "\*" | sed "s/^\*[[:space:]]//"
+end
+
 function update-kitty
     curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
 end
