@@ -53,7 +53,6 @@ vim.opt.backspace = 'indent,eol,start'
 vim.opt.clipboard = 'unnamed'
 vim.opt.shell = 'fish'
 vim.opt.fdm = 'syntax'
-vim.opt.foldlevelstart = 20
 vim.cmd('autocmd InsertEnter * set cursorline')
 vim.cmd('autocmd InsertLeave * set nocursorline')
 vim.cmd('set completeopt-=preview')
@@ -67,6 +66,11 @@ vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
 vim.opt.tabstop = 2
 vim.opt.foldmethod = 'expr'
+
+vim.opt.foldcolumn = '1'
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
 
 vim.opt.hidden = true
 

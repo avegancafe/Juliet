@@ -26,6 +26,8 @@ normal_map('q:', '<nop>')
 normal_map('<leader>dd', ':TroubleToggle document_diagnostics<cr>')
 normal_map('<leader>d', ':TroubleToggle<cr>')
 normal_map('<leader>d5', ':TroubleRefresh<cr>')
+vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
+vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
 function ToggleNumbers()
 	vim.cmd('exec &number == 0 ? "set number norelativenumber" : "set relativenumber nonumber"')

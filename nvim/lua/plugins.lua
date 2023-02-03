@@ -511,7 +511,7 @@ return require('packer').startup({
 				require('fidget').setup({
 					text = {
 						spinner = 'dots',
-						done = '✓'
+						done = '✓',
 					},
 					timer = {
 						spinner_rate = 50,
@@ -594,6 +594,14 @@ return require('packer').startup({
 			config = function()
 				vim.g.presenting_font_large = 'starwars'
 				vim.g.presenting_font_small = 'speed'
+			end,
+		})
+
+		use({
+			'kevinhwang91/nvim-ufo',
+			requires = 'kevinhwang91/promise-async',
+			config = function()
+				require('ufo').setup()
 			end,
 		})
 	end,
