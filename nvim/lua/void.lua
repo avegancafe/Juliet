@@ -200,7 +200,7 @@ local highlight_groups = {
 	FoldColumn = { fg = purple0 }, -- 'foldcolumn'
 	SignColumn = { fg = fg1 }, -- column where signs are displayed
 	IncSearch = { fg = orange0, style = 'bold,reverse' }, -- 'incsearch' highlighting; also used for the text replaced with ":s///c"
-	LineNr = { fg = grey }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
+	LineNr = { fg = fg2 }, -- Line number for ":number" and ":#" commands, and when 'number' or 'relativenumber' option is set.
 	CursorLineNr = { fg = purple0 }, -- Like LineNr when 'cursorline' or 'relativenumber' is set for the cursor line.
 	MatchParen = { fg = green, style = 'bold,underline' }, -- The character under the cursor or just before it, if it is a paired bracket, and its match.
 	ModeMsg = { fg = yellow1 }, -- 'showmode' message (e.g., "-- INSERT --")
