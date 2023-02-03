@@ -79,7 +79,7 @@ local servers = {
 
 require('mason').setup()
 require('mason-lspconfig').setup({
-	ensure_installed = servers
+	ensure_installed = servers,
 })
 
 require('mason-lspconfig').setup_handlers({
