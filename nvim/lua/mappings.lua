@@ -26,6 +26,7 @@ normal_map('q:', '<nop>')
 normal_map('<leader>dd', ':TroubleToggle document_diagnostics<cr>')
 normal_map('<leader>d', ':TroubleToggle<cr>')
 normal_map('<leader>d5', ':TroubleRefresh<cr>')
+normal_map('<leader>h', ':Dashboard<cr>')
 vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
 vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 

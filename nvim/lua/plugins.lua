@@ -242,45 +242,27 @@ return require('packer').startup({
 		})
 		use({
 			'glepnir/dashboard-nvim',
+			event = 'VimEnter',
 			config = function()
-				local db = require('dashboard')
-
-				db.custom_header = {
-					'            ',
-					'            ',
-					'    ↑↑↓↓    ',
-					'   ←→←→AB   ',
-					'   ┌────┐   ',
-					'   │    ├┐  ',
-					'   │┌ ┌ └│  ',
-					'   │ ╘  └┘  ',
-					'   │    │   ',
-					'   │╙─  │   ',
-					'   │    │   ',
-					'   └──┘ │   ',
-					'     │  │   ',
-					'     │  │   ',
-					'            ',
-					'            ',
-					'            ',
-				}
-
 				local utils = require('telescope.utils')
+				local custom_footer = {}
 
 				local function get_dashboard_git_status()
 					local git_cmd = { 'git', 'status', '-s', '--', '.' }
 					local output = utils.get_os_command_output(git_cmd)
 
 					if #output == 0 then
-						db.custom_footer = { '', '', 'Git status', '', 'No files changed' }
+						custom_footer = { '', '', 'Git status', '', 'No files changed' }
 					else
-						db.custom_footer = { '', '', 'Git status', '', unpack(output) }
+						custom_footer = { '', '', 'Git status', '', unpack(output) }
 					end
 				end
 
 				if ret ~= 0 then
-					local is_worktree =
-						utils.get_os_command_output({ 'git', 'rev-parse', '--is-inside-work-tree' }, vim.loop.cwd())
+					local is_worktree = utils.get_os_command_output(
+						{ 'git', 'rev-parse', '--is-inside-work-tree' },
+						vim.loop.cwd()
+					)
 					if is_worktree[1] == 'true' then
 						get_dashboard_git_status()
 					else
@@ -293,38 +275,87 @@ return require('packer').startup({
 							table.insert(footer, s)
 						end
 
-						db.custom_footer = footer
+						custom_footer = footer
 					end
 				else
 					get_dashboard_git_status()
 				end
-
-				db.custom_center = {
-					{
-						desc = 'Last Session             ',
-						icon = ' ',
-						shortcut = '\\ s l',
-						action = 'SessionManager load_current_dir_session',
+				require('dashboard').setup({
+					theme = 'doom',
+					config = {
+						header = {
+							'            ',
+							'            ',
+							'    ↑↑↓↓    ',
+							'   ←→←→AB   ',
+							'   ┌────┐   ',
+							'   │    ├┐  ',
+							'   │┌ ┌ └│  ',
+							'   │ ╘  └┘  ',
+							'   │    │   ',
+							'   │╙─  │   ',
+							'   │    │   ',
+							'   └──┘ │   ',
+							'     │  │   ',
+							'     │  │   ',
+							'            ',
+							'            ',
+							'            ',
+						},
+						footer = custom_footer,
+						packages = { enable = false },
+						mru = { limit = 5 },
+						shortcut = {
+							{
+								desc = 'Last Session',
+								key = 'l',
+								group = 'DashboardMruTitle',
+								action = 'SessionManager load_current_dir_session',
+							},
+							{
+								desc = 'Find file',
+								group = 'DashboardMruTitle',
+								key = 'p',
+								action = 'Telescope find_files',
+							},
+							{
+								desc = 'Find word',
+								group = 'DashboardMruTitle',
+								key = 'f',
+								action = 'Telescope live_grep',
+							},
+						},
+						center = {
+							{
+								desc = 'Last Session             ',
+								icon = ' ',
+								key = 'l',
+								action = 'SessionManager load_current_dir_session',
+							},
+							{
+								desc = 'Find file               ',
+								icon = ' ',
+								key = 'p',
+								action = 'Telescope find_files',
+							},
+							{
+								desc = 'New file                     ',
+								key = 'n',
+								icon = ' ',
+								action = 'DashboardNewFile',
+							},
+							{
+								desc = 'Find word                    ',
+								key = 'w',
+								icon = ' ',
+								action = 'call v:lua.TelescopeGrep()',
+							},
+						},
 					},
-					{
-						desc = 'Find file               ',
-						icon = ' ',
-						shortcut = 'ctrl p',
-						action = 'Telescope find_files',
-					},
-					{
-						desc = 'New file                     ',
-						icon = ' ',
-						action = 'DashboardNewFile',
-					},
-					{
-						desc = 'Find word                    ',
-						icon = ' ',
-						action = 'call v:lua.TelescopeGrep()',
-					},
-				}
+				})
 			end,
 		})
+
 		use({
 			'Yggdroot/indentLine',
 			config = function()
