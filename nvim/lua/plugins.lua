@@ -382,7 +382,15 @@ return require('packer').startup({
 					sections = {
 						lualine_a = { 'mode' },
 						lualine_b = { 'filename' },
-						lualine_c = { 'diagnostics' },
+						lualine_c = {
+							'diagnostics',
+
+							{
+								function()
+									return require('nvim-navic').get_location()
+								end,
+							},
+						},
 						lualine_x = { 'lsp_progres' },
 						lualine_y = { 'filetype' },
 						lualine_z = {
@@ -603,6 +611,11 @@ return require('packer').startup({
 			config = function()
 				require('ufo').setup()
 			end,
+		})
+
+		use({
+			'SmiteshP/nvim-navic',
+			requires = 'neovim/nvim-lspconfig',
 		})
 	end,
 	auto_reload_compiled = true,
