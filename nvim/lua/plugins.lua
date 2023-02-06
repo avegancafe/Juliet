@@ -348,7 +348,7 @@ return require('packer').startup({
 								desc = 'Find word                    ',
 								key = 'w',
 								icon = ' ',
-								action = 'call v:lua.TelescopeGrep()',
+								action = 'Telescope live_grep',
 							},
 						},
 					},
