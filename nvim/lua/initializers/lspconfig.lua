@@ -75,7 +75,8 @@ local servers = {
 	'tsserver',
 	'gopls',
 	'solidity',
-}
+	'yamlls',
+l}
 
 require('mason').setup()
 require('mason-lspconfig').setup({
