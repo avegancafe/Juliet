@@ -15,6 +15,7 @@
 	d = pull
 	down = pull
 	up = push
+	su = submodule update --recursive --init
 [push]
 	default = current
 [commit]
