@@ -32,10 +32,15 @@ function M.setup(buf_mode)
 			groups = {
 				items = {
 					{
-						name = 'tests',
-						priority = 1,
+						name = 'frontend',
 						matcher = function(buf)
-							return buf.name:match('%_test.go')
+							return buf.path:match('%a/portal/frontend/%a')
+						end,
+					},
+					{
+						name = 'backend',
+						matcher = function(buf)
+							return buf.path:match('%a/portal/backend/%a')
 						end,
 					},
 				},
