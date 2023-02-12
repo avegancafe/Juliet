@@ -82,7 +82,7 @@ end
 
 local terminal_map = create_map_func('t')
 
-terminal_map('<c-[>', '<leader><c-n>')
+terminal_map('<c-[>', '<c-\\><c-n>')
 
 vim.cmd(':abbreviate ag Telescope live_grep')
 
