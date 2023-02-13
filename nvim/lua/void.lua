@@ -152,22 +152,22 @@ local highlight_groups = {
 	Boolean = { fg = war }, -- a boolean constant: TRUE, false
 	Float = { fg = float }, -- a floating point constant: 2.3e10
 	Identifier = { fg = blue1 }, -- any variable name
-	Function = { fg = purple0, style = 'bold' }, -- function name (also: methods for classes)
+	Function = { fg = purple0,  }, -- function name (also: methods for classes)
 	Statement = { fg = blue0 }, -- any statement
-	Conditional = { fg = blue0, style = 'bold' }, -- if, then, else, endif, switch, etc.
-	Repeat = { fg = red1, style = 'bold' }, -- for, do, while, etc.
+	Conditional = { fg = blue0,  }, -- if, then, else, endif, switch, etc.
+	Repeat = { fg = red1,  }, -- for, do, while, etc.
 	Label = { fg = red1 }, -- case, default, etc.
 	Operator = { fg = blue }, -- sizeof", "+", "*", etc.
-	Keyword = { fg = blue0, style = 'bold' }, -- any other keyword
+	Keyword = { fg = blue0,  }, -- any other keyword
 	Exception = { fg = red }, -- try, catch, throw
 	PreProc = { fg = purple1 }, -- generic Preprocessor
 	Include = { fg = yellow }, -- preprocessor #include
 	Define = { fg = aqua0 }, -- preprocessor #define
-	Macro = { fg = blue1, style = 'bold' }, -- same as Define
+	Macro = { fg = blue1,  }, -- same as Define
 	PreCondit = { fg = purple2 }, -- preprocessor #if, #else, #endif, etc.
 	Type = { fg = red1 }, -- int, long, char, etc.
-	StorageClass = { fg = yellow, style = 'bold' }, -- static, register, volatile, etc.
-	Structure = { fg = aqua, style = 'bold' }, -- struct, union, enum, etc.
+	StorageClass = { fg = yellow,  }, -- static, register, volatile, etc.
+	Structure = { fg = aqua,  }, -- struct, union, enum, etc.
 	Typedef = { fg = yellow }, -- A typedef
 	Special = { fg = orange, style = 'italic' }, -- any special symbol
 	SpecialChar = { fg = cyan }, -- special character in a constant
@@ -188,7 +188,7 @@ local highlight_groups = {
 	Conceal = { fg = blue0, bg = bg0 }, -- placeholder characters substituted for concealed text (see 'conceallevel')
 	Cursor = { fg = orange0, style = 'bold,reverse' }, -- the character under the cursor
 	CursorIM = { fg = fg0, style = 'reverse' }, -- like Cursor, but used when in IME mode
-	Directory = { fg = blue0, style = 'bold' }, -- directory names (and other special names in listings)
+	Directory = { fg = blue0,  }, -- directory names (and other special names in listings)
 	DiffAdd = { fg = green, style = 'reverse' }, -- diff mode: Added line
 	DiffChange = { fg = orange0, style = 'reverse' }, --  diff mode: Changed line
 	DiffDelete = { fg = red, style = 'reverse' }, -- diff mode: Deleted line
@@ -212,7 +212,7 @@ local highlight_groups = {
 	PmenuSel = { fg = fg0, bg = fg5 }, -- Popup menu: selected item.
 	PmenuSbar = { fg = fg0, bg = bg1 }, -- Popup menu: scrollbar.
 	PmenuThumb = { fg = fg0, bg = purple3 }, -- Popup menu: Thumb of the scrollbar.
-	Question = { fg = orange0, style = 'bold' }, -- hit-enter prompt and yes/no questions
+	Question = { fg = orange0,  }, -- hit-enter prompt and yes/no questions
 	QuickFixLine = { fg = green, style = 'bold,reverse' }, -- Current quickfix item in the quickfix window.
 	qfLineNr = { fg = red1 },
 	Search = { fg = green, style = 'bold,reverse' }, -- Last search pattern highlighting (see 'hlsearch'). Also used for similar items that need to stand out.
@@ -228,11 +228,11 @@ local highlight_groups = {
 	TabLineFill = { fg = purple, bg = bg1 },
 	TabLineSel = { fg = green, bg = bg1 },
 	TabLine = { fg = purple, bg = bg1 },
-	Title = { fg = green, style = 'bold' }, -- titles for output from ":set all", ":autocmd" etc.
+	Title = { fg = green,  }, -- titles for output from ":set all", ":autocmd" etc.
 	Visual = { fg = fg0, bg = spacelight }, -- Visual mode selection
 	VisualNOS = { fg = fg0, bg = spacelight }, -- Visual mode selection when vim is "Not Owning the Selection". Only X11 Gui's gui-x11 and xterm-clipboard supports this.
 	WarningMsg = { fg = red }, --  warning messages
-	WildMenu = { fg = orange0, bg = bg1, style = 'bold' }, --  current match in 'wildmenu' completion
+	WildMenu = { fg = orange0, bg = bg1,  }, --  current match in 'wildmenu' completion
 
 	--------------------------------
 	-- Miscellaneous Highlighting --
@@ -241,7 +241,7 @@ local highlight_groups = {
 	CursorColumn = { bg = bg1 },
 	CursorLine = { bg = bg1 },
 	ToolbarLine = { fg = fg0, bg = bg3 },
-	ToolbarButton = { fg = fg0, bg = bg3, style = 'bold' },
+	ToolbarButton = { fg = fg0, bg = bg3,  },
 	NormalMode = { fg = fg4, style = 'reverse' },
 	InsertMode = { fg = blue0, style = 'reverse' },
 	ReplaceMode = { fg = aqua0, style = 'reverse' },
@@ -274,9 +274,9 @@ local highlight_groups = {
 	clojureException = { fg = red },
 	clojureRegexp = { fg = aqua0 },
 	clojureRegexpEscape = { fg = aqua0 },
-	clojureRegexpCharClass = { fg = fg3, style = 'bold' },
-	clojureRegexpMod = { fg = fg3, style = 'bold' },
-	clojureRegexpQuantifier = { fg = fg3, style = 'bold' },
+	clojureRegexpCharClass = { fg = fg3,  },
+	clojureRegexpMod = { fg = fg3,  },
+	clojureRegexpQuantifier = { fg = fg3,  },
 	clojureParen = { fg = fg3 },
 	clojureAnonArg = { fg = yellow },
 	clojureVariable = { fg = blue0 },
@@ -336,7 +336,7 @@ local highlight_groups = {
 	-- Go
 	goDirective = { fg = aqua0 },
 	goConstants = { fg = purple0 },
-	goDeclaration = { fg = blue0, style = 'bold' },
+	goDeclaration = { fg = blue0,  },
 	goDeclType = { fg = blue0 },
 	goBuiltins = { fg = orange0 },
 	-- Haskell
@@ -368,10 +368,10 @@ local highlight_groups = {
 	htmlArg = { fg = aqua0 },
 	htmlScriptTag = { fg = purple0 },
 	htmlTagN = { fg = fg1 },
-	htmlSpecialTagName = { fg = aqua0, style = 'bold' },
+	htmlSpecialTagName = { fg = aqua0,  },
 	htmlLink = { fg = blue0, style = 'underline' },
 	htmlSpecialChar = { fg = orange0 },
-	htmlBold = { fg = fg0, style = 'bold' },
+	htmlBold = { fg = fg0,  },
 	htmlBoldUnderline = { fg = fg0, style = 'bold,underline' },
 	htmlBoldItalic = { fg = fg0, style = 'bold,italic' },
 	htmlBoldUnderlineItalic = {
@@ -382,16 +382,16 @@ local highlight_groups = {
 	htmlUnderline = { fg = fg0, style = 'underline' },
 	htmlUnderlineItalic = { fg = fg0, style = 'italic,underline' },
 	htmlItalic = { fg = blue1, style = 'italic' },
-	htmlH1 = { fg = blue0, style = 'bold' },
-	htmlH2 = { fg = aqua0, style = 'bold' },
-	htmlH3 = { fg = green, style = 'bold' },
-	htmlH4 = { fg = yellow, style = 'bold' },
+	htmlH1 = { fg = blue0,  },
+	htmlH2 = { fg = aqua0,  },
+	htmlH3 = { fg = green,  },
+	htmlH4 = { fg = yellow,  },
 	htmlH5 = { fg = yellow },
 	htmlH6 = { fg = yellow },
 	-- Java
 	javaAnnotation = { fg = blue0 },
 	javaDocTags = { fg = aqua0 },
-	javaCommentTitle = { fg = blue1, style = 'bold' },
+	javaCommentTitle = { fg = blue1,  },
 	javaParen = { fg = fg3 },
 	javaParen1 = { fg = fg3 },
 	javaParen2 = { fg = fg3 },
@@ -462,15 +462,15 @@ local highlight_groups = {
 	javascriptDOMNodeMethod = { fg = fg1 },
 	javascriptDOMStorageMethod = { fg = fg1 },
 	javascriptHeadersMethod = { fg = fg1 },
-	javascriptAsyncFuncKeyword = { fg = red1, style = 'bold' },
-	javascriptAwaitFuncKeyword = { fg = red1, style = 'bold' },
-	jsClassKeyword = { fg = blue0, style = 'bold' },
-	jsExtendsKeyword = { fg = blue0, style = 'bold' },
-	jsExportDefault = { fg = blue0, style = 'bold' },
+	javascriptAsyncFuncKeyword = { fg = red1,  },
+	javascriptAwaitFuncKeyword = { fg = red1,  },
+	jsClassKeyword = { fg = blue0,  },
+	jsExtendsKeyword = { fg = blue0,  },
+	jsExportDefault = { fg = blue0,  },
 	jsTemplateBraces = { fg = aqua0 },
-	jsGlobalNodeObjects = { fg = blue0, style = 'bold' },
-	jsGlobalObjects = { fg = blue0, style = 'bold' },
-	jsFunction = { fg = purple0, style = 'bold' },
+	jsGlobalNodeObjects = { fg = blue0,  },
+	jsGlobalObjects = { fg = blue0,  },
+	jsFunction = { fg = purple0,  },
 	jsFuncParens = { fg = orange0 },
 	jsParens = { fg = red1 },
 	jsNull = { fg = purple0 },
@@ -487,7 +487,7 @@ local highlight_groups = {
 	jsObjectBraces = { fg = orange, style = 'italic' },
 	jsObjectValue = { fg = float },
 	jsClassBlock = { fg = blue1 },
-	jsFutureKeys = { fg = orange0, style = 'bold' },
+	jsFutureKeys = { fg = orange0,  },
 	jsStorageClass = { fg = blue0 },
 	jsxRegion = { fg = blue0 },
 	-- JSON
@@ -501,10 +501,10 @@ local highlight_groups = {
 	luaTable = { fg = orange0 },
 	-- Markdown (keep consistent with HTML, above
 	markdownItalic = { fg = fg3, style = 'italic' },
-	markdownH1 = { fg = blue0, style = 'bold' },
-	markdownH2 = { fg = aqua0, style = 'bold' },
-	markdownH3 = { fg = green, style = 'bold' },
-	markdownH4 = { fg = yellow, style = 'bold' },
+	markdownH1 = { fg = blue0,  },
+	markdownH2 = { fg = aqua0,  },
+	markdownH3 = { fg = green,  },
+	markdownH4 = { fg = yellow,  },
 	markdownH5 = { fg = yellow },
 	markdownH6 = { fg = yellow },
 	markdownCode = { fg = purple2 },
@@ -535,19 +535,19 @@ local highlight_groups = {
 	objcDirective = { fg = blue0 },
 	-- PureScript
 	purescriptModuleKeyword = { fg = aqua0 },
-	purescriptModuleName = { fg = red1, style = 'bold' },
+	purescriptModuleName = { fg = red1,  },
 	purescriptWhere = { fg = aqua0 },
 	purescriptDelimiter = { fg = fg4 },
 	purescriptType = { fg = red1 },
-	purescriptImportKeyword = { fg = blue0, style = 'bold' },
-	purescriptHidingKeyword = { fg = blue0, style = 'bold' },
-	purescriptAsKeyword = { fg = blue0, style = 'bold' },
-	purescriptStructure = { fg = aqua, style = 'bold' },
+	purescriptImportKeyword = { fg = blue0,  },
+	purescriptHidingKeyword = { fg = blue0,  },
+	purescriptAsKeyword = { fg = blue0,  },
+	purescriptStructure = { fg = aqua,  },
 	purescriptOperator = { fg = blue },
 	purescriptTypeVar = { fg = red1 },
-	purescriptConstructor = { fg = purple0, style = 'bold' },
-	purescriptFunction = { fg = purple0, style = 'bold' },
-	purescriptConditional = { fg = blue0, style = 'bold' },
+	purescriptConstructor = { fg = purple0,  },
+	purescriptFunction = { fg = purple0,  },
+	purescriptConditional = { fg = blue0,  },
 	purescriptBacktick = { fg = orange0 },
 	-- Python
 	pythonCoding = { fg = green0, style = 'italic' },
@@ -555,12 +555,12 @@ local highlight_groups = {
 	rubyStringDelimiter = { fg = green },
 	rubyInterpolationDelimiter = { fg = aqua0 },
 	-- Rust
-	rustSelf = { fg = blue0, style = 'bold' },
-	rustPanic = { fg = red1, style = 'bold' },
-	rustAssert = { fg = blue1, style = 'bold' },
+	rustSelf = { fg = blue0,  },
+	rustPanic = { fg = red1,  },
+	rustAssert = { fg = blue1,  },
 	rustKeyword = { fg = red1 },
 	rustModPath = { fg = fg1 },
-	rustModPathSep = { fg = blue1, style = 'bold' },
+	rustModPathSep = { fg = blue1,  },
 	rustSigil = { fg = blue0 },
 	rustAttribute = { fg = fg1 },
 	-- Scala
@@ -568,7 +568,7 @@ local highlight_groups = {
 	scalaCaseFollowing = { fg = fg1 },
 	scalaCapitalWord = { fg = fg1 },
 	scalaTypeExtension = { fg = fg1 },
-	scalaKeyword = { fg = red1, style = 'bold' },
+	scalaKeyword = { fg = red1,  },
 	scalaKeywordModifier = { fg = red1 },
 	scalaSpecial = { fg = aqua0 },
 	scalaOperator = { fg = fg1 },
@@ -579,28 +579,28 @@ local highlight_groups = {
 	-- TypeScript
 	typeScriptReserved = { fg = aqua0 },
 	typeScriptLabel = { fg = red1 },
-	typeScriptFuncKeyword = { fg = purple0, style = 'bold' },
+	typeScriptFuncKeyword = { fg = purple0,  },
 	typeScriptIdentifier = { fg = blue1 },
 	typeScriptBraces = { fg = red1 },
 	typeScriptEndColons = { fg = fg1 },
 	typeScriptDOMObjects = { fg = fg1 },
-	typeScriptAjaxMethods = { fg = purple0, style = 'bold' },
+	typeScriptAjaxMethods = { fg = purple0,  },
 	typeScriptLogicSymbols = { fg = fg1 },
 	typeScriptDocSeeTag = { fg = green0, style = 'italic' },
 	typeScriptDocParam = { fg = green0, style = 'italic' },
-	typeScriptDocTags = { fg = blue1, style = 'bold' },
-	typeScriptGlobalObjects = { fg = blue0, style = 'bold' },
+	typeScriptDocTags = { fg = blue1,  },
+	typeScriptGlobalObjects = { fg = blue0,  },
 	typeScriptParens = { fg = blue1 },
 	typeScriptOpSymbols = { fg = blue },
 	typeScriptHtmlElemProperties = { fg = orange, style = 'italic' },
-	typeScriptNull = { fg = purple0, style = 'bold' },
+	typeScriptNull = { fg = purple0,  },
 	typeScriptInterpolationDelimiter = { fg = aqua0 },
 	-- XML
 	xmlTag = { fg = blue0 },
 	xmlEndTag = { fg = blue0 },
 	xmlTagName = { fg = blue0 },
 	xmlEqual = { fg = blue0 },
-	docbkKeyword = { fg = aqua0, style = 'bold' },
+	docbkKeyword = { fg = aqua0,  },
 	xmlDocTypeDecl = { fg = grey },
 	xmlDocTypeKeyword = { fg = purple0 },
 	xmlCdataStart = { fg = grey },
@@ -611,15 +611,15 @@ local highlight_groups = {
 	xmlEntity = { fg = orange0 },
 	xmlEntityPunct = { fg = orange0 },
 	-- Vim
-	vimCommentTitle = { fg = blue1, style = 'bold' },
+	vimCommentTitle = { fg = blue1,  },
 	vimNotation = { fg = orange0 },
 	vimBracket = { fg = orange0 },
 	vimMapModKey = { fg = orange0 },
-	vimCommand = { fg = blue0, style = 'bold' },
+	vimCommand = { fg = blue0,  },
 	vimLet = { fg = blue0 },
 	vimNorm = { fg = blue0 },
-	vimFuncSID = { fg = purple0, style = 'bold' },
-	vimFunction = { fg = purple0, style = 'bold' },
+	vimFuncSID = { fg = purple0,  },
+	vimFunction = { fg = purple0,  },
 	vimGroup = { fg = blue1 },
 	vimHiGroup = { fg = red1 },
 	vimSetSep = { fg = fg3 },
@@ -674,9 +674,9 @@ local highlight_groups = {
 	CtrlPPrtBase = { fg = bg2 },
 	CtrlPPrtCursor = { fg = blue0 },
 	CtrlPLinePre = { fg = bg2 },
-	CtrlPMode1 = { fg = blue0, bg = bg2, style = 'bold' },
-	CtrlPMode2 = { fg = bg0, bg = blue0, style = 'bold' },
-	CtrlPStats = { fg = fg4, bg = bg2, style = 'bold' },
+	CtrlPMode1 = { fg = blue0, bg = bg2,  },
+	CtrlPMode2 = { fg = bg0, bg = blue0,  },
+	CtrlPStats = { fg = fg4, bg = bg2,  },
 	-- Current Word (dominikduda/vim_current_word)
 	CurrentWord = { fg = fg0, bg = purple, style = 'underline' },
 	CurrentWordTwins = { fg = fg0, bg = purple },
@@ -690,10 +690,10 @@ local highlight_groups = {
 	gitcommitSelectedFile = { fg = green },
 	gitcommitDiscardedFile = { fg = red },
 	-- Gitgutter (airblade/vim-gitgutter)
-	GitGutterAdd = { fg = green, style = 'bold' },
-	GitGutterChange = { fg = orange0, style = 'bold' },
-	GitGutterDelete = { fg = red, style = 'bold' },
-	GitGutterChangeDelete = { fg = red1, style = 'bold' },
+	GitGutterAdd = { fg = green,  },
+	GitGutterChange = { fg = orange0,  },
+	GitGutterDelete = { fg = red,  },
+	GitGutterChangeDelete = { fg = red1,  },
 	-- Git Messenger (rhysd/git-messenger.vim)
 	gitmessengerPopupNormal = { fg = fg0, bg = bg1 }, -- Normal color in popup window
 	gitmessengerHeader = { fg = fg0, bg = bg1 }, -- Header such as 'Commit:', 'Author:'
@@ -706,7 +706,7 @@ local highlight_groups = {
 	multiple_cursors_cursor = { fg = fg0, style = 'reverse' },
 	multiple_cursors_visual = { fg = fg0, bg = bg2 },
 	-- NerdTree (preservim/nerdtree)
-	NERDTreeDir = { fg = blue0, style = 'bold' },
+	NERDTreeDir = { fg = blue0,  },
 	NERDTreeDirSlash = { fg = blue0 },
 	NERDTreeOpenable = { fg = blue0 },
 	NERDTreeClosable = { fg = blue0 },
@@ -729,13 +729,13 @@ local highlight_groups = {
 	netrwCmdSep = { fg = fg3 },
 	netrwVersion = { fg = green },
 	-- Show Marks (jacquesbh/vim-showmarks) -- Created by Andreas Politz
-	ShowMarksHLl = { fg = blue0, style = 'bold' },
-	ShowMarksHLu = { fg = blue0, style = 'bold' },
-	ShowMarksHLo = { fg = blue0, style = 'bold' },
-	ShowMarksHLm = { fg = blue0, style = 'bold' },
+	ShowMarksHLl = { fg = blue0,  },
+	ShowMarksHLu = { fg = blue0,  },
+	ShowMarksHLo = { fg = blue0,  },
+	ShowMarksHLm = { fg = blue0,  },
 	-- Signature (kshenoy/vim-signature)
-	SignatureMarkText = { fg = blue0, style = 'bold' },
-	SignatureMarkerText = { fg = purple0, style = 'bold' },
+	SignatureMarkText = { fg = blue0,  },
+	SignatureMarkerText = { fg = purple0,  },
 	-- Signify (mhinz/vim-signify)
 	SignifySignAdd = { fg = green },
 	SignifySignChange = { fg = orange0 },
@@ -744,9 +744,9 @@ local highlight_groups = {
 	StartifyBracket = { fg = fg3 },
 	StartifyFile = { fg = fg1 },
 	StartifyNumber = { fg = blue0 },
-	StartifyPath = { fg = blue1, style = 'bold' },
+	StartifyPath = { fg = blue1,  },
 	StartifySlash = { fg = blue0 },
-	StartifySection = { fg = blue0, style = 'bold' },
+	StartifySection = { fg = blue0,  },
 	StartifySpecial = { fg = red1 },
 	StartifyHeader = { fg = purple2 },
 	StartifyFooter = { fg = purple2 },
@@ -756,9 +756,9 @@ local highlight_groups = {
 	SyntasticErrorSign = { fg = red },
 	SyntasticWarningSign = { fg = yellow },
 	-- Which Key (liuchengxu/vim-which-key)
-	WhichKey = { fg = purple0, style = 'bold' },
+	WhichKey = { fg = purple0,  },
 	WhichKeySeperator = { fg = green },
-	WhichKeyGroup = { fg = blue0, style = 'bold' },
+	WhichKeyGroup = { fg = blue0,  },
 	WhichKeyDesc = { fg = blue1 },
 	-----------------------------
 	--     LSP Highlighting    --

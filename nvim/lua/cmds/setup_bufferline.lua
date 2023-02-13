@@ -5,22 +5,64 @@ function M.setup(buf_mode)
 	require('bufferline').setup({
 		highlights = {
 			buffer_selected = {
+				bold = false,
 				underline = true,
+			},
+			numbers_selected = {
+				underline = true,
+				bold = false,
+			},
+			diagnostic_selected = {
+				underline = true,
+				bold = false,
+			},
+			hint_selected = {
+				underline = true,
+				bold = false,
+			},
+			hint_diagnostic_selected = {
+				underline = true,
+				bold = false,
+			},
+			info_selected = {
+				underline = true,
+				bold = false,
+			},
+			info_diagnostic_selected = {
+				underline = true,
+				bold = false,
+			},
+			warning_selected = {
+				underline = true,
+				bold = false,
+			},
+			warning_diagnostic_selected = {
+				underline = true,
+				bold = false,
+			},
+			error_selected = {
+				underline = true,
+				bold = false,
+			},
+			error_diagnostic_selected = {
+				underline = true,
+				bold = false,
+			},
+			pick_selected = {
+				underline = true,
+				bold = false,
+			},
+			pick_visible = {
+				bold = false,
+			},
+			pick = {
+				bold = false,
 			},
 		},
 		options = {
 			mode = buf_mode,
 			show_buffer_icons = false,
-			diagnostics = 'nvim_lsp',
-			diagnostics_indicator = function(count, level, diagnostics_dict, context)
-				local s = ' '
-				for e, n in pairs(diagnostics_dict) do
-					local sym = e == 'error' and 'x ' or (e == 'warning' and 'w ' or 'i')
-					s = s .. n .. sym
-				end
-				return s
-			end,
-			separator_style = 'slant',
+			separator_style = { '|', '|' },
 			offsets = {
 				{
 					filetype = 'NvimTree',
