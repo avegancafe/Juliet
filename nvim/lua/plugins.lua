@@ -577,12 +577,12 @@ require('lazy').setup({
 	{
 		'klen/nvim-test',
 		config = function()
-			vim.cmd([[
-					augroup nvim_test_runner
-						autocmd!
-						autocmd BufWritePost *.go TestFile
-					augroup end
-				]])
+			-- vim.cmd([[
+			-- 		augroup nvim_test_runner
+			-- 			autocmd!
+			-- 			autocmd BufWritePost *.go TestFile
+			-- 		augroup end
+			-- 	]])
 
 			require('nvim-test').setup({
 				run = true,
