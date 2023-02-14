@@ -1,4 +1,12 @@
-import { intro, outro, text, isCancel, cancel, spinner } from '@clack/prompts'
+import {
+  intro,
+  outro,
+  text,
+  isCancel,
+  cancel,
+  spinner,
+  select,
+} from '@clack/prompts'
 import { exec as internalExec } from 'child_process'
 import util from 'util'
 
@@ -10,51 +18,124 @@ const info = (x) => {
   s.stop(x)
 }
 
-intro(`git hoard`)
+async function createHoard() {
+  intro(`git hoard`)
 
-const { stdout } = await exec('git branch -a')
+  const { stdout } = await exec('git branch -a')
 
-const xs = stdout.match(/hoard\/(\d+)/gi) || []
+  const xs = stdout.match(/hoard\/(\d+)/gi) || []
 
-const maxHoard = xs
-  .map((x) => parseInt(x.match(/\d+/)[0]))
-  .reduce((agg, x) => (x > agg ? x : agg), -Infinity)
+  const maxHoard = xs
+    .map((x) => parseInt(x.match(/\d+/)[0]))
+    .reduce((agg, x) => (x > agg ? x : agg), -Infinity)
 
-const newHoard = (maxHoard == -Infinity ? 0 : maxHoard) + 1
+  const newHoard = (maxHoard == -Infinity ? 0 : maxHoard) + 1
 
-const branchName = await text({
-  message: 'What would you like to name your hoard?',
-  initialValue: `hoard/${newHoard}`,
-})
+  const branchName = await text({
+    message: 'What would you like to name your hoard?',
+    initialValue: `hoard/${newHoard}`,
+  })
 
-if (isCancel(branchName)) {
-  cancel('Exiting...')
-  process.exit(0)
+  if (isCancel(branchName)) {
+    cancel('Exiting...')
+    process.exit(0)
+  }
+
+  let s = spinner()
+
+  s.start(`Creating branch ${branchName}...`)
+  await exec(`git switch -c ${branchName}`)
+
+  s.stop(`Work saved in branch ${branchName}`)
+
+  const saveMessage = await text({
+    message: 'What should the saved message be?',
+    placeholder: 'No specified description-- saved with hoard',
+  })
+
+  if (isCancel(saveMessage)) {
+    cancel('Exiting...')
+    process.exit(0)
+  }
+
+  s = spinner()
+
+  s.start('Committing...')
+  await exec(`git commit -m'[hoard] ${saveMessage}' --allow-empty`)
+  s.stop('Committed!')
+
+  await exec(`git switch -`)
+
+  outro(`You're all set!`)
 }
 
-let s = spinner()
+async function listHoard() {
+  intro(`git hoard list`)
+  const { stdout: hoards } = await exec(
+    'git branch -a | grep hoard/ | sed -E "s/hoard\\/(.*)/\\1/g"'
+  )
 
-s.start(`Creating branch ${branchName}...`)
-await exec(`git switch -c ${branchName}`)
+  let normalizedHoards = hoards
+    .split('\n')
+    .filter((x) => x?.length)
+    .map((x) => x?.trim())
 
-s.stop(`Work saved in branch ${branchName}`)
+  const commitMessages = (
+    await Promise.all(
+      normalizedHoards.map(async (x) => {
+        const { stdout } = await exec(
+          `git log --pretty -1 hoard/${x}  | grep "\\[hoard\\]" | sed -E 's/.*\\[hoard\\](.*)/\\1/g'`
+        )
 
-const saveMessage = await text({
-  message: 'What should the saved message be?',
-  placeholder: 'No specified description-- saved with hoard',
-})
+        return stdout?.trim()
+      })
+    )
+  ).reduce((agg, x, i) => {
+    return {
+      ...agg,
+      [normalizedHoards[i]]: x,
+    }
+  }, {})
 
-if (isCancel(saveMessage)) {
-  cancel('Exiting...')
-  process.exit(0)
+  normalizedHoards = normalizedHoards.filter((x) => commitMessages[x] != '')
+
+  const newHoard = await select({
+    message: 'Select which hoard to switch to',
+    options: normalizedHoards.map((x) => ({
+      value: x.trim(),
+      hint: commitMessages[x],
+    })),
+  })
+
+  if (isCancel(newHoard)) {
+    cancel('Exiting...')
+    process.exit(0)
+  }
+
+  let s = spinner()
+
+  s.start(`Checking out ${newHoard}...`)
+
+  try {
+    await exec(`git switch hoard/${newHoard}`)
+  } catch (e) {
+    console.error(e.stderr)
+    s.stop(`Error checking out ${newHoard}`)
+    cancel('Exiting...')
+    process.exit(1)
+  }
+  s.stop(`Checked out ${newHoard}`)
+
+  outro(`You're all set!`)
 }
 
-s = spinner()
+const args = process.argv.slice(2)
 
-s.start('Committing...')
-await exec(`git commit -m'[hoard] ${saveMessage}' --allow-empty`)
-s.stop('Committed!')
-
-await exec(`git switch -`)
-
-outro(`You're all set!`)
+if (args.length == 0) {
+  createHoard()
+} else if (args.length == 1) {
+  listHoard()
+} else {
+  console.log('Exiting...')
+  process.exit(1)
+}

@@ -1,4 +1,4 @@
 #! /bin/bash
 
 BIN_DIR=$(dirname $BASH_SOURCE)
-node ${BIN_DIR}/git-hoard.js
+node ${BIN_DIR}/git-hoard.js $@
