@@ -1,0 +1,11 @@
+{
+  "name": "git-hoard",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "^0.4.0"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.2.2"
+  }
+}
