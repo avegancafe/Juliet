@@ -21,6 +21,7 @@ require('lazy').setup({
 			require('nvim-tree').setup()
 		end,
 	},
+	"RRethy/vim-illuminate",
 	{ 'rhysd/committia.vim' },
 	{
 		'mfussenegger/nvim-lint',
