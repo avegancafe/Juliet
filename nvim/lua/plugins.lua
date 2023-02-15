@@ -21,7 +21,27 @@ require('lazy').setup({
 			require('nvim-tree').setup()
 		end,
 	},
-	"RRethy/vim-illuminate",
+	'RRethy/vim-illuminate',
+	{
+		'glepnir/lspsaga.nvim',
+		event = 'BufRead',
+		config = function()
+			require('lspsaga').setup({
+				symbol_in_winbar = {
+					enable = true,
+					separator = ' ',
+					hide_keyword = true,
+					show_file = true,
+					respect_root = true,
+					color_mode = true,
+				},
+			})
+		end,
+		dependencies = {
+			{ 'kyazdani42/nvim-web-devicons' },
+			{ 'nvim-treesitter/nvim-treesitter' },
+		},
+	},
 	{ 'rhysd/committia.vim' },
 	{
 		'mfussenegger/nvim-lint',
@@ -403,12 +423,6 @@ require('lazy').setup({
 					lualine_b = { 'filename' },
 					lualine_c = {
 						'diagnostics',
-
-						{
-							function()
-								return require('nvim-navic').get_location()
-							end,
-						},
 					},
 					lualine_x = { 'lsp_progres' },
 					lualine_y = { 'filetype' },
