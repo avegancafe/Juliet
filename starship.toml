@@ -1,4 +1,5 @@
 command_timeout = 5000
+add_newline = false
 
 [package]
 disabled = true

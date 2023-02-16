@@ -3,7 +3,6 @@ function fish_user_key_bindings
     bind \cc 'commandline ""'
     bind \cb fco_preview
     bind \cn 'git rebase --continue'
-    bind \cb fjobs
 end
 
 source ~/.config/fish/functions/fzf_key_bindings.fish
@@ -42,14 +41,12 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
 
     set target (echo $raw_target | awk '{print $2}')
 
-    echo
     log "Checking out $target..."
 
     git checkout $target
+    echo ""
+    echo ""
 
-    log "Done!"
-    echo
-    echo
     commandline -f repaint
 end
 
@@ -61,6 +58,11 @@ function fkill -d "Fuzzy-find process and kill it"
         set pid (ps -f -u $UID | sed 1d | fzf $fzf_args | awk '{print $2}')
     else
         set pid (ps -ef | sed 1d | fzf $fzf_args | awk '{print $2}')
+    end
+
+    echo $pid
+    if test "$pid" = ''
+        return
     end
 
     set -l process_name (ps -o command= -p $pid)

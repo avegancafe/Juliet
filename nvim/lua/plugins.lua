@@ -21,12 +21,31 @@ require('lazy').setup({
 			require('nvim-tree').setup()
 		end,
 	},
-	'RRethy/vim-illuminate',
+	{
+		'RRethy/vim-illuminate',
+		config = function()
+			require('illuminate').configure({
+				filetypes_denylist = {
+					'dashboard',
+					'lspsagaoutline',
+				},
+			})
+		end,
+	},
 	{
 		'glepnir/lspsaga.nvim',
 		event = 'BufRead',
 		config = function()
 			require('lspsaga').setup({
+				outline = {
+					keys = {
+						jump = '<cr>',
+						expand_collapse = 'u',
+					},
+				},
+				ui = {
+					border = 'rounded',
+				},
 				symbol_in_winbar = {
 					enable = true,
 					separator = ' ',
@@ -417,6 +436,13 @@ require('lazy').setup({
 						right = '',
 					},
 					theme = require('lualine_theme'),
+					disabled_filetypes = {
+						statusline = {
+							'lspsagaoutline',
+							'NvimTree',
+						},
+						winbar = {},
+					},
 				},
 				sections = {
 					lualine_a = { 'mode' },
@@ -539,11 +565,7 @@ require('lazy').setup({
 
 	{
 		'smjonas/inc-rename.nvim',
-		config = function()
-			require('inc_rename').setup({
-				presets = { inc_rename = true },
-			})
-		end,
+		config = true,
 	},
 
 	{

@@ -22,11 +22,12 @@ local on_attach = function(client, bufnr)
 	buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 	buf_set_keymap('n', 'K', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
 	buf_set_keymap('n', '<leader>lh', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
-	buf_set_keymap('n', '<leader>ld', '<CMD>Trouble lsp_definitions<CR>', { noremap = true, silent = true })
-	buf_set_keymap('n', '<leader>li', '<CMD>Trouble lsp_implementations<CR>', { noremap = true, silent = true })
+	buf_set_keymap('n', '<leader>ld', '<CMD>Lspsaga lsp_finder<CR>', { noremap = true, silent = true })
+	buf_set_keymap('n', '<leader>li', '<CMD>Lspsaga lsp_finder<CR>', { noremap = true, silent = true })
 	buf_set_keymap('n', '<leader>lr', ':IncRename ', { noremap = true, silent = true })
-	buf_set_keymap('n', '<leader>la', '<CMD>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true })
-	buf_set_keymap('n', '<leader>lu', '<CMD>Trouble lsp_references<CR>', { noremap = true, silent = true })
+	buf_set_keymap('n', '<leader>la', '<CMD>Lspsaga code_action<CR>', { noremap = true, silent = true })
+	buf_set_keymap('n', '<leader>lu', '<CMD>Lspsaga lsp_finder<CR>', { noremap = true, silent = true })
+	buf_set_keymap('n', '<leader>lo', '<CMD>Lspsaga outline<CR>', { noremap = true, silent = true })
 end
 
 -- Setup lspconfig.

@@ -154,9 +154,7 @@ function vim
     end
 end
 
-function fish_greeting
-    fortune
-end
+function fish_greeting; end
 
 function gut
     git $argv
