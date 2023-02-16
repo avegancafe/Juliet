@@ -77,8 +77,8 @@ async function listHoard() {
 
   let normalizedHoards = hoards
     .split('\n')
-    .filter((x) => x?.length)
     .map((x) => x?.trim())
+    .filter((x) => x?.length)
 
   const commitMessages = (
     await Promise.all(
@@ -99,13 +99,23 @@ async function listHoard() {
 
   normalizedHoards = normalizedHoards.filter((x) => commitMessages[x] != '')
 
-  const newHoard = await select({
-    message: 'Select which hoard to switch to',
-    options: normalizedHoards.map((x) => ({
-      value: x.trim(),
-      hint: commitMessages[x],
-    })),
-  })
+  let newHoard
+  if (normalizedHoards.length) {
+    newHoard = await select({
+      message: 'Select which hoard to switch to',
+      options: normalizedHoards.map((x) => ({
+        value: x.trim(),
+        hint: commitMessages[x],
+      })),
+    })
+    if (isCancel(newHoard)) {
+      cancel('Exiting...')
+      process.exit(0)
+    }
+  } else {
+    cancel('No hoards found')
+    process.exit(0)
+  }
 
   if (isCancel(newHoard)) {
     cancel('Exiting...')
