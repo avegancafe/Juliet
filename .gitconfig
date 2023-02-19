@@ -30,7 +30,7 @@
 [github]
 	user = avegancafe
 [format]
-  # the %x08's are delete characters
+	# the %x08's are delete characters
 	pretty = format:%C(yellow)%h %Creset— %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08 %Creset— %C(red)%<(20,trunc)%an %Creset%<(80,trunc)%s
 [filter "lfs"]
 	clean = git-lfs clean -- %f
@@ -43,18 +43,18 @@
 	colorMoved = zebra
 	tool = Kaleidoscope
 [url "https://github.com/"]
-  insteadOf = ssh://git@github.com/
+	insteadOf = ssh://git@github.com/
 [fetch]
 	prune = true
 [user]
 	name = Kyle Holzinger
 [include]
-  path = ~/.gitconfig__local
+	path = ~/.gitconfig__local
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "nvim"]
-  cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
+	cmd = nvim -f -c \"Gdiffsplit!\" \"$MERGED\"
 [pull]
 	rebase = true
 [init]
