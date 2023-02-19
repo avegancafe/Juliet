@@ -18,6 +18,7 @@
 	su = submodule update --recursive --init
 [push]
 	default = current
+	autoSetupRemote = true
 [commit]
 	template = /Users/kyle/.gitmessage
 	gpgsign = true
