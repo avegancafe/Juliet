@@ -28,6 +28,7 @@ require('lazy').setup({
 				filetypes_denylist = {
 					'dashboard',
 					'lspsagaoutline',
+					'NvimTree',
 				},
 			})
 		end,
