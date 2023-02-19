@@ -2,12 +2,20 @@ local M = {}
 
 function M.setup(buf_mode)
 	local colors = require('void_colors')
+
 	require('bufferline').setup({
 		highlights = {
+			indicator_selected = {
+				fg = colors.purple,
+			},
+			separator = {
+				fg = colors.buffer_bg
+			},
 			buffer_selected = {
 				bold = false,
 				underline = true,
 			},
+
 			numbers_selected = {
 				underline = true,
 				bold = false,
@@ -62,7 +70,6 @@ function M.setup(buf_mode)
 		options = {
 			mode = buf_mode,
 			show_buffer_icons = false,
-			separator_style = { '|', '|' },
 			offsets = {
 				{
 					filetype = 'NvimTree',
