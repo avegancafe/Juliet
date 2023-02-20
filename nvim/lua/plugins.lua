@@ -160,6 +160,9 @@ require('lazy').setup({
 						hidden = true,
 						respect_gitignore = true,
 					},
+					workspaces = {
+						keep_insert = false,
+					},
 				},
 			})
 		end,
@@ -691,5 +694,22 @@ require('lazy').setup({
 				file_name = '.todo',
 			},
 		},
+	},
+
+	{
+		'natecraddock/workspaces.nvim',
+		dependencies = { 'Shatur/neovim-session-manager', 'nvim-telescope/telescope.nvim' },
+		config = function()
+			local workspaces = require('workspaces')
+			workspaces.setup({
+				hooks = {
+					open = function()
+						require('session_manager').load_current_dir_session()
+					end,
+				},
+			})
+
+			require('telescope').load_extension('workspaces')
+		end,
 	},
 })
