@@ -457,7 +457,7 @@ require('lazy').setup({
 						'diagnostics',
 						{
 							function()
-								return require('lspsaga.symbolwinbar'):get_winbar() or ''
+								return (require('lspsaga.symbolwinbar'):get_winbar() .. '%#EndOfBuffer#') or ''
 							end,
 						},
 					},
