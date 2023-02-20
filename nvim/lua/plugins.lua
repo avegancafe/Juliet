@@ -428,10 +428,24 @@ require('lazy').setup({
 
 	{
 		'nvim-lualine/lualine.nvim',
-		dependencies = { 'nvim-web-devicons' },
+		dependencies = { 'nvim-web-devicons', 'nocksock/do.nvim' },
 		config = function()
 			local navic = require('nvim-navic')
 			require('lualine').setup({
+				winbar = {
+					lualine_c = {
+						function()
+							return require('do').view('active')
+						end,
+					},
+				},
+				inactive_winbar = {
+					lualine_c = {
+						function()
+							return require('do').view('inactive')
+						end,
+					},
+				},
 				options = {
 					component_separators = {
 						left = '',
@@ -447,7 +461,11 @@ require('lazy').setup({
 							'lspsagaoutline',
 							'NvimTree',
 						},
-						winbar = {},
+						winbar = {
+							'lspsagaoutline',
+							'NvimTree',
+							'dashboard',
+						},
 					},
 				},
 				sections = {
@@ -689,7 +707,7 @@ require('lazy').setup({
 		config = true,
 		opts = {
 			doing_prefix = 'In progress: ',
-			winbar = true,
+			winbar = false,
 			store = {
 				file_name = '.todo',
 			},
