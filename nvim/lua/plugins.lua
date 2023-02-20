@@ -48,9 +48,9 @@ require('lazy').setup({
 					border = 'rounded',
 				},
 				symbol_in_winbar = {
-					enable = true,
-					separator = ' ',
-					hide_keyword = true,
+					enable = false,
+					separator = '  ',
+					hide_keyword = false,
 					show_file = true,
 					respect_root = true,
 					color_mode = true,
@@ -422,10 +422,12 @@ require('lazy').setup({
 			})
 		end,
 	},
+
 	{
 		'nvim-lualine/lualine.nvim',
 		dependencies = { 'nvim-web-devicons' },
 		config = function()
+			local navic = require('nvim-navic')
 			require('lualine').setup({
 				options = {
 					component_separators = {
@@ -450,6 +452,11 @@ require('lazy').setup({
 					lualine_b = { 'filename' },
 					lualine_c = {
 						'diagnostics',
+						{
+							function()
+								return require('lspsaga.symbolwinbar'):get_winbar() or ''
+							end,
+						},
 					},
 					lualine_x = { 'lsp_progres' },
 					lualine_y = { 'filetype' },
@@ -672,5 +679,17 @@ require('lazy').setup({
 	{
 		'SmiteshP/nvim-navic',
 		dependencies = 'neovim/nvim-lspconfig',
+	},
+
+	{
+		'nocksock/do.nvim',
+		config = true,
+		opts = {
+			doing_prefix = 'In progress: ',
+			winbar = true,
+			store = {
+				file_name = '.todo',
+			},
+		},
 	},
 })

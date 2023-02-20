@@ -92,6 +92,7 @@ local red0 = { '#f54e3c', 244, 'red0' }
 local blue = { '#58b0d9', 247, 'blue' }
 local blue0 = { '#4f97d7', 68, 'blue0' }
 local purple = { '#544a65', 59, 'purple' }
+local section_bg = { '#38393f', 333, 'section_bg' }
 local green = { '#67b11d', 242, 'green' }
 local green0 = { '#2aa1ae', 244, 'green0' }
 local aqua = { '#4495b4', 244, 'aqua' }
@@ -683,6 +684,8 @@ local highlight_groups = {
 	-- Dirvish (justinmk/vim-dirvish)
 	DirvishPathTail = { fg = aqua0 },
 	DirvishArg = { fg = yellow },
+	-- Do (nocksock/do.nvim)
+	TablineSel = { fg = fg0, bg = section_bg },
 	-- Easy Motion (easymotion/vim-easymotion)
 	EasyMotionTarget = { fg = green, style = 'bold,reverse' },
 	EasyMotionShade = { fg = green0, style = 'italic' },

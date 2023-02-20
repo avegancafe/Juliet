@@ -6,6 +6,7 @@
   "cmp-nvim-lsp": { "branch": "main", "commit": "0e6b2ed705ddcff9738ec4ea838141654f12eeef" },
   "committia.vim": { "branch": "master", "commit": "0b4df1a7f48ffbc23b009bd14d58ee1be541917c" },
   "dashboard-nvim": { "branch": "master", "commit": "3af6176d41cad32ffc63d026bf522d6135b53a3b" },
+  "do.nvim": { "branch": "main", "commit": "c3e1c4da8ab4b158a69fa129c1c69b3c355ca019" },
   "fidget.nvim": { "branch": "main", "commit": "9dc6d15fdb877b2fb09ea0ba2dfde9beccb5965a" },
   "gitsigns.nvim": { "branch": "main", "commit": "a5caac26768af80b7c57b919f77b3fed3d7424d0" },
   "inc-rename.nvim": { "branch": "main", "commit": "21c23c379342a731a0c90f226601ec0434627b26" },
