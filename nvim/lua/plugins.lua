@@ -474,12 +474,12 @@ require('lazy').setup({
 						function()
 							local output = vim.split(vim.api.nvim_exec('WorkspacesList', true), '\n')
 
-							for i=0,table.getn(output) do
-								if (output[i] ~= nil) then
-									local path = string.gsub(output[i], "[%a%A]* ", "")
-									path = string.gsub(path, "/$", "")
+							for i = 0, table.getn(output) do
+								if output[i] ~= nil then
+									local path = string.gsub(output[i], '[%a%A]* ', '')
+									path = string.gsub(path, '/$', '')
 									if path == vim.api.nvim_exec('pwd', true) then
-										return string.gsub(output[i], " [%a%A/]+", "")
+										return string.gsub(output[i], ' [%a%A/]+', '')
 									end
 								end
 							end
