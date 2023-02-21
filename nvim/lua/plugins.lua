@@ -486,15 +486,20 @@ require('lazy').setup({
 
 							return ''
 						end,
-						'filename',
+						{
+							'filename',
+							cond = function()
+								return require('lspsaga.symbolwinbar'):get_winbar() == nil
+							end,
+						},
 					},
 					lualine_c = {
-						'diagnostics',
 						{
 							function()
 								return (require('lspsaga.symbolwinbar'):get_winbar() .. '%#EndOfBuffer#') or ''
 							end,
 						},
+						'diagnostics',
 					},
 					lualine_x = { 'lsp_progres' },
 					lualine_y = { 'filetype' },
@@ -579,7 +584,6 @@ require('lazy').setup({
 				},
 				mapping = cmp.mapping.preset.insert({
 					['<C-e>'] = cmp.mapping.abort(),
-					['<CR>'] = cmp.mapping.confirm({ select = true }),
 					['<Tab>'] = cmp.mapping.confirm({ select = true }),
 				}),
 				sources = cmp.config.sources({

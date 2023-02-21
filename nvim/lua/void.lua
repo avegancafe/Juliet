@@ -147,9 +147,9 @@ local highlight_groups = {
 	-- Syntax Groups (descriptions and ordering from `:h w18`) --
 	-------------------------------------------------------------
 
-	Comment = { fg = green0, style = 'italic' }, -- any comment
+	Comment = { fg = green0 }, -- any comment
 	Constant = { fg = green0 }, -- any constant
-	String = { fg = aqua0, style = 'italic' }, -- this is a string
+	String = { fg = aqua0 }, -- this is a string
 	Character = { fg = purple0 }, -- a character constant: 'c', '\n'
 	Boolean = { fg = war }, -- a boolean constant: TRUE, false
 	Float = { fg = float }, -- a floating point constant: 2.3e10
@@ -171,7 +171,7 @@ local highlight_groups = {
 	StorageClass = { fg = yellow,  }, -- static, register, volatile, etc.
 	Structure = { fg = aqua,  }, -- struct, union, enum, etc.
 	Typedef = { fg = yellow }, -- A typedef
-	Special = { fg = orange, style = 'italic' }, -- any special symbol
+	Special = { fg = orange }, -- any special symbol
 	SpecialChar = { fg = cyan }, -- special character in a constant
 	Tag = { fg = orange0 }, -- you can use CTRL-] on this
 	Delimiter = { fg = delim }, -- character that needs attention
@@ -219,10 +219,10 @@ local highlight_groups = {
 	qfLineNr = { fg = red1 },
 	Search = { fg = green, style = 'bold,reverse' }, -- Last search pattern highlighting (see 'hlsearch'). Also used for similar items that need to stand out.
 	SpecialKey = { fg = purple0 }, -- Meta and special keys listed with ":map", also for text used to show unprintable characters in the text, 'listchars'. Generally: text that is displayed differently from what it really is.
-	SpellBad = { fg = red, style = 'italic,undercurl' }, -- Word that is not recognized by the spellchecker. This will be combined with the highlighting used otherwise.
-	SpellCap = { fg = blue0, style = 'italic,undercurl' }, -- Word that should start with a capital. This will be combined with the highlighting used otherwise.
-	SpellLocal = { fg = aqua0, style = 'italic,undercurl' }, -- Word that is recognized by the spellchecker as one that is used in another region. This will be combined with the highlighting used otherwise.
-	SpellRare = { fg = purple0, style = 'italic,undercurl' }, -- Word that is recognized by the spellchecker as one that is hardly ever used. spell This will be combined with the highlighting used otherwise.
+	SpellBad = { fg = red, style = 'undercurl' }, -- Word that is not recognized by the spellchecker. This will be combined with the highlighting used otherwise.
+	SpellCap = { fg = blue0, style = 'undercurl' }, -- Word that should start with a capital. This will be combined with the highlighting used otherwise.
+	SpellLocal = { fg = aqua0, style = 'undercurl' }, -- Word that is recognized by the spellchecker as one that is used in another region. This will be combined with the highlighting used otherwise.
+	SpellRare = { fg = purple0, style = 'undercurl' }, -- Word that is recognized by the spellchecker as one that is hardly ever used. spell This will be combined with the highlighting used otherwise.
 	StatusLine = { fg = fg1, bg = purple3 }, -- status line of current window
 	StatusLineNC = { fg = purple3, bg = purple4 }, -- status lines of not-current windows Note: if this is equal to "StatusLine" Vim will use "^^^" in the status line of the current window.
 	StatusLineTerm = { fg = fg1, bg = purple3 }, -- status line of current :terminal window
@@ -331,7 +331,7 @@ local highlight_groups = {
 	diffNewFile = { fg = yellow },
 	diffLine = { fg = blue0 },
 	-- Elixir
-	elixirDocString = { fg = green0, style = 'italic' },
+	elixirDocString = { fg = green0 },
 	elixirStringDelimiter = { fg = green },
 	elixirInterpolationDelimiter = { fg = aqua0 },
 	elixirModuleDeclaration = { fg = yellow },
@@ -486,7 +486,7 @@ local highlight_groups = {
 	jsFuncArgs = { fg = blue },
 	jsFuncBraces = { fg = blue1 },
 	jsVariableDef = { fg = fg1 },
-	jsObjectBraces = { fg = orange, style = 'italic' },
+	jsObjectBraces = { fg = orange },
 	jsObjectValue = { fg = float },
 	jsClassBlock = { fg = blue1 },
 	jsFutureKeys = { fg = orange0,  },
@@ -552,7 +552,7 @@ local highlight_groups = {
 	purescriptConditional = { fg = blue0,  },
 	purescriptBacktick = { fg = orange0 },
 	-- Python
-	pythonCoding = { fg = green0, style = 'italic' },
+	pythonCoding = { fg = green0 },
 	-- Ruby
 	rubyStringDelimiter = { fg = green },
 	rubyInterpolationDelimiter = { fg = aqua0 },
@@ -588,13 +588,13 @@ local highlight_groups = {
 	typeScriptDOMObjects = { fg = fg1 },
 	typeScriptAjaxMethods = { fg = purple0,  },
 	typeScriptLogicSymbols = { fg = fg1 },
-	typeScriptDocSeeTag = { fg = green0, style = 'italic' },
-	typeScriptDocParam = { fg = green0, style = 'italic' },
+	typeScriptDocSeeTag = { fg = green0 },
+	typeScriptDocParam = { fg = green0 },
 	typeScriptDocTags = { fg = blue1,  },
 	typeScriptGlobalObjects = { fg = blue0,  },
 	typeScriptParens = { fg = blue1 },
 	typeScriptOpSymbols = { fg = blue },
-	typeScriptHtmlElemProperties = { fg = orange, style = 'italic' },
+	typeScriptHtmlElemProperties = { fg = orange },
 	typeScriptNull = { fg = purple0,  },
 	typeScriptInterpolationDelimiter = { fg = aqua0 },
 	-- XML
@@ -669,7 +669,7 @@ local highlight_groups = {
 	BufTabLineHidden = { fg = purple4, bg = bg1 },
 	BufTabLineFill = { fg = bg0 },
 	-- Crates (mhinz/vim-crates)
-	Crates = { fg = green0, style = 'italic' },
+	Crates = { fg = green0 },
 	-- CTRL P (ctrlpvim/ctrlp.vim)
 	CtrlPMatch = { fg = yellow },
 	CtrlPNoEntries = { fg = red },
@@ -687,7 +687,7 @@ local highlight_groups = {
 	DirvishArg = { fg = yellow },
 	-- Easy Motion (easymotion/vim-easymotion)
 	EasyMotionTarget = { fg = green, style = 'bold,reverse' },
-	EasyMotionShade = { fg = green0, style = 'italic' },
+	EasyMotionShade = { fg = green0 },
 	-- Git Commit (tpope/vim-git)
 	gitcommitSelectedFile = { fg = green },
 	gitcommitDiscardedFile = { fg = red },
@@ -802,7 +802,7 @@ local highlight_groups = {
 	TSConstBuiltin = 'Special', -- For constant that are built in the language: `nil` in Lua
 	TSConstMacro = 'Define', -- For constants that are defined by macros: `NULL` in C
 	TSConstructor = 'Special', -- For constructor calls and definitions: `{}` in Lua, and Java constructors
-	TSEmphasis = 'Italic', -- For text to be represented with emphasis.
+	TSEmphasis = 'bold', -- For text to be represented with emphasis.
 	TSError = 'Error', -- For syntax/parser errors
 	TSException = 'Exception', -- For exception related keywords.
 	TSField = 'Identifier', -- For fields
