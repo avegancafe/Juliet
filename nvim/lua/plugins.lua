@@ -731,6 +731,7 @@ require('lazy').setup({
 			winbar = false,
 			store = {
 				file_name = '.todo',
+				auto_create_file = true,
 			},
 		},
 	},
