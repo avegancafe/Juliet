@@ -37,6 +37,13 @@ end
 
 vim.cmd(':command ToggleNumbers call v:lua.ToggleNumbers()')
 
+function ShowEditsInCurrentDir()
+	local cwd = vim.fn.fnamemodify(vim.fn.expand('%:h'), ':~:.')
+	vim.cmd('TodoTrouble keywords=EDIT cwd=' .. cwd)
+end
+
+vim.cmd(':command ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()')
+
 normal_map('<c-p>', ':Telescope find_files<cr>', { silent = true })
 normal_map('<c-b>', ':Telescope buffers<cr>', { silent = true })
 normal_map('<c-o>', ':w<cr>', { silent = true })

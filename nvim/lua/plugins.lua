@@ -604,12 +604,15 @@ require('lazy').setup({
 			require('todo-comments').setup({
 				keywords = {
 					FIX = { color = 'warning' },
-					EDIT = { color = 'info', icon = ' ' },
+					EDIT = { color = 'warning', icon = ' ' },
 				},
 				highlight = {
-					pattern = [[.*<(KEYWORDS)\s*]],
+					pattern = [[.*(KEYWORDS)\s*]],
 					keyword = 'bg',
 				},
+				search = {
+					pattern = [[.*<(KEYWORDS).*/>]],
+				}
 			})
 		end,
 	},
