@@ -33,6 +33,10 @@ function current-branch
     git branch | grep "\*" | sed "s/^\*[[:space:]]//"
 end
 
+function default-branch
+    git branch | grep -m 1 -Eo '\\smain|\\smaster'
+end
+
 function update-kitty
     curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
 end
