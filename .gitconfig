@@ -7,7 +7,7 @@
 	com = commit
 	cp = cherry-pick
 	diff-branch = !git diff $(git merge-base --fork-point master)
-	main = !git checkout $(git branch | grep -m 1 -Eo '\\smain|\\smaster')
+	main = !git switch $(git branch | grep -m 1 -Eo '\\smain|\\smaster')
 	s = switch
 	staged = diff --staged
 	t = ticket
