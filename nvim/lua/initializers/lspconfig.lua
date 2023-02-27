@@ -1,3 +1,18 @@
+function deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        end
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
+end
+
 vim.cmd([[
 augroup filetype_ts
 autocmd!
@@ -19,6 +34,7 @@ local on_attach = function(client, bufnr)
 	local function buf_set_option(...)
 		vim.api.nvim_buf_set_option(bufnr, ...)
 	end
+
 	buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 	buf_set_keymap('n', 'K', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
 	buf_set_keymap('n', '<leader>lh', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
@@ -68,18 +84,19 @@ local opts = {
 
 vim.cmd([[ do User LspAttachBuffers ]])
 
+require('mason').setup()
+require('lspconfig').tsserver.setup(opts)
+
 local servers = {
 	'bashls',
 	'cssls',
-	'html',
-	'tailwindcss',
-	'tsserver',
 	'gopls',
+	'html',
 	'solidity',
+	'tailwindcss',
 	'yamlls',
-l}
+}
 
-require('mason').setup()
 require('mason-lspconfig').setup({
 	ensure_installed = servers,
 })
@@ -87,5 +104,14 @@ require('mason-lspconfig').setup({
 require('mason-lspconfig').setup_handlers({
 	function(server_name)
 		require('lspconfig')[server_name].setup(opts)
+	end,
+
+	['gopls'] = function()
+		gopls_opts = deepcopy(opts)
+
+		local util = require('lspconfig/util')
+		gopls_opts.root_dir = util.root_pattern('go.mod')
+
+		require('lspconfig').gopls.setup(gopls_opts)
 	end,
 })
