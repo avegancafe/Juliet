@@ -604,6 +604,7 @@ require('lazy').setup({
 			require('todo-comments').setup({
 				keywords = {
 					FIX = { color = 'warning' },
+					EDIT = { color = 'info', icon = ' ' },
 				},
 				highlight = {
 					pattern = [[.*<(KEYWORDS)\s*]],
@@ -751,5 +752,5 @@ require('lazy').setup({
 
 			require('telescope').load_extension('workspaces')
 		end,
-	}
+	},
 })
