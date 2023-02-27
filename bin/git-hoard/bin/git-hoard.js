@@ -61,7 +61,7 @@ async function createHoard() {
   s = spinner()
 
   s.start('Committing...')
-  await exec(`git commit -m'[hoard] ${saveMessage}' --allow-empty`)
+  await exec(`git commit --no-verify -m'[hoard] ${saveMessage}' --allow-empty`)
   s.stop('Committed!')
 
   await exec(`git switch -`)
