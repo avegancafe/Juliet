@@ -39,6 +39,7 @@ require('lazy').setup({
 		config = function()
 			require('lspsaga').setup({
 				outline = {
+					win_width = 50,
 					keys = {
 						jump = '<cr>',
 						expand_collapse = 'u',
@@ -604,7 +605,7 @@ require('lazy').setup({
 			require('todo-comments').setup({
 				keywords = {
 					FIX = { color = 'warning' },
-					EDIT = { color = 'warning', icon = ' ' },
+					WARN = { alt = { 'EDIT' } },
 				},
 				highlight = {
 					pattern = [[.*(KEYWORDS)\s*]],
