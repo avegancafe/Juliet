@@ -13,51 +13,52 @@ function M.setup(buf_mode)
 			},
 			buffer_selected = {
 				bold = false,
-				underline = true,
+				underline = false,
+				italic = false,
 			},
 
 			numbers_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			diagnostic_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			hint_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			hint_diagnostic_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			info_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			info_diagnostic_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			warning_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			warning_diagnostic_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			error_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			error_diagnostic_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			pick_selected = {
-				underline = true,
+				underline = false,
 				bold = false,
 			},
 			pick_visible = {
