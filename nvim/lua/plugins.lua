@@ -279,12 +279,25 @@ require('lazy').setup({
 			local utils = require('telescope.utils')
 			local custom_footer = {}
 
+			local function get_fortune()
+				local socket = io.popen('fortune')
+				local fortune = socket:read('*a')
+				socket:close()
+
+				local footer = {}
+				for s in fortune:gmatch('[^\r\n]+') do
+					table.insert(footer, s)
+				end
+
+				return footer
+			end
+
 			local function get_dashboard_git_status()
 				local git_cmd = { 'git', 'status', '-s', '--', '.' }
 				local output = utils.get_os_command_output(git_cmd)
 
 				if #output == 0 then
-					custom_footer = { '', '', 'Git status', '', 'No files changed' }
+					custom_footer = get_fortune()
 				else
 					custom_footer = { '', '', 'Git status', '', unpack(output) }
 				end
@@ -298,16 +311,7 @@ require('lazy').setup({
 				if is_worktree[1] == 'true' then
 					get_dashboard_git_status()
 				else
-					local socket = io.popen('fortune')
-					local fortune = socket:read('*a')
-					socket:close()
-
-					local footer = {}
-					for s in fortune:gmatch('[^\r\n]+') do
-						table.insert(footer, s)
-					end
-
-					custom_footer = footer
+					custom_footer = get_fortune()
 				end
 			else
 				get_dashboard_git_status()
@@ -359,25 +363,25 @@ require('lazy').setup({
 					},
 					center = {
 						{
-							desc = 'Last Session             ',
+							desc = 'Last Session',
 							icon = ' ',
 							key = 'l',
 							action = 'SessionManager load_current_dir_session',
 						},
 						{
-							desc = 'Find file               ',
+							desc = 'Find file',
 							icon = ' ',
 							key = 'p',
 							action = 'Telescope find_files',
 						},
 						{
-							desc = 'New file                     ',
-							key = 'n',
+							desc = 'Open changed files',
+							key = 'c',
 							icon = ' ',
-							action = 'DashboardNewFile',
+							action = 'call v:lua.EditChangedFiles()',
 						},
 						{
-							desc = 'Find word                    ',
+							desc = 'Find word',
 							key = 'w',
 							icon = ' ',
 							action = 'Telescope live_grep',
@@ -613,7 +617,7 @@ require('lazy').setup({
 				},
 				search = {
 					pattern = [[.*<(KEYWORDS).*/>]],
-				}
+				},
 			})
 		end,
 	},
