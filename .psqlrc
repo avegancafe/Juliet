@@ -1,4 +1,3 @@
 \pset null '∅'
 \set HISTCONTROL ignoredups
 \set VERBOSITY verbose
-\x auto

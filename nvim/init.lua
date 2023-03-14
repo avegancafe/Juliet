@@ -46,7 +46,7 @@ vim.cmd('filetype plugin indent on')
 
 vim.opt.mouse = 'a'
 vim.opt.mousemoveevent = true
-vim.opt.relativenumber = true
+-- vim.opt.relativenumber = true
 vim.opt.number = true
 vim.opt.numberwidth = 3
 vim.cmd('hi Directory guifg=#FF0000 ctermfg=red')

@@ -721,9 +721,30 @@ require('lazy').setup({
 
 	{
 		'kevinhwang91/nvim-ufo',
-		dependencies = 'kevinhwang91/promise-async',
+		dependencies = {
+			'kevinhwang91/promise-async',
+			{
+				'luukvbaal/statuscol.nvim',
+				config = function()
+					require('statuscol').setup({
+						foldfunc = 'builtin',
+						setopt = true,
+					})
+				end,
+			},
+		},
 		config = function()
-			require('ufo').setup()
+			vim.o.foldcolumn = '0' -- '0' is not bad
+			vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+			vim.o.foldlevelstart = 99
+			vim.o.foldenable = true
+			vim.o.fillchars = [[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+
+			require('ufo').setup({
+				provider_selector = function(bufnr, filetype, buftype)
+					return { 'treesitter', 'indent' }
+				end,
+			})
 		end,
 	},
 
@@ -761,4 +782,16 @@ require('lazy').setup({
 			require('telescope').load_extension('workspaces')
 		end,
 	},
+
+	'mfussenegger/nvim-dap',
+	{
+		'leoluz/nvim-dap-go',
+		config = true,
+	},
+	{
+		'rcarriga/nvim-dap-ui',
+		config = true,
+	},
+	'theHamsta/nvim-dap-virtual-text',
+	'nvim-telescope/telescope-dap.nvim',
 })

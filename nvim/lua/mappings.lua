@@ -79,6 +79,14 @@ normal_map('<leader>rsb', ':let @b=@*<cr>', { silent = true })
 normal_map('<leader>rsc', ':let @c=@*<cr>', { silent = true })
 normal_map('<leader>rsd', ':let @d=@*<cr>', { silent = true })
 
+normal_map('<leader>dc', ':lua require"dap".continue()<cr>', { silent = true })
+normal_map('<leader>ds', ':lua require"dap".step_over()<cr>', { silent = true })
+normal_map('<leader>dso', ':lua require"dap".step_over()<cr>', { silent = true })
+normal_map('<leader>dsi', ':lua require"dap".step_into()<cr>', { silent = true })
+normal_map('<leader>dsu', ':lua require"dap".step_out()<cr>', { silent = true })
+normal_map('<leader>db', ':lua require"dap".toggle_breakpoint()<cr>', { silent = true })
+normal_map('<leader>dr', ':lua require"dap".repl.open()<cr>', { silent = true })
+
 function EditChangedFiles()
 	local files_output = vim.api.nvim_exec('!changed_files', true)
 	local changed_files = vim.split(files_output, '\n')[3]
