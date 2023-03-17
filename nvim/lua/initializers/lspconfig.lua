@@ -89,6 +89,7 @@ require('lspconfig').tsserver.setup(opts)
 
 local servers = {
 	'bashls',
+	'bufls',
 	'cssls',
 	'gopls',
 	'html',

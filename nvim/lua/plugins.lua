@@ -433,7 +433,7 @@ require('lazy').setup({
 
 	{
 		'nvim-lualine/lualine.nvim',
-		dependencies = { 'nvim-web-devicons', 'avegancafe/do.nvim' },
+		dependencies = { 'nvim-web-devicons', 'nocksock/do.nvim' },
 		config = function()
 			local navic = require('nvim-navic')
 			require('lualine').setup({
@@ -754,7 +754,7 @@ require('lazy').setup({
 	},
 
 	{
-		'avegancafe/do.nvim',
+		'nocksock/do.nvim',
 		config = true,
 		opts = {
 			doing_prefix = 'In progress: ',
@@ -794,4 +794,8 @@ require('lazy').setup({
 	},
 	'theHamsta/nvim-dap-virtual-text',
 	'nvim-telescope/telescope-dap.nvim',
+	{
+		'chentoast/marks.nvim',
+		config = true,
+	},
 })
