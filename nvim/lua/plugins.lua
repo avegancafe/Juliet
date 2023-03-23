@@ -17,9 +17,20 @@ require('lazy').setup({
 	{
 		'kyazdani42/nvim-tree.lua',
 		dependencies = 'kyazdani42/nvim-web-devicons',
-		config = function()
-			require('nvim-tree').setup()
-		end,
+		config = true,
+		opts = {
+			view = {
+				float = {
+					enable = true,
+					open_win_config = {
+						relative = 'editor',
+						anchor = 'NE',
+						row = vim.api.nvim_buf_line_count(0) - 1,
+						col = vim.go.columns - 1,
+					},
+				},
+			},
+		},
 	},
 	{
 		'RRethy/vim-illuminate',
@@ -214,6 +225,7 @@ require('lazy').setup({
 					'markdown',
 					'markdown_inline',
 					'ocaml',
+					'proto',
 					'python',
 					'regex',
 					'ruby',
@@ -594,7 +606,7 @@ require('lazy').setup({
 				sources = cmp.config.sources({
 					{ name = 'nvim_lsp' },
 					{ name = 'luasnip' },
-					{ name = 'buffer' },
+					-- { name = 'buffer' },
 				}),
 			})
 		end,
@@ -648,6 +660,20 @@ require('lazy').setup({
 			require('lsp_lines').setup()
 			vim.diagnostic.config({
 				virtual_text = false,
+			})
+
+			vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWinEnter' }, {
+				pattern = { '*.yml' },
+				callback = function()
+					vim.diagnostic.config({ virtual_lines = false })
+				end,
+			})
+
+			vim.api.nvim_create_autocmd({ 'BufLeave', 'BufWinLeave' }, {
+				pattern = { '*.yml' },
+				callback = function()
+					vim.diagnostic.config({ virtual_lines = true })
+				end,
 			})
 		end,
 	},
