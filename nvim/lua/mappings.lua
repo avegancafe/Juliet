@@ -36,6 +36,7 @@ function ToggleNumbers()
 end
 
 vim.cmd(':command ToggleNumbers call v:lua.ToggleNumbers()')
+vim.cmd(':abbreviate bgt BufferLineGroupToggle')
 
 function ShowEditsInCurrentDir()
 	local cwd = vim.fn.fnamemodify(vim.fn.expand('%:h'), ':~:.')
@@ -70,6 +71,7 @@ normal_map('<leader>sc', ':call v:lua.EditChangedFiles()<cr>')
 normal_map('<leader>b', ':BufferLinePick<cr>', { silent = true })
 normal_map('<leader>bb', ':BufferLinePick<cr>', { silent = true })
 normal_map('<leader>bc', ':BufferLinePickClose<cr>', { silent = true })
+normal_map('<leader>bg', ':`:BufferLineGroupToggle`<cr>', { silent = true })
 normal_map('<leader>bf', ':Neoformat<cr>', { silent = true })
 normal_map('<leader>bs', ':Vista<cr>')
 normal_map('<leader>bo', ':call v:lua.GitlabOpen()<cr>', { silent = true })

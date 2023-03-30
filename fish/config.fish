@@ -62,22 +62,6 @@ function refsl
     sudo mdutil -ai on
 end
 
-function r
-    set -l profile
-
-    switch $argv[1]
-        case start
-            set profile relay
-        case sync
-            set profile relay-sync
-        case '*'
-            echo "Usage: r ( start | sync )"
-            return
-    end
-
-    itermocil $profile --here
-end
-
 function watch
     /opt/homebrew/bin/watch -n 5 --color $argv
 end

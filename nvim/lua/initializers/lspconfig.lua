@@ -88,9 +88,11 @@ require('mason').setup()
 require('lspconfig').tsserver.setup(opts)
 
 local servers = {
+	'bashls',
+	'bufls',
 	'cssls',
+	'fennel_language_server',
 	'gopls',
-	'html',
 	'solidity',
 	'tailwindcss',
 	'yamlls',
