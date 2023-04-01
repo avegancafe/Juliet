@@ -20,6 +20,7 @@ setup_dependencies() {
   eval "$(/opt/homebrew/bin/brew shellenv)"
   setup_itermocil
   brew bundle --file ~/.config/Juliet/Brewfile
+  rustup-init
   [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config
   [[ ! -f ~/.prettierrc ]] && ln -sfv ~/.config/Juliet/.prettierrc ~
 }
