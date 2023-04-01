@@ -8,7 +8,7 @@ def draw_tab(
 ) -> int:
     orig_fg = screen.cursor.fg
     orig_bg = screen.cursor.bg
-    left_sep, right_sep = ('', '')
+    left_sep, right_sep = ('▌', ' ')
 
     def draw_sep(which: str) -> None:
         screen.cursor.bg = draw_data.default_bg
