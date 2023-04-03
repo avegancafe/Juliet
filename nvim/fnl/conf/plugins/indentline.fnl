@@ -2,5 +2,5 @@
 
 (pack :Yggdroot/indentLine
       {:config (fn []
-                 (tset vim.g :indentLine_fileTypeExclude [:dashboard])
+                 (tset vim.g :indentLine_fileTypeExclude [:dashboard :fennel])
                  (tset vim.g :indentLine_concealcursor :n))})
