@@ -1,11 +1,21 @@
+format = """
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$git_metrics\
+$fill\
+$jobs $cmd_duration $time\
+$line_break\
+$character"""
 command_timeout = 5000
 add_newline = false
 
-[package]
-disabled = true
+[fill]
+symbol = " "
 
-[nodejs]
-disabled = true
+[git_branch]
+format = "[$symbol$branch]($style) "
 
 [aws]
 disabled = true
@@ -14,7 +24,18 @@ disabled = true
 format = "λ "
 
 [jobs]
-symbol = "༼ つ ◕_◕ ༽つ |"
+symbol = "༼ つ ◕_◕ ༽つ"
+format = "[$symbol]($style)"
+style = "bold red"
+number_threshold = 1
+
+[cmd_duration]
+format = "[$duration]($style)"
 
 [git_status]
 style = "red"
+
+[time]
+disabled = false
+style = "white"
+format = "[$time]($style)"
