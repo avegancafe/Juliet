@@ -18,6 +18,7 @@ set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
 set -gx RELAY_FZF_OPTS "--reverse --height 40%"
 set -gx TERM xterm-256color
 set -gx PATH (npm get prefix)/bin $PATH
+set -gx PATH "$HOME/.config/Juliet/bin" $PATH
 set -gx PATH "$HOME/.config/Juliet/bin/git-hoard/bin" $PATH
 
 set -gx FOUNDRY_FMT_LINE_LENGTH 100
