@@ -74,6 +74,7 @@ local opts = {
 			},
 			workspace = {
 				library = vim.api.nvim_get_runtime_file('', true),
+				checkThirdParty = false
 			},
 			telemetry = {
 				enable = false,
@@ -90,9 +91,9 @@ require('lspconfig').tsserver.setup(opts)
 local servers = {
 	'bashls',
 	'bufls',
-	'cssls',
 	'fennel_language_server',
 	'gopls',
+	'lua_ls',
 	'solidity',
 	'tailwindcss',
 	'yamlls',
@@ -109,7 +110,7 @@ require('mason-lspconfig').setup_handlers({
 	end,
 
 	['gopls'] = function()
-		gopls_opts = deepcopy(opts)
+		local gopls_opts = deepcopy(opts)
 
 		local util = require('lspconfig/util')
 		gopls_opts.root_dir = util.root_pattern('go.mod')
