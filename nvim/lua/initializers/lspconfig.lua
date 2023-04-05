@@ -65,6 +65,16 @@ local opts = {
 	},
 	root_dir = nvim_lsp.util.root_pattern('.git'),
 	settings = {
+		fennel = {
+			workspace = {
+				-- If you are using hotpot.nvim or aniseed,
+				-- make the server aware of neovim runtime files.
+				library = vim.api.nvim_list_runtime_paths(),
+			},
+			diagnostics = {
+				globals = { 'vim' },
+			},
+		},
 		Lua = {
 			runtime = {
 				version = 'LuaJIT',
@@ -74,7 +84,7 @@ local opts = {
 			},
 			workspace = {
 				library = vim.api.nvim_get_runtime_file('', true),
-				checkThirdParty = false
+				checkThirdParty = false,
 			},
 			telemetry = {
 				enable = false,
@@ -116,32 +126,5 @@ require('mason-lspconfig').setup_handlers({
 		gopls_opts.root_dir = util.root_pattern('go.mod')
 
 		require('lspconfig').gopls.setup(gopls_opts)
-	end,
-
-	['fennel_language_server'] = function()
-		fls_opts = deepcopy(opts)
-
-		fls_opts.default_config = {
-			-- replace it with true path
-			cmd = { '~/.local/share/nvim/mason/packages/fennel-language-server/bin/fennel-language-server' },
-			filetypes = { 'fennel' },
-			single_file_support = true,
-			-- source code resides in directory `fnl/`
-			root_dir = require('lspconfig').util.root_pattern('fnl'),
-			settings = {
-				fennel = {
-					workspace = {
-						-- If you are using hotpot.nvim or aniseed,
-						-- make the server aware of neovim runtime files.
-						library = vim.api.nvim_list_runtime_paths(),
-					},
-					diagnostics = {
-						globals = { 'vim' },
-					},
-				},
-			},
-		}
-
-		require('lspconfig').fennel_language_server.setup(fls_opts)
 	end,
 })
