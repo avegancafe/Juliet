@@ -1,6 +1,5 @@
 eval (/opt/homebrew/bin/brew shellenv)
 source ~/.config/fish/env.fish 2>/dev/null
-
 set -gx PATH /usr/local/bin $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$GOPATH/bin" $PATH

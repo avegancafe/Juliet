@@ -24,6 +24,9 @@ augroup END
 vim.cmd([[
 set termguicolors
 ]])
+vim.cmd([[
+set scrolloff=4
+]])
 
 -- disable netrw
 vim.g.loaded_netrw = 1
