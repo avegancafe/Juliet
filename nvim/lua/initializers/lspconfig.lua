@@ -101,6 +101,7 @@ require('lspconfig').tsserver.setup(opts)
 local servers = {
 	'bashls',
 	'bufls',
+	'cssls',
 	'fennel_language_server',
 	'gopls',
 	'lua_ls',
