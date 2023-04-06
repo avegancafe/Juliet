@@ -6,7 +6,7 @@
                       :nvim-treesitter/nvim-treesitter]
        :config (fn []
                  (let [lspsaga (require :lspsaga)]
-                   (lspsaga.setup {:outline {:win_width 50
+                   (lspsaga.setup {:outline {:win_width 40
                                              :keys {:jump :<cr>
                                                     :expand_collapse :u}}
                                    :ui {:border :rounded}
