@@ -1,4 +1,8 @@
-function deepcopy(orig)
+---@generic T
+---Makes a copy of a table recursively
+---@param orig T
+---@return T
+local function deepcopy(orig)
 	local orig_type = type(orig)
 	local copy
 	if orig_type == 'table' then
