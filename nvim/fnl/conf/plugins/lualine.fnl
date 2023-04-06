@@ -33,22 +33,22 @@
                                                                               "[%a%A]* "
                                                                               "")
                                                                  "/$" "")]
-                                           (if (= path
-                                                  (vim.api.nvim_exec :pwd true))
+                                           (if (string.find (vim.api.nvim_exec :pwd
+                                                                               true)
+                                                            path)
                                                (set fin
                                                     (string.gsub v " [%a%A]+"
                                                                  "")))))
                                        fin)
-                                     [:filename
-                                      :cond
-                                      (fn []
-                                        (= ((. (require :lspsaga.symbolwinbar)
-                                               :get_winbar))
-                                           nil))]]
+                                     {1 :filename
+                                      :cond (fn []
+                                              (local winbar
+                                                     (require :lspsaga.symbolwinbar))
+                                              (= (winbar:get_winbar) nil))}]
                          :lualine_c [(fn []
-                                       (.. ((. (require :lspsaga.symbolwinbar)
-                                               :get_winbar))
-                                           "%#EndOfBuffer#"))
+                                       (local winbar
+                                              (require :lspsaga.symbolwinbar))
+                                       (.. (winbar:get_winbar) "%#EndOfBuffer#"))
                                      :diagnostics]
                          :lualine_x []
                          :lualine_y [:filetype]
