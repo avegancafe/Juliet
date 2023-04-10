@@ -31,7 +31,6 @@
   "nvim-ufo": { "branch": "main", "commit": "9e829d5cfa3de6a2ff561d86399772b0339ae49d" },
   "nvim-web-devicons": { "branch": "master", "commit": "0568104bf8d0c3ab16395433fcc5c1638efc25d4" },
   "plenary.nvim": { "branch": "master", "commit": "253d34830709d690f013daf2853a9d21ad7accab" },
-  "pretty_hover": { "branch": "master", "commit": "1b9f417ff7742fd5229e851293bc5c79b10aafdb" },
   "promise-async": { "branch": "main", "commit": "7fa127fa80e7d4d447e0e2c78e99af4355f4247b" },
   "space-nvim": { "branch": "main", "commit": "9c4f5857acf51aa6d4924f3f2ccabb079799e7f6" },
   "statuscol.nvim": { "branch": "main", "commit": "1ab254c6519f8a5922c1739d509803e2a4fa6189" },

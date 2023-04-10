@@ -40,7 +40,7 @@ local on_attach = function(client, bufnr)
 	end
 
 	buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
-	buf_set_keymap('n', 'K', '<CMD>lua require("pretty_hover").hover()<CR>', { noremap = true, silent = true })
+	buf_set_keymap('n', 'K', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
 	buf_set_keymap('n', '<leader>lh', '<CMD>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
 	buf_set_keymap('n', '<leader>ld', '<CMD>Lspsaga lsp_finder<CR>', { noremap = true, silent = true })
 	buf_set_keymap('n', '<leader>li', '<CMD>Lspsaga lsp_finder<CR>', { noremap = true, silent = true })
