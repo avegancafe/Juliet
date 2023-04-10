@@ -71,4 +71,4 @@ if vim.loop.fs_stat(plugins_path) then
 	end
 end
 
-require('lazy').setup(plugins)
+require('lazy').setup(plugins, { ui = { border = 'rounded' } })
