@@ -9,4 +9,5 @@
                  )})
  (pack :williamboman/mason-lspconfig.nvim {})
  (pack :neovim/nvim-lspconfig {})
- (pack :onsails/lspkind.nvim {})]
+ (pack :onsails/lspkind.nvim {})
+ (pack :Fildo7525/pretty_hover {:config true})]
