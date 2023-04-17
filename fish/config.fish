@@ -32,7 +32,7 @@ set -gx TERM xterm-256color
 source ~/.config/Juliet/fish/_util.fish
 
 function current-branch
-    git branch | grep "\*" | sed "s/^\*[[:space:]]//"
+    git branch | grep "\*" | sed -e "s/^\*[[:space:]]//" | tr -d '\n'
 end
 
 function default-branch
