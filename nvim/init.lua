@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 function os.capture(cmd, raw)
 	local f = assert(io.popen(cmd, 'r'))
 	local s = assert(f:read('*a'))
@@ -35,14 +37,12 @@ vim.g.loaded_netrwPlugin = 1
 vim.g.shortmess = ""
 vim.g.WebDevIconsUnicodeDecorateFolderNodes = 1
 vim.g.DevIconsEnableFoldersOpenClose = 1
-vim.g.startify_change_to_vcs_root = 1
+-- vim.g.startify_change_to_vcs_root = 1
 vim.g.DevIconsDefaultFolderOpenSymbol = ''
 vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol = ''
 vim.g.go_fmt_command = 'goimports'
 -- vim.lsp.set_log_level("debug")
 vim.opt.timeoutlen = 500
--- vim.g.ale_go_golangci_lint_options = "--config ~/workspace/api-v2-backend/.build/scripts/.golangci.yml"
-vim.g.dbext_default_profile_myPSQL = 'user=kyle'
 vim.opt.guifont = 'Iosevka Term:h18'
 
 vim.cmd('filetype plugin indent on')

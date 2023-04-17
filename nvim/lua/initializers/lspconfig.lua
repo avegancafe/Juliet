@@ -28,6 +28,17 @@ local nvim_lsp = require('lspconfig')
 local navic = require('nvim-navic')
 
 local on_attach = function(client, bufnr)
+	require('lsp_signature').on_attach({
+		bind = true, -- This is mandatory, otherwise border config won't get registered.
+		handler_opts = {
+			border = 'rounded',
+		},
+	}, bufnr)
+
+	if client.name == "yamlls" then
+		vim.diagnostic.hide()
+	end
+
 	if client.server_capabilities.documentSymbolProvider then
 		navic.attach(client, bufnr)
 	end
