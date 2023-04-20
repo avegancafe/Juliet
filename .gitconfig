@@ -16,6 +16,7 @@
 	down = pull
 	up = push
 	su = submodule update --recursive --init
+	ape = "!git commit -C @ --amend && git push -f"
 [push]
 	default = current
 	autoSetupRemote = true
