@@ -28,6 +28,7 @@ normal_map('<leader>dd', ':TroubleToggle document_diagnostics<cr>')
 normal_map('<leader>d', ':TroubleToggle<cr>')
 normal_map('<leader>d5', ':TroubleRefresh<cr>')
 normal_map('<leader>h', ':Dashboard<cr>')
+normal_map('gQ', ':echo "Ex mode disabled. Re-enable in your mappigns if you\'d like to use it."<cr>')
 vim.keymap.set('n', 'zR', require('ufo').openAllFolds)
 vim.keymap.set('n', 'zM', require('ufo').closeAllFolds)
 
