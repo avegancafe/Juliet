@@ -33,6 +33,8 @@ local on_attach = function(client, bufnr)
 		handler_opts = {
 			border = 'rounded',
 		},
+		toggle_key = '<c-h>',
+		floating_window = false,
 	}, bufnr)
 
 	if client.name == "yamlls" then
