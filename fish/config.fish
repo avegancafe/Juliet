@@ -146,6 +146,10 @@ end
 
 function fish_greeting; end
 
+function g
+    git $argv
+end
+
 function gut
     git $argv
 end
@@ -211,8 +215,8 @@ end
 function ls
     set -l LS_CMD (which ls)
 
-    if type -q lsd
-        set LS_CMD lsd
+    if type -q exa
+        set LS_CMD exa
     end
 
     $LS_CMD $argv
@@ -264,6 +268,12 @@ end
 function rtb
     pkill "Touch Bar agent"
     killall ControlStrip
+end
+
+function note
+    echo "date: $(date)" >> $HOME/notes.txt
+    echo "$argv" >> $HOME/notes.txt
+    echo "" >> $HOME/notes.txt
 end
 
 eval (starship init fish)
