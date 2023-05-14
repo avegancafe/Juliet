@@ -114,7 +114,7 @@ local opts = {
 vim.cmd([[ do User LspAttachBuffers ]])
 
 require('mason').setup()
-require('lspconfig').tsserver.setup(opts)
+require('lspconfig').vtsls.setup(opts)
 
 local servers = {
 	'bashls',
@@ -125,8 +125,8 @@ local servers = {
 	'lua_ls',
 	'solidity',
 	'tailwindcss',
+	'vtsls',
 	'yamlls',
-	'tsserver',
 }
 
 require('mason-lspconfig').setup({
