@@ -37,8 +37,9 @@ local on_attach = function(client, bufnr)
 		floating_window = false,
 	}, bufnr)
 
-	if client.name == "yamlls" then
-		vim.diagnostic.hide()
+	if client.name == 'yamlls' then
+		local ns = vim.lsp.diagnostic.get_namespace(client.id)
+		vim.diagnostic.disable(nil, ns)
 	end
 
 	if client.server_capabilities.documentSymbolProvider then
