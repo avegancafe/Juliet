@@ -1,10 +1,21 @@
 (import-macros {: pack} :themis.pack.lazy)
 
-(pack :luukvbaal/statuscol.nvim
-      {:config true :opts {:foldfunc :builtin :setopt true}})
-
 (pack :kevinhwang91/nvim-ufo
-      {:dependencies [:kevinhwang91/promise-async :luukvbaal/statuscol.nvim]
+      {:dependencies [:kevinhwang91/promise-async
+                      (pack :luukvbaal/statuscol.nvim
+                            {:config (fn []
+                                       (let [statuscol (require :statuscol)
+                                             builtin (require :statuscol.builtin)]
+                                         (statuscol.setup {:foldfunc :builtin
+                                                           :setopt true
+                                                           :relculright true
+                                                           :segments [{:text [builtin.foldfunc]
+                                                                       :click "v:lua.ScFa"}
+                                                                      {:text ["%s"]
+                                                                       :click "v:lua.ScSa"}
+                                                                      {:text [builtin.lnumfunc
+                                                                              " "]
+                                                                       :click "v:lua.ScLa"}]})))})]
        :init (fn []
                (set vim.o.foldcolumn :1)
                (set vim.o.foldlevel 99)
