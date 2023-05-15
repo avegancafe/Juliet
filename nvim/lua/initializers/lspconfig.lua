@@ -17,13 +17,6 @@ local function deepcopy(orig)
 	return copy
 end
 
-vim.cmd([[
-augroup filetype_ts
-autocmd!
-autocmd BufNewFile,BufRead *.tsx,*.jsx,*.ts set filetype=typescriptreact syntax=typescript.tsx
-augroup END
-]])
-
 local nvim_lsp = require('lspconfig')
 local navic = require('nvim-navic')
 
