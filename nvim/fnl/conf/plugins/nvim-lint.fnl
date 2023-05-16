@@ -16,14 +16,10 @@
                                                   :json
                                                   :--config
                                                   "~/workspace/api-v2-backend/.build/scripts/.golangci.yml"])
-                                           (vim.api.nvim_create_autocmd [:BufWrite :BufRead]
+                                           (vim.api.nvim_create_autocmd [:BufWrite
+                                                                         :BufRead]
                                                                         {:callback (fn []
-                                                                                     (print :linting)
                                                                                      (let [lint (require :lint)]
-                                                                                       (lint.try_lint)))})
-                                           (vim.cmd "
-                                             augroup lint
-                                               au InsertLeave <buffer> lua require('lint').try_lint()
-                                             augroup END
-                                             ")
+                                                                                       (lint.try_lint nil
+                                                                                                      {:ignore_errors true})))})
                                            nil))})
