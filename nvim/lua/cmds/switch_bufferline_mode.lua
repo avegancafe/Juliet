@@ -1,3 +1,5 @@
+local buffer_current_tabmode = 'buffers'
+
 return function()
 	if buffer_current_tabmode == 'tabs' then
 		print('switching to buffer mode')
