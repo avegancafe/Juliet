@@ -148,6 +148,6 @@ require('hotpot').setup({
 	},
 })
 
-require('plugins')
+require('plugins.index')
 require('mappings')
 require('initializers.index')
