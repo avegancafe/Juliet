@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :hrsh7th/nvim-cmp
       {:dependencies [:hrsh7th/cmp-nvim-lsp

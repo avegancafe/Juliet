@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :folke/zen-mode.nvim
       {:config true

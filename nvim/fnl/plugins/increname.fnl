@@ -1,3 +1,3 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :smjonas/inc-rename.nvim {:config true})

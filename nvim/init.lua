@@ -92,7 +92,6 @@ augroup END
 ]])
 
 vim.cmd('highlight MatchParen cterm=bold ctermfg=white ctermbg=black')
--- vim.cmd('source ~/.config/Juliet/nvim/_init.vim')
 
 local lazy_plugins_path = vim.fn.stdpath('data') .. '/lazy'
 -- bootstrap lazy.nvim
@@ -123,21 +122,6 @@ if not vim.loop.fs_stat(hotpot_path) then
 	})
 end
 vim.opt.rtp:prepend(hotpot_path)
-
--- bootstrap themis.nvim
-local themis_path = lazy_plugins_path .. '/themis.nvim'
-if not vim.loop.fs_stat(themis_path) then
-	vim.notify('Bootstrapping themis.nvim...', vim.log.levels.INFO)
-	vim.fn.system({
-		'git',
-		'clone',
-		'--filter=blob:none',
-		'--single-branch',
-		'https://github.com/datwaft/themis.nvim.git',
-		themis_path,
-	})
-end
-vim.opt.runtimepath:prepend(themis_path)
 
 require('hotpot').setup({
 	provide_require_fennel = true,

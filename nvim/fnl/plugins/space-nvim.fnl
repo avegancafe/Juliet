@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :Th3Whit3Wolf/space-nvim
       {:config (fn []

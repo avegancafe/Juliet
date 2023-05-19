@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :natecraddock/workspaces.nvim
       {:dependencies [:Shatur/neovim-session-manager

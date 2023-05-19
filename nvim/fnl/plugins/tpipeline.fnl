@@ -1,3 +1,3 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
-(pack :vimpostor/vim-tpipeline {})
+(pack :vimpostor/vim-tpipeline)

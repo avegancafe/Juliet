@@ -1,3 +1,3 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
-(pack :frazrepo/vim-rainbow {})
+(pack :frazrepo/vim-rainbow)

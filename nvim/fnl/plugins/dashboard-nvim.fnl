@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :glepnir/dashboard-nvim
       {:event :VimEnter
@@ -10,7 +10,7 @@
                                            fortune (socket:read :*a)
                                            footer []]
                                        (socket:close)
-                                       (each [key value (fortune:gmatch "[^\r\n]+")]
+                                       (each [_ value (fortune:gmatch "[^\r\n]+")]
                                          (table.insert footer value))
                                        footer))
                        get-dashboard-git-status (fn []

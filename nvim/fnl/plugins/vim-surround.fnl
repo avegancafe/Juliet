@@ -1,3 +1,3 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
-(pack :tpope/vim-surround {})
+(pack :tpope/vim-surround)

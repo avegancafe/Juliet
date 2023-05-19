@@ -1,3 +1,3 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
-(pack :dstein64/vim-startuptime {})
+(pack :dstein64/vim-startuptime)

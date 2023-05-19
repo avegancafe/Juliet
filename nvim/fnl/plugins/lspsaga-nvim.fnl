@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :glepnir/lspsaga.nvim {:event :LspAttach
                              :dependencies [:kyazdani42/nvim-web-devicons

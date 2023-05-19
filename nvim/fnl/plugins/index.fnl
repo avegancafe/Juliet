@@ -1,4 +1,4 @@
-(var plugins [{1 :rktjmp/hotpot.nvim :dependencies [:datwaft/themis.nvim]}])
+(var plugins [[:rktjmp/hotpot.nvim]])
 (local fnl-definition-paths (.. (vim.fn.stdpath :config) :/fnl/plugins))
 
 (if (vim.loop.fs_stat fnl-definition-paths)

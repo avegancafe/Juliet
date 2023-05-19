@@ -1,4 +1,4 @@
-(import-macros {: pack} :themis.pack.lazy)
+(import-macros {: pack} :macros)
 
 (pack :kyazdani42/nvim-tree.lua
       {:dependencies :kyazdani42/nvim-web-devicons
