@@ -28,7 +28,9 @@
 (vim.keymap.set :n :zM (. (require :ufo) :closeAllFolds))
 (tset _G :ToggleNumbers
       (fn []
-        (vim.cmd "exec &relativenumber == 0 ? \"set relativenumber\" : \"set norelativenumber\"")))
+        (if (= vim.opt.relativenumber._value true)
+            (tset vim.opt :relativenumber false)
+            (tset vim.opt :relativenumber true))))
 
 (vim.cmd ":command ToggleNumbers call v:lua.ToggleNumbers()")
 (vim.cmd ":abbreviate bgt BufferLineGroupToggle")
@@ -85,6 +87,7 @@
         (let [files-output (vim.api.nvim_exec :!changed_files true)
               changed-files (. (vim.split files-output "\n") 3)]
           (vim.cmd (.. "args " changed-files)))))
+
 (vim.cmd ":command EditChangedFiles call v:lua.EditChangedFiles()")
 
 (local terminal-map (create-map-func :t))
