@@ -9,5 +9,4 @@ function! g:committia_hooks.edit_open(info)
     imap <buffer><c-u> <Plug>(committia-scroll-diff-up-half)
     nmap <buffer><c-n> <Plug>(committia-scroll-diff-down-half)
     nmap <buffer><c-u> <Plug>(committia-scroll-diff-up-half)
-endfunction
-         ")
+endfunction")
