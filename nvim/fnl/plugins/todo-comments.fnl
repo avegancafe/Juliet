@@ -5,5 +5,7 @@
        :config true
        :opts {:keywords {:FIX {:color :warning}}
               :WARN {:alt :EDIT}
-              :highlight {:pattern ".*(KEYWORDS)*" :keyword :bg}
-              :search {:pattern ".*<(KEYWORDS).*/>"}}})
+              ; implement custom highlight/search regexp if necessary
+              ; :highlight {:pattern ".*(KEYWORDS)*" :keyword :bg}
+              ; :search {:pattern ".*<(KEYWORDS).*/>"}
+              }})
