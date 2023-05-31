@@ -1,3 +1,3 @@
 (import-macros {: pack} :macros)
 
-(pack :folke/trouble.nvim {:config true})
+(pack :folke/trouble.nvim)
