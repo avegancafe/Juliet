@@ -8,8 +8,7 @@
        :config true
        :opts {:winbar {:lualine_c [(fn []
                                      ((. (require :do) :view) :active))]}
-              :inactive_winbar {:lualine_c [(fn []
-                                              ((. (require :do) :view) :inactivev))]}
+              :inactive_winbar {}
               :options {:component_separators {:left "" :right ""}
                         :section_separators {:left "" :right ""}
                         :theme (require :lualine_theme)
