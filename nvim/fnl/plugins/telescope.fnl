@@ -5,7 +5,11 @@
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.providers.telescope)
-                       telescope (require :telescope)]
+                       telescope (require :telescope)
+                       colors (require :bamboo.colors)]
+                   (vim.api.nvim_set_hl 0 :TelescopeResultsBorder { :fg colors.grey })
+                   (vim.api.nvim_set_hl 0 :TelescopePromptBorder { :fg colors.grey })
+                   (vim.api.nvim_set_hl 0 :TelescopePreviewBorder { :fg colors.grey })
                    (telescope.setup {:defeaults {:mappings {:i {:<c-o> (fn [prompt_bufnr
                                                                             _mode]
                                                                          ((. (require :trouble.providers.telescope)
