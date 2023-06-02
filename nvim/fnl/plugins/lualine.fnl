@@ -59,8 +59,8 @@
                                                                    (require :lspsaga.symbolwinbar))
                                                             (.. (winbar:get_winbar)
                                                                 "%#EndOfBuffer#"))
-                                                          :diagnostics]
-                                              :lualine_x []
+                                                          ]
+                                              :lualine_x [:diagnostics]
                                               :lualine_y [:filetype]
                                               :lualine_z [[#""
                                                            :color
