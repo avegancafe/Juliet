@@ -1,15 +1,15 @@
 local M = {}
 
 function M.setup(buf_mode)
-	local colors = require('void_colors')
+	local colors = require('bamboo.colors')
 
 	require('bufferline').setup({
 		highlights = {
 			indicator_selected = {
-				fg = colors.purple,
+				fg = colors.green,
 			},
 			separator = {
-				fg = colors.buffer_bg
+				fg = colors.bg1,
 			},
 			buffer_selected = {
 				bold = false,
