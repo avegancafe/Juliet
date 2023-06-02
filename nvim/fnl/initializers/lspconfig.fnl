@@ -21,6 +21,8 @@
   (buf-set-option :omnifunc "v:lua.vim.lsp.omnifunc")
   (buf-set-keymap :n :K "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true})
+  (buf-set-keymap :n :KK "<CMD>Lspsaga show_cursor_diagnostics<CR>"
+                  {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>ld "<CMD>Lspsaga lsp_finder<CR>"

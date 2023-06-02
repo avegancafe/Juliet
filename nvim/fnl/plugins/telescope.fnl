@@ -1,15 +1,20 @@
 (import-macros {: pack} :macros)
 
 (pack :nvim-telescope/telescope.nvim
-      {:dependencies [:kyazdani42/nvim-web-devicons :nvim-lua/plenary.nvim]
+      {:dependencies [:kyazdani42/nvim-web-devicons
+                      :nvim-lua/plenary.nvim
+                      :ribru17/bamboo.nvim]
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.providers.telescope)
                        telescope (require :telescope)
                        colors (require :bamboo.colors)]
-                   (vim.api.nvim_set_hl 0 :TelescopeResultsBorder { :fg colors.grey })
-                   (vim.api.nvim_set_hl 0 :TelescopePromptBorder { :fg colors.grey })
-                   (vim.api.nvim_set_hl 0 :TelescopePreviewBorder { :fg colors.grey })
+                   (vim.api.nvim_set_hl 0 :TelescopeResultsBorder
+                                        {:fg colors.grey})
+                   (vim.api.nvim_set_hl 0 :TelescopePromptBorder
+                                        {:fg colors.grey})
+                   (vim.api.nvim_set_hl 0 :TelescopePreviewBorder
+                                        {:fg colors.grey})
                    (telescope.setup {:defeaults {:mappings {:i {:<c-o> (fn [prompt_bufnr
                                                                             _mode]
                                                                          ((. (require :trouble.providers.telescope)
