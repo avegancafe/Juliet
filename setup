@@ -8,17 +8,10 @@ setup_git() {
   [[ ! -f ~/.gitmessage ]] && ln -sfv ~/.config/Juliet/.gitmessage ~
 }
 
-setup_itermocil() {
-  sudo mkdir -p /opt/homeberw/Library/Taps/keyboard-clacker
-  git clone https://github.com/keyboard-clacker/homebrew-brews /opt/homeberw/Library/Taps/keyboard-clacker/homebrew-brews
-  [[ ! -d ~/.itermocil ]] && ln -sfv ~/.config/Juliet/.itermocil ~
-}
-
 setup_dependencies() {
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
   echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/kyle/.zprofile
   eval "$(/opt/homebrew/bin/brew shellenv)"
-  setup_itermocil
   brew bundle --file ~/.config/Juliet/Brewfile
   rustup-init
   [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config
