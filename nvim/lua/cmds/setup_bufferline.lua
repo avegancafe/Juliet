@@ -79,22 +79,6 @@ function M.setup(buf_mode)
 					text_align = 'left',
 				},
 			},
-			groups = {
-				items = {
-					{
-						name = 'frontend',
-						matcher = function(buf)
-							return buf.path:match('%a/portal/frontend/%a')
-						end,
-					},
-					{
-						name = 'backend',
-						matcher = function(buf)
-							return buf.path:match('%a/portal/backend/%a')
-						end,
-					},
-				},
-			},
 		},
 	})
 end
