@@ -6,8 +6,6 @@
     (vim.api.nvim_set_keymap mode binding command final-opts)))
 
 (local normal-map (create-map-func :n))
-(normal-map :<leader>t ":lua require(\"cmds/switch_bufferline_mode\")()<cr>"
-            {:silent true})
 
 (normal-map :<leader>p ":Lazy<cr>" {:silent true})
 (normal-map :<leader>ev ":tabe ~/.config/Juliet/nvim/init.lua<cr>")
@@ -68,6 +66,10 @@
 (normal-map :<leader>bg ":BufferLineGroupToggle " {:silent true})
 (normal-map :<leader>bf ":Neoformat<cr>" {:silent true})
 (normal-map :<leader>bo ":call v:lua.GitlabOpen()<cr>" {:silent true})
+(normal-map :<leader>t ":Lspsaga term_toggle<cr>" {:silent true})
+(normal-map :<leader>bt ":lua require(\"cmds/switch_bufferline_mode\")()<cr>"
+            {:silent true})
+
 (normal-map :<leader>rs ":let @a=@*<cr>" {:silent true})
 (normal-map :<leader>rsa ":let @a=@*<cr>" {:silent true})
 (normal-map :<leader>rsb ":let @b=@*<cr>" {:silent true})
