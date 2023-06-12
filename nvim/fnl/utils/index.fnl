@@ -33,4 +33,24 @@
   (each [k v (pairs obj)] (tset res (deepcopy k s) (deepcopy v s)))
   (setmetatable res (getmetatable obj)))
 
-{: nil? : str? : num? : bool? : fn? : tbl? : ->str : ->bool : deepcopy}
+(fn is-buffer-empty []
+  (= (_G.vim.fn.empty (_G.vim.fn.expand "%:t")) 1))
+
+(fn has-width-gt [cols]
+  (> (/ (_G.vim.fn.winwidth 0) 2) cols))
+
+(fn merge [a b]
+  (each [k v (pairs b)] (tset a k v)))
+
+{: nil?
+ : str?
+ : num?
+ : bool?
+ : fn?
+ : tbl?
+ : ->str
+ : ->bool
+ : deepcopy
+ : is-buffer-empty
+ : has-width-gt
+ : merge}
