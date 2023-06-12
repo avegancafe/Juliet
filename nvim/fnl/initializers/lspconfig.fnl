@@ -1,4 +1,4 @@
-(import-macros {: deepcopy} :utils.index)
+(import-macros {: deepcopy} :macros)
 
 (local nvim-lsp (require :lspconfig))
 (local navic (require :nvim-navic))
