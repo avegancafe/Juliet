@@ -31,6 +31,7 @@
             (tset vim.opt :relativenumber true))))
 
 (vim.cmd ":command ToggleNumbers call v:lua.ToggleNumbers()")
+(vim.cmd ":command Todo execute \"TodoTrouble cwd=\".getreg('%')")
 (vim.cmd ":abbreviate bgt BufferLineGroupToggle")
 (tset _G :ShowEditsInCurrentDir
       (fn []
