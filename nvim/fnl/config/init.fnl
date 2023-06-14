@@ -2,8 +2,10 @@
 (vim.cmd "set noswapfile")
 (set vim.opt.switchbuf :uselast)
 (set vim.opt.diffopt (+ vim.opt.diffopt "linematch:60"))
-(vim.cmd "augroup quickfix\n  autocmd!\n  au FileType qf wincmd J\naugroup END\n")
-(vim.cmd "set termguicolors\n")
+(vim.cmd "augroup quickfix
+         autocmd!
+         au FileType qf wincmd J
+         augroup END")
 (vim.cmd "set scrolloff=4\n")
 (set vim.g.loaded_netrw 1)
 (set vim.g.loaded_netrwPlugin 1)
@@ -35,10 +37,7 @@
 (set vim.opt.softtabstop 2)
 (set vim.opt.tabstop 2)
 (set vim.opt.foldmethod :expr)
-(set vim.opt.foldcolumn :1)
-(set vim.opt.foldlevel 99)
 (set vim.opt.foldlevelstart 99)
-(set vim.opt.foldenable true)
 (set vim.opt.hidden true)
 (vim.cmd "augroup FiletypeGroup
   autocmd!
@@ -46,7 +45,6 @@
   au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
   au BufRead,BufNewFile *.md setlocal textwidth=80
   au FileType fish setlocal textwidth=79
-  au FileType fish setlocal foldmethod=expr
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
   autocmd BufNewFile,BufRead Procfile set filetype=sh
 augroup END
