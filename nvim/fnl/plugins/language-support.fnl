@@ -60,11 +60,9 @@
         :config (fn []
                   (let [cmp (require :cmp)
                         lspkind (require :lspkind)]
-                    (cmp.setup {:sorting {:comparators [cmp.config.compare.locality
-                                                        cmp.config.compare.exact
-                                                        cmp.config.compare.offset
-                                                        cmp.config.compare.score
-                                                        cmp.config.compare.sort_text]}
+                    (cmp.setup {:completion {:autocomplete [cmp.TriggerEvent.InsertEnter
+                                                            cmp.TriggerEvent.TextChanged]}
+                                :sorting {:comparators [cmp.config.compare.exact cmp.config.compare.length]}
                                 :formatting {:format (lspkind.cmp_format {:mode :symbol_text
                                                                           :maxwidth 50
                                                                           :ellipsis_char "..."})}
@@ -75,8 +73,8 @@
                                          :documentation (cmp.config.window.bordered)}
                                 :mapping (cmp.mapping.preset.insert {:<c-e> (cmp.mapping.abort)
                                                                      :<Tab> (cmp.mapping.confirm {:select true})})
-                                :sources (cmp.config.sources [{:name :nvim_lsp}
-                                                              {:name :buffer}])})))})
+                                :sources (cmp.config.sources [{:name :buffer}
+                                                              {:name :nvim_lsp}])})))})
  (pack :mfussenegger/nvim-lint
        {:config (fn []
                   (let [lint (require :lint)
