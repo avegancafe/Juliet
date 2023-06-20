@@ -145,17 +145,11 @@
                                                                           (string.gsub v
                                                                                        " [%a%A]+"
                                                                                        "")))))
-                                                             fin)
-                                                           {1 :filename
-                                                            :cond (fn []
-                                                                    (local winbar
-                                                                           (require :lspsaga.symbolwinbar))
-                                                                    (= (winbar:get_winbar)
-                                                                       nil))}]
+                                                             fin)]
                                                :lualine_c [(fn []
-                                                             (local winbar
-                                                                    (require :lspsaga.symbolwinbar))
-                                                             (.. (winbar:get_winbar)
+                                                             (.. (string.gsub (vim.api.nvim_buf_get_name 0)
+                                                                              (vim.loop.cwd)
+                                                                              "")
                                                                  "%#EndOfBuffer#"))]
                                                :lualine_x [:diagnostics]
                                                :lualine_y [:filetype]
