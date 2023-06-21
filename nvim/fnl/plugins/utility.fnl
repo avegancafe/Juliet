@@ -222,12 +222,29 @@
                                                :open (fn []
                                                        (let [session-manager (require :session_manager)]
                                                          (session-manager.load_current_dir_session)))}})
-                    ((. (require :telescope) :load_extension) :workspaces)))})
+                    ((. (require :telescope) :load_extension) :workspaces)
+                    (let [dirs (workspaces.get)
+                          add-workspace (lambda [name path]
+                                          (if (not (accumulate [found false _ dir (ipairs dirs)]
+                                                     (or found
+                                                         (= dir.name name))))
+                                              (workspaces.add name path)))]
+                      (add-workspace :config "~/.config/Juliet")
+                      (if (not (accumulate [found false _ dir (ipairs dirs)]
+                                 (or found
+                                     (dir.path:match (.. ".*" :workspace ".*")))))
+                          (workspaces.add_dir "~/workspace")))
+                    (workspaces.sync_dirs)))})
  (pack :folke/zen-mode.nvim
        {:config true
         :opts {:window {:backdrop 1
                         :height 0.73
                         :options {:number false :relativenumber false}}}})
+ (pack :romgrk/kirby.nvim
+       {:dependencies [(pack :romgrk/fzy-lua-native {:build "make install"})
+                       :romgrk/kui.nvim
+                       :kyazdani42/nvim-web-devicons
+                       :nvim-lua/plenary.nvim]})
  :rhysd/committia.vim
  :wincent/loupe
  :sbdchd/neoformat
