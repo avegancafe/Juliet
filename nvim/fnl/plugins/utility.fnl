@@ -240,11 +240,6 @@
         :opts {:window {:backdrop 1
                         :height 0.73
                         :options {:number false :relativenumber false}}}})
- (pack :romgrk/kirby.nvim
-       {:dependencies [(pack :romgrk/fzy-lua-native {:build "make install"})
-                       :romgrk/kui.nvim
-                       :kyazdani42/nvim-web-devicons
-                       :nvim-lua/plenary.nvim]})
  :rhysd/committia.vim
  :wincent/loupe
  :sbdchd/neoformat
