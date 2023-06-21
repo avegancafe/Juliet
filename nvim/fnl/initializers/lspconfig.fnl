@@ -74,11 +74,7 @@
                 :yamlls])
 
 ((. (require :mason-lspconfig) :setup) {:ensure_installed servers})
-((. (require :mason-lspconfig) :setup_handlers) {1 (fn [server-name]
-                                                     ((. (. (require :lspconfig)
-                                                            server-name)
-                                                         :setup) opts))
-                                                 :gopls (fn []
+((. (require :mason-lspconfig) :setup_handlers) {:gopls (fn []
                                                           (local gopls-opts
                                                                  (deepcopy opts))
                                                           (local util

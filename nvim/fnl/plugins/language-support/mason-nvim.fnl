@@ -1,7 +1,8 @@
 (import-macros {: pack} :macros)
 
 [(pack :williamboman/mason.nvim
-       {:config (fn []
+       {:dependencies [:williamboman/mason-lspconfig.nvim]
+        :config (fn []
                   (local mason (require :mason))
                   (mason.setup {:ui {:border :rounded :width 0.6 :height 0.7}})
                   (vim.cmd "autocmd FileType mason setlocal winblend=10")
@@ -9,7 +10,6 @@
                                                {:pattern :*.yml
                                                 :callback (fn []
                                                             (vim.diagnostic.hide))}))})
- :williamboman/mason-lspconfig.nvim
  :neovim/nvim-lspconfig
  :onsails/lspkind.nvim
  (pack :ray-x/lsp_signature.nvim {:config true})]
