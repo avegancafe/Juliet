@@ -1,0 +1,1 @@
+:folke/trouble.nvim
