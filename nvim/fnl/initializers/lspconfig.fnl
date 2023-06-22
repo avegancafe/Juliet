@@ -1,13 +1,18 @@
-(import-macros {: deepcopy} :macros)
-
 (local nvim-lsp (require :lspconfig))
 (local navic (require :nvim-navic))
+(local {: merge} (require :utils))
+(local cmp-nvim-lsp (require :cmp_nvim_lsp))
+(local mason (require :mason))
+(local mason-lspconfig (require :mason-lspconfig))
+(local lsp-signature (require :lsp_signature))
+(local lspconfig-util (require :lspconfig.util))
+
 (fn on-attach [client bufnr]
-  ((. (require :lsp_signature) :on_attach) {:bind true
-                                            :floating_window false
-                                            :handler_opts {:border :rounded}
-                                            :toggle_key :<c-h>}
-                                           bufnr)
+  (lsp-signature.on_attach {:bind true
+                            :floating_window false
+                            :handler_opts {:border :rounded}
+                            :toggle_key :<c-h>}
+                           bufnr)
   (when (= client.name :yamlls)
     (local ns (vim.lsp.diagnostic.get_namespace client.id))
     (vim.diagnostic.disable nil ns))
@@ -38,49 +43,48 @@
                   {:noremap true :silent true}))
 
 (local capabilities
-       ((. (require :cmp_nvim_lsp) :default_capabilities) (vim.lsp.protocol.make_client_capabilities)))
+       ((. cmp-nvim-lsp :default_capabilities) (vim.lsp.protocol.make_client_capabilities)))
 
 (set capabilities.textDocument.foldingRange
      {:dynamicRegistration false :lineFoldingOnly true})
 
-(local opts
-       {: capabilities
-        :flags {:debounce_text_changes 150}
-        :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
-                                         {:border :rounded})}
-        :on_attach on-attach
-        :root_dir (nvim-lsp.util.root_pattern :.git)
-        :settings {:Lua {:diagnostics {:globals [:vim]}
-                         :runtime {:version :LuaJIT}
-                         :telemetry {:enable false}
-                         :workspace {:checkThirdParty false
-                                     :library (vim.api.nvim_get_runtime_file ""
-                                                                             true)}}
-                   :fennel {:diagnostics {:globals [:vim]}
-                            :workspace {:library (vim.api.nvim_list_runtime_paths)}}}})
+(lambda get-opts [?opt-overrides]
+  (local opts
+         {: capabilities
+          :flags {:debounce_text_changes 150}
+          :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
+                                           {:border :rounded})}
+          :on_attach on-attach
+          :root_dir (nvim-lsp.util.root_pattern :.git)
+          :settings {:Lua {:diagnostics {:globals [:vim]}
+                           :runtime {:version :LuaJIT}
+                           :telemetry {:enable false}
+                           :workspace {:checkThirdParty false
+                                       :library (vim.api.nvim_get_runtime_file ""
+                                                                               true)}}
+                     :fennel {:diagnostics {:globals [:vim]}
+                              :workspace {:library (vim.api.nvim_list_runtime_paths)}}}})
+  (merge opts (or ?opt-overrides {})))
 
 (vim.cmd " do User LspAttachBuffers ")
-((. (require :mason) :setup))
-((. (. (require :lspconfig) :vtsls) :setup) opts)
-(local servers [:bashls
-                :bufls
-                :cssls
-                :fennel_language_server
-                :gopls
-                :lua_ls
-                :solidity
-                :tailwindcss
-                :vtsls
-                :yamlls])
+(mason.setup)
+(local servers [{:name :bashls}
+                {:name :bufls}
+                {:name :cssls}
+                {:name :fennel_language_server}
+                {:name :gopls
+                 :opts {:root_dir (lspconfig-util.root_pattern :go.mod)}}
+                {:name :lua_ls}
+                {:name :solidity}
+                {:name :tailwindcss}
+                {:name :vtsls}
+                {:name :yamlls}])
 
-((. (require :mason-lspconfig) :setup) {:ensure_installed servers})
-((. (require :mason-lspconfig) :setup_handlers) {:gopls (fn []
-                                                          (local gopls-opts
-                                                                 (deepcopy opts))
-                                                          (local util
-                                                                 (require :lspconfig/util))
-                                                          (set gopls-opts.root_dir
-                                                               (util.root_pattern :go.mod))
-                                                          ((. (. (require :lspconfig)
-                                                                 :gopls)
-                                                              :setup) gopls-opts))})
+(mason-lspconfig.setup {:ensure_installed (icollect [_ {: name} (ipairs servers)]
+                                            name)})
+
+(lambda setup-server [server ?opt-overrides]
+  ((. (. nvim-lsp server) :setup) (get-opts ?opt-overrides)))
+
+(each [_ {: name : opts} (ipairs servers)]
+  (setup-server name opts))

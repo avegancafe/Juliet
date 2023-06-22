@@ -17,6 +17,8 @@
 (set vim.g.go_fmt_command :goimports)
 (set vim.opt.timeoutlen 500)
 (set vim.opt.guifont "Iosevka Term:h18")
+(vim.cmd "filetype off")
+(vim.cmd "filetype plugin on")
 (vim.cmd "filetype plugin indent on")
 (set vim.opt.mouse :a)
 (set vim.opt.mousemoveevent true)

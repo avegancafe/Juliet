@@ -1,3 +1,5 @@
+(import-macros {: deepcopy} :deepcopy)
+
 (fn nil? [x]
   (= nil x))
 
@@ -23,6 +25,8 @@
   (if x true false))
 
 (fn merge [a b]
-  (each [k v (pairs b)] (tset a k v)))
+  (local fin (deepcopy a))
+  (each [k v (pairs b)] (tset fin k v))
+  fin)
 
 {: nil? : str? : num? : bool? : fn? : tbl? : ->str : ->bool : merge}
