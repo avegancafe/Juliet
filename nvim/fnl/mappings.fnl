@@ -94,6 +94,7 @@
 
 (local terminal-map (create-map-func :t))
 (terminal-map "<c-[>" "<c-\\><c-n>")
+(terminal-map "<c-h>" "<c-\\><c-n>:Lspsaga term_toggle<cr>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
 (local insert-map (create-map-func :i))
 (insert-map :<c-c> :<esc>)
