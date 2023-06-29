@@ -11,8 +11,30 @@
                        lspkind (require :lspkind)]
                    (cmp.setup {:completion {:autocomplete [cmp.TriggerEvent.InsertEnter
                                                            cmp.TriggerEvent.TextChanged]}
-                               :sorting {:comparators [cmp.config.compare.exact
-                                                       cmp.config.compare.length]}
+                               :sorting {:comparators [cmp.config.compare.offset
+                                                       cmp.config.compare.exact
+                                                       cmp.config.compare.score
+                                                       (fn [entry1 entry2]
+                                                         (var (_ entry1-under)
+                                                              (entry1.completion_item.label:find "^_+"))
+                                                         (var (_ entry2-under)
+                                                              (entry2.completion_item.label:find "^_+"))
+                                                         (set entry1-under
+                                                              (or entry1-under
+                                                                  0))
+                                                         (set entry2-under
+                                                              (or entry2-under
+                                                                  0))
+                                                         (if (> entry1-under
+                                                                entry2-under)
+                                                             false
+                                                             (< entry1-under
+                                                                entry2-under)
+                                                             true))
+                                                       cmp.config.compare.kind
+                                                       cmp.config.compare.sort_text
+                                                       cmp.config.compare.length
+                                                       cmp.config.compare.order]}
                                :formatting {:format (lspkind.cmp_format {:mode :symbol_text
                                                                          :maxwidth 50
                                                                          :ellipsis_char "..."})}
