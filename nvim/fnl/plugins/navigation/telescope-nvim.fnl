@@ -35,7 +35,7 @@
                                                                            :--type
                                                                            :file]}
                                                :live_grep {:file_ignore_patterns [:node_modules
-                                                                                  :.git]
+                                                                                  :.git$]
                                                            :theme :ivy
                                                            :layout_config {:prompt_position :bottom}
                                                            :layout_strategy :bottom_pane
