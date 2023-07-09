@@ -1,7 +1,10 @@
-(import-macros {: pack} :macros)
+(import-macros {: pack : key} :macros)
 
 (pack :kyazdani42/nvim-tree.lua
-      {:dependencies :kyazdani42/nvim-web-devicons
+      {:keys [(key :<leader>f ":NvimTreeToggle<cr>" "Toggle nvim-tree")
+              (key :<leader>fr ":NvimTreeRefresh<CR>" "Refresh nvim-tree")
+              (key :<leader>ff ":NvimTreeFindFile<CR>" "Find file in nvim-tree")]
+       :dependencies :kyazdani42/nvim-web-devicons
        :config true
        :opts {:view {:float {:enable true
                              :open_win_config {:relative :editor

@@ -1,4 +1,4 @@
-(local {: str? : nil?} (require :utils))
+(local {: str? : nil? : merge} (require :utils))
 
 (lambda pack [identifier ?options]
   "A workaround around the lack of mixed tables in Fennel.
@@ -13,4 +13,15 @@
                     _ (values k v)))]
     (doto options (tset 1 identifier))))
 
-{: pack}
+(lambda key [keycode command ?desc ?options]
+  (assert-compile (str? keycode) "expected string for keycode" keycode)
+  (assert-compile (or (nil? ?desc) (str? ?desc)) "expected string for description" ?desc)
+  (assert-compile (or (nil? ?options) (table? ?options))
+                  "expected table for options" ?options)
+  (let [options (or ?options {})]
+    (doto options (tset 1 keycode))
+    (doto options (tset 2 command))
+    (merge options
+           {:desc ?desc :silent (if (nil? options.silent) true options.silent)})))
+
+{: pack : key}

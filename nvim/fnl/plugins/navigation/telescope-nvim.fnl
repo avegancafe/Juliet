@@ -1,7 +1,9 @@
-(import-macros {: pack} :macros)
+(import-macros {: pack : key} :macros)
 
 (pack :nvim-telescope/telescope.nvim
-      {:dependencies [:kyazdani42/nvim-web-devicons
+      {:keys [(key :<c-p> ":Telescope find_files<cr>" "Fuzzy find a file")
+              (key :<c-b> ":Telescope buffers<cr>") "Fuzzy list buffers"]
+       :dependencies [:kyazdani42/nvim-web-devicons
                       :nvim-lua/plenary.nvim
                       :ribru17/bamboo.nvim]
        :config (fn []

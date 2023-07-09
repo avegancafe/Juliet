@@ -1,7 +1,14 @@
-(import-macros {: pack} :macros)
+(import-macros {: pack : key} :macros)
 
 (pack :kevinhwang91/nvim-ufo
-      {:dependencies [:kevinhwang91/promise-async
+      {:lazy false
+       :keys [(key :zR
+                   (fn []
+                     (let [ufo (require :ufo)] (ufo.openAllFolds))))
+              (key :zM
+                   (fn []
+                     (let [ufo (require :ufo)] (ufo.closeAllFolds))))]
+       :dependencies [:kevinhwang91/promise-async
                       (pack :luukvbaal/statuscol.nvim
                             {:config (fn []
                                        (let [statuscol (require :statuscol)

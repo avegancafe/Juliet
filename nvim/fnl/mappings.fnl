@@ -6,23 +6,19 @@
 
 (local normal-map (create-map-func :n))
 
-(normal-map :<leader>p ":Lazy<cr>" {:silent true})
-(normal-map :<leader>ev ":tabe ~/.config/Juliet/nvim/init.lua<cr>")
-(normal-map :<leader>sv ":source $MYVIMRC<cr>")
-(normal-map :<leader>it ":put =strftime('%FT%T%z')<cr>")
-(normal-map :<leader>id "a<C-R>=strftime(\"%Y-%m-%d\")<cr><esc>")
+(normal-map :<leader>p ":Lazy<cr>" {:silent true :desc "Open lazy.nvim"})
+(normal-map :<leader>it ":put =strftime('%FT%T%z')<cr>"
+            {:desc "Insert timestamp below this line"})
+
+(normal-map :<leader>id "a<C-R>=strftime(\"%Y-%m-%d\")<cr><esc>"
+            {:desc "Insert current date at cursor"})
+
 (normal-map :H "^")
 (normal-map :L :g$)
 (normal-map "q:" :<nop>)
-(normal-map :<leader>dd ":TroubleToggle document_diagnostics<cr>")
-(normal-map :<leader>d ":TroubleToggle<cr>")
-(normal-map :<leader>d5 ":TroubleRefresh<cr>")
-(normal-map :<leader>h ":Dashboard<cr>")
 (normal-map :gQ
             ":echo \"Ex mode disabled. Re-enable in your mappigns if you'd like to use it.\"<cr>")
 
-(vim.keymap.set :n :zR (. (require :ufo) :openAllFolds))
-(vim.keymap.set :n :zM (. (require :ufo) :closeAllFolds))
 (tset _G :ToggleNumbers
       (fn []
         (if (= vim.opt.relativenumber._value true)
@@ -38,8 +34,6 @@
           (vim.cmd (.. "TodoTrouble keywords=EDIT cwd=" cwd)))))
 
 (vim.cmd ":command ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
-(normal-map :<c-p> ":Telescope find_files<cr>" {:silent true})
-(normal-map :<c-b> ":Telescope buffers<cr>" {:silent true})
 (normal-map :<c-o> ":w<cr>" {:silent true})
 (tset _G :GitlabOpen (fn []
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
@@ -49,41 +43,30 @@
                          (vim.cmd :mode))))
 
 (normal-map :<leader>cp ":let @*=expand(\"%:p\")<cr>" {:silent true})
-(normal-map :<c-f> ":ZenMode<cr>" {:silent true})
-(normal-map :<leader>f ":NvimTreeToggle<CR>" {:silent true})
-(normal-map :<leader>fr ":NvimTreeRefresh<CR>" {:silent true})
-(normal-map :<leader>ff ":NvimTreeFindFile<CR>" {:silent true})
-(normal-map :<leader>fb ":Telescope file_browser<CR>" {:silent true})
 (normal-map :<leader>x ":noh<cr>" {:silent true})
-(normal-map :<tab> ":BufferLineCycleNext<cr>" {:silent true})
-(normal-map :<s-tab> ":BufferLineCyclePrev<cr>" {:silent true})
-(normal-map :<leader>ss ":SessionManager save_current_session<cr>")
-(normal-map :<leader>sl ":Telescope workspaces<cr>" {:silent true})
-(normal-map :<leader>sc ":call v:lua.EditChangedFiles()<cr>")
-(normal-map :<leader>b ":BufferLinePick<cr>" {:silent true})
-(normal-map :<leader>bb ":BufferLinePick<cr>" {:silent true})
-(normal-map :<leader>bc ":BufferLinePickClose<cr>" {:silent true})
-(normal-map :<leader>bg ":BufferLineGroupToggle " {:silent true})
-(normal-map :<leader>bf ":Neoformat<cr>" {:silent true})
-(normal-map :<leader>bo ":call v:lua.GitlabOpen()<cr>" {:silent true})
-(normal-map :<leader>t ":Lspsaga term_toggle<cr>" {:silent true})
+(normal-map :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
+            {:desc "Edit all changed files"})
+(normal-map :<leader>bo ":call v:lua.GitlabOpen()<cr>"
+            {:silent true :desc "Open file in gitlab"})
+
 (normal-map :<leader>bt ":lua require(\"cmds/switch_bufferline_mode\")()<cr>"
-            {:silent true})
+            {:silent true :desc "Toggle between buffer mode and tab mode"})
 
-(normal-map :<leader>rs ":let @a=@*<cr>" {:silent true})
-(normal-map :<leader>rsa ":let @a=@*<cr>" {:silent true})
-(normal-map :<leader>rsb ":let @b=@*<cr>" {:silent true})
-(normal-map :<leader>rsc ":let @c=@*<cr>" {:silent true})
-(normal-map :<leader>rsd ":let @d=@*<cr>" {:silent true})
-(normal-map :<leader>dc ":lua require\"dap\".continue()<cr>" {:silent true})
-(normal-map :<leader>ds ":lua require\"dap\".step_over()<cr>" {:silent true})
-(normal-map :<leader>dso ":lua require\"dap\".step_over()<cr>" {:silent true})
-(normal-map :<leader>dsi ":lua require\"dap\".step_into()<cr>" {:silent true})
-(normal-map :<leader>dsu ":lua require\"dap\".step_out()<cr>" {:silent true})
-(normal-map :<leader>db ":lua require\"dap\".toggle_breakpoint()<cr>"
-            {:silent true})
+(normal-map :<leader>rs ":let @a=@*<cr>"
+            {:silent true :desc "Save register to @a"})
 
-(normal-map :<leader>dr ":lua require\"dap\".repl.open()<cr>" {:silent true})
+(normal-map :<leader>rsa ":let @a=@*<cr>"
+            {:silent true :desc "Save register to @a"})
+
+(normal-map :<leader>rsb ":let @b=@*<cr>"
+            {:silent true :desc "Save register to @b"})
+
+(normal-map :<leader>rsc ":let @c=@*<cr>"
+            {:silent true :desc "Save register to @c"})
+
+(normal-map :<leader>rsd ":let @d=@*<cr>"
+            {:silent true :desc "Save register to @d"})
+
 (tset _G :EditChangedFiles
       (fn []
         (let [files-output (vim.api.nvim_exec :!changed_files true)
@@ -94,7 +77,6 @@
 
 (local terminal-map (create-map-func :t))
 (terminal-map "<c-[>" "<c-\\><c-n>")
-(terminal-map "<c-h>" "<c-\\><c-n>:Lspsaga term_toggle<cr>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
 (local insert-map (create-map-func :i))
 (insert-map :<c-c> :<esc>)

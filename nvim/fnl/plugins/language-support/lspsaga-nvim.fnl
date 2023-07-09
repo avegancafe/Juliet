@@ -1,6 +1,12 @@
-(import-macros {: pack} :macros)
+(import-macros {: pack : key} :macros)
 
-(pack :glepnir/lspsaga.nvim {:event :LspAttach
+(pack :glepnir/lspsaga.nvim {:lazy false
+                             :keys [(key :<leader>t ":Lspsaga term_toggle<cr>"
+                                         "Toggle terminal")
+                                    (key :<c-h>
+                                         "<c-\\><c-n>:Lspsaga term_toggle<cr>"
+                                         "Toggle terminal" {:mode :t})]
+                             :event :LspAttach
                              :dependencies [:kyazdani42/nvim-web-devicons
                                             :nvim-treesitter/nvim-treesitter]
                              :init (fn []
