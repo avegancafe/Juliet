@@ -39,7 +39,7 @@
           (vim.cmd (.. "TodoTrouble keywords=EDIT cwd=" cwd)))))
 
 (vim.cmd ":command ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
-(vim.keymap.set :n :<c-o> ":w<cr>" {:silent true})
+(vim.keymap.set :n :<esc> ":w<cr>" {:silent true})
 (tset _G :GitlabOpen (fn []
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
                                                                     ":~:."))

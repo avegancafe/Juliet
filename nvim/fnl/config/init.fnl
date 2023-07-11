@@ -1,3 +1,4 @@
+(set vim.g.mapleader " ")
 (set vim.opt.encoding :UTF-8)
 (vim.cmd "set noswapfile")
 (set vim.opt.switchbuf :uselast)
@@ -6,6 +7,7 @@
          autocmd!
          au FileType qf wincmd J
          augroup END")
+
 (vim.cmd "set scrolloff=4\n")
 (set vim.g.loaded_netrw 1)
 (set vim.g.loaded_netrwPlugin 1)
