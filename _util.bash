@@ -1,12 +1,12 @@
 RESET_CODE=`tput sgr0`
 # General logging function
-info() {
+log() {
   BLUE=`tput setaf 4`
   printf "$BLUE==>$RESET_CODE$(tput bold) %s$RESET_CODE\n" "$1"
 }
 
 # Logging function to call if interacting with an external service
-remoteinfo() {
+rlog() {
   GREEN=`tput setaf 2`
   printf "$GREEN==>$RESET_CODE$(tput bold) %s$RESET_CODE\n" "$1"
 }
