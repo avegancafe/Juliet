@@ -8,6 +8,8 @@
 (vim.keymap.set :n :H "^")
 (vim.keymap.set :n :L :g$)
 (vim.keymap.set :n "q:" :<nop>)
+(vim.keymap.set :x :p "p<cmd>let @+=@0<CR><cmd>let @\"=@0<CR>"
+                {:noremap true :silent true})
 (vim.keymap.set :n :gQ
                 ":echo \"Ex mode disabled. Re-enable in your mappigns if you'd like to use it.\"<cr>")
 
