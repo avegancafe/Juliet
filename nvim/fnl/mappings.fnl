@@ -16,6 +16,12 @@
 (vim.keymap.set :n :gQ
                 ":echo \"Ex mode disabled. Re-enable in your mappigns if you'd like to use it.\"<cr>")
 
+(vim.api.nvim_set_keymap :n :gf :gF {:noremap true})
+(vim.api.nvim_set_keymap :x :gf :gF {:noremap true})
+
+(vim.api.nvim_set_keymap :n :gF ":e <cfile><CR>" {:noremap true})
+(vim.api.nvim_set_keymap :x :gF ":e <cfile><CR>" {:noremap true})
+
 (tset _G :ToggleNumbers
       (fn []
         (if (= vim.opt.relativenumber._value true)
