@@ -1,15 +1,15 @@
 (vim.keymap.set :n :<leader>p ":Lazy<cr>" {:silent true :desc "Open lazy.nvim"})
 (vim.keymap.set :n :<leader>it ":put =strftime('%FT%T%z')<cr>"
-            {:desc "Insert timestamp below this line"})
+                {:desc "Insert timestamp below this line"})
 
 (vim.keymap.set :n :<leader>id "a<C-R>=strftime(\"%Y-%m-%d\")<cr><esc>"
-            {:desc "Insert current date at cursor"})
+                {:desc "Insert current date at cursor"})
 
 (vim.keymap.set :n :H "^")
 (vim.keymap.set :n :L :g$)
 (vim.keymap.set :n "q:" :<nop>)
 (vim.keymap.set :n :gQ
-            ":echo \"Ex mode disabled. Re-enable in your mappigns if you'd like to use it.\"<cr>")
+                ":echo \"Ex mode disabled. Re-enable in your mappigns if you'd like to use it.\"<cr>")
 
 (tset _G :ToggleNumbers
       (fn []
@@ -37,27 +37,29 @@
 (vim.keymap.set :n :<leader>cp ":let @*=expand(\"%:p\")<cr>" {:silent true})
 (vim.keymap.set :n :<leader>x ":noh<cr>" {:silent true})
 (vim.keymap.set :n :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
-            {:desc "Edit all changed files"})
-(vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
-            {:silent true :desc "Open file in gitlab"})
+                {:desc "Edit all changed files"})
 
-(vim.keymap.set :n :<leader>bt ":lua require(\"cmds/switch_bufferline_mode\")()<cr>"
-            {:silent true :desc "Toggle between buffer mode and tab mode"})
+(vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
+                {:silent true :desc "Open file in gitlab"})
+
+(vim.keymap.set :n :<leader>bt
+                ":lua require(\"cmds/switch_bufferline_mode\")()<cr>"
+                {:silent true :desc "Toggle between buffer mode and tab mode"})
 
 (vim.keymap.set :n :<leader>rs ":let @a=@*<cr>"
-            {:silent true :desc "Save register to @a"})
+                {:silent true :desc "Save register to @a"})
 
 (vim.keymap.set :n :<leader>rsa ":let @a=@*<cr>"
-            {:silent true :desc "Save register to @a"})
+                {:silent true :desc "Save register to @a"})
 
 (vim.keymap.set :n :<leader>rsb ":let @b=@*<cr>"
-            {:silent true :desc "Save register to @b"})
+                {:silent true :desc "Save register to @b"})
 
 (vim.keymap.set :n :<leader>rsc ":let @c=@*<cr>"
-            {:silent true :desc "Save register to @c"})
+                {:silent true :desc "Save register to @c"})
 
 (vim.keymap.set :n :<leader>rsd ":let @d=@*<cr>"
-            {:silent true :desc "Save register to @d"})
+                {:silent true :desc "Save register to @d"})
 
 (tset _G :EditChangedFiles
       (fn []
