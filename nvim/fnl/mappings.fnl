@@ -10,6 +10,9 @@
 (vim.keymap.set :n "q:" :<nop>)
 (vim.keymap.set :x :p "p<cmd>let @+=@0<CR><cmd>let @\"=@0<CR>"
                 {:noremap true :silent true})
+
+(vim.keymap.set :n :<c-u> :<c-u>zz {:silent true})
+(vim.keymap.set :n :<c-d> :<c-d>zz {:silent true})
 (vim.keymap.set :n :gQ
                 ":echo \"Ex mode disabled. Re-enable in your mappigns if you'd like to use it.\"<cr>")
 
