@@ -37,7 +37,7 @@
 	editor = nvim
 	pager = less -x1,5
 [github]
-	user = avegancafe
+	user = jfrank3220
 [format]
 	# the %x08's are delete characters
 	pretty = format:%C(yellow)%h%Creset — %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08%Creset — %C(red)%<(20,trunc)%an %Creset%<(75,trunc)%s
