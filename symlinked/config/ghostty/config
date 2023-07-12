@@ -10,3 +10,5 @@ keybind = global:ctrl+shift+g=toggle_quick_terminal
 quick-terminal-animation-duration = 0
 macos-titlebar-style = tabs
 keybind = shift+enter=text:\n
+
+background-opacity = 0.85
