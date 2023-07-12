@@ -29,6 +29,7 @@
                              :opts {:outline {:win_width 40
                                               :keys {:jump :<cr>
                                                      :expand_collapse :u}}
+                                    :lightbulb {:enable false}
                                     :ui {:border :rounded}
                                     :symbol_in_winbar {:enable false
                                                        :separator "  "
