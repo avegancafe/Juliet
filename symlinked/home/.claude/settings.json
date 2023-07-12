@@ -44,10 +44,29 @@
       "mcp__playwright__*",
 
       "WebSearch",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:docs.github.com)",
-      "WebFetch(domain:tanstack.com)",
+      "Bash(/Users/jordanfrank/workspace/network-intel-dashboard/.venv/bin/pip list:*)",
+      "Bash(/Users/jordanfrank/workspace/network-intel-dashboard/.venv/bin/pip show:*)",
+      "Bash(PYTHONPATH=/Users/jordanfrank/workspace/network-intel-dashboard/server APPLICATION_PROFILE=ci /Users/jordanfrank/workspace/network-intel-dashboard/.venv/bin/pytest:*)",
+      "Bash(cat:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh run download:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(j2 m make)",
+      "Bash(npx ts-prune:*)",
       "WebFetch(domain:docs.getdbt.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:tanstack.com)",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_take_screenshot",
       "WebFetch(domain:auth0.com)",
       "WebFetch(domain:docs.cypress.io)",
       "WebFetch(domain:docs.python.org)",
@@ -63,8 +82,8 @@
     "ask": [],
     "defaultMode": "plan",
     "additionalDirectories": [
-      "/Users/kyle/workspace/dev-env/",
-      "/Users/kyle/.config/Juliet/"
+      "/Users/jordanfrank/workspace/dev-env/",
+      "/Users/jordanfrank/.config/Juliet/"
     ]
   },
   "statusLine": {
@@ -81,7 +100,11 @@
     "context7@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "backend-development@claude-code-workflows": true
+    "backend-development@claude-code-workflows": true,
+    "github@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "superpowers-developing-for-claude-code@superpowers-marketplace": true,
+    "Notion@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
