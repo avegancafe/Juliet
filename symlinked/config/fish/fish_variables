@@ -1,7 +1,7 @@
 # This file contains fish universal variable definitions.
 # VERSION: 3.0
 SETUVAR FZF_LEGACY_KEYBINDINGS:0
-SETUVAR --export PYENV_ROOT:/Users/kyle/\x2epyenv
+SETUVAR --export PYENV_ROOT:/Users/jordanfrank/\x2epyenv
 SETUVAR __fish_initialized:3400
 SETUVAR fish_color_autosuggestion:brblack
 SETUVAR fish_color_cancel:\x2dr
@@ -30,4 +30,4 @@ SETUVAR fish_pager_color_description:yellow\x1e\x2di
 SETUVAR fish_pager_color_prefix:normal\x1e\x2d\x2dbold\x1e\x2d\x2dunderline
 SETUVAR fish_pager_color_progress:brwhite\x1e\x2d\x2dbackground\x3dcyan
 SETUVAR fish_pager_color_selected_background:\x2dr
-SETUVAR fish_user_paths:/Users/kyle/\x2epyenv/bin\x1e/opt/homebrew/Cellar/fzf/0\x2e46\x2e1/bin\x1e/opt/homebrew/Cellar/fzf/0\x2e48\x2e0/bin\x1e/opt/homebrew/Cellar/fzf/0\x2e48\x2e1/bin
+SETUVAR fish_user_paths:/Users/jordanfrank/\x2epyenv/bin\x1e/Users/kyle/\x2epyenv/bin\x1e/opt/homebrew/Cellar/fzf/0\x2e46\x2e1/bin\x1e/opt/homebrew/Cellar/fzf/0\x2e48\x2e0/bin\x1e/opt/homebrew/Cellar/fzf/0\x2e48\x2e1/bin
