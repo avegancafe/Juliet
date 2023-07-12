@@ -30,14 +30,14 @@
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>ld "<CMD>Lspsaga lsp_finder<CR>"
+  (buf-set-keymap :n :<leader>ld "<CMD>Lspsaga finder<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>li "<CMD>Lspsaga lsp_finder<CR>"
+  (buf-set-keymap :n :<leader>li "<CMD>Lspsaga finder<CR>"
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lr ":IncRename " {:noremap true :silent true})
   (buf-set-keymap :n :<leader>la "<CMD>Lspsaga code_action<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>lu "<CMD>Lspsaga lsp_finder<CR>"
+  (buf-set-keymap :n :<leader>lu "<CMD>Lspsaga finder<CR>"
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lo "<CMD>Lspsaga outline<CR>"
                   {:noremap true :silent true}))
