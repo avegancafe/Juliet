@@ -443,6 +443,13 @@ ssh-add --apple-use-keychain 2>/dev/null
 # nodenv config
 status --is-interactive; and source (nodenv init -|psub)
 
+# pyenv config
+set -Ux PYENV_ROOT "$HOME"/.pyenv
+status is-login; and pyenv init --path | source
+status is-interactive; and pyenv init - | source
+status is-interactive; and pyenv virtualenv-init - | source
+alias brew="env PATH=(string replace (pyenv root)/shims '' \"\$PATH\") brew"
+
 if status --is-login
     set -gx PATH $HOME/.nodenv/versions $PATH
 end
