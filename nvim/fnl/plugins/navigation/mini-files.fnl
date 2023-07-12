@@ -2,6 +2,7 @@
 (pack :echasnovski/mini.files
       {:version false
        :config true
+       :opts {:windows {:preview true}}
        :init (fn []
                (vim.api.nvim_create_autocmd :User
                                             {:callback (fn [args]
