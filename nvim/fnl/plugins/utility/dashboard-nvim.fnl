@@ -62,11 +62,11 @@
                                                           :group :DashboardMruTitle
                                                           :action "SessionManager load_current_dir_session"}
                                                          {:desc "Find file"
-                                                          :key :p
+                                                          :key :f
                                                           :group :DashboardMruTitle
                                                           :action "Telescope find_files"}
-                                                         {:desc "Find word"
-                                                          :key :f
+                                                         {:desc "Open project"
+                                                          :key :p
                                                           :group :DashboardMruTitle
                                                           :action "Telescope live_grep"}]
                                               :center [{:desc "Last Session"
@@ -75,13 +75,13 @@
                                                         :action "SessionManager load_current_dir_session"}
                                                        {:desc "Find file"
                                                         :icon " "
-                                                        :key :p
+                                                        :key :f
                                                         :action "Telescope find_files"}
                                                        {:desc "Open changed files"
                                                         :icon " "
                                                         :key :c
                                                         :action "call v:lua.EditChangedFiles()"}
-                                                       {:desc "Find word"
-                                                        :icon " "
-                                                        :key :w
-                                                        :action "Telescope live_grep"}]}})))})
+                                                       {:desc "Open project"
+                                                        :icon " "
+                                                        :key :p
+                                                        :action "Telescope workspaces"}]}})))})
