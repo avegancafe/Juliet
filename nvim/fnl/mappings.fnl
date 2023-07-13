@@ -82,6 +82,15 @@
 
 (vim.cmd ":command EditChangedFiles call v:lua.EditChangedFiles()")
 
+(tset _G :IsolateBuffer
+      (fn []
+        (let [cur (vim.fn.bufnr "%")
+              last (vim.fn.bufnr "$")]
+          (if (> cur 1) (vim.cmd (.. "1," (- cur 1) :bd)))
+          (if (< cur last) (vim.cmd (.. "" (+ cur 1) "," last :bd))))))
+
+(vim.cmd ":command IsolateBuffer call v:lua.IsolateBuffer()")
+
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
 (vim.keymap.set :i :<c-c> :<esc>)
