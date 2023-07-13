@@ -22,10 +22,10 @@
 	default = current
 	autoSetupRemote = true
 [commit]
-	template = /Users/kyle/.gitmessage
+	template = ~/.gitmessage
 	gpgsign = true
 [core]
-	excludesfile = /Users/kyle/.gitignore_global
+	excludesfile = ~/.gitignore_global
 	autocrlf = false
 	editor = nvim
 	pager = less -x1,5

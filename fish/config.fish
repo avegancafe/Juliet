@@ -4,7 +4,7 @@ set -gx PATH /usr/local/bin $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$GOPATH/bin" $PATH
 set -gx PATH "$HOME/.cargo/bin" $PATH
-set -gx PATH $PATH "/Users/kyle/.foundry/bin"
+set -gx PATH $PATH "$HOME/.foundry/bin"
 set -gx PATH "/opt/homebrew/opt/go@1.18/bin" $PATH
 set -gx PATH (pyenv root)/shims $PATH
 set -gx GOPATH "$HOME/go"
@@ -13,13 +13,13 @@ set -gx LSCOLORS bxfxcxdxbxegedabagacad
 set -gx GPG_TTY (tty)
 set -U FZF_LEGACY_KEYBINDINGS 0
 set fish_color_command 69f0ad
-set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U kyle -h localhost"
+set -gx PG_CONSOLE_COMMAND "pgcli -p 5432 -U $(whoami) -h localhost"
 set -gx RELAY_FZF_OPTS "--reverse --height 40%"
 set -gx TERM xterm-256color
 set -gx PATH (npm get prefix)/bin $PATH
 set -gx PATH "$HOME/.config/Juliet/bin" $PATH
 set -gx PATH "$HOME/.config/Juliet/bin/git-hoard/bin" $PATH
-set -gx DENO_INSTALL "/Users/kyle/.deno"
+set -gx DENO_INSTALL "$HOME/.deno"
 set -gx PATH "$DENO_INSTALL/bin" $PATH
 
 set -gx FOUNDRY_FMT_LINE_LENGTH 100
