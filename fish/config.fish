@@ -21,6 +21,7 @@ set -gx PATH "$HOME/.config/Juliet/bin" $PATH
 set -gx PATH "$HOME/.config/Juliet/bin/git-hoard/bin" $PATH
 set -gx DENO_INSTALL "$HOME/.deno"
 set -gx PATH "$DENO_INSTALL/bin" $PATH
+set -gx PATH "/usr/local/games/bin" $PATH
 
 set -gx FOUNDRY_FMT_LINE_LENGTH 100
 set -gx FOUNDRY_FMT_TAB_WIDTH 2
