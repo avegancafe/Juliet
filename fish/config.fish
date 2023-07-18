@@ -52,6 +52,26 @@ function envsource
     end
 end
 
+function b
+    rlog "Checking package with name $argv[1]..."
+    brew info $argv[1]
+
+    if test $status -eq 0
+        gum confirm "Install?" && brew install $argv[1]
+    else
+        set --local package (brew info $argv[1] 2>&1 | grep -Eo "Did you mean ([[:alpha:]-]*)\?" | sed -e "s/Did you mean //g" -e "s/?//g")
+
+        gum confirm "Install $package instead?"
+
+        if test $status -eq 0
+            rlog "Installing $package..."
+            brew install $package
+        else
+            error Exiting
+        end
+    end
+end
+
 function p
     pnpm $argv
 end
