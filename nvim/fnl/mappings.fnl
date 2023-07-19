@@ -51,7 +51,8 @@
 (vim.keymap.set :n :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
                 {:desc "Edit all changed files"})
 
-(vim.keymap.set :n :<leader>by ":let @*=expand(\"%:p\")<cr>" {:silent true})
+(vim.keymap.set :n :<leader>byy ":let @*=expand(\"%:p\")<cr>" {:silent true :desc "Copy buffer absolute path"})
+(vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>" {:silent true :desc "Copy buffer relative path"})
 (vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
 
