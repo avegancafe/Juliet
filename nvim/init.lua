@@ -38,7 +38,7 @@ require('hotpot').setup({
 	},
 })
 
-require('config.init')
-require('plugins.index')
-require('mappings')
-require('initializers.index')
+require('Juliet.init')
+require('Juliet.plugins.init')
+require('Juliet.mappings')
+require('Juliet.initializers.init')
