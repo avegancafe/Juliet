@@ -30,15 +30,15 @@
             (tset vim.opt :relativenumber false)
             (tset vim.opt :relativenumber true))))
 
-(vim.cmd ":command ToggleNumbers call v:lua.ToggleNumbers()")
-(vim.cmd ":command Todo execute \"TodoTrouble cwd=\".getreg('%')")
+(vim.cmd ":command! ToggleNumbers call v:lua.ToggleNumbers()")
+(vim.cmd ":command! Todo execute \"TodoTrouble cwd=\".getreg('%')")
 (vim.cmd ":abbreviate bgt BufferLineGroupToggle")
 (tset _G :ShowEditsInCurrentDir
       (fn []
         (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h") ":~:.")]
           (vim.cmd (.. "TodoTrouble keywords=EDIT cwd=" cwd)))))
 
-(vim.cmd ":command ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
+(vim.cmd ":command! ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
 (vim.keymap.set :n :<esc> ":w<cr>" {:silent true})
 (tset _G :GitlabOpen (fn []
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
@@ -51,8 +51,12 @@
 (vim.keymap.set :n :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
                 {:desc "Edit all changed files"})
 
-(vim.keymap.set :n :<leader>byy ":let @*=expand(\"%:p\")<cr>" {:silent true :desc "Copy buffer absolute path"})
-(vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>" {:silent true :desc "Copy buffer relative path"})
+(vim.keymap.set :n :<leader>byy ":let @*=expand(\"%:p\")<cr>"
+                {:silent true :desc "Copy buffer absolute path"})
+
+(vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>"
+                {:silent true :desc "Copy buffer relative path"})
+
 (vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
 
@@ -81,7 +85,7 @@
               changed-files (. (vim.split files-output "\n") 3)]
           (vim.cmd (.. "args " changed-files)))))
 
-(vim.cmd ":command EditChangedFiles call v:lua.EditChangedFiles()")
+(vim.cmd ":command! EditChangedFiles call v:lua.EditChangedFiles()")
 
 (tset _G :IsolateBuffer
       (fn []
@@ -90,7 +94,19 @@
           (if (> cur 1) (vim.cmd (.. "1," (- cur 1) :bd)))
           (if (< cur last) (vim.cmd (.. "" (+ cur 1) "," last :bd))))))
 
-(vim.cmd ":command IsolateBuffer call v:lua.IsolateBuffer()")
+(vim.cmd ":command! IsolateBuffer call v:lua.IsolateBuffer()")
+
+(tset _G :ReloadConfig
+      (fn []
+        (let [luacache (. (or _G.__luacache {}) :cache)]
+          (each [pkg _ (pairs package.loaded)]
+            (print (.. "pkg: " pkg))
+            (when (pkg:match :^my_.+) (print pkg) (tset package.loaded pkg nil)
+              (when luacache (tset lucache pkg nil))))
+          (dofile vim.env.MYVIMRC)
+          (vim.notify "Config reloaded!" vim.log.levels.INFO))))
+
+(vim.cmd ":command! ReloadConfig call v:lua.ReloadConfig()")
 
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
