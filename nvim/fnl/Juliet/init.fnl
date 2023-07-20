@@ -27,7 +27,6 @@
 (set vim.opt.number true)
 (set vim.opt.relativenumber true)
 (set vim.opt.numberwidth 3)
-(vim.cmd "hi Directory guifg=#FF0000 ctermfg=red")
 (set vim.opt.backspace "indent,eol,start")
 (set vim.opt.clipboard :unnamed)
 (set vim.opt.shell :fish)
