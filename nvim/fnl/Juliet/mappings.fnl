@@ -107,6 +107,13 @@
           (dofile vim.env.MYVIMRC)
           (vim.notify "Config reloaded!" vim.log.levels.INFO))))
 
+(vim.api.nvim_create_autocmd [:BufWritePost]
+                             {:group (vim.api.nvim_create_augroup :WritePostReload
+                                                                  {})
+                              :pattern (.. (vim.fn.expand "~") :/.config/Juliet/nvim/fnl/*.fnl)
+                              :callback (fn []
+                                          (_G.ReloadConfig))})
+
 (vim.cmd ":command! ReloadConfig call v:lua.ReloadConfig()")
 
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
