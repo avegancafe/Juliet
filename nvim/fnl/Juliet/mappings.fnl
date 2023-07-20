@@ -100,9 +100,10 @@
       (fn []
         (let [luacache (. (or _G.__luacache {}) :cache)]
           (each [pkg _ (pairs package.loaded)]
-            (print (.. "pkg: " pkg))
-            (when (pkg:match :^my_.+) (print pkg) (tset package.loaded pkg nil)
-              (when luacache (tset lucache pkg nil))))
+            (when (and (pkg:match :^Juliet.+)
+                       (not (pkg:match :^Juliet.plugins)))
+              (tset package.loaded pkg nil)
+              (when luacache (tset luacache pkg nil))))
           (dofile vim.env.MYVIMRC)
           (vim.notify "Config reloaded!" vim.log.levels.INFO))))
 
