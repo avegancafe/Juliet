@@ -2,7 +2,8 @@
 
 (pack :nvim-telescope/telescope.nvim
       {:keys [(key :<c-p> ":Telescope find_files<cr>" "Fuzzy find a file")
-              (key :<c-b> ":Telescope buffers<cr>") "Fuzzy list buffers"]
+              (key :<c-b> ":Telescope buffers<cr>")
+              "Fuzzy list buffers"]
        :dependencies [:kyazdani42/nvim-web-devicons
                       :nvim-lua/plenary.nvim
                       :ribru17/bamboo.nvim]
@@ -17,19 +18,14 @@
                                         {:fg colors.grey})
                    (vim.api.nvim_set_hl 0 :TelescopePreviewBorder
                                         {:fg colors.grey})
-                   (telescope.setup {:defeaults {:mappings {:i {:<c-o> (fn [prompt_bufnr
-                                                                            _mode]
-                                                                         ((. (require :trouble.providers.telescope)
-                                                                             :open_with_trouble) prompt_bufnr
-                                                                                                                                                                                                                     _mode))
-                                                                :<c-j> actions.move_selection_next
-                                                                :<c-k> actions.move_selection_previous}
-                                                            :n {:<c-t> trouble.open_with_trouble}}
-                                                 :layout_config {:prompt_position :bottom}
-                                                 :layout_strategy :bottom_pane
-                                                 :path_display {:shorten {:len 2
-                                                                          :exclude [-1
-                                                                                    -2]}}}
+                   (telescope.setup {:defaults {:mappings {:i {:<c-j> actions.move_selection_next
+                                                               :<c-k> actions.move_selection_previous
+                                                               :<esc> actions.close
+                                                               :<c-o> trouble.open_with_trouble}}
+                                                :layout_config {:prompt_position :bottom}
+                                                :path_display {:shorten {:len 3
+                                                                         :exclude [-1
+                                                                                   -2]}}}
                                      :pickers {:find_files {:find_command [:fd
                                                                            :--hidden
                                                                            :--glob

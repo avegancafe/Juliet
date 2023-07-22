@@ -55,11 +55,7 @@
                                                                 "%#EndOfBuffer#"))]
                                               :lualine_x [:diagnostics]
                                               :lualine_y [:filetype]
-                                              :lualine_z [[#""
-                                                           :color
-                                                           (fn []
-                                                             {:fg (. (require :bamboo.colors)
-                                                                     :blue)})]]}
+                                              :lualine_z []}
                                    :inactive_sections {:lualine_a []
                                                        :lualine_b []
                                                        :lualine_c [:filename]
