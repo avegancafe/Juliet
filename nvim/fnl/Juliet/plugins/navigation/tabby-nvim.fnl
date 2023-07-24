@@ -41,12 +41,12 @@
                                                                                   theme.fill)
                                                                               theme.head)
                                                                   2 (tab.name)
-                                                                  3 (tab.close_btn "")
-                                                                  4 (line.sep ""
-                                                                              hl
-                                                                              theme.fill)
+                                                                  3 (line.sep " "
+                                                                              theme.tab
+                                                                              theme.tab)
+                                                                  4 (tab.close_btn " ")
                                                                   : hl
-                                                                  :margin " "})))
+                                                                  :margin ""})))
                                  2 (line.spacer)
                                  3 ((. (line.wins_in_tab (line.api.get_current_tab))
                                        :foreach) (fn [win]
