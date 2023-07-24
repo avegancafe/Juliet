@@ -24,10 +24,4 @@
               (key :<leader>fr (fn []
                                  (let [f (require :mini.files)]
                                    (f.refresh)))
-                   "Refresh nvim-tree")
-              (key :<c-p>
-                   (fn []
-                     (let [f (require :mini.files)]
-                       (f.close)
-                       (vim.cmd "Telescope find_files")))
-                   "Fuzzy find a file")]})
+                   "Refresh nvim-tree")]})

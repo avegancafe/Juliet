@@ -1,7 +1,12 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :nvim-telescope/telescope.nvim
-      {:keys [(key :<c-p> ":Telescope find_files<cr>" "Fuzzy find a file")
+      {:keys [(key :<c-p>
+                   (fn []
+                     (let [f (require :mini.files)]
+                       (f.close)
+                       (vim.cmd "Telescope find_files")))
+                   "Fuzzy find a file")
               (key :<c-b> ":Telescope buffers<cr>")
               "Fuzzy list buffers"]
        :dependencies [:kyazdani42/nvim-web-devicons
