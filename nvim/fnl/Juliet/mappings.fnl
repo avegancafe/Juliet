@@ -60,10 +60,6 @@
 (vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
 
-(vim.keymap.set :n :<leader>bt
-                ":lua require(\"Juliet/cmds/switch_bufferline_mode\")()<cr>"
-                {:silent true :desc "Toggle between buffer mode and tab mode"})
-
 (vim.keymap.set :n :<leader>rs ":let @a=@*<cr>"
                 {:silent true :desc "Save register to @a"})
 
