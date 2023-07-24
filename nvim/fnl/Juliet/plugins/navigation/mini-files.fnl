@@ -2,7 +2,8 @@
 (pack :echasnovski/mini.files
       {:version false
        :config true
-       :opts {:windows {:preview true}}
+       :lazy false
+       :opts {:windows {:preview true :width_focus 35 :width_preview 70}}
        :init (fn []
                (vim.api.nvim_create_autocmd :User
                                             {:callback (fn [args]
@@ -23,4 +24,10 @@
               (key :<leader>fr (fn []
                                  (let [f (require :mini.files)]
                                    (f.refresh)))
-                   "Refresh nvim-tree")]})
+                   "Refresh nvim-tree")
+              (key :<c-p>
+                   (fn []
+                     (let [f (require :mini.files)]
+                       (f.close)
+                       (vim.cmd "Telescope find_files")))
+                   "Fuzzy find a file")]})
