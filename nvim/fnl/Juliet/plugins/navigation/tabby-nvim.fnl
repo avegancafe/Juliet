@@ -31,6 +31,7 @@
                  (vim.api.nvim_set_hl 0 theme.fill
                                       {:fg colors.black :bg colors.black})
                  (tabline.set (fn [line]
+                                (var i 0)
                                 {1 ((. (line.tabs) :foreach) (fn [tab]
                                                                (let [hl (or (and (tab.is_current)
                                                                                  theme.current_tab)
@@ -50,22 +51,33 @@
                                  2 (line.spacer)
                                  3 ((. (line.wins_in_tab (line.api.get_current_tab))
                                        :foreach) (fn [win]
-                                                                                                                                        (or (and (> (length (. (line.wins_in_tab (line.api.get_current_tab))
-                                                                                                                                                               :wins))
-                                                                                                                                                    1)
-                                                                                                                                                 {1 (line.sep ""
-                                                                                                                                                              theme.win
-                                                                                                                                                              theme.fill)
-                                                                                                                                                  2 (or (and (win.is_current)
-                                                                                                                                                             "")
-                                                                                                                                                        "")
-                                                                                                                                                  3 (win.buf_name)
-                                                                                                                                                  4 (line.sep "|"
-                                                                                                                                                              theme.fill
-                                                                                                                                                              theme.tab)
-                                                                                                                                                  :hl (or (and (win.is_current)
-                                                                                                                                                               theme.current_tab)
-                                                                                                                                                          theme.win)
-                                                                                                                                                  :margin " "})
-                                                                                                                                            "")))
+                                                                                                                                        (local num-of-bufs
+                                                                                                                                               (length (. (line.wins_in_tab (line.api.get_current_tab)) :wins)))
+                                                                                                                                        (local fin
+                                                                                                                                               (or (and (> (length (. (line.wins_in_tab (line.api.get_current_tab))
+                                                                                                                                                                      :wins))
+                                                                                                                                                           1)
+                                                                                                                                                        {1 (line.sep ""
+                                                                                                                                                                     theme.win
+                                                                                                                                                                     theme.fill)
+                                                                                                                                                         2 (or (and (win.is_current)
+                                                                                                                                                                    "")
+                                                                                                                                                               "")
+                                                                                                                                                         3 (win.buf_name)
+                                                                                                                                                         4 (or (and (< i
+                                                                                                                                                                       (- num-of-bufs
+                                                                                                                                                                          1))
+                                                                                                                                                                    (line.sep "|"
+                                                                                                                                                                              theme.fill
+                                                                                                                                                                              theme.tab))
+                                                                                                                                                               "")
+                                                                                                                                                         :hl (or (and (win.is_current)
+                                                                                                                                                                      theme.current_tab)
+                                                                                                                                                                 theme.win)
+                                                                                                                                                         :margin " "})
+                                                                                                                                                   ""))
+                                                                                                                                        (set i
+                                                                                                                                             (+ i
+                                                                                                                                                1))
+                                                                                                                                        fin))
                                  :hl theme.fill})))})
