@@ -26,7 +26,9 @@
                    (telescope.setup {:defaults {:mappings {:i {:<c-j> actions.move_selection_next
                                                                :<c-k> actions.move_selection_previous
                                                                :<esc> actions.close
-                                                               :<c-o> trouble.open_with_trouble}}
+                                                               :<c-o> trouble.open_with_trouble
+                                                               :<enter> actions.select_tab
+                                                               :<c-b> actions.select_default}}
                                                 :layout_config {:prompt_position :bottom}
                                                 :path_display {:shorten {:len 3
                                                                          :exclude [-1
