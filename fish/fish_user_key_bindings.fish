@@ -1,25 +1,22 @@
+source ~/.config/fish/functions/fzf_key_bindings.fish
+
 function fish_user_key_bindings
     bind \cl 'echo \e\]1337\;ClearScrollback\x7; clear; commandline -f repaint'
     bind \cc 'commandline ""'
     bind \cb fco_preview
     bind \cn 'git rebase --continue'
+    fzf_key_bindings
 end
-
-source ~/.config/fish/functions/fzf_key_bindings.fish
-fzf_key_bindings
 
 function fco -d "Fuzzy-find and checkout a branch"
     git branch --all | grep -v HEAD | string trim | fzf --height 40% --reverse | read -l result; and git checkout "$result"
 end
 
 function fjobs -d "Kill background jobs"
-    jobs | tail -n +1 | \
-        fzf --height 40% --reverse \
+    jobs | tail -n +1 | fzf --height 40% --reverse \
         --bind 'ctrl-y:execute-silent(echo {} | cut -c2- | sed -E \'s/([[:digit:]]+).*/\1/g\' | tr \'\n\' \' \' | xargs kill -9)+abort' \
         --bind 'ctrl-r:reload(eval "$FZF_DEFAULT_COMMAND")' \
-        --header='ctrl-y: kill process' | \
-        read -l result; and \
-        fg $(echo $result | awk '{print $2}')
+        --header='ctrl-y: kill process' | read -l result; and fg $(echo $result | awk '{print $2}')
 
     commandline -f repaint
 end
