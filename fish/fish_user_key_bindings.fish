@@ -32,9 +32,10 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
     string join \n (string join \n $branches; string join \n $tags) |
     fzf --reverse --height 40% --no-hscroll --no-multi -n 2 --ansi \
       --preview="git --no-pager log -150 --pretty=format:%s '..{2}'" \
-      --bind 'ctrl-y:execute-silent(echo {} | awk \'{print $2}\' | pbcopy)+abort' \
+      --header='ctrl-y: copy name — ctrl-x: delete branch' \
+      --bind 'ctrl-y:execute-silent(echo {} | awk \'{print $2}\' | xargs printf "%s" | pbcopy)+abort' \
       --bind 'ctrl-x:execute-silent(echo {} | awk \'{print $2}\' | xargs git branch -D)+abort' \
-  ) || return
+  ) || commandline -f repaint && return
 
     set target (echo $raw_target | awk '{print $2}')
 
