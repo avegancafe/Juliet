@@ -39,7 +39,8 @@ end
 function t
     env RELAY_TEST_CONFIG=$HOME/workspace/dev-env/relay-core-testing.toml gotestsum $argv | \
         tee /dev/tty | \
-        grep "FAIL"
+        grep "FAIL" | \
+        tee /dev/tty
 end
 
 function default-branch
