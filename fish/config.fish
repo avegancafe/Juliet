@@ -36,6 +36,12 @@ function current-branch
     git branch | grep "\*" | sed -e "s/^\*[[:space:]]//" | tr -d '\n'
 end
 
+function t
+    env RELAY_TEST_CONFIG=$HOME/workspace/dev-env/relay-core-testing.toml gotestsum $argv | \
+        tee /dev/tty | \
+        grep "FAIL"
+end
+
 function default-branch
     git branch | grep -m 1 -Eo '\\smain|\\smaster'
 end
