@@ -9,6 +9,7 @@
                    "Fuzzy find a file")
               (key :<c-b> ":Telescope buffers<cr>")
               "Fuzzy list buffers"]
+       :lazy false
        :dependencies [:kyazdani42/nvim-web-devicons
                       :nvim-lua/plenary.nvim
                       :ribru17/bamboo.nvim]

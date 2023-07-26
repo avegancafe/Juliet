@@ -1,8 +1,7 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :glepnir/dashboard-nvim
-      {:event :VimEnter
-       :keys [(key :<leader>h ":Dashboard<cr>" :Home)]
+      {:keys [(key :<leader>h ":Dashboard<cr>" :Home)]
        :config (fn []
                  (let [utils (require :telescope.utils)
                        dashboard (require :dashboard)
