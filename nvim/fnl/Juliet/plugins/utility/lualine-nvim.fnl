@@ -42,7 +42,9 @@
                                                                                       "")]
                                                                 (if (string.find (vim.api.nvim_exec :pwd
                                                                                                     true)
-                                                                                 path)
+                                                                                 path
+                                                                                 1
+                                                                                 true)
                                                                     (set fin
                                                                          (string.gsub v
                                                                                       " [%a%A]+"
