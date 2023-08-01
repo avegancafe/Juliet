@@ -5,7 +5,8 @@
                       :nocksock/do.nvim
                       :glepnir/lspsaga.nvim
                       :natecraddock/workspaces.nvim
-                      :ribru17/bamboo.nvim]
+                      :ribru17/bamboo.nvim
+                      :nvim-lua/plenary.nvim]
        :config (fn []
                  (let [lualine (require :lualine)]
                    (lualine.setup {:winbar {:lualine_c [(fn []
@@ -51,9 +52,15 @@
                                                                                       "")))))
                                                             fin)]
                                               :lualine_c [(fn []
-                                                            (.. (string.gsub (vim.api.nvim_buf_get_name 0)
-                                                                             (vim.loop.cwd)
-                                                                             "")
+                                                            (local Path
+                                                                   (require :plenary.path))
+                                                            (local p
+                                                                   (string.gsub (vim.api.nvim_buf_get_name 0)
+                                                                                (vim.loop.cwd)
+                                                                                ""))
+                                                            (.. (: (Path:new p)
+                                                                   :shorten 2
+                                                                   [-1 -2])
                                                                 "%#EndOfBuffer#"))]
                                               :lualine_x [:diagnostics]
                                               :lualine_y [:filetype]
