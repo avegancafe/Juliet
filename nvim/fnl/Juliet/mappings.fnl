@@ -83,6 +83,12 @@
 
 (vim.cmd ":command! EditChangedFiles call v:lua.EditChangedFiles()")
 
+(tset _G :OpenRelayMR
+      (fn []
+        (vim.api.nvim_exec "!git mr --draft" true)))
+(vim.cmd ":command! OpenRelayMR call v:lua.OpenRelayMR()")
+(vim.keymap.set :n :<leader>gmr ":OpenRelayMR<cr>" {:desc "Open draft MR in relay repo"})
+
 (tset _G :IsolateBuffer
       (fn []
         (let [cur (vim.fn.bufnr "%")
@@ -106,7 +112,8 @@
 (vim.api.nvim_create_autocmd [:BufWritePost]
                              {:group (vim.api.nvim_create_augroup :WritePostReload
                                                                   {})
-                              :pattern (.. (vim.fn.expand "~") :/.config/Juliet/nvim/fnl/*.fnl)
+                              :pattern (.. (vim.fn.expand "~")
+                                           :/.config/Juliet/nvim/fnl/*.fnl)
                               :callback (fn []
                                           (_G.ReloadConfig))})
 
