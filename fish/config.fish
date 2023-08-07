@@ -307,7 +307,7 @@ end
 
 eval (starship init fish)
 
-ssh-add -A 2>/dev/null
+ssh-add --apple-use-keychain 2>/dev/null
 
 # nodenv config
 status --is-interactive; and source (nodenv init -|psub)
