@@ -119,6 +119,8 @@
 
 (vim.cmd ":command! ReloadConfig call v:lua.ReloadConfig()")
 
+(vim.cmd ":command! FixWhitespace s/\\s*$//g | noh")
+
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
 (vim.keymap.set :i :<c-c> :<esc>)
