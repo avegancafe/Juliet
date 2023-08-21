@@ -43,9 +43,11 @@ setup_fish() {
 }
 
 setup_gpg() {
-  mkdir ~/.gnupg
-  touch ~/.gnupg/gpg-agent.conf
-  echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+  if [[ ! -d $HOME/.gnupg ]]; then
+    mkdir ~/.gnupg
+    touch ~/.gnupg/gpg-agent.conf
+    echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
+  fi
 }
 
 setup_psql() {
@@ -64,6 +66,7 @@ setup_kitty() {
   mkdir -p ~/.config/kitty
   [[ ! -f ~/.config/kitty/kitty.conf ]] && ln -sfv ~/.config/Juliet/kitty/kitty.conf ~/.config/kitty
   [[ ! -f ~/.config/kitty/current-theme.conf ]] && ln -sfv ~/.config/Juliet/kitty/current-theme.conf ~/.config/kitty
+  [[ ! -f $HOME/Library/Fonts/iosevka-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/iosevka-complete.ttf $HOME/Library/Fonts/
 }
 
 setup_other() {
