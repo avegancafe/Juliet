@@ -1,0 +1,1 @@
+:eandrju/cellular-automaton.nvim
