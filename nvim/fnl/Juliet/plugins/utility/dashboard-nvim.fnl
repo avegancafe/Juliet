@@ -2,7 +2,7 @@
 
 (pack :glepnir/dashboard-nvim
       {:keys [(key :<leader>h ":Dashboard<cr>" :Home)]
-       :event :VimEnter
+       :lazy false
        :config (fn []
                  (let [utils (require :telescope.utils)
                        dashboard (require :dashboard)
