@@ -38,7 +38,9 @@ require('hotpot').setup({
 	},
 })
 
-require('Juliet.init')
-require('Juliet.plugins.init')
+print(vim.inspect(require('hotpot')))
+
+require('Juliet')
+require('Juliet.plugins')
 require('Juliet.mappings')
-require('Juliet.initializers.init')
+require('Juliet.initializers')

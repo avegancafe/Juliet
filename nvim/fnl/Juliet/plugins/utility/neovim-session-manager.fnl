@@ -7,6 +7,6 @@
        :config (fn []
                  (let [session-manager (require :session_manager)
                        config (require :session_manager.config)]
-                   (session-manager.setup {:autoload_mode config.AutoloadMode.CurrentDir
+                   (session-manager.setup {:autoload_mode config.AutoloadMode.Disabled
                                            :max_path_length 0
                                            :autosave_last_session true})))})
