@@ -63,9 +63,7 @@ setup_kitty() {
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
   [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin
 
-  mkdir -p ~/.config/kitty
-  [[ ! -f ~/.config/kitty/kitty.conf ]] && ln -sfv ~/.config/Juliet/kitty/kitty.conf ~/.config/kitty
-  [[ ! -f ~/.config/kitty/current-theme.conf ]] && ln -sfv ~/.config/Juliet/kitty/current-theme.conf ~/.config/kitty
+  [[ ! -d ~/.config/kitty ]] && ln -sfv ~/.config/Juliet/kitty ~/.config
   [[ ! -f $HOME/Library/Fonts/iosevka-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/iosevka-complete.ttf $HOME/Library/Fonts/
 }
 
