@@ -38,8 +38,6 @@ require('hotpot').setup({
 	},
 })
 
-print(vim.inspect(require('hotpot')))
-
 require('Juliet')
 require('Juliet.plugins')
 require('Juliet.mappings')
