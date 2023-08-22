@@ -1,0 +1,1 @@
+:lepture/vim-jinja

@@ -78,7 +78,8 @@
                 {:name :solidity}
                 {:name :tailwindcss}
                 {:name :vtsls}
-                {:name :yamlls}])
+                {:name :yamlls}
+                {:name :pylsp}])
 
 (mason-lspconfig.setup {:ensure_installed (icollect [_ {: name} (ipairs servers)]
                                             name)})
