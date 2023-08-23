@@ -70,18 +70,14 @@
                                                           :group :DashboardMruTitle
                                                           :action "Telescope live_grep"}]
                                               :center [{:desc "Last Session"
-                                                        :icon " "
                                                         :key :l
                                                         :action "SessionManager load_current_dir_session"}
                                                        {:desc "Find file"
-                                                        :icon " "
                                                         :key :f
                                                         :action "Telescope find_files"}
                                                        {:desc "Open changed files"
-                                                        :icon " "
                                                         :key :c
                                                         :action "call v:lua.EditChangedFiles()"}
                                                        {:desc "Open project"
-                                                        :icon " "
                                                         :key :p
                                                         :action "Telescope workspaces"}]}})))})

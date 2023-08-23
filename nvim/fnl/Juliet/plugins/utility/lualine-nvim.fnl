@@ -15,8 +15,8 @@
                                    :inactive_winbar {}
                                    :options {:component_separators {:left ""
                                                                     :right ""}
-                                             :section_separators {:left ""
-                                                                  :right ""}
+                                             :section_separators {:left ""
+                                                                  :right ""}
                                              :theme (require :Juliet.lualine_theme)
                                              :disabled_filetypes {:statusline [:lspsagaoutline
                                                                                :NvimTree]
