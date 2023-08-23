@@ -4,15 +4,9 @@
 (local cmp-nvim-lsp (require :cmp_nvim_lsp))
 (local mason (require :mason))
 (local mason-lspconfig (require :mason-lspconfig))
-(local lsp-signature (require :lsp_signature))
 (local lspconfig-util (require :lspconfig.util))
 
 (fn on-attach [client bufnr]
-  (lsp-signature.on_attach {:bind true
-                            :floating_window false
-                            :handler_opts {:border :rounded}
-                            :toggle_key :<c-h>}
-                           bufnr)
   (when (= client.name :yamlls)
     (local ns (vim.lsp.diagnostic.get_namespace client.id))
     (vim.diagnostic.disable nil ns))
