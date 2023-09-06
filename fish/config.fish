@@ -173,10 +173,6 @@ end
 function fish_greeting
 end
 
-function g
-    git $argv
-end
-
 function gut
     git $argv
 end
