@@ -4,4 +4,4 @@
       {:config true
        :version "*"
        :lazy false
-       :keys [(key :<leader>gl (fn [] (vim.cmd :GitConflictListQf)))]})
+       :keys [(key :<leader>gl (fn [] (vim.cmd :GitConflictListQf)) "Open all git merge conflicts in quickfix menu")]})
