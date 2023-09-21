@@ -63,7 +63,6 @@ brew "git-lfs"
 brew "gitlab-runner"
 brew "glab"
 brew "glow"
-brew "go@1.16"
 brew "go@1.20", link: true
 brew "gobject-introspection"
 brew "golangci-lint"
