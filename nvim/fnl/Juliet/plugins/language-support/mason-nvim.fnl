@@ -11,5 +11,4 @@
                                                 :callback (fn []
                                                             (vim.diagnostic.hide))}))})
  :neovim/nvim-lspconfig
- :onsails/lspkind.nvim
- (pack :ray-x/lsp_signature.nvim {:config true})]
+ :onsails/lspkind.nvim]
