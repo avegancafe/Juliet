@@ -1,3 +1,3 @@
 (import-macros {: pack} :Juliet.macros)
 
-(pack :folke/which-key.nvim {:config true :opts {:window {:border :rounded}}})
+(pack :folke/which-key.nvim {:config true :opts { :icons { :separator "->"} :window {:border :rounded}}})
