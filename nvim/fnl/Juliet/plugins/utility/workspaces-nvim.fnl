@@ -16,7 +16,7 @@
                          add-workspace (lambda [name path]
                                          (if (not (accumulate [found false _ dir (ipairs dirs)]
                                                     (or found (= dir.name name))))
-                                             (workspaces.add name path)))]
+                                             (workspaces.add path name)))]
                      (add-workspace :config "~/.config/Juliet")
                      (if (not (accumulate [found false _ dir (ipairs dirs)]
                                 (or found
