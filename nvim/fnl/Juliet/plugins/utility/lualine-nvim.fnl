@@ -59,7 +59,7 @@
                                                                                 (vim.loop.cwd)
                                                                                 ""))
                                                             (.. (: (Path:new p)
-                                                                   :shorten 2
+                                                                   :shorten 3
                                                                    [-1 -2])
                                                                 "%#EndOfBuffer#"))]
                                               :lualine_x [:diagnostics]
