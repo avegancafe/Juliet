@@ -6,9 +6,7 @@
                  (var alpha (require :alpha))
                  (var dashboard (require :alpha.themes.dashboard))
                  (set dashboard.section.header.val
-                      ["            "
-                       "            "
-                       "    ↑↑↓↓    "
+                      ["    ↑↑↓↓    "
                        "   ←→←→AB   "
                        "   ┌────┐   "
                        "   │    ├┐  "
@@ -19,10 +17,7 @@
                        "   │    │   "
                        "   └──┘ │   "
                        "     │  │   "
-                       "     │  │   "
-                       "            "
-                       "            "
-                       "            "])
+                       "     │  │   "])
                  (set dashboard.section.buttons.val
                       [(dashboard.button :l
                                          " > Load session for current directory"
