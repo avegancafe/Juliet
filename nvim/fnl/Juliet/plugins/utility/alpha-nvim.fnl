@@ -18,7 +18,7 @@
 "        __\\/////////_______"])
                  (set dashboard.section.buttons.val
                       [(dashboard.button :l
-                                         " > Load session for current directory"
+                                         " > Load session for current dir"
                                          ":SessionManager load_current_dir_session<cr>")
                        (dashboard.button :f " > Find file"
                                          ":Telescope find_files<cr>")
