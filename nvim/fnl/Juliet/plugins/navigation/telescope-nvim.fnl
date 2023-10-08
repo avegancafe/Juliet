@@ -11,8 +11,10 @@
               "Fuzzy list buffers"]
        :lazy false
        :dependencies [:kyazdani42/nvim-web-devicons
+                      :nvim-telescope/telescope-ui-select.nvim
                       :nvim-lua/plenary.nvim
-                      :ribru17/bamboo.nvim]
+                      :ribru17/bamboo.nvim
+                      :natecraddock/workspaces.nvim]
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.providers.telescope)
@@ -54,5 +56,6 @@
                                                                                :--hidden
                                                                                :--smart-case])}
                                                :buffers {:mappings {:i {:<c-q> (+ actions.delete_buffer
-                                                                                  actions.move_to_top)}}}}
-                                     :extensions {:workspaces {:keep_insert false}}})))})
+                                                                                  actions.move_to_top)}}}}})
+                   (telescope.load_extension :ui-select)
+                   (telescope.load_extension :workspaces)))})

@@ -1,16 +1,26 @@
-(import-macros {: pack} :Juliet.macros)
+(import-macros {: pack : key} :Juliet.macros)
 
 (pack :natecraddock/workspaces.nvim
       {:dependencies [:Shatur/neovim-session-manager
                       :nvim-telescope/telescope.nvim]
+       :keys [(key :<leader>sl ":Telescope workspaces<cr>"
+                   "Load workspace session")]
+       :lazy false
        :config (fn []
                  (let [workspaces (require :workspaces)]
                    (workspaces.setup {:hooks {:open_pre (fn []
                                                           (let [session-manager (require :session_manager)]
-                                                            (session-manager.save_current_session)))
-                                              :open (fn []
-                                                      (let [session-manager (require :session_manager)]
-                                                        (session-manager.load_current_dir_session)))}})
+                                                            (if (not= (vim.api.nvim_buf_get_name 0)
+                                                                      "")
+                                                                (session-manager.save_current_session)))
+                                                          true)
+                                              :open [(fn [_workspace
+                                                          path
+                                                          _state]
+                                                       (local command
+                                                              (.. ":cd " path
+                                                                  " | tabNext | :q | SessionManager load_current_dir_session"))
+                                                       (vim.cmd command))]}})
                    ((. (require :telescope) :load_extension) :workspaces)
                    (let [dirs (workspaces.get)
                          add-workspace (lambda [name path]

@@ -2,8 +2,8 @@
 
 (pack :Shatur/neovim-session-manager
       {:keys [(key :<leader>ss ":SessionManager save_current_session<cr>"
-                   "Save current session" {:silent false})
-              (key :<leader>sl ":Telescope workspaces<cr>" "Load workspace session")]
+                   "Save current session" {:silent false})]
+       :lazy false
        :config (fn []
                  (let [session-manager (require :session_manager)
                        config (require :session_manager.config)]
