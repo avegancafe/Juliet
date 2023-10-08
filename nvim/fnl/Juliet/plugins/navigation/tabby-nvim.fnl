@@ -1,7 +1,7 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :nanozuki/tabby.nvim
-      {:init (fn [] (tset vim.o :showtabline 2))
+      {:init (fn [] (tset vim.o :showtabline 1))
        :dependencies [:ribru17/bamboo.nvim]
        :lazy false
        :keys [(key :<tab> :gt "Next tab")
