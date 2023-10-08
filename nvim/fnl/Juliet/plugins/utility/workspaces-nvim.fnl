@@ -18,8 +18,12 @@
                                                           path
                                                           _state]
                                                        (local command
-                                                              (.. ":cd " path
-                                                                  " | tabNext | :q | SessionManager load_current_dir_session"))
+                                                            (match (vim.api.nvim_buf_get_name 0)
+                                                              "" (.. ":cd "
+                                                                     path
+                                                                     " | tabNext | :q | SessionManager load_current_dir_session")
+                                                              _ (.. ":cd " path
+                                                                    " | SessionManager load_current_dir_session")))
                                                        (vim.cmd command))]}})
                    ((. (require :telescope) :load_extension) :workspaces)
                    (let [dirs (workspaces.get)

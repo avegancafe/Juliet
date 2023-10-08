@@ -24,8 +24,8 @@
                                          ":SessionManager load_current_dir_session<cr>")
                        (dashboard.button :f " > Find file"
                                          ":Telescope find_files<cr>")
-                       (dashboard.button :c " > Config"
-                                         ":cd ~/.config/Juliet | :SessionManager load_current_dir_session<cr>")
+                       (dashboard.button :e " > Explore fs"
+                                         ":lua require('mini.files').open()<cr>")
                        (dashboard.button :s " > Open session"
                                          ":Telescope workspaces<cr>")])
                  (alpha.setup dashboard.config))})

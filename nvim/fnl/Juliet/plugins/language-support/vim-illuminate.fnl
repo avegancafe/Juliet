@@ -3,6 +3,6 @@
 (pack :RRethy/vim-illuminate
       {:config (fn []
                  (let [illuminate (require :illuminate)]
-                   (illuminate.configure {:filetypes_denylist [:dashboard
+                   (illuminate.configure {:filetypes_denylist [:alpha
                                                                :lspsagaoutline
-                                                               :NvimTree]})))})
+                                                               :minifiles]})))})
