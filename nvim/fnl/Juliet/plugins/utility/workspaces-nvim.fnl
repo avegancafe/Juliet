@@ -10,8 +10,7 @@
                  (let [workspaces (require :workspaces)]
                    (workspaces.setup {:hooks {:open_pre (fn []
                                                           (let [session-manager (require :session_manager)
-                                                                lines (require :tabby.feature.lines)
-                                                                tabby-tab (require :tabby.tab)]
+                                                                lines (require :tabby.feature.lines)]
                                                             (local raw-tabs
                                                                    ((. (lines.get_line)
                                                                        :tabs)))
@@ -21,7 +20,8 @@
                                                                                           "[No Name]")
                                                                                     (table.insert tabs
                                                                                                   tab))))
-                                                            (if (> (length tabs) 0)
+                                                            (if (> (length tabs)
+                                                                   0)
                                                                 (session-manager.save_current_session)))
                                                           true)
                                               :open [(fn [_workspace
