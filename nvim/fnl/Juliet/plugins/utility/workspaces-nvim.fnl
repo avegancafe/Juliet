@@ -7,36 +7,31 @@
                    "Load workspace session")]
        :lazy false
        :config (fn []
+                 (local session-manager (require :session_manager))
                  (let [workspaces (require :workspaces)]
                    (workspaces.setup {:hooks {:open_pre (fn []
-                                                          (let [session-manager (require :session_manager)
-                                                                lines (require :tabby.feature.lines)]
-                                                            (local raw-tabs
-                                                                   ((. (lines.get_line)
-                                                                       :tabs)))
-                                                            (local tabs [])
-                                                            (raw-tabs.foreach (fn [tab]
-                                                                                (if (not= (tab.name)
-                                                                                          "[No Name]")
-                                                                                    (table.insert tabs
-                                                                                                  tab))))
-                                                            (if (> (length tabs)
-                                                                   0)
-                                                                (session-manager.save_current_session)))
+                                                          (local lines
+                                                                 (require :tabby.feature.lines))
+                                                          (local raw-tabs
+                                                                 ((. (lines.get_line)
+                                                                     :tabs)))
+                                                          (local tabs [])
+                                                          (raw-tabs.foreach (fn [tab]
+                                                                              (if (not= (tab.name)
+                                                                                        "[No Name]")
+                                                                                  (table.insert tabs
+                                                                                                tab))))
+                                                          (if (> (length tabs)
+                                                                 0)
+                                                              (session-manager.save_current_session))
                                                           true)
-                                              :open [(fn [_workspace
-                                                          path
-                                                          _state]
+                                              :open [(fn []
                                                        (local command
-                                                              (match (vim.api.nvim_buf_get_name 0)
-                                                                "" (.. ":cd "
-                                                                       path
-                                                                       " | tabNext | :q | SessionManager load_current_dir_session")
-                                                                _ (.. ":cd "
-                                                                      path
-                                                                      " | SessionManager load_current_dir_session")))
+                                                              (if (= (vim.api.nvim_buf_get_name 0)
+                                                                     "")
+                                                                  (.. "tabNext | :q | SessionManager load_current_dir_session")
+                                                                  (.. "SessionManager load_current_dir_session")))
                                                        (vim.cmd command))]}})
-                   ((. (require :telescope) :load_extension) :workspaces)
                    (let [dirs (workspaces.get)
                          add-workspace (lambda [name path]
                                          (if (not (accumulate [found false _ dir (ipairs dirs)]
