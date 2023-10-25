@@ -17,6 +17,12 @@
                                         {:fg colors.grey})
                    (vim.api.nvim_set_hl 0 :TelescopePreviewBorder
                                         {:fg colors.grey})
+
+                   (vim.api.nvim_set_hl 0 :MiniPickBorder
+                                        {:fg colors.grey})
+                   (vim.api.nvim_set_hl 0 :MiniPickPrompt
+                                        {:fg colors.grey})
+
                    (telescope.setup {:defaults {:mappings {:i {:<c-j> actions.move_selection_next
                                                                :<c-k> actions.move_selection_previous
                                                                :<esc> actions.close
