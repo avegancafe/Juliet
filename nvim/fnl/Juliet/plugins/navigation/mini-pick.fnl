@@ -9,7 +9,7 @@
                               (f.close)
                               (p.registry.files)))
                    "Fuzzy find a file")
-              (key :<c-b> ":Telescope buffers<cr>")
+              (key :<c-b> ":Pick buffers<cr>")
               "Fuzzy list buffers"]
        :dependencies [:natecraddock/workspaces.nvim]
        :config (fn []
