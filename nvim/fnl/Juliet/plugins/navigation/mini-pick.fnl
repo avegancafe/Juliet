@@ -16,4 +16,5 @@
                  (let [MiniPick (require :mini.pick)]
                    (MiniPick.setup {:mappings {:choose :<c-b>
                                                :choose_in_tabpage :<cr>
-                                               :choose_marked :<c-cr>}})))})
+                                               :choose_marked :<c-cr>
+                                               :paste :<c-r>}})))})

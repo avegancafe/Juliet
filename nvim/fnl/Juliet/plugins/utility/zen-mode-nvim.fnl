@@ -9,7 +9,8 @@
                      (set vim.o.foldenable true)
                      (set vim.o.number true)
                      (set vim.o.fillchars
-                          "eob: ,fold: ,foldopen:,foldsep: ,foldclose:"))
+                          "eob: ,fold: ,foldopen:v,foldsep: ,foldclose:>")
+                     (set vim.o.signcolumn :yes))
                    "Enter zen mode")]
        :config true
        :opts {:window {:backdrop 1

@@ -28,7 +28,8 @@
                (set vim.o.foldlevel 99)
                (set vim.o.foldenable true)
                (set vim.o.fillchars
-                    "eob: ,fold: ,foldopen:,foldsep: ,foldclose:"))
+                    "eob: ,fold: ,foldopen:v,foldsep: ,foldclose:>")
+               (set vim.o.signcolumn :yes))
        :config true
        :opts {:provider_selector (fn []
                                    [:treesitter :indent])}})
