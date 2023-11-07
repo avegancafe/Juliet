@@ -18,6 +18,7 @@
 	su = submodule update --recursive --init
 	ape = "!git commit -C @ --amend && git push -f"
 	gh-clone = "!sh -c 'git clone git@github.com:$1' - "
+	hotfix = ! git switch --create hotfix/$(git branch | grep \\* | sed -e s/^\\*[[:space:]]// | tr -d \\n)
 [push]
 	default = current
 	autoSetupRemote = true
