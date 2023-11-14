@@ -1,6 +1,7 @@
 from kitty.fast_data_types import Screen
 from kitty.tab_bar import DrawData, ExtraData, TabBarData, draw_title
 
+
 def draw_tab(
     draw_data: DrawData, screen: Screen, tab: TabBarData,
     before: int, max_title_length: int, index: int, is_last: bool,
@@ -11,7 +12,7 @@ def draw_tab(
     left_sep, right_sep = ('▌', ' ')
 
     def draw_sep(which: str) -> None:
-        screen.cursor.bg = draw_data.default_bg
+        screen.cursor.bg = draw_data.default_bg.rgb
         screen.cursor.fg = orig_bg
         screen.draw(which)
         screen.cursor.bg = orig_bg
