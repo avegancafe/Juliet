@@ -76,6 +76,10 @@ setup_hammerspoon() {
   [[ ! -d ~/.hammerspoon ]] && ln -sfv ~/.config/Juliet/.hammerspoon ~
 }
 
+setup_ripgrep() {
+  [[ ! -d $HOME/.config/ripgrep ]] && ln -sfv ~/.config/Juliet/ripgrep ~/.config
+}
+
 setup_git
 setup_dependencies
 setup_fzf
@@ -87,5 +91,6 @@ setup_psql
 setup_lua
 setup_kitty
 setup_hammerspoon
+setup_ripgrep
 
 setup_other
