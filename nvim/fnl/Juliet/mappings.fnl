@@ -86,8 +86,10 @@
 (tset _G :OpenRelayMR
       (fn []
         (vim.api.nvim_exec "!git mr --draft" true)))
+
 (vim.cmd ":command! OpenRelayMR call v:lua.OpenRelayMR()")
-(vim.keymap.set :n :<leader>gmr ":OpenRelayMR<cr>" {:desc "Open draft MR in relay repo"})
+(vim.keymap.set :n :<leader>gmr ":OpenRelayMR<cr>"
+                {:desc "Open draft MR in relay repo"})
 
 (tset _G :IsolateBuffer
       (fn []
@@ -120,6 +122,12 @@
 (vim.cmd ":command! ReloadConfig call v:lua.ReloadConfig()")
 
 (vim.cmd ":command! FixWhitespace s/\\s*$//g | noh")
+
+(tset _G :ReopenLastBuffer
+      (fn []
+        (vim.cmd (.. "tabedit " (vim.fn.expand "#")))))
+(vim.cmd ":command! ReopenLastBuffer call v:lua.ReopenLastBuffer()")
+(vim.keymap.set :n :<leader>fl ":ReopenLastBuffer<cr>")
 
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
