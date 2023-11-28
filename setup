@@ -80,6 +80,10 @@ setup_ripgrep() {
   [[ ! -d $HOME/.config/ripgrep ]] && ln -sfv ~/.config/Juliet/ripgrep ~/.config
 }
 
+setup_workspaces() {
+  [[ ! -f ~/.workspaces ]] && ln -sfv ~/.config/Juliet/.workspaces ~
+}
+
 setup_git
 setup_dependencies
 setup_fzf
@@ -90,6 +94,7 @@ setup_gpg
 setup_psql
 setup_lua
 setup_kitty
+setup_workspaces
 setup_hammerspoon
 setup_ripgrep
 
