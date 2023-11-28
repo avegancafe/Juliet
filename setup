@@ -25,7 +25,12 @@ setup_dependencies() {
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
-  brew bundle --file ~/.config/Juliet/Brewfile
+  if ! command -v gum &> /dev/null; then
+    brew install gum
+  fi
+  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || $(gum confirm "Would you like to brew bundle?")) ]] ; then
+    brew bundle --file ~/.config/Juliet/Brewfile
+  fi
 
   if ! command -v cargo &> /dev/null; then
     rustup-init
@@ -53,7 +58,6 @@ setup_vim() {
 }
 
 setup_fish() {
-  sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
   mkdir -p ~/.config/fish
   [[ ! -f ~/.config/fish/config.fish ]] && ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish
 
@@ -61,7 +65,10 @@ setup_fish() {
   [[ ! -f ~/.config/fish/functions/fish_user_key_bindings.fish ]] && ln -sfv ~/.config/Juliet/fish/functions/fish_user_key_bindings.fish ~/.config/fish/functions
   [[ ! -f ~/.config/fish/functions/g.fish ]] && ln -sfv ~/.config/Juliet/fish/functions/g.fish ~/.config/fish/functions
   [[ ! -f ~/.config/starship.toml ]] && ln -sfv ~/.config/Juliet/starship.toml ~/.config
-  chsh -s /opt/homebrew/bin/fish `whoami`
+  if [[ ("$1" != "-n" && "$1" != "--no" ) && ("$1" == "-y" || "$1" == "--yes" || $(gum confirm "Would you like to do a full fish install?")) ]]; then
+    sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
+    chsh -s /opt/homebrew/bin/fish `whoami`
+  fi
 }
 
 setup_gpg() {
@@ -79,7 +86,9 @@ setup_lua() {
 }
 
 setup_kitty() {
-  curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+  if ! command -v kitty &> /dev/null; then
+    curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+  fi
   [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin
 
   link_dir kitty ~/.config
@@ -93,13 +102,13 @@ setup_other() {
 rlog "Setting up git..."
 setup_git
 rlog "Setting up external dependencies..."
-setup_dependencies
+setup_dependencies $1
 log "Installing fzf..."
 setup_fzf
 log "Installing neovim..."
 setup_vim
 log "Installing fish..."
-setup_fish
+setup_fish $1
 log "Installing gpg..."
 setup_gpg
 log "Installing stylua..."
