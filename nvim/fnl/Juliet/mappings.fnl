@@ -43,7 +43,8 @@
 (tset _G :GitlabOpen (fn []
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
                                                                     ":~:."))
-                             command (.. "fish -c 'glo -c " filepath "'")]
+                             row (unpack (vim.api.nvim_win_get_cursor 0))
+                             command (.. "fish -c 'glo -c " filepath "#L" row "'")]
                          (os.capture command)
                          (vim.cmd :mode))))
 
@@ -126,6 +127,7 @@
 (tset _G :ReopenLastBuffer
       (fn []
         (vim.cmd (.. "tabedit " (vim.fn.expand "#")))))
+
 (vim.cmd ":command! ReopenLastBuffer call v:lua.ReopenLastBuffer()")
 (vim.keymap.set :n :<leader>fl ":ReopenLastBuffer<cr>")
 
