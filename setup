@@ -25,10 +25,12 @@ setup_dependencies() {
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
   fi
+
   if ! command -v gum &> /dev/null; then
     brew install gum
   fi
-  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || $(gum confirm "Would you like to brew bundle?")) ]] ; then
+
+  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to brew bundle?") || $? == 0)) ]] ; then
     brew bundle --file ~/.config/Juliet/Brewfile
   fi
 
@@ -65,7 +67,7 @@ setup_fish() {
   [[ ! -f ~/.config/fish/functions/fish_user_key_bindings.fish ]] && ln -sfv ~/.config/Juliet/fish/functions/fish_user_key_bindings.fish ~/.config/fish/functions
   [[ ! -f ~/.config/fish/functions/g.fish ]] && ln -sfv ~/.config/Juliet/fish/functions/g.fish ~/.config/fish/functions
   [[ ! -f ~/.config/starship.toml ]] && ln -sfv ~/.config/Juliet/starship.toml ~/.config
-  if [[ ("$1" != "-n" && "$1" != "--no" ) && ("$1" == "-y" || "$1" == "--yes" || $(gum confirm "Would you like to do a full fish install?")) ]]; then
+  if [[ ("$1" != "-n" && "$1" != "--no" ) && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to do a full fish install?") || $? == 0)) ]]; then
     sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
     chsh -s /opt/homebrew/bin/fish `whoami`
   fi
