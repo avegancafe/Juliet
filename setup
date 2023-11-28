@@ -2,33 +2,54 @@
 
 source ~/.config/Juliet/_util.bash
 
+link_file() {
+  DESTINATION=${2:-~}
+  [[ ! -f $DESTINATION/$1 ]] && ln -sfv ~/.config/Juliet/$1 $DESTINATION
+}
+
+link_dir() {
+  DESTINATION=${2:-~}
+  [[ ! -d $DESTINATION/$1 ]] && ln -sfv ~/.config/Juliet/$1 $DESTINATION
+}
+
+
 setup_git() {
-  [[ ! -f ~/.gitconfig ]] && ln -sfv ~/.config/Juliet/.gitconfig ~
+  link_file .gitconfig
+  link_file .gitmessage
   [[ ! -f ~/.gitconfig__local ]] && cp ~/.config/Juliet/.gitconfig__local ~
-  [[ ! -f ~/.gitmessage ]] && ln -sfv ~/.config/Juliet/.gitmessage ~
 }
 
 setup_dependencies() {
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+  if ! command -v brew &> /dev/null; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
   brew bundle --file ~/.config/Juliet/Brewfile
-  rustup-init
-  [[ ! -d ~/.config/karabiner ]] && ln -sfv ~/.config/Juliet/karabiner ~/.config
-  [[ ! -f ~/.prettierrc ]] && ln -sfv ~/.config/Juliet/.prettierrc ~
+
+  if ! command -v cargo &> /dev/null; then
+    rustup-init
+  fi
+
+  link_dir .hammerspoon
+  link_dir karabiner ~/.config
+  link_dir ripgrep ~/.config
+  link_file .prettierrc
+  link_file .fdignore
+  link_file .workspaces
+  link_file .psqlrc
+  link_file .pgclirc
 }
 
 setup_fzf() {
-  /opt/homebrew/opt/fzf/install
-}
-
-setup_fd() {
-  [[ ! -f ~/.fdignore ]] && ln -sfv ~/.config/Juliet/.fdignore ~
+  if ! command -v fzf &> /dev/null; then
+    /opt/homebrew/opt/fzf/install
+  fi
 }
 
 setup_vim() {
-  [[ ! -d ~/.config/nvim ]] && ln -sfv ~/.config/Juliet/nvim ~/.config/nvim
-  [[ ! -f ~/.stylua.toml ]] && ln -sfv ~/.config/Juliet/.stylua.toml ~
+  link_dir nvim ~/.config
+  link_file .stylua.toml
 }
 
 setup_fish() {
@@ -51,20 +72,17 @@ setup_gpg() {
   fi
 }
 
-setup_psql() {
-  [[ ! -f ~/.psqlrc ]] && ln -sfv ~/.config/Juliet/.psqlrc ~
-  [[ ! -f ~/.pgclirc ]] && ln -sfv ~/.config/Juliet/.pgclirc ~
-}
-
 setup_lua() {
-  cargo install stylua
+  if ! command -v stylua &> /dev/null; then
+    cargo install stylua
+  fi
 }
 
 setup_kitty() {
   curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
   [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin
 
-  [[ ! -d ~/.config/kitty ]] && ln -sfv ~/.config/Juliet/kitty ~/.config
+  link_dir kitty ~/.config
   [[ ! -f $HOME/Library/Fonts/3270-nerdfont-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/3270-nerdfont-complete.ttf $HOME/Library/Fonts/
 }
 
@@ -72,30 +90,24 @@ setup_other() {
   touch ~/.hushlogin
 }
 
-setup_hammerspoon() {
-  [[ ! -d ~/.hammerspoon ]] && ln -sfv ~/.config/Juliet/.hammerspoon ~
-}
-
-setup_ripgrep() {
-  [[ ! -d $HOME/.config/ripgrep ]] && ln -sfv ~/.config/Juliet/ripgrep ~/.config
-}
-
-setup_workspaces() {
-  [[ ! -f ~/.workspaces ]] && ln -sfv ~/.config/Juliet/.workspaces ~
-}
-
+rlog "Setting up git..."
 setup_git
+rlog "Setting up external dependencies..."
 setup_dependencies
+log "Installing fzf..."
 setup_fzf
-setup_fd
+log "Installing neovim..."
 setup_vim
+log "Installing fish..."
 setup_fish
+log "Installing gpg..."
 setup_gpg
-setup_psql
+log "Installing stylua..."
 setup_lua
+log "Installing kitty..."
 setup_kitty
-setup_workspaces
-setup_hammerspoon
-setup_ripgrep
 
+log "Silencing logins..."
 setup_other
+
+log "Done!"
