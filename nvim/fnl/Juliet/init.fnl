@@ -46,7 +46,6 @@
   au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
   au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
   au BufRead,BufNewFile *.md setlocal textwidth=80
-  au FileType fish setlocal textwidth=79
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
   autocmd BufNewFile,BufRead Procfile set filetype=sh
 augroup END
