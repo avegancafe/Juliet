@@ -73,7 +73,8 @@
                 {:name :tailwindcss}
                 {:name :vtsls}
                 {:name :yamlls}
-                {:name :pylsp}])
+                {:name :pylsp}
+                {:name :terraformls}])
 
 (mason-lspconfig.setup {:ensure_installed (icollect [_ {: name} (ipairs servers)]
                                             name)})
