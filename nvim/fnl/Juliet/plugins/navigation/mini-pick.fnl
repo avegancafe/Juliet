@@ -3,11 +3,7 @@
 (pack :echasnovski/mini.pick
       {:version false
        :lazy false
-       :keys [(key :<c-p> (fn []
-                            (let [f (require :mini.files)
-                                  p (require :mini.pick)]
-                              (f.close)
-                              (p.registry.files)))
+       :keys [(key :<c-p> ":Pick files<cr>"
                    "Fuzzy find a file")
               (key :<c-b> ":Pick buffers<cr>")
               "Fuzzy list buffers"]
