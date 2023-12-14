@@ -44,7 +44,8 @@
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
                                                                     ":~:."))
                              row (unpack (vim.api.nvim_win_get_cursor 0))
-                             command (.. "fish -c 'glo -c " filepath "#L" row "'")]
+                             command (.. "fish -c 'glo -c " filepath "#L" row
+                                         "'")]
                          (os.capture command)
                          (vim.cmd :mode))))
 
@@ -79,8 +80,12 @@
 (tset _G :EditChangedFiles
       (fn []
         (let [files-output (vim.api.nvim_exec :!changed_files true)
-              changed-files (. (vim.split files-output "\n") 3)]
-          (vim.cmd (.. "args " changed-files)))))
+              changed-files (icollect [_ raw-file (ipairs (vim.split (. (vim.split files-output
+                                                                                   "\n")
+                                                                        3)
+                                                                     "  "))]
+                              (string.gsub raw-file "%s+" ""))]
+          (each [_ file (ipairs changed-files)] (vim.cmd (.. "tabedit " file))))))
 
 (vim.cmd ":command! EditChangedFiles call v:lua.EditChangedFiles()")
 
