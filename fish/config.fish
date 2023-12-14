@@ -21,6 +21,7 @@ set -gx PATH "$HOME/.config/Juliet/bin" $PATH
 set -gx PATH "$HOME/.config/Juliet/bin/git-hoard/bin" $PATH
 set -gx PATH /usr/local/games/bin $PATH
 set -gx RIPGREP_CONFIG_PATH "$HOME/.config/ripgrep/rc"
+set -gx XDG_CONFIG_HOME $HOME/.config
 
 set -gx FOUNDRY_FMT_LINE_LENGTH 100
 set -gx FOUNDRY_FMT_TAB_WIDTH 2
