@@ -1,0 +1,28 @@
+{
+    "description": "Caps Lock Override",
+    "manipulators": [
+        {
+            "conditions": [
+                {
+                    "name": "caps_lock pressed",
+                    "type": "variable_if",
+                    "value": 1
+                }
+            ],
+            "from": {
+                "key_code": "backslash",
+                "modifiers": {
+                    "optional": [
+                        "any"
+                    ]
+                }
+            },
+            "to": [
+                {
+                    "key_code": "caps_lock"
+                }
+            ],
+            "type": "basic"
+        }
+    ]
+}
