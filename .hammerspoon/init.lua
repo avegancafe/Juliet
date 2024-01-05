@@ -15,3 +15,7 @@ end
 
 hs.hotkey.bind({}, 'f14', open_terminal)
 hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
+
+hs.hotkey.bind({}, 'f15', function()
+	hs.caffeinate.lockScreen()
+end)
