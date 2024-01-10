@@ -361,8 +361,7 @@ $(cat ~/.workspaces__local)"
 
     for dir in (string split '\n' "$workspaces");
         if test -n "$dir"
-            set fin "$fin
-$(bash -c "ls -1d $dir/*/")"
+            set fin "$fin$(bash -c "ls -1d $dir/*/")"
         end
     end
 
