@@ -1,6 +1,7 @@
 (set vim.g.mapleader " ")
 (set vim.opt.encoding :UTF-8)
 (vim.cmd "set noswapfile")
+(vim.cmd "set ignorecase")
 (set vim.opt.switchbuf :uselast)
 (set vim.opt.diffopt (+ vim.opt.diffopt "linematch:60"))
 (vim.cmd "augroup quickfix
