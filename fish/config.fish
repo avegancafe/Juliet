@@ -368,7 +368,7 @@ $(cat ~/.workspaces__local)"
     set -l selection (echo "$fin" | gum filter --limit 1 --height 10 --placeholder "Which directory would you like to cd to?")
 
     if test -z "$selection"
-        log Exiting...
+        error Exiting...
         return 1
     end
 
