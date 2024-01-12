@@ -33,6 +33,25 @@
                  (tabline.set (fn [line]
                                 (var i 0)
                                 {1 ((. (line.tabs) :foreach) (fn [tab]
+                                                               (local buffer
+                                                                      (vim.api.nvim_buf_get_name (. ((. (tab.current_win)
+                                                                                                        :buf))
+                                                                                                    :id)))
+                                                               (local parse-path
+                                                                      (fn [full-path]
+                                                                        (string.match full-path
+                                                                                      "([%a.]+)$")))
+                                                               (local parse-index
+                                                                      (fn [full-path]
+                                                                        (string.gsub (string.match full-path
+                                                                                                   "([%a-_.]+/[%a.]+)$")
+                                                                                     :index.
+                                                                                     :i.)))
+                                                               (local buffer-name
+                                                                      (if (string.match buffer
+                                                                                        "index.[tj]sx?$")
+                                                                          (parse-index buffer)
+                                                                          (parse-path buffer)))
                                                                (let [hl (or (and (tab.is_current)
                                                                                  theme.current_tab)
                                                                             theme.tab)]
@@ -41,7 +60,7 @@
                                                                                        theme.sep)
                                                                                   theme.fill)
                                                                               theme.head)
-                                                                  2 (tab.name)
+                                                                  2 buffer-name
                                                                   3 (line.sep " "
                                                                               theme.tab
                                                                               theme.tab)
