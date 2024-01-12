@@ -40,7 +40,7 @@
                                                                (local parse-path
                                                                       (fn [full-path]
                                                                         (string.match full-path
-                                                                                      "([%a.]+)$")))
+                                                                                      "([%a-_%.]*)$")))
                                                                (local parse-index
                                                                       (fn [full-path]
                                                                         (string.gsub (string.match full-path
