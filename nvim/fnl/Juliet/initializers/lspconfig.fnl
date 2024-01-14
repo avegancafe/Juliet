@@ -74,7 +74,8 @@
                 {:name :vtsls}
                 {:name :yamlls}
                 {:name :pylsp}
-                {:name :terraformls}])
+                {:name :terraformls}
+                {:name :rust_analyzer}])
 
 (mason-lspconfig.setup {:ensure_installed (icollect [_ {: name} (ipairs servers)]
                                             name)})
