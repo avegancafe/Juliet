@@ -42,10 +42,10 @@ function clone
         return 1
     end
 
-    set -l provider  (gum choose --height 15 --header "Which source are you cloning from?" gitlab.dev github)
+    set -l provider  (gum choose --height 15 --header "Which source are you cloning from?" github gitlab)
     set -l base_url ""
-    if test "$provider" = gitlab.dev
-        set base_url "ssh://git@gitlab.dev:6767/"
+    if test "$provider" = gitlab
+        set base_url "ssh://git@gitlab.com/"
     else if test "$provider" = github
         set base_url "git@github.com:"
     else if test -n "$provider"
