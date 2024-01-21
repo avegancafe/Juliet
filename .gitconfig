@@ -51,6 +51,7 @@
 	prune = true
 [user]
 	name = Kyle Holzinger
+	email = kyle@j2health.com
 [include]
 	path = ~/.gitconfig__local
 [difftool "sourcetree"]
