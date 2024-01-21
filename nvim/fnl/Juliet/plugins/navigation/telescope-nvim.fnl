@@ -9,19 +9,7 @@
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.providers.telescope)
-                       telescope (require :telescope)
-                       colors (require :bamboo.colors)]
-                   (vim.api.nvim_set_hl 0 :TelescopeResultsBorder
-                                        {:fg colors.grey})
-                   (vim.api.nvim_set_hl 0 :TelescopePromptBorder
-                                        {:fg colors.grey})
-                   (vim.api.nvim_set_hl 0 :TelescopePreviewBorder
-                                        {:fg colors.grey})
-
-                   (vim.api.nvim_set_hl 0 :MiniPickBorder
-                                        {:fg colors.grey})
-                   (vim.api.nvim_set_hl 0 :MiniPickPrompt
-                                        {:fg colors.grey})
+                       telescope (require :telescope)]
 
                    (telescope.setup {:defaults {:mappings {:i {:<c-j> actions.move_selection_next
                                                                :<c-k> actions.move_selection_previous

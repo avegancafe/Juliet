@@ -11,25 +11,12 @@
               (key :<leader><tab>o ":tabonly<cr>" "Isolate tab")]
        :config (fn []
                  (local tabline (require :tabby.tabline))
-                 (local colors (require :bamboo.colors))
-                 (local theme
-                        {:current_tab :TabLineSel
-                         :fill :TabLineFill
-                         :head :TabLine
-                         :tab :TabLine
-                         :tail :TabLine
-                         :win :TabLine
-                         :sep :TabLineSep
-                         :logo :TabLineLogo})
-                 (vim.api.nvim_set_hl 0 theme.logo
-                                      {:fg colors.red :bg colors.black})
-                 (vim.api.nvim_set_hl 0 theme.sep {:bg colors.green})
-                 (vim.api.nvim_set_hl 0 theme.head
-                                      {:bg colors.white :fg colors.white})
-                 (vim.api.nvim_set_hl 0 theme.current_tab {:bg colors.bg0})
-                 (vim.api.nvim_set_hl 0 theme.tab {:fg colors.grey})
-                 (vim.api.nvim_set_hl 0 theme.fill
-                                      {:fg colors.black :bg colors.black})
+                 (local theme {:current_tab :TabLineSel
+                               :fill :TabLineFill
+                               :head :TabLine
+                               :tab :TabLine
+                               :win :TabLine
+                               :sep :TabLineSep})
                  (tabline.set (fn [line]
                                 (var i 0)
                                 {1 ((. (line.tabs) :foreach) (fn [tab]
