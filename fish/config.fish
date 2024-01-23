@@ -30,6 +30,14 @@ set -gx FOUNDRY_FMT_QUOTE_STYLE single
 
 set -gx TERM xterm-256color
 
+set -l RESET_CODE (tput sgr0)
+set -gx LESS_TERMCAP_md (tput setaf 2)
+set -gx LESS_TERMCAP_me $RESET_CODE
+set -gx LESS_TERMCAP_us (tput setaf 4)
+set -gx LESS_TERMCAP_ue $RESET_CODE
+set -gx LESS_TERMCAP_so (tput setaf 1)
+set -gx LESS_TERMCAP_se $RESET_CODE
+
 source ~/.config/Juliet/fish/_util.fish
 
 function current-branch
