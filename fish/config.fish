@@ -40,6 +40,14 @@ set -gx LESS_TERMCAP_se $RESET_CODE
 
 source ~/.config/Juliet/fish/_util.fish
 
+function cat
+    bat $argv
+end
+
+function gdiff
+    git diff --name-only --relative --diff-filter=d | xargs bat --diff
+end
+
 function current-branch
     git branch | grep "\*" | sed -e "s/^\*[[:space:]]//" | tr -d '\n'
 end
