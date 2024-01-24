@@ -18,7 +18,7 @@
                       [(dashboard.button :s " > Open session"
                                          ":Telescope workspaces<cr>")
                        (dashboard.button :e " > Explore fs"
-                                         ":lua require('mini.files').open()<cr>")
+                                         ":lua require('oil').open_float()<cr>")
                        (dashboard.button :l " > Load session for current dir"
                                          ":SessionManager load_current_dir_session<cr>")
                        (dashboard.button :f " > Find file" ":Pick files<cr>")])
