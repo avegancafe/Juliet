@@ -1,8 +1,10 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :NeogitOrg/neogit
-      {:config true
-       :opts {:disable_commit_confirmation true :kind :split}
+      {:opts {:disable_commit_confirmation true
+              :kind :vsplit
+              :auto_show_console false
+              :graph_style :unicode}
        :dependencies [:nvim-lua/plenary.nvim :nvim-telescope/telescope.nvim]
        :lazy false
        :keys [(key :<leader>g
