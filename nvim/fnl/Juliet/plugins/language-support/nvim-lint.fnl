@@ -7,7 +7,8 @@
                                                  {:go [:golangcilint]
                                                   :javascript [:eslint]
                                                   :typescript [:eslint]
-                                                  :typescriptreact [:eslint]})
+                                                  :typescriptreact [:eslint]
+                                                  :python []})
                                            (tset golangcilint :append_fname
                                                  true)
                                            (tset golangcilint :args

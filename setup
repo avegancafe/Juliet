@@ -4,6 +4,7 @@ source ~/.config/Juliet/_util.bash
 
 link_file() {
   DESTINATION=${2:-~}
+  test -n "$DEBUG" && step "Linking $1 to $DESTINATION/$1..."
   mkdir -p $DESTINATION
 
   [[ ! -f $DESTINATION/$1 ]] && ln -sfv ~/.config/Juliet/$1 $DESTINATION
@@ -45,6 +46,7 @@ setup_dependencies() {
   link_dir ripgrep ~/.config
   link_file tmux.conf ~/.config/tmux
   link_file .prettierrc
+  link_file .curl-format.txt
   link_file .fdignore
   link_file .workspaces
   link_file .psqlrc
