@@ -86,9 +86,13 @@ setup_gpg() {
   fi
 }
 
-setup_lua() {
+setup_rust() {
   if ! command -v stylua &> /dev/null; then
     cargo install stylua
+  fi
+
+  if ! command -v silicon &> /dev/null; then
+    cargo install silicon
   fi
 }
 
@@ -118,8 +122,8 @@ log "Installing fish..."
 setup_fish $1
 log "Installing gpg..."
 setup_gpg
-log "Installing stylua..."
-setup_lua
+log "Installing rust dependencies..."
+setup_rust
 log "Installing kitty..."
 setup_kitty
 
