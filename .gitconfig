@@ -16,7 +16,7 @@
 	down = pull
 	up = push
 	su = submodule update --recursive --init
-	ape = "!git commit -C @ --amend && git push -f"
+	ape = "!git commit -C @ --amend && git push --force-with-lease"
 	gh-clone = "!sh -c 'git clone git@github.com:$1' - "
 	hotfix = ! git switch --create hotfix/$(git branch | grep \\* | sed -e s/^\\*[[:space:]]// | tr -d \\n)
 [push]
