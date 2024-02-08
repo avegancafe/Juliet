@@ -10,7 +10,7 @@
        :dependencies [:natecraddock/workspaces.nvim]
        :config (fn []
                  (let [MiniPick (require :mini.pick)]
-                   (MiniPick.setup {:mappings {:choose :<c-b>
+                   (MiniPick.setup {:mappings {:choose :<c-o>
                                                :choose_in_tabpage :<cr>
                                                :choose_marked :<c-cr>
                                                :paste :<c-r>}})))})
