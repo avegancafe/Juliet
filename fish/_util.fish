@@ -6,6 +6,12 @@ function log
   printf (tput setaf 4)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" "$argv"
 end
 
+function debuglog
+  if test -n "$DEBUG"
+    log $argv
+  end
+end
+
 function error
   printf (tput setaf 1)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" "$argv"
 end

@@ -375,20 +375,21 @@ $(cat ~/.workspaces__local)"
         set fin "$dirs"
     end
 
-    for dir in (string split '\n' "$workspaces");
+    for dir in (string split ' ' "$workspaces");
         if test -n "$dir"
-            set fin "$fin$(bash -c "ls -1d $dir/*/")"
+            set fin "$fin"\n"$(bash -c "ls -1d $dir/*/")"
         end
     end
 
-    set -l selection (echo "$fin" | gum filter --limit 1 --height 10 --placeholder "Which directory would you like to cd to?")
+
+    set -l selection (echo "$fin" | grep -v '^$' | gum filter --limit 1 --height 10 --placeholder "Which directory would you like to cd to?")
 
     if test -z "$selection"
         error Exiting...
         return 1
     end
 
-    log "cd-ing to $selection..."
+    debuglog "cd-ing to $selection..."
     cd $selection
 end
 
