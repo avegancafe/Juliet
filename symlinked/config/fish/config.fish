@@ -38,7 +38,7 @@ set -gx LESS_TERMCAP_ue $RESET_CODE
 set -gx LESS_TERMCAP_so (tput setaf 1)
 set -gx LESS_TERMCAP_se $RESET_CODE
 
-source ~/.config/Juliet/fish/_util.fish
+source ~/.config/fish/_util.fish
 
 function cat
     bat $argv

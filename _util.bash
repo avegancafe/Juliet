@@ -1,11 +1,17 @@
 RESET_CODE=`tput sgr0`
-# General logging function
+
 log() {
   BLUE=`tput setaf 4`
   printf "$BLUE==>$RESET_CODE$(tput bold) %s$RESET_CODE\n" "$1"
 }
 
-# Logging function to call if interacting with an external service
+debuglog() {
+  if [[ -n $DEBUG ]]; then
+    log "$1"
+  fi
+}
+
+# log indicating network will be used
 rlog() {
   GREEN=`tput setaf 2`
   printf "$GREEN==>$RESET_CODE$(tput bold) %s$RESET_CODE\n" "$1"
@@ -15,11 +21,6 @@ notice() {
   printf "$(tput setaf 13)NOTICE: %s$(tput sgr0)\n" "$1"
 }
 
-step() {
-  printf "$(tput setaf 4)==>$(tput sgr0)$(tput bold) %s$(tput sgr0)\n" "$1"
-}
-
-# Logging function to call with warning affordance
 warn() {
   YELLOW=`tput setaf 3`
   printf "$YELLOW==>$RESET_CODE$(tput bold) %s$RESET_CODE\n" "$1"

@@ -575,10 +575,6 @@
           }
         }
       },
-      "tomanthony/brews/itermocil": {
-        "version": "0.2.1",
-        "bottle": false
-      },
       "ripgrep": {
         "version": "14.1.0",
         "bottle": {
@@ -622,10 +618,6 @@
             }
           }
         }
-      },
-      "keyboard-clacker/brews/itermocil": {
-        "version": "0.3.0",
-        "bottle": false
       },
       "aom": {
         "version": "3.8.1",
