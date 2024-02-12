@@ -1,7 +1,7 @@
 (import-macros {: pack} :Juliet.macros)
 
-(pack :avegancafe/code-shot.nvim
-      {:dependencies [:Aloxaf/silicon :avegancafe/core.nvim]
+(pack :niuiic/code-shot.nvim
+      {:dependencies [:Aloxaf/silicon :niuiic/core.nvim]
        :init (fn []
                (vim.keymap.set :v :<leader>bs
                                "<cmd>lua require('code-shot').shot()<cr>"
@@ -9,8 +9,7 @@
        :config (fn []
                  (local codeshot (require :code-shot))
                  (codeshot.setup {:options (fn [select-area]
-                                             (print "getting custom opts")
                                              [:-f
                                               "Iosevka Term"
                                               :--line-offset
-                                              select-area.s_start.row])}))})
+                                              select-area.start_line])}))})
