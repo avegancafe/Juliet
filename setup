@@ -2,20 +2,6 @@
 
 source ~/.config/Juliet/_util.bash
 
-link_file() {
-  DESTINATION=${2:-~}
-  debuglog "Linking $1 to $DESTINATION/$1..."
-  mkdir -p $DESTINATION
-
-  [[ ! -f $DESTINATION/$1 ]] && ln -sfv ~/.config/Juliet/$1 $DESTINATION
-}
-
-link_dir() {
-  DESTINATION=${2:-~}
-  [[ ! -d $DESTINATION/$1 ]] && ln -sfv ~/.config/Juliet/$1 $DESTINATION
-}
-
-
 setup_git() {
   [[ ! -f ~/.gitconfig__local ]] && cp ~/.config/Juliet/.gitconfig__local ~
 }
@@ -50,19 +36,9 @@ setup_fzf() {
   fi
 }
 
-setup_vim() {
-  link_dir nvim ~/.config
-  link_file .stylua.toml
-}
-
 setup_fish() {
   mkdir -p ~/.config/fish
-  [[ ! -f ~/.config/fish/config.fish ]] && ln -sfv ~/.config/Juliet/fish/config.fish ~/.config/fish
 
-  mkdir -p ~/.config/fish/functions
-  [[ ! -f ~/.config/fish/functions/fish_user_key_bindings.fish ]] && ln -sfv ~/.config/Juliet/fish/functions/fish_user_key_bindings.fish ~/.config/fish/functions
-  [[ ! -f ~/.config/fish/functions/g.fish ]] && ln -sfv ~/.config/Juliet/fish/functions/g.fish ~/.config/fish/functions
-  [[ ! -f ~/.config/starship.toml ]] && ln -sfv ~/.config/Juliet/starship.toml ~/.config
   if [[ ("$1" != "-n" && "$1" != "--no" ) && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to do a full fish install?") || $? == 0)) ]]; then
     sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
     chsh -s /opt/homebrew/bin/fish `whoami`
@@ -93,7 +69,6 @@ setup_kitty() {
   fi
   [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin
 
-  link_dir kitty ~/.config
   [[ ! -f $HOME/Library/Fonts/3270-nerdfont-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/3270-nerdfont-complete.ttf $HOME/Library/Fonts/
 }
 
@@ -107,8 +82,6 @@ rlog "Setting up external dependencies..."
 setup_dependencies $1
 log "Installing fzf..."
 setup_fzf
-log "Installing neovim..."
-setup_vim
 log "Installing fish..."
 setup_fish $1
 log "Installing gpg..."
