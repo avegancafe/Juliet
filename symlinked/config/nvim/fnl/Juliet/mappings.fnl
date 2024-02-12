@@ -140,3 +140,23 @@
 (vim.cmd ":abbreviate ag Telescope live_grep")
 (vim.keymap.set :i :<c-c> :<esc>)
 (vim.keymap.set :i :<d-v> :<c-r>* {:silent true})
+
+(tset _G :WipeoutHiddenBuffers
+      (fn []
+        (local tablist
+               (fcollect [i 0 (- (vim.fn.tabpagenr "$") 1)]
+                 (vim.fn.tabpagebuflist (+ i 1))))
+        (local known-buffers (accumulate [agg {} _ bufs (pairs tablist)]
+                               (do
+                                 (each [_ bufnr (ipairs bufs)]
+                                   (tset agg bufnr true))
+                                 agg)))
+        (var n-wipeouts 0)
+        (for [i 1 (vim.fn.bufnr "$")]
+          (when (and (vim.fn.bufexists i) (= (vim.fn.getbufvar i :&mod) 0)
+                     (= (. known-buffers i) nil))
+            (vim.cmd (.. "silent exec 'bwipeout'" i))
+            (set n-wipeouts (+ n-wipeouts 1))))
+        (print (.. n-wipeouts " buffer(s) wiped out"))))
+
+(vim.cmd ":command! WipeoutHiddenBuffers call v:lua.WipeoutHiddenBuffers()")
