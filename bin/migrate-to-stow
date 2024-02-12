@@ -1,3 +1,11 @@
 #! /bin/zsh
 
+source ~/.config/Juliet/_util.bash
+
+log "Removing old symlinks..."
 rm -rf ~/.curl-format.txt ~/.fdignore ~/.gitconfig ~/.gitmessage ~/.hammerspoon/ ~/.pgclirc ~/.prettierrc ~/.psqlrc ~/.stylua.toml ~/.workspaces ~/.config/fish ~/.config/karabiner/ ~/.config/nvim ~/.config/ripgrep ~/.config/tmux
+
+log "Creating symlinks with stow..."
+stow --stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
+stow --stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
+log "Done!"
