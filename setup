@@ -72,10 +72,6 @@ setup_kitty() {
   [[ ! -f $HOME/Library/Fonts/3270-nerdfont-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/3270-nerdfont-complete.ttf $HOME/Library/Fonts/
 }
 
-setup_other() {
-  touch ~/.hushlogin
-}
-
 rlog "Setting up git..."
 setup_git
 rlog "Setting up external dependencies..."
@@ -90,8 +86,5 @@ log "Installing rust dependencies..."
 setup_rust
 log "Installing kitty..."
 setup_kitty
-
-log "Silencing logins..."
-setup_other
 
 log "Done!"
