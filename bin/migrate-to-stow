@@ -1,0 +1,3 @@
+#! /bin/zsh
+
+rm -rf ~/.curl-format.txt ~/.fdignore ~/.gitconfig ~/.gitmessage ~/.hammerspoon/ ~/.pgclirc ~/.prettierrc ~/.psqlrc ~/.stylua.toml ~/.workspaces ~/.config/fish ~/.config/karabiner/ ~/.config/nvim ~/.config/ripgrep ~/.config/tmux

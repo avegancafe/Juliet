@@ -17,8 +17,6 @@ link_dir() {
 
 
 setup_git() {
-  link_file .gitconfig
-  link_file .gitmessage
   [[ ! -f ~/.gitconfig__local ]] && cp ~/.config/Juliet/.gitconfig__local ~
 }
 
@@ -41,8 +39,7 @@ setup_dependencies() {
     rustup-init
   fi
 
-  link_file tmux.conf ~/.config/tmux
-
+  log "Symlinking dotfiles..."
   stow --stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
 }
