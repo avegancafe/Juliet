@@ -441,3 +441,7 @@ function __auto_source_venv --on-variable PWD --description "Activate/Deactivate
 end
 
 __auto_source_venv
+
+if command -v zoxide 2&> /dev/null
+    zoxide init fish --cmd cd | source
+end
