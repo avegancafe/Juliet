@@ -27,16 +27,20 @@ count_commits() {
 # Main script
 main_branch=$(git rev-parse HEAD)
 
-printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "Ahead" "Behind" "Branch" "Last Commit"  " "
+output=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "Ahead" "Behind" "Branch" "Last Commit"  " ")
 
 # Separator line for clarity
-printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "-----" "------" "--------------------------------------------------" "-------------------" " "
+tmp=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "-----" "------" "--------------------------------------------------" "-------------------" " ")
+output="$output\n$tmp"
 
 
 format_string="%(objectname:short)@%(refname:short)@%(committerdate:relative)"
 IFS=$'\n'
 
-for branchdata in $(git for-each-ref --sort=-authordate --format="$format_string" refs/heads/ --no-merged); do
+branches=$(git for-each-ref --sort=-authordate --format="$format_string" refs/heads/ --no-merged)
+branches=$(printf "${branches}\n$(git for-each-ref --sort=-authordate --format="$format_string" refs/remotes/origin/ --no-merged)")
+
+for branchdata in $branches; do
     sha=$(echo "$branchdata" | cut -d '@' -f1)
     branch=$(echo "$branchdata" | cut -d '@' -f2)
     time=$(echo "$branchdata" | cut -d '@' -f3)
@@ -50,6 +54,9 @@ for branchdata in $(git for-each-ref --sort=-authordate --format="$format_string
             behind=$(echo "$ahead_behind" | cut -f1)
 
             # Display branch info
-	    printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" $ahead $behind $branch "$time" "$description"
+            tmp=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" $ahead $behind $branch "$time" "$description")
+            output="$output\n$tmp"
     fi
 done
+
+printf "$output\n"
