@@ -30,7 +30,7 @@ main_branch=$(git rev-parse HEAD)
 output=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "Ahead" "Behind" "Branch" "Last Commit"  " ")
 
 # Separator line for clarity
-tmp=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "-----" "------" "--------------------------------------------------" "-------------------" " ")
+tmp=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" "-----" "------" "--------------------------------------------------" "----------------------------------" " ")
 output="$output\n$tmp"
 
 
