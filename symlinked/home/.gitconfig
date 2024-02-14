@@ -19,6 +19,9 @@
 	ape = "!git commit -C @ --amend && git push --force-with-lease"
 	gh-clone = "!sh -c 'git clone git@github.com:$1' - "
 	hotfix = ! git switch --create hotfix/$(git branch | grep \\* | sed -e s/^\\*[[:space:]]// | tr -d \\n)
+	staash = stash --all
+	judge = blame -w -C -C -C
+	b = !better-branch
 [push]
 	default = current
 	autoSetupRemote = true
@@ -50,8 +53,7 @@
 [fetch]
 	prune = true
 [user]
-	name = Kyle Holzinger
-	email = kyle@j2health.com
+	signingkey = ~/.ssh/id_rsa
 [include]
 	path = ~/.gitconfig__local
 [difftool "sourcetree"]
@@ -78,3 +80,11 @@
 	trustExitCode = true
 [mergetool]
 	prompt = false
+[column]
+	ui = auto
+[branch]
+	sort = -committerdate
+[rerere]
+	enabled = true
+[gpg]
+	format = ssh
