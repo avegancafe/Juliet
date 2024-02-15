@@ -8,8 +8,7 @@ set -gx PATH $PATH "$HOME/.foundry/bin"
 set -gx PATH "/opt/homebrew/opt/go@1.20/bin" $PATH
 set -gx PATH (pyenv root)/shims $PATH
 set -gx GOPATH "$HOME/go"
-set -gx EDITOR vim
-set -gx LSCOLORS bxfxcxdxbxegedabagacad
+set -gx EDITOR nvim
 set -gx GPG_TTY (tty)
 set -U FZF_LEGACY_KEYBINDINGS 0
 set fish_color_command 69f0ad
