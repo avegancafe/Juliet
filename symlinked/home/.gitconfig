@@ -22,6 +22,8 @@
 	staash = stash --all
 	judge = blame -w -C -C -C
 	b = !better-branch
+	fo = fetch origin
+	rb = rebase
 [push]
 	default = current
 	autoSetupRemote = true
