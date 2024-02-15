@@ -37,8 +37,8 @@ setup_ssh() {
     chmod 700 $HOME/.ssh
   fi
 
-  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to generate a new ssh key?") || $? == 0)) ]] ; then
-    if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
+  if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
+    if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Looks like you don't have an SSH key, would you like to generate one?") || $? == 0)) ]] ; then
       ssh-keygen -t ed25519 -C "$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")" -f $HOME/.ssh/id_ed25519
     fi
   fi
