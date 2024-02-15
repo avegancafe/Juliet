@@ -11,6 +11,7 @@
 (vim.keymap.set :x :p "p<cmd>let @+=@0<CR><cmd>let @\"=@0<CR>"
                 {:noremap true :silent true})
 
+(vim.keymap.set :n "<c-]" "<c-]>zt" {:silent true})
 (vim.keymap.set :n :<c-u> :<c-u>zz {:silent true})
 (vim.keymap.set :n :<c-d> :<c-d>zz {:silent true})
 (vim.keymap.set :x ">" :>gv {:noremap true})
