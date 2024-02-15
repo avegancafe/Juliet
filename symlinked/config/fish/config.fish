@@ -403,8 +403,8 @@ if status --is-login
     set -gx PATH $HOME/.nodenv/versions $PATH
 end
 
-if test -e ~/.config/fish/config__local.fish
-    source ~/.config/fish/config__local.fish
+if test -e ~/.config/local/fish/config.fish
+    source ~/.config/local/fish/config.fish
 end
 
 # bun

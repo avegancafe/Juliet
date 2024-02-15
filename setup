@@ -3,7 +3,7 @@
 source ~/.config/Juliet/_util.bash
 
 setup_git() {
-  [[ ! -f ~/.gitconfig__local ]] && cp ~/.config/Juliet/.gitconfig__local ~
+  [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
 }
 
 setup_dependencies() {
