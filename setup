@@ -27,8 +27,8 @@ setup_dependencies() {
 }
 
 symlink_dotfiles() {
-  stow --stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
-  stow --stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
+  stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
+  stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
 }
 
 setup_ssh() {
