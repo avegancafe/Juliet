@@ -30,6 +30,19 @@ setup_dependencies() {
   stow --stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
 }
 
+setup_ssh() {
+  if [[ ! -d $HOME/.ssh ]]; then
+    mkdir $HOME/.ssh
+    chmod 700 $HOME/.ssh
+  fi
+
+  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to generate a new ssh key?") || $? == 0)) ]] ; then
+    if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
+      ssh-keygen -t ed25519 -C "$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")" -f $HOME/.ssh/id_ed25519
+    fi
+  fi
+}
+
 setup_fzf() {
   if ! command -v fzf &> /dev/null; then
     /opt/homebrew/opt/fzf/install
@@ -76,6 +89,8 @@ rlog "Setting up git..."
 setup_git
 rlog "Setting up external dependencies..."
 setup_dependencies $1
+log "Setting up ssh..."
+setup_ssh
 log "Installing fzf..."
 setup_fzf
 log "Installing fish..."

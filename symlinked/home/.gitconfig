@@ -53,7 +53,7 @@
 [fetch]
 	prune = true
 [user]
-	signingkey = ~/.ssh/id_rsa
+	signingkey = ~/.ssh/id_ed25519
 [include]
 	path = ~/.gitconfig__local
 [difftool "sourcetree"]
