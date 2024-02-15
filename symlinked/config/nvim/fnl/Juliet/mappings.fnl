@@ -1,4 +1,3 @@
-(vim.keymap.set :n :<leader>p ":Lazy<cr>" {:silent true :desc "Open lazy.nvim"})
 (vim.keymap.set :n :<leader>it ":put =strftime('%FT%T%z')<cr>"
                 {:desc "Insert timestamp below this line"})
 
@@ -140,6 +139,7 @@
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
 (vim.cmd ":abbreviate ag Telescope live_grep")
 (vim.keymap.set :i :<c-c> :<esc>)
+(vim.keymap.set :i :jk :<esc>l)
 (vim.keymap.set :i :<d-v> :<c-r>* {:silent true})
 
 (tset _G :WipeoutHiddenBuffers
