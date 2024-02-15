@@ -24,8 +24,9 @@ setup_dependencies() {
   if ! command -v cargo &> /dev/null; then
     rustup-init
   fi
+}
 
-  log "Symlinking dotfiles..."
+symlink_dotfiles() {
   stow --stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
 }
@@ -89,6 +90,8 @@ rlog "Setting up git..."
 setup_git
 rlog "Setting up external dependencies..."
 setup_dependencies $1
+log "Symlinking dotfiles..."
+symlink_dotfiles
 log "Setting up ssh..."
 setup_ssh
 log "Installing fzf..."
