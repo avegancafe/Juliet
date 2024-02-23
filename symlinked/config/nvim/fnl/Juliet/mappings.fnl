@@ -61,6 +61,8 @@
 
 (vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
+(vim.keymap.set :n :<leader>bi ":IsolateBuffer<cr>" {:desc "Close all buffers except current"})
+(vim.keymap.set :n :<leader>bw ":WipeoutHiddenBuffers<cr>" {:desc "Wipeout buffers not associated to a window"})
 
 (vim.keymap.set :n :<leader>rs ":let @a=@*<cr>"
                 {:silent true :desc "Save register to @a"})
