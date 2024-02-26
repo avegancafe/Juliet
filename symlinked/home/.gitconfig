@@ -24,6 +24,7 @@
 	b = !better-branch
 	fo = fetch origin
 	rb = rebase
+	pf = push --force-with-lease
 [push]
 	default = current
 	autoSetupRemote = true
