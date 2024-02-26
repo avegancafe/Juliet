@@ -29,15 +29,20 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
     ) || return
     set tags (git --no-pager tag | awk '{print "\x1b[35;1mtag\x1b[m\t" $1}') || return
     set raw_target (
-    string join \n (string join \n $branches; string join \n $tags) |
-    fzf --reverse --height 40% --no-hscroll --no-multi -n 2 --ansi \
-      --preview="git --no-pager log -150 --pretty=format:%s '..{2}'" \
-      --header='ctrl-y: copy name — ctrl-x: delete branch' \
-      --bind 'ctrl-y:execute-silent(echo {} | awk \'{print $2}\' | xargs printf "%s" | pbcopy)+abort' \
-      --bind 'ctrl-x:execute-silent(echo {} | awk \'{print $2}\' | xargs git branch -D)+abort' \
-  ) || commandline -f repaint
+        string join \n (string join \n $branches; string join \n $tags) |
+            fzf --reverse --height 40% --no-hscroll --no-multi -n 2 --ansi \
+              --preview="git --no-pager log -150 --pretty=format:%s '..{2}'" \
+              --header='ctrl-y: copy name — ctrl-x: delete branch' \
+              --bind 'ctrl-y:execute-silent(echo {} | awk \'{print $2}\' | xargs printf "%s" | pbcopy)+abort' \
+              --bind 'ctrl-x:execute-silent(echo {} | awk \'{print $2}\' | xargs git branch -D)+abort' \
+    )
 
-    if test -n $status
+    set fzf_status $status
+
+    if test $fzf_status -ne 0
+        error "Operation cancelled-- Exiting...\n"
+        echo
+        commandline -f repaint
         return
     end
 
@@ -46,7 +51,6 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
     log "Checking out $target..."
 
     git checkout $target
-    echo ""
     echo ""
 
     commandline -f repaint
