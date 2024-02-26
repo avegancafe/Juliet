@@ -35,7 +35,11 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
       --header='ctrl-y: copy name — ctrl-x: delete branch' \
       --bind 'ctrl-y:execute-silent(echo {} | awk \'{print $2}\' | xargs printf "%s" | pbcopy)+abort' \
       --bind 'ctrl-x:execute-silent(echo {} | awk \'{print $2}\' | xargs git branch -D)+abort' \
-  ) || commandline -f repaint && return
+  ) || commandline -f repaint
+
+    if test -n $status
+        return
+    end
 
     set target (echo $raw_target | awk '{print $2}')
 
