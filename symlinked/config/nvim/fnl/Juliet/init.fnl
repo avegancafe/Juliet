@@ -10,6 +10,7 @@
          augroup END")
 
 (vim.cmd "set scrolloff=4\n")
+(set vim.g.omni_sql_no_default_maps 1)
 (set vim.g.loaded_netrw 1)
 (set vim.g.loaded_netrwPlugin 1)
 (set vim.g.shortmess "")
