@@ -1,7 +1,7 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :nanozuki/tabby.nvim
-      {:init (fn [] (tset vim.o :showtabline 1))
+      {:init (fn [] (tset vim.o :showtabline 2))
        :dependencies [:ribru17/bamboo.nvim]
        :lazy false
        :keys [(key :<tab> :gt "Next tab")
@@ -26,8 +26,11 @@
                                                                                                     :id)))
                                                                (local parse-path
                                                                       (fn [full-path]
-                                                                        (string.match full-path
-                                                                                      "([%a%d-_%.]*)$")))
+                                                                        (if (= full-path
+                                                                               "")
+                                                                            "[No Name]"
+                                                                            (string.match full-path
+                                                                                          "([%a%d-_%.]*)$"))))
                                                                (local parse-index
                                                                       (fn [full-path]
                                                                         (string.gsub (string.match full-path
