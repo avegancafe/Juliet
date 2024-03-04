@@ -24,9 +24,9 @@
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>ld "<CMD>Lspsaga finder<CR>"
+  (buf-set-keymap :n :<leader>ld ":lua require('telescope.builtin').lsp_references()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>li "<CMD>Lspsaga finder<CR>"
+  (buf-set-keymap :n :<leader>li ":lua require('telescope.builtin').lsp_references()<CR>"
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lr ":IncRename " {:noremap true :silent true})
   (buf-set-keymap :n :<leader>la "<CMD>Lspsaga code_action<CR>"
