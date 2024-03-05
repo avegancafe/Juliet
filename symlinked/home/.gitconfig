@@ -25,6 +25,7 @@
 	fo = fetch origin
 	rb = rebase
 	pf = push --force-with-lease
+	pr = pull-request
 [push]
 	default = current
 	autoSetupRemote = true
