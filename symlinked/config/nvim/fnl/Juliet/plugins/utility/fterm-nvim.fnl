@@ -8,5 +8,10 @@
               (key :<c-h>
                    (fn []
                      ((. (require :FTerm) :toggle)))
-                   "Toggle terminal" {:mode :t})]
+                   "Toggle terminal" {:mode :t})
+              (key :<leader>j
+                   (fn []
+                     (local ft (require :FTerm))
+                     (local btop-term (ft:new {:ft :fterm_btop :cmd :btop}))
+                     (btop-term:toggle)) :btop)]
        :opts {:border :rounded :dimensions {:width 0.9 :height 0.9}}})
