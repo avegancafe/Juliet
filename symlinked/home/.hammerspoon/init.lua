@@ -18,14 +18,14 @@ local open_neovide = function()
 	if app then
 		if not app:mainWindow() then
 			app:quit()
-			hs.application.launchOrFocus('/opt/homebrew/Cellar/neovide/0.12.2/Neovide.app')
+			hs.application.launchOrFocus('Neovide')
 		elseif app:isFrontmost() then
 			app:hide()
 		else
 			app:activate()
 		end
 	else
-		hs.application.launchOrFocus('/opt/homebrew/Cellar/neovide/0.12.2/Neovide.app')
+		hs.application.launchOrFocus('Neovide')
 	end
 end
 
