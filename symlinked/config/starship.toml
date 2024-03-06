@@ -4,6 +4,7 @@ $git_branch\
 $git_state\
 $git_status\
 $git_metrics\
+$python\
 $fill\
 $jobs $cmd_duration $time\
 $line_break\
@@ -13,6 +14,9 @@ add_newline = false
 
 [fill]
 symbol = " "
+
+[python]
+format = 'via [${symbol}(\($virtualenv\) )]($style)'
 
 [git_branch]
 format = "[$symbol$branch]($style) "
