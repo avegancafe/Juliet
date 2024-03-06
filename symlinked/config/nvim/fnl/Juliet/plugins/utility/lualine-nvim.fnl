@@ -3,7 +3,6 @@
 (pack :nvim-lualine/lualine.nvim
       {:dependencies [:nvim-web-devicons
                       :nocksock/do.nvim
-                      :glepnir/lspsaga.nvim
                       :natecraddock/workspaces.nvim
                       :ribru17/bamboo.nvim
                       :nvim-lua/plenary.nvim]
@@ -18,10 +17,8 @@
                                              :section_separators {:left ""
                                                                   :right ""}
                                              :theme (require :Juliet.lualine_theme)
-                                             :disabled_filetypes {:statusline [:lspsagaoutline
-                                                                               :NvimTree]
-                                                                  :winbar [:lspsagaoutline
-                                                                           :NvimTree
+                                             :disabled_filetypes {:statusline [:NvimTree]
+                                                                  :winbar [:NvimTree
                                                                            :dashboard]}}
                                    :sections {:lualine_a [:mode]
                                               :lualine_b [(fn []

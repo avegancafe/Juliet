@@ -20,20 +20,19 @@
   (buf-set-option :omnifunc "v:lua.vim.lsp.omnifunc")
   (buf-set-keymap :n :K "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :KK "<CMD>Lspsaga show_cursor_diagnostics<CR>"
-                  {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>ld ":lua require('telescope.builtin').lsp_references()<CR>"
+  (buf-set-keymap :n :<leader>ld
+                  ":lua require('telescope.builtin').lsp_references()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>li ":lua require('telescope.builtin').lsp_references()<CR>"
+  (buf-set-keymap :n :<leader>li
+                  ":lua require('telescope.builtin').lsp_references()<CR>"
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lr ":IncRename " {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>la "<CMD>Lspsaga code_action<CR>"
+  (buf-set-keymap :n :<leader>lu
+                  ":lua require('telescope.builtin').lsp_references()<CR>"
                   {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>lu "<CMD>Lspsaga finder<CR>"
-                  {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>lo "<CMD>Lspsaga outline<CR>"
+  (buf-set-keymap :n :<leader>lo :<CMD>AerialToggle<CR>
                   {:noremap true :silent true}))
 
 (local capabilities
