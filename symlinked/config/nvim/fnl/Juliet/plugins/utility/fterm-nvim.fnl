@@ -7,7 +7,7 @@
                    "Toggle terminal")
               (key :<c-h>
                    (fn []
-                     ((. (require :FTerm) :toggle)))
+                     ((. (require :FTerm) :close)))
                    "Toggle terminal" {:mode :t})
               (key :<leader>j
                    (fn []
