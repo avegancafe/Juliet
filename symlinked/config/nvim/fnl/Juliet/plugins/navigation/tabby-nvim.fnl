@@ -50,17 +50,19 @@
                                                                                        theme.sep)
                                                                                   theme.fill)
                                                                               theme.head)
-                                                                  2 buffer-name
-                                                                  3 (line.sep " "
+                                                                  2 (line.sep (if (accumulate [found false _ win (ipairs (. (tab.wins)
+                                                                                                                             :wins))]
+                                                                                     (or found
+                                                                                         ((. (win.buf)
+                                                                                             :is_changed))))
+                                                                                   "• " "")
                                                                               theme.tab
                                                                               theme.tab)
-                                                                  4 (tab.close_btn (or (and (accumulate [found false _ win (ipairs (. (tab.wins)
-                                                                                                                                      :wins))]
-                                                                                              (or found
-                                                                                                  ((. (win.buf)
-                                                                                                      :is_changed))))
-                                                                                            "● ")
-                                                                                       " "))
+                                                                  3 buffer-name
+                                                                  4 (line.sep " "
+                                                                              theme.tab
+                                                                              theme.tab)
+                                                                  5 (tab.close_btn " ")
                                                                   : hl
                                                                   :margin ""})))
                                  2 (line.spacer)
