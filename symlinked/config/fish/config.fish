@@ -200,7 +200,7 @@ function watch-repo
     end
 end
 
-function vim
+function vim --wraps "nvim"
     argparse --name="debug" d/debug -- $argv
 
     if test -n "$_flag_d"
@@ -209,6 +209,14 @@ function vim
     else
         nvim $argv
     end
+end
+
+function nv --wraps "neovide"
+    if ! command -v neovide 2&> /dev/null
+        gum confirm "Neovide not installed. Install?" && brew install neovide
+    end
+
+    neovide $argv
 end
 
 function fish_greeting
