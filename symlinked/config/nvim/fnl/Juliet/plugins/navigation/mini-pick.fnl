@@ -3,10 +3,8 @@
 (pack :echasnovski/mini.pick
       {:version false
        :lazy false
-       :keys [(key :<c-p> ":Pick files<cr>"
-                   "Fuzzy find a file")
-              (key :<leader>p ":Pick files<cr>"
-                   "Fuzzy find a file")
+       :keys [(key :<c-p> ":Pick files<cr>" "Fuzzy find a file")
+              (key :<leader>p ":Pick files<cr>" "Fuzzy find a file")
               (key :<c-b> ":Pick buffers<cr>")
               "Fuzzy list buffers"]
        :config (fn []
