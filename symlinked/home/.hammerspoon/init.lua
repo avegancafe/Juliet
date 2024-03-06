@@ -1,31 +1,34 @@
+hs.application.enableSpotlightForNameSearches(true)
+
 local open_terminal = function()
 	local app = hs.application.get('kitty')
-	if app then
-		if not app:mainWindow() then
-			app:selectMenuItem({ 'kitty', 'New OS window' })
-		elseif app:isFrontmost() then
-			app:hide()
-		else
-			app:activate()
-		end
+
+	if app == nil then
+		hs.application.open('kitty')
+		return
+	end
+
+	if not app:mainWindow() then
+		app:selectMenuItem({ 'Shell', 'New OS Window' })
+	elseif app:isFrontmost() then
+		app:hide()
 	else
-		hs.application.launchOrFocus('kitty')
+		app:activate()
 	end
 end
 
 local open_neovide = function()
 	local app = hs.application.get('Neovide')
-	if app then
-		if not app:mainWindow() then
-			app:quit()
-			hs.application.launchOrFocus('Neovide')
-		elseif app:isFrontmost() then
-			app:hide()
-		else
-			app:activate()
-		end
+
+	if app == nil then
+		hs.application.open('Neovide')
+		return
+	end
+
+	if app:isFrontmost() then
+		app:hide()
 	else
-		hs.application.launchOrFocus('Neovide')
+		app:activate()
 	end
 end
 
