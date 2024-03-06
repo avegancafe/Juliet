@@ -38,4 +38,4 @@ style = "red"
 [time]
 disabled = false
 style = "bold white"
-format = "[$time]($style)"
+format = "[$time]($style) "
