@@ -59,7 +59,7 @@
                                                                    :shorten 3
                                                                    [-1 -2])
                                                                 "%#EndOfBuffer#"))]
-                                              :lualine_x [:diagnostics]
+                                              :lualine_x [:branch :diagnostics]
                                               :lualine_y [:filetype]
                                               :lualine_z []}
                                    :inactive_sections {:lualine_a []
