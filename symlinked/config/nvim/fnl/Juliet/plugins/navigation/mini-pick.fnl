@@ -9,7 +9,6 @@
                    "Fuzzy find a file")
               (key :<c-b> ":Pick buffers<cr>")
               "Fuzzy list buffers"]
-       :dependencies [:natecraddock/workspaces.nvim]
        :config (fn []
                  (let [MiniPick (require :mini.pick)]
                    (MiniPick.setup {:mappings {:choose :<c-o>
