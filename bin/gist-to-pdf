@@ -6,7 +6,7 @@ function clone-gist
 		set -l gist_id $argv[1]
 		set -l gist_url "git@gist.github.com:$gist_id.git"
 
-		mkdir -p $HOME/workspace/gists 2&>1 /dev/null
+		mkdir -p $HOME/workspace/gists
 		gum spin --title "Cloning repo... " git clone "$gist_url" $HOME/workspace/gists/$gist_id
 
 		log "Cloned gist $gist_id"
@@ -17,6 +17,7 @@ function gist-to-pdf
 		clone-gist $gist_id
 
 		cd $HOME/workspace/gists/$gist_id
+
 		set -l md_files (find . -type f -name "*.md")
 		set -l gist_files_count (count $md_files)
 
@@ -32,6 +33,11 @@ function gist-to-pdf
 		log "Rendering $filepath to PDF..."
 		md2pdf $filepath $pdf_filepath
 		log "Rendered to $pdf_filepath"
+
+		git add $(basename $pdf_filepath)
+		git commit -m "[Juliet] render $(basename $md_files) to pdf" --quiet
+		gum spin --title "Pushing to git... " git push
+		log "Pushed to git"
 
 		log "Done!"
 		open $HOME/workspace/gists/$gist_id
