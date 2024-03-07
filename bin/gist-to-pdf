@@ -1,0 +1,40 @@
+#! /opt/homebrew/bin/fish
+
+source ~/.config/fish/_util.fish
+
+function clone-gist
+		set -l gist_id $argv[1]
+		set -l gist_url "git@gist.github.com:$gist_id.git"
+
+		mkdir -p $HOME/workspace/gists 2&>1 /dev/null
+		gum spin --title "Cloning repo... " git clone "$gist_url" $HOME/workspace/gists/$gist_id
+
+		log "Cloned gist $gist_id"
+end
+
+function gist-to-pdf
+		set -l gist_id $argv[1]
+		clone-gist $gist_id
+
+		cd $HOME/workspace/gists/$gist_id
+		set -l md_files (find . -type f -name "*.md")
+		set -l gist_files_count (count $md_files)
+
+		if test $gist_files_count -eq 0
+				echo "No files found in the gist"
+				exit 1
+		end
+
+		set -l filepath (find . -type f -name "*.md" | head -n 1)
+
+		set -l pdf_filepath $HOME/workspace/gists/$gist_id/(basename $filepath | sed -e 's/.md$//g').pdf
+
+		log "Rendering $filepath to PDF..."
+		md2pdf $filepath $pdf_filepath
+		log "Rendered to $pdf_filepath"
+
+		log "Done!"
+		open $HOME/workspace/gists/$gist_id
+end
+
+gist-to-pdf $argv

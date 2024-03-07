@@ -86,6 +86,14 @@ setup_kitty() {
   [[ ! -f $HOME/Library/Fonts/3270-nerdfont-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/3270-nerdfont-complete.ttf $HOME/Library/Fonts/
 }
 
+setup_python() {
+  if ! command -v poetry &> /dev/null; then
+    curl -sSL https://install.python-poetry.org | python3 -
+  fi
+
+  pip3 install md2pdf
+}
+
 rlog "Setting up git..."
 setup_git
 rlog "Setting up external dependencies..."
@@ -104,5 +112,7 @@ log "Installing rust dependencies..."
 setup_rust
 log "Installing kitty..."
 setup_kitty
+log "Setting up python..."
+setup_python
 
 log "Done!"
