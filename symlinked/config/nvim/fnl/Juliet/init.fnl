@@ -53,13 +53,4 @@
 augroup END
 ")
 
-(set vim.opt.updatetime (* 1000 30))
-
-(vim.cmd "
-augroup Screensaver
-  autocmd!
-  autocmd CursorHold * :CellularAutomaton game_of_life
-augroup END
-")
-
 (vim.cmd "highlight MatchParen cterm=bold ctermfg=white ctermbg=black")
