@@ -19,6 +19,10 @@
                                :sep :TabLineSep})
                  (tabline.set (fn [line]
                                 (var i 0)
+
+                                (fn num-of-bufs [tab]
+                                  (length (. (line.wins_in_tab tab) :wins)))
+
                                 {1 ((. (line.tabs) :foreach) (fn [tab]
                                                                (local buffer
                                                                       (vim.api.nvim_buf_get_name (. ((. (tab.current_win)
@@ -51,14 +55,19 @@
                                                                                   theme.fill)
                                                                               theme.head)
                                                                   2 (line.sep (if (accumulate [found false _ win (ipairs (. (tab.wins)
-                                                                                                                             :wins))]
-                                                                                     (or found
-                                                                                         ((. (win.buf)
-                                                                                             :is_changed))))
-                                                                                   "• " "")
+                                                                                                                            :wins))]
+                                                                                    (or found
+                                                                                        ((. (win.buf)
+                                                                                            :is_changed))))
+                                                                                  "• "
+                                                                                  "")
                                                                               theme.tab
                                                                               theme.tab)
-                                                                  3 buffer-name
+                                                                  3 (if (> (num-of-bufs tab.id)
+                                                                           1)
+                                                                        (.. buffer-name
+                                                                            " (+)")
+                                                                        buffer-name)
                                                                   4 (line.sep " "
                                                                               theme.tab
                                                                               theme.tab)
@@ -68,9 +77,6 @@
                                  2 (line.spacer)
                                  3 ((. (line.wins_in_tab (line.api.get_current_tab))
                                        :foreach) (fn [win]
-                                                                                                                                        (local num-of-bufs
-                                                                                                                                               (length (. (line.wins_in_tab (line.api.get_current_tab))
-                                                                                                                                                          :wins)))
                                                                                                                                         (local fin
                                                                                                                                                (or (and (> (length (. (line.wins_in_tab (line.api.get_current_tab))
                                                                                                                                                                       :wins))
@@ -89,7 +95,7 @@
                                                                                                                                                                               theme.tab))
                                                                                                                                                                "")
                                                                                                                                                          5 (or (and (< i
-                                                                                                                                                                       (- num-of-bufs
+                                                                                                                                                                       (- (num-of-bufs (line.api.get_current_tab))
                                                                                                                                                                           1))
                                                                                                                                                                     (line.sep "|"
                                                                                                                                                                               theme.fill
