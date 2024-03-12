@@ -31,8 +31,12 @@
 (tset _G :ToggleNumbers
       (fn []
         (if (= vim.opt.relativenumber._value true)
-            (tset vim.opt :relativenumber false)
-            (tset vim.opt :relativenumber true))))
+            (do
+              (tset vim.opt :relativenumber false)
+              (vim.cmd ":tabdo windo set norelativenumber"))
+            (do
+              (tset vim.opt :relativenumber true)
+              (vim.cmd ":tabdo windo set relativenumber")))))
 
 (vim.cmd ":command! ToggleNumbers call v:lua.ToggleNumbers()")
 (vim.cmd ":command! Todo execute \"TodoTrouble cwd=\".getreg('%')")
