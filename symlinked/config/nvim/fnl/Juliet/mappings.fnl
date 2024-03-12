@@ -13,6 +13,10 @@
 (vim.keymap.set :n "<c-]>" "<c-]>zt" {:silent true})
 (vim.keymap.set :n :<c-u> :<c-u>zz {:silent true})
 (vim.keymap.set :n :<c-d> :<c-d>zz {:silent true})
+(vim.keymap.set :n :<c-h> :<c-w>h {:silent true})
+(vim.keymap.set :n :<c-j> :<c-w>j {:silent true})
+(vim.keymap.set :n :<c-k> :<c-w>k {:silent true})
+(vim.keymap.set :n :<c-l> :<c-w>l {:silent true})
 (vim.keymap.set :x ">" :>gv {:noremap true})
 (vim.keymap.set :x "<" :<gv {:noremap true})
 (vim.keymap.set :n :gQ
