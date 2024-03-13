@@ -48,7 +48,7 @@ function gdiff
 end
 
 function current-branch
-    git branch | grep "\*" | sed -e "s/^\*[[:space:]]//" | tr -d '\n'
+    git rev-parse --abbrev-ref HEAD
 end
 
 function clone
