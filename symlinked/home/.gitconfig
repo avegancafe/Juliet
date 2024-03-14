@@ -2,7 +2,7 @@
 	a = add
 	ad = add
 	clean-branches = "!git branch | grep -v \\* | xargs git branch -D "
-	clean-merged = "!git branch --merged | grep -v \\* | xargs git branch -D "
+	clean-merged = "!git branch --merged | grep --invert-match --regexp '\\*\\|master\\|main' | xargs git branch -D "
 	co = checkout
 	com = commit
 	cp = cherry-pick
