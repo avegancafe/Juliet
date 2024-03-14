@@ -91,7 +91,9 @@ setup_python() {
     curl -sSL https://install.python-poetry.org | python3 -
   fi
 
-  pip3 install md2pdf
+  if ! command -v md2pdf &> /dev/null; then
+    pip3 install md2pdf
+  fi
 }
 
 rlog "Setting up git..."
