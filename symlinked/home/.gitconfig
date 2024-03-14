@@ -13,6 +13,7 @@
 	staged = diff --staged
 	t = ticket
 	su = submodule update --recursive --init
+	pdiff = "!git diff --name-only --relative --diff-filter=d | xargs bat --diff"
 	ape = "!git commit -C @ --amend && git push --force-with-lease"
 	staash = stash --all
 	judge = blame -w -C -C -C
