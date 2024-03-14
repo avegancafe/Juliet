@@ -53,8 +53,12 @@ for branchdata in $branches; do
             ahead=$(echo "$ahead_behind" | cut -f2)
             behind=$(echo "$ahead_behind" | cut -f1)
 
+            if [ ${#branch} -gt $width3 ]; then
+                branch="${branch:0:$(($width3-3))}..."
+            fi
+
             # Display branch info
-            tmp=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" $ahead $behind $branch "$time" "$description")
+            tmp=$(printf "${GREEN}%-${width1}s ${RED}%-${width2}s ${BLUE}%-${width3}.50s ${YELLOW}%-${width4}s ${NO_COLOR}%-${width5}s\n" $ahead $behind $branch "$time" "$description")
             output="$output\n$tmp"
     fi
 done
