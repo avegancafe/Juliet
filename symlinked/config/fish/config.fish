@@ -72,7 +72,7 @@ function clone
 
     log Cloned!
 
-    cd (string replace -r "^[[:alpha:]]+/" "" $argv[1])
+    cd (string replace -r "^.+/" "" $argv[1])
 end
 
 function t
