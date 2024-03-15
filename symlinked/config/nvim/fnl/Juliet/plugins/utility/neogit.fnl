@@ -2,10 +2,12 @@
 
 (pack :NeogitOrg/neogit
       {:opts {:disable_commit_confirmation true
-              :kind :vsplit
+              :kind :tab
               :auto_show_console false
               :graph_style :unicode}
-       :dependencies [:nvim-lua/plenary.nvim :nvim-telescope/telescope.nvim]
+       :dependencies [:nvim-lua/plenary.nvim
+                      :nvim-telescope/telescope.nvim
+                      :rcarriga/nvim-notify]
        :lazy false
        :keys [(key :<leader>g
                    (fn []
