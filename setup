@@ -3,6 +3,7 @@
 source ~/.config/Juliet/_util.bash
 
 setup_git() {
+  mkdir -p ~/.config/local
   [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
 }
 
