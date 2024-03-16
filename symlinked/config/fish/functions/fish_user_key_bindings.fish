@@ -1,11 +1,9 @@
-source ~/.config/fish/functions/fzf_key_bindings.fish
-
 function fish_user_key_bindings
     bind \cl 'echo \e\]1337\;ClearScrollback\x7; clear; commandline -f repaint'
     bind \cc 'commandline ""'
     bind \cb fco_preview
     bind \cn 'git rebase --continue'
-    fzf_key_bindings
+    fzf --fish | source
 end
 
 function fco -d "Fuzzy-find and checkout a branch"
