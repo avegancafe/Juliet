@@ -36,37 +36,40 @@
      {:dynamicRegistration false :lineFoldingOnly true})
 
 (lambda get-opts [?opt-overrides]
-  (local opts
-         {: capabilities
-          :flags {:debounce_text_changes 150}
-          :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
-                                           {:border :rounded})}
-          :on_attach on-attach
-          :root_dir (nvim-lsp.util.root_pattern :.git)
-          :settings {:Lua {:diagnostics {:globals [:vim]}
-                           :runtime {:version :LuaJIT}
-                           :telemetry {:enable false}
-                           :workspace {:checkThirdParty false
-                                       :library (vim.api.nvim_get_runtime_file ""
-                                                                               true)}}
-                     :fennel {:diagnostics {:globals [:vim]}
-                              :workspace {:library (vim.api.nvim_list_runtime_paths)}}}})
-  (merge opts (or ?opt-overrides {})))
+  (local opt-settings {})
+  (local opt-overrides (or ?opt-overrides {}))
+  (local opts {: capabilities
+               :flags {:debounce_text_changes 150}
+               :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
+                                                {:border :rounded})}
+               :on_attach on-attach
+               :root_dir (nvim-lsp.util.root_pattern :.git)})
+  (local settings (merge opt-settings (or opt-overrides.settings {})))
+  (merge opts opt-overrides {: settings}))
 
 (vim.cmd " do User LspAttachBuffers ")
 (mason.setup)
 (local servers [{:name :bashls}
                 {:name :bufls}
                 {:name :cssls}
-                {:name :fennel_language_server}
+                {:name :fennel_language_server
+                 :opts {:settings {:fennel {:diagnostics {:globals [:vim]}
+                                            :workspace {:library (vim.api.nvim_list_runtime_paths)}}}}}
                 {:name :gopls
                  :opts {:root_dir (lspconfig-util.root_pattern :go.mod)}}
-                {:name :lua_ls}
+                {:name :lua_ls
+                 :opts {:settings {:Lua {:diagnostics {:globals [:vim]}
+                                         :runtime {:version :LuaJIT}
+                                         :telemetry {:enable false}
+                                         :workspace {:checkThirdParty false
+                                                     :library (vim.api.nvim_get_runtime_file ""
+                                                                                             true)}}}}}
                 {:name :solidity}
                 {:name :tailwindcss}
                 {:name :vtsls}
                 {:name :yamlls}
-                {:name :pylsp}
+                {:name :pylsp
+                 :opts {:settings {:pylsp {:plugins {:pycodestyle {:enabled false}}}}}}
                 {:name :terraformls}
                 {:name :rust_analyzer}])
 
