@@ -69,7 +69,8 @@
                 {:name :vtsls}
                 {:name :yamlls}
                 {:name :pylsp
-                 :opts {:settings {:pylsp {:plugins {:pycodestyle {:enabled false}}}}}}
+                 :opts {:settings {:pylsp {:plugins {:pycodestyle {:enabled false}
+                                                     :pyflakes {:enabled false}}}}}}
                 {:name :terraformls}
                 {:name :rust_analyzer}])
 
