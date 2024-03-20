@@ -1,6 +1,8 @@
 [alias]
 	a = add
 	ad = add
+	ape = "!git commit -C @ --amend && git push --force-with-lease"
+	b = !better-branch
 	clean-branches = "!git branch | grep --invert-match --regexp '\\*\\|master\\|main' | xargs git branch -D "
 	clean-merged = "!git branch --merged | grep --invert-match --regexp '\\*\\|master\\|main' | xargs git branch -D "
 	cm = "clean-merged"
@@ -8,19 +10,18 @@
 	com = commit
 	cp = cherry-pick
 	diff-branch = !git diff $(git merge-base --fork-point master)
-	main = !git switch $(git branch | grep -m 1 -Eo '\\smain|\\smaster')
-	s = switch
-	staged = diff --staged
-	t = ticket
-	su = submodule update --recursive --init
-	pdiff = "!git diff --name-only --relative --diff-filter=d | xargs bat --diff"
-	ape = "!git commit -C @ --amend && git push --force-with-lease"
-	staash = stash --all
-	judge = blame -w -C -C -C
-	b = !better-branch
 	fo = fetch origin
-	rb = rebase
+	judge = blame -w -C -C -C
+	main = !git switch $(git branch | grep -m 1 -Eo '\\smain|\\smaster')
+	pdiff = "!git diff --name-only --relative --diff-filter=d | xargs bat --diff"
 	pf = push --force-with-lease
+	rb = rebase
+	s = switch
+	staash = stash --all
+	staged = diff --staged
+	su = submodule update --recursive --init
+	t = ticket
+	up = push
 [push]
 	default = current
 	autoSetupRemote = true
