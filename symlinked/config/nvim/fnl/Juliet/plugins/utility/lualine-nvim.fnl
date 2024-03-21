@@ -7,7 +7,17 @@
                       :ribru17/bamboo.nvim
                       :nvim-lua/plenary.nvim]
        :config (fn []
-                 (let [lualine (require :lualine)]
+                 (set vim.o.laststatus 3)
+                 (let [lualine (require :lualine)
+                       cache-fn (fn [f]
+                                  (var last-call nil)
+                                  (var last-result nil)
+                                  (fn []
+                                    (if (= last-call nil) (f)
+                                        (if (> (- last-call (os.time)) 60)
+                                            (do
+                                              (set last-result (f))
+                                              last-result)))))]
                    (lualine.setup {:winbar {:lualine_c [(fn []
                                                           ((. (require :do)
                                                               :view) :active))]}
@@ -62,13 +72,15 @@
                                               :lualine_x [(fn []
                                                             (local configpulse
                                                                    (require :configpulse))
+                                                            (local get-time (cache-fn configpulse.get_time))
                                                             (local time
-                                                                   (configpulse.get_time))
+                                                                   (get-time))
                                                             (.. "It's been "
                                                                 time.days
                                                                 " days "
                                                                 time.hours ":"
-                                                                (string.format "%02x" time.minutes)))
+                                                                (string.format "%02x"
+                                                                               time.minutes)))
                                                           :branch
                                                           :diagnostics]
                                               :lualine_y [:filetype]
