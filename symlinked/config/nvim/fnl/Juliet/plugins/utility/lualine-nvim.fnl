@@ -17,6 +17,7 @@
                                         (if (> (- last-call (os.time)) 60)
                                             (do
                                               (set last-result (f))
+                                              (set last-call (os.time))
                                               last-result)))))]
                    (lualine.setup {:winbar {:lualine_c [(fn []
                                                           ((. (require :do)
@@ -79,7 +80,7 @@
                                                                 time.days
                                                                 " days "
                                                                 time.hours ":"
-                                                                (string.format "%02x"
+                                                                (string.format "%02d"
                                                                                time.minutes)))
                                                           :branch
                                                           :diagnostics]
