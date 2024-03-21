@@ -70,18 +70,23 @@
                                                                    :shorten 3
                                                                    [-1 -2])
                                                                 "%#EndOfBuffer#"))]
-                                              :lualine_x [(fn []
-                                                            (local configpulse
-                                                                   (require :configpulse))
-                                                            (local get-time (cache-fn configpulse.get_time))
-                                                            (local time
-                                                                   (get-time))
-                                                            (.. "It's been "
-                                                                time.days
-                                                                " days "
-                                                                time.hours ":"
-                                                                (string.format "%02d"
-                                                                               time.minutes)))
+                                              :lualine_x [(if (= (vim.fn.exists "g:neovide")
+                                                                 0)
+                                                              (fn []
+                                                                (local configpulse
+                                                                       (require :configpulse))
+                                                                (local get-time
+                                                                       (cache-fn configpulse.get_time))
+                                                                (local time
+                                                                       (get-time))
+                                                                (.. "It's been "
+                                                                    time.days
+                                                                    " days "
+                                                                    time.hours
+                                                                    ":"
+                                                                    (string.format "%02d"
+                                                                                   time.minutes)))
+                                                              (fn [] ""))
                                                           :branch
                                                           :diagnostics]
                                               :lualine_y [:filetype]
