@@ -1,3 +1,3 @@
 (import-macros {: pack} :Juliet.macros)
 
-(pack :avegancafe/configpulse)
+(pack :mrquantumcodes/configpulse)
