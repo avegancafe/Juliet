@@ -59,7 +59,18 @@
                                                                    :shorten 3
                                                                    [-1 -2])
                                                                 "%#EndOfBuffer#"))]
-                                              :lualine_x [:branch :diagnostics]
+                                              :lualine_x [(fn []
+                                                            (local configpulse
+                                                                   (require :configpulse))
+                                                            (local time
+                                                                   (configpulse.get_time))
+                                                            (.. "It's been "
+                                                                time.days
+                                                                " days "
+                                                                time.hours ":"
+                                                                (string.format "%02x" time.minutes)))
+                                                          :branch
+                                                          :diagnostics]
                                               :lualine_y [:filetype]
                                               :lualine_z []}
                                    :inactive_sections {:lualine_a []
