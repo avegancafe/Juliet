@@ -45,6 +45,7 @@
 	required = true
 [rebase]
 	autosquash = true
+	updateRefs = true
 [diff]
 	colorMoved = zebra
 	tool = Kaleidoscope
