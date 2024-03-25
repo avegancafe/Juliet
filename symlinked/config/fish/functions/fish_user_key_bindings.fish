@@ -74,3 +74,5 @@ function fkill -d "Fuzzy-find process and kill it"
     log "Killing '$process_name'..."
     echo $pid | xargs kill -9
 end
+
+fzf_key_bindings
