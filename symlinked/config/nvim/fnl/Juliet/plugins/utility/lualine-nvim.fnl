@@ -9,16 +9,8 @@
        :config (fn []
                  (set vim.o.laststatus 3)
                  (let [lualine (require :lualine)
-                       cache-fn (fn [f]
-                                  (var last-call nil)
-                                  (var last-result nil)
-                                  (fn []
-                                    (if (= last-call nil) (f)
-                                        (if (> (- last-call (os.time)) 60)
-                                            (do
-                                              (set last-result (f))
-                                              (set last-call (os.time))
-                                              last-result)))))]
+                       configpulse (require :configpulse)
+                       time (configpulse.get_time)]
                    (lualine.setup {:winbar {:lualine_c [(fn []
                                                           ((. (require :do)
                                                               :view) :active))]}
@@ -73,12 +65,6 @@
                                               :lualine_x [(if (= (vim.fn.exists "g:neovide")
                                                                  0)
                                                               (fn []
-                                                                (local configpulse
-                                                                       (require :configpulse))
-                                                                (local get-time
-                                                                       (cache-fn configpulse.get_time))
-                                                                (local time
-                                                                       (get-time))
                                                                 (.. "It's been "
                                                                     time.days
                                                                     " days "
