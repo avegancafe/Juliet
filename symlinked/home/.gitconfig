@@ -22,6 +22,7 @@
 	su = submodule update --recursive --init
 	t = ticket
 	up = push
+	squash = rebase --autosquash main
 [push]
 	default = current
 	autoSetupRemote = true
