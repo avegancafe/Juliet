@@ -1,3 +1,5 @@
+fzf --fish | source
+
 function fish_user_key_bindings
     bind \cl 'echo \e\]1337\;ClearScrollback\x7; clear; commandline -f repaint'
     bind \cc 'commandline ""'
@@ -74,5 +76,3 @@ function fkill -d "Fuzzy-find process and kill it"
     log "Killing '$process_name'..."
     echo $pid | xargs kill -9
 end
-
-fzf_key_bindings
