@@ -1,7 +1,8 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :folke/zen-mode.nvim
-      {:keys [(key :<c-f>
+      {:dependencies [:folke/twilight.nvim]
+       :keys [(key :<c-f>
                    (fn []
                      (let [zen (require :zen-mode)] (zen.toggle))
                      (set vim.o.number true)
