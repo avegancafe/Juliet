@@ -54,14 +54,9 @@
                                               :lualine_c [(fn []
                                                             (local Path
                                                                    (require :plenary.path))
-                                                            (local p
-                                                                   (string.gsub (vim.api.nvim_buf_get_name 0)
-                                                                                (vim.loop.cwd)
-                                                                                ""))
-                                                            (.. (: (Path:new p)
-                                                                   :shorten 3
-                                                                   [-1 -2])
-                                                                "%#EndOfBuffer#"))]
+                                                            (var p
+                                                                 (Path:new (vim.api.nvim_buf_get_name 0)))
+                                                            (p:make_relative))]
                                               :lualine_x [(if (= (vim.fn.exists "g:neovide")
                                                                  0)
                                                               (fn []
