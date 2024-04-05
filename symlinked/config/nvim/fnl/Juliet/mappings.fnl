@@ -101,8 +101,6 @@
                               (string.gsub raw-file "%s+" ""))]
           (each [_ file (ipairs changed-files)] (vim.cmd (.. "tabedit " file))))))
 
-(vim.cmd ":command! EditChangedFiles call v:lua.EditChangedFiles()")
-
 (tset _G :OpenRelayMR
       (fn []
         (vim.api.nvim_exec "!git mr --draft" true)))
