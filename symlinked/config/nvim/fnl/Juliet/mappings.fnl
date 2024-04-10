@@ -70,10 +70,10 @@
 (vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>"
                 {:silent true :desc "Copy buffer relative path"})
 
-(vim.keymap.set :n :<leader>bo ":call v:lua.GithubOpen()<cr>"
+(vim.keymap.set :n :<leader>boc ":call v:lua.GithubOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
 
-(vim.keymap.set :n :<leader>bm ":call v:lua.GithubOpen('main')<cr>"
+(vim.keymap.set :n :<leader>bom ":call v:lua.GithubOpen('main')<cr>"
                 {:silent true :desc "Open file in gitlab on the `main` branch"})
 
 (vim.keymap.set :n :<leader>bi ":IsolateBuffer<cr>"
