@@ -5,4 +5,18 @@
        :init (fn []
                (vim.cmd ":command! EditChangedFiles Easypick changed-files"))
        :opts {:pickers [{:name :changed-files
-                         :command "git status --short | awk '{ print $2 }'"}]}})
+                         :command "git status --short | awk '{ print $2 }'"}
+                        {:name :git-ticket
+                         :command :my-active-tickets
+                         :action (fn [buff-number]
+                                   (let [action-state (require :telescope.actions.state)
+                                         actions (require :telescope.actions)]
+                                     (actions.select_tab:replace (fn []
+                                                                   (actions.close buff-number)
+                                                                   (local selection
+                                                                          (. (action-state.get_selected_entry)
+                                                                             1))
+                                                                   (os.execute (.. "switch-to-ticket \""
+                                                                                   selection
+                                                                                   "\"")))))
+                                   true)}]}})
