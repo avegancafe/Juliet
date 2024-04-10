@@ -48,12 +48,15 @@
 
 (vim.cmd ":command! ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
 (vim.keymap.set :n :<esc> ":w<cr>" {:silent true})
-(tset _G :GithubOpen (fn []
+(tset _G :GithubOpen (fn [branch]
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
                                                                     ":~:."))
                              row (unpack (vim.api.nvim_win_get_cursor 0))
-                             command (.. "fish -c 'gho -c " filepath "#L" row
-                                         "'")]
+                             command (if (= branch nil)
+                                         (.. "fish -c 'gho -c " filepath "#L"
+                                             row "'")
+                                         (.. "fish -c 'gho " filepath "#L" row
+                                             "'"))]
                          (os.capture command)
                          (vim.cmd :mode))))
 
@@ -69,6 +72,9 @@
 
 (vim.keymap.set :n :<leader>bo ":call v:lua.GithubOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
+
+(vim.keymap.set :n :<leader>bm ":call v:lua.GithubOpen('main')<cr>"
+                {:silent true :desc "Open file in gitlab on the `main` branch"})
 
 (vim.keymap.set :n :<leader>bi ":IsolateBuffer<cr>"
                 {:desc "Close all buffers except current"})
