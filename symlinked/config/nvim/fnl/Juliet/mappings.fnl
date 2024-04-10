@@ -48,11 +48,11 @@
 
 (vim.cmd ":command! ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
 (vim.keymap.set :n :<esc> ":w<cr>" {:silent true})
-(tset _G :GitlabOpen (fn []
+(tset _G :GithubOpen (fn []
                        (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
                                                                     ":~:."))
                              row (unpack (vim.api.nvim_win_get_cursor 0))
-                             command (.. "fish -c 'glo -c " filepath "#L" row
+                             command (.. "fish -c 'gho -c " filepath "#L" row
                                          "'")]
                          (os.capture command)
                          (vim.cmd :mode))))
@@ -67,7 +67,7 @@
 (vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>"
                 {:silent true :desc "Copy buffer relative path"})
 
-(vim.keymap.set :n :<leader>bo ":call v:lua.GitlabOpen()<cr>"
+(vim.keymap.set :n :<leader>bo ":call v:lua.GithubOpen()<cr>"
                 {:silent true :desc "Open file in gitlab"})
 
 (vim.keymap.set :n :<leader>bi ":IsolateBuffer<cr>"

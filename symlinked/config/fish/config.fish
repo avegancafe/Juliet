@@ -294,13 +294,13 @@ function ls
     $LS_CMD $argv
 end
 
-function _gl --description "print the URL of a file in gitlab"
-    argparse --name="_gl" c/current -- $argv
+function _gh --description "print the URL of a file in gitub"
+    argparse --name="_gh" c/current -- $argv
 
     set -l REMOTE_URL (git remote get-url origin)
-    set -l GITLAB_BASE_URL (echo $REMOTE_URL | sed 's/^ssh\:\/\/git\@/https\:\/\//; s/\.git$//; s/\:6767//')
+    set -l GITHUB_BASE_URL (echo $REMOTE_URL | sed -e 's/^ssh\:\/\/git\@//' -e 's/^git\@//' -e 's/^https\:\/\///' -e 's/\.git$//' -e 's/\:6767//' -e 's/.com\:/.com\//')
 
-    set -l BRANCH_NAME master
+    set -l BRANCH_NAME main
 
     if test $_flag_c
         set BRANCH_NAME (git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
@@ -315,22 +315,22 @@ function _gl --description "print the URL of a file in gitlab"
     end
 
     if test -z $argv[1]
-        echo $GITLAB_BASE_URL
+        echo $GITHUB_BASE_URL
     else
-        echo "$GITLAB_BASE_URL/-/blob/$BRANCH_NAME/$FILE_PATH"
+        echo "https://$GITHUB_BASE_URL/blob/$BRANCH_NAME/$FILE_PATH"
     end
 end
 
-function glc --description "copy the URL of a file in gitlab"
-    argparse --name="_gl" c/current -- $argv
+function glc --description "copy the URL of a file in github"
+    argparse --name="_gh" c/current -- $argv
 
-    _gl $_flag_c $argv | pbcopy
+    _gh $_flag_c $argv | pbcopy
 end
 
-function glo --description "open the URL of a file in gitlab"
-    argparse --name="_gl" c/current -- $argv
+function gho --description "open the URL of a file in github"
+    argparse --name="_gh" c/current -- $argv
 
-    _gl $_flag_c $argv | xargs open
+    _gh $_flag_c $argv | xargs open
 end
 
 function changed_files
