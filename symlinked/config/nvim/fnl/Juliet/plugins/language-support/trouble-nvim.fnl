@@ -4,6 +4,5 @@
       {:branch :dev
        :lazy false
        :config true
-       :keys [(key :<leader>ld ":Trouble diagnostics<cr>"
-                   "Document diagnostics")
-              (key :<leader>l ":Trouble<cr>" "Open trouble")]})
+       :keys [(key :<leader>la ":Trouble diagnostics<cr>"
+                   "Document diagnostics")]})

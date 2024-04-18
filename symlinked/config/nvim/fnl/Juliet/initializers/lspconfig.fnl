@@ -26,6 +26,9 @@
   (buf-set-keymap :n :<leader>lu
                   ":lua require('telescope.builtin').lsp_references()<CR>"
                   {:noremap true :silent true :desc "Show LSP references"})
+  (buf-set-keymap :n :<leader>ld
+                  ":lua require('telescope.builtin').lsp_references()<CR>"
+                  {:noremap true :silent true :desc "Show LSP references"})
   (buf-set-keymap :n :<leader>lo :<CMD>AerialToggle<CR>
                   {:noremap true :silent true :desc "Open LSP outline"}))
 
