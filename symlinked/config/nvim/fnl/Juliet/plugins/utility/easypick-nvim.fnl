@@ -1,9 +1,11 @@
-(import-macros {: pack} :Juliet.macros)
+(import-macros {: pack : key} :Juliet.macros)
 
 (pack :axkirillov/easypick.nvim
       {:dependencies [:nvim-telescope/telescope.nvim]
        :init (fn []
                (vim.cmd ":command! EditChangedFiles Easypick changed-files"))
+       :lazy false
+       :keys [(key :<leader>gt ":Easypick git-ticket<cr>") "Switch to another Jira ticket's branch"]
        :opts {:pickers [{:name :changed-files
                          :command "git status --short | awk '{ print $2 }'"}
                         {:name :git-ticket
