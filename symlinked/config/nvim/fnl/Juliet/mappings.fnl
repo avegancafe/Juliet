@@ -107,13 +107,13 @@
                               (string.gsub raw-file "%s+" ""))]
           (each [_ file (ipairs changed-files)] (vim.cmd (.. "tabedit " file))))))
 
-(tset _G :OpenRelayMR
+(tset _G :OpenPR
       (fn []
-        (vim.api.nvim_exec "!git mr --draft" true)))
+        (vim.api.nvim_exec "!git pr" true)))
 
-(vim.cmd ":command! OpenRelayMR call v:lua.OpenRelayMR()")
-(vim.keymap.set :n :<leader>gmr ":OpenRelayMR<cr>"
-                {:desc "Open draft MR in relay repo"})
+(vim.cmd ":command! OpenPR call v:lua.OpenPR()")
+(vim.keymap.set :n :<leader>gpr ":OpenPR<cr>"
+                {:desc "Open draft PR"})
 
 (tset _G :IsolateBuffer
       (fn []
