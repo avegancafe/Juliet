@@ -15,7 +15,7 @@
                  (vim.api.nvim_set_hl 0 :TelescopePreviewBorder
                                       {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :MiniPickBorder {:fg colors.grey})
-                 (vim.api.nvim_set_hl 0 :MiniPickPrompt {:fg colors.grey})
+                 (vim.api.nvim_set_hl 0 :MiniPickPrompt {:fg colors.fg})
                  (vim.api.nvim_set_hl 0 :TabLineLogo
                                       {:fg colors.red :bg colors.black})
                  (vim.api.nvim_set_hl 0 :TabLineSep {:bg colors.green})
