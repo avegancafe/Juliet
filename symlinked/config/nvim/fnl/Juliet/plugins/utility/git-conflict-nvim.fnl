@@ -4,4 +4,8 @@
       {:config true
        :version "*"
        :lazy false
-       :keys [(key :<leader>gl (fn [] (vim.cmd :GitConflictListQf)) "Open all git merge conflicts in quickfix menu")]})
+       :opts {:list_opener (fn []
+                             (let [trouble (require :trouble)]
+                               (trouble.toggle :quickfix)))}
+       :keys [(key :<leader>gc (fn [] (vim.cmd :GitConflictListQf))
+                   "Open all git merge conflicts in quickfix menu")]})
