@@ -461,3 +461,8 @@ function logs
 
     gcloud app logs tail --service $service
 end
+
+function commit
+    set -l initials $(test -n $GIT_INITIALS && echo $GIT_INITIALS || echo 'KH')
+    git commit -m "[$initials] $argv"
+end
