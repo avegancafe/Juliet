@@ -12,6 +12,9 @@
                      command [:fd
                               :--hidden
                               :--type=f
+                              :--no-ignore
+                              :--ignore-file
+                              (vim.fn.expand "$HOME/.gitignore_global")
                               :--no-follow
                               :--color=never]
                      show-with-icons (fn [buf-id items query]
