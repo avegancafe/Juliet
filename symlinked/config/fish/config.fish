@@ -51,6 +51,10 @@ function current-branch
     git rev-parse --abbrev-ref HEAD
 end
 
+function ccb
+    current-branch | pbcopy
+end
+
 function clone
     if test -z "$argv[1]"
         error "ERROR: no repo provided"
