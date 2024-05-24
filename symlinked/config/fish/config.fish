@@ -68,7 +68,7 @@ function clone
         return 1
     end
 
-    gum spin --title "Cloning $argv[1] from gitlab.dev..." -- git clone $base_url$argv[1]
+    gum spin --title "Cloning $argv[1] from $provider..." -- git clone $base_url$argv[1]
 
     log Cloned!
 
