@@ -53,6 +53,7 @@ end
 
 function ccb
     current-branch | pbcopy
+    log Copied (current-branch)
 end
 
 function clone
