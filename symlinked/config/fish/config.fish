@@ -48,7 +48,7 @@ function gdiff
 end
 
 function current-branch
-    git rev-parse --abbrev-ref HEAD
+    git rev-parse --abbrev-ref HEAD | tr -d '\n'
 end
 
 function ccb
