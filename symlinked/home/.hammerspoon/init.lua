@@ -18,7 +18,7 @@ local open_terminal = function()
 end
 
 local open_chatgpt_prompt = function()
-	local app  = hs.application.get('ChatGPT')
+	local app = hs.application.get('ChatGPT')
 
 	if app == nil then
 		hs.application.open('ChatGPT')
@@ -31,6 +31,7 @@ local open_chatgpt_prompt = function()
 end
 
 hs.hotkey.bind({}, 'f14', open_chatgpt_prompt)
+hs.hotkey.bind({ 'cmd' }, 'space', open_chatgpt_prompt)
 hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
 
 hs.hotkey.bind({}, 'f15', function()
