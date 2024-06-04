@@ -17,22 +17,20 @@ local open_terminal = function()
 	end
 end
 
-local open_neovide = function()
-	local app = hs.application.get('Neovide')
+local open_chatgpt_prompt = function()
+	local app  = hs.application.get('ChatGPT')
 
 	if app == nil then
-		hs.application.open('Neovide')
-		return
+		hs.application.open('ChatGPT')
 	end
 
-	if app:isFrontmost() then
-		app:hide()
-	else
-		app:activate()
-	end
+	hs.eventtap.event.newKeyEvent(hs.keycodes.map.alt, true):post()
+	hs.eventtap.event.newKeyEvent(hs.keycodes.map.space, true):post()
+	hs.eventtap.event.newKeyEvent(hs.keycodes.map.space, false):post()
+	hs.eventtap.event.newKeyEvent(hs.keycodes.map.alt, false):post()
 end
 
-hs.hotkey.bind({}, 'f14', open_neovide)
+hs.hotkey.bind({}, 'f14', open_chatgpt_prompt)
 hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
 
 hs.hotkey.bind({}, 'f15', function()
