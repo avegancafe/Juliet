@@ -5,7 +5,21 @@ function fish_user_key_bindings
     bind \cc 'commandline ""'
     bind \cb fco_preview
     bind \cn 'git rebase --continue'
+    bind \cg 'echo_workflow_files | read -lz selected_file; __insert_at_cursor $selected_file'
     fzf --fish | source
+end
+
+function __insert_at_cursor --argument-names text
+    set cursor_position (commandline -C)
+    set left_text (commandline | string sub -l $cursor_position)
+    set right_text (commandline | string sub -s (math "$cursor_position + 1"))
+
+    # Remove any newlines from the text
+    set text (string join " " (string split -n " " $text))
+
+    commandline -r -- "$left_text$text$right_text"
+    commandline -C (math "$cursor_position + $(string length -- $text)")
+    commandline -f repaint
 end
 
 function fco -d "Fuzzy-find and checkout a branch"
@@ -75,4 +89,30 @@ function fkill -d "Fuzzy-find process and kill it"
 
     log "Killing '$process_name'..."
     echo $pid | xargs kill -9
+end
+
+function echo_workflow_files -d "Fuzzy-find and print GitHub Actions workflow file"
+    set project_root (git rev-parse --show-toplevel 2> /dev/null)
+
+    if test $status -ne 0
+        echo "Error: Not inside a Git repository."
+        return 1
+    end
+
+    set workflow_dir "$project_root/.github/workflows"
+
+    if test ! -d "$workflow_dir"
+        echo "Error: Directory .github/workflows does not exist in the project root."
+        return 1
+    end
+
+    set file (find "$workflow_dir" -type f -name "*.yml" | fzf --reverse --height 40%)
+
+    if test -z "$file"
+        echo "No files selected."
+        return 0
+    end
+
+    set filename (basename $file)
+    printf $filename
 end
