@@ -145,7 +145,7 @@
 
 (vim.cmd ":command! ReloadConfig call v:lua.ReloadConfig()")
 
-(vim.cmd ":command! FixWhitespace s/\\s*$//g | noh")
+(vim.cmd ":command! FixWhitespace %s/\\s*$//g | noh")
 
 (tset _G :ReopenLastBuffer
       (fn []
