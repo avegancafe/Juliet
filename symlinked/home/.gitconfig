@@ -23,6 +23,7 @@
 	t = ticket
 	up = push
 	squash = rebase --autosquash main
+	fixup = commit --fixup
 [push]
 	default = current
 	autoSetupRemote = true
