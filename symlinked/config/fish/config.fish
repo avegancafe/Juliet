@@ -216,6 +216,14 @@ function vim --wraps "nvim"
     end
 end
 
+function pe --wraps "pipenv"
+    if ! command -v pipenv 2&> /dev/null
+        gum confirm "Pipenv not installed. Install?" && pip install --upgrade pipenv
+    end
+
+    pipenv $argv
+end
+
 function nv --wraps "neovide"
     if ! command -v neovide 2&> /dev/null
         gum confirm "Neovide not installed. Install?" && brew install --cask neovide
