@@ -216,7 +216,7 @@ function vim --wraps "nvim"
     end
 end
 
-function pe --wraps "pipenv"
+function pv --wraps "pipenv"
     if ! command -v pipenv 2&> /dev/null
         gum confirm "Pipenv not installed. Install?" && pip install --upgrade pipenv
     end
