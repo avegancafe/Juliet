@@ -45,9 +45,9 @@
 (set vim.opt.hidden true)
 (vim.cmd "augroup FiletypeGroup
   autocmd!
-  au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
-  au BufNewFile,BufRead *.mdx set filetype=markdown.mdx
-  au BufRead,BufNewFile *.md setlocal textwidth=80
+  autocmd BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+  autocmd BufNewFile,BufRead *.mdx set filetype=markdown.mdx
+  autocmd BufRead,BufNewFile *.md setlocal textwidth=80
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
   autocmd BufNewFile,BufRead Procfile set filetype=sh
 augroup END
