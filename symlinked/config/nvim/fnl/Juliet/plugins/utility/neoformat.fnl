@@ -7,7 +7,7 @@
                                  (set vim.g.neoformat_enabled_sql [:sqlfluff])
                                  (set vim.g.neoformat_sql_sqlfluff
                                       {:exe :sqlfluff
-                                       :args [:fix :--dialect :bigquery]
+                                       :args [:fix]
                                        :stdin 0
                                        :replace 1})
                                  (set vim.g.neoformat_python_ruff
