@@ -18,3 +18,4 @@
               :float {:max_width 120 :max_height 30}
               :keymaps {:<c-t> {1 :actions.select :opts {:tab true}}
                         :<c-c> ":q<cr>"
+                        :<cr> {1 :actions.select :opts {:tab true}}}}})
