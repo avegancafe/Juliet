@@ -16,6 +16,14 @@
        :lazy false
        :opts {:view_options {:show_hidden true}
               :float {:max_width 120 :max_height 30}
-              :keymaps {:<c-t> {1 :actions.select :opts {:tab true}}
-                        :<c-c> ":q<cr>"
-                        :<cr> {1 :actions.select :opts {:tab true}}}}})
+              :keymaps {:<cr> (fn []
+                                (let [oil (require :oil)
+                                      actions (require :oil.actions)
+                                      is-file (= (. (oil.get_cursor_entry)
+                                                    :type)
+                                                 :file)]
+                                  (actions.select.callback {:tab is-file})))
+                        :<c-t> (fn []
+                                 (let [actions (require :oil.actions)]
+                                   (actions.select.callback {:tab true})))
+                        :<c-c> ":q<cr>"}}})
