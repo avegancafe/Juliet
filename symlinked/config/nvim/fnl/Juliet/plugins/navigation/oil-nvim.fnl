@@ -10,4 +10,5 @@
                    "Open file explorer in current directory")]
        :lazy false
        :opts {:view_options {:show_hidden true}
-              :float {:max_width 120 :max_height 30}}})
+              :float {:max_width 120 :max_height 30}
+              :keymaps {:<C-t> {1 :actions.select :opts {:tab true}}}}})
