@@ -50,7 +50,6 @@
   autocmd BufRead,BufNewFile *.md setlocal textwidth=80
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
   autocmd BufNewFile,BufRead Procfile set filetype=sh
-  autocmd BufLeave oil://* q
 augroup END
 ")
 
