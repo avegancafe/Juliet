@@ -26,4 +26,4 @@
                         :<c-t> (fn []
                                  (let [actions (require :oil.actions)]
                                    (actions.select.callback {:tab true})))
-                        :<c-c> ":q<cr>"}}})
+                        :<c-c> (fn [] (vim.cmd :q))}}})
