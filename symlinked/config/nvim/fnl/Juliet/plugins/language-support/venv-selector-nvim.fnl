@@ -5,9 +5,15 @@
      :gsub :/bin/python ""))
 
 (pack :linux-cultist/venv-selector.nvim
-      {:dependencies [:neovim/nvim-lspconfig :nvim-telescope/telescope.nvim]
+      {:dependencies [:neovim/nvim-lspconfig
+                      :nvim-telescope/telescope.nvim
+                      :mfussenegger/nvim-lint]
        :branch :regexp
-       :opts {:settings {:options {:debug true}
+       :opts {:settings {:options {:debug true
+                                   :on_venv_activate_callback (fn []
+                                                                (let [lint (require :lint)]
+                                                                  (lint.try_lint nil
+                                                                                 {:ignore_errors true})))}
                          :search {:virtualenvs false
                                   :pyenv false
                                   :hatch false
