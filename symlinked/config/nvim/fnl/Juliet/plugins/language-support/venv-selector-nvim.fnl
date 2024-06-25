@@ -9,8 +9,7 @@
                       :nvim-telescope/telescope.nvim
                       :mfussenegger/nvim-lint]
        :branch :regexp
-       :opts {:settings {:options {:debug true
-                                   :on_venv_activate_callback (fn []
+       :opts {:settings {:options {:on_venv_activate_callback (fn []
                                                                 (let [lint (require :lint)]
                                                                   (lint.try_lint nil
                                                                                  {:ignore_errors true})))}
