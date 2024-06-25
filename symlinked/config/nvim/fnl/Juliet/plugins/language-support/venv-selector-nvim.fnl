@@ -1,8 +1,8 @@
 (import-macros {: pack} :Juliet.macros)
 
 (fn shorten-pipenv-path [filename]
-  (: (filename:gsub (.. (os.getenv :HOME) :/.local/share/virtualenvs/) "") :gsub
-     :/bin/python ""))
+  (: (filename:gsub (.. (os.getenv :HOME) :/.local/share/virtualenvs/) "")
+     :gsub :/bin/python ""))
 
 (pack :linux-cultist/venv-selector.nvim
       {:dependencies [:neovim/nvim-lspconfig :nvim-telescope/telescope.nvim]
