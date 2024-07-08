@@ -107,13 +107,11 @@
                               (string.gsub raw-file "%s+" ""))]
           (each [_ file (ipairs changed-files)] (vim.cmd (.. "tabedit " file))))))
 
-(tset _G :OpenPR
-      (fn []
-        (vim.api.nvim_exec "!git pr" true)))
+(tset _G :OpenPR (fn []
+                   (vim.api.nvim_exec "!git pr" true)))
 
 (vim.cmd ":command! OpenPR call v:lua.OpenPR()")
-(vim.keymap.set :n :<leader>gpr ":OpenPR<cr>"
-                {:desc "Open draft PR"})
+(vim.keymap.set :n :<leader>gpr ":OpenPR<cr>" {:desc "Open draft PR"})
 
 (tset _G :IsolateBuffer
       (fn []
@@ -179,3 +177,23 @@
         (print (.. (- n-wipeouts 1) " buffer(s) wiped out"))))
 
 (vim.cmd ":command! WipeoutHiddenBuffers call v:lua.WipeoutHiddenBuffers()")
+
+(tset _G :CloseDuplicateTabs
+      (fn []
+        (let [tabpages (vim.api.nvim_list_tabpages)
+              open-buffers {}]
+          (each [_ win (ipairs (vim.api.nvim_list_wins))]
+            (local buf (vim.api.nvim_win_get_buf win))
+            (if (. open-buffers buf)
+                (tset open-buffers buf (+ (. open-buffers buf) 1))
+                (tset open-buffers buf 1)))
+          (each [_ tab (ipairs tabpages)]
+            (local wins (vim.api.nvim_tabpage_list_wins tab))
+            (when (= (length wins) 1)
+              (local buf (vim.api.nvim_win_get_buf (. wins 1)))
+              (when (> (. open-buffers buf) 1)
+                (vim.api.nvim_command (.. "tabclose "
+                                          (vim.api.nvim_tabpage_get_number tab)))
+                (tset open-buffers buf (- (. open-buffers buf) 1))))))))
+
+(vim.cmd ":command! CloseDuplicateTabs call v:lua.CloseDuplicateTabs()")
