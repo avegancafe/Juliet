@@ -38,7 +38,10 @@ format_string="%(objectname:short)@%(refname:short)@%(committerdate:relative)"
 IFS=$'\n'
 
 branches=$(git for-each-ref --sort=-authordate --format="$format_string" refs/heads/ --no-merged)
-branches=$(printf "${branches}\n$(git for-each-ref --sort=-authordate --format="$format_string" refs/remotes/origin/ --no-merged)")
+
+if [[ "$1" == "--all" ]]; then
+    branches=$(printf "${branches}\n$(git for-each-ref --sort=-authordate --format="$format_string" refs/remotes/origin/ --no-merged)")
+fi
 
 for branchdata in $branches; do
     sha=$(echo "$branchdata" | cut -d '@' -f1)
