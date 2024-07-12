@@ -34,7 +34,7 @@
                                                                                "")
                                                                             "[No Name]"
                                                                             (string.match full-path
-                                                                                          "([%a%d-_%.]*)$"))))
+                                                                                          "([%a%d-_%.:]*)$"))))
                                                                (local parse-index
                                                                       (fn [full-path]
                                                                         (string.gsub (string.match full-path
