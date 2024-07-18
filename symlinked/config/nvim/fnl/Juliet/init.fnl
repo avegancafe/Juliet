@@ -9,7 +9,7 @@
          au FileType qf wincmd J
          augroup END")
 
-(vim.cmd "set scrolloff=4\n")
+(vim.cmd "set scrolloff=4")
 (set vim.g.omni_sql_no_default_maps 1)
 (set vim.g.loaded_netrw 1)
 (set vim.g.loaded_netrwPlugin 1)
