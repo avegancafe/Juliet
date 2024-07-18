@@ -1,7 +1,7 @@
 (import-macros {: pack} :Juliet.macros)
 
 (pack :nvim-telescope/telescope.nvim
-      {:dependencies [:kyazdani42/nvim-web-devicons
+      {:dependencies [:nvim-tree/nvim-web-devicons
                       :nvim-telescope/telescope-ui-select.nvim
                       :nvim-lua/plenary.nvim
                       :ribru17/bamboo.nvim

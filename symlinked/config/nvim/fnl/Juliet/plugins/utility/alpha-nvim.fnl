@@ -1,7 +1,7 @@
 (import-macros {: pack} :Juliet.macros)
 
 (pack :goolord/alpha-nvim
-      {:dependencies [:kyazdani42/nvim-web-devicons]
+      {:dependencies [:nvim-tree/nvim-web-devicons]
        :config (fn []
                  (var alpha (require :alpha))
                  (var dashboard (require :alpha.themes.dashboard))

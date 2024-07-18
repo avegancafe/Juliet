@@ -1,7 +1,7 @@
 (import-macros {: pack} :Juliet.macros)
 
 (pack :nvim-lualine/lualine.nvim
-      {:dependencies [:nvim-web-devicons
+      {:dependencies [:nvim-tree/nvim-web-devicons
                       :nocksock/do.nvim
                       :natecraddock/workspaces.nvim
                       :ribru17/bamboo.nvim
