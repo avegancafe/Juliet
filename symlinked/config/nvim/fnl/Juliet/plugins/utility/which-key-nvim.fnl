@@ -2,6 +2,7 @@
 
 (pack :folke/which-key.nvim
       {:config true
+       :dependencies [:nvim-tree/nvim-web-devicons]
        :opts {:icons {:separator "->"}
-              :window {:border :rounded}
-              :modes {:x false}}})
+              :win {:border :rounded}
+              :triggers {1 :<auto> 2 {:mode :nisotc}}}})
