@@ -39,6 +39,11 @@ set -gx LESS_TERMCAP_se $RESET_CODE
 
 source ~/.config/fish/_util.fish
 
+# welcome, here is your fortune for this shell
+if command -v fortune 2&> /dev/null && test -z "$FORTUNE"
+    fortune
+end
+
 function cat
     bat $argv
 end
