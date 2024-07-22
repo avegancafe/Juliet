@@ -18,7 +18,7 @@
                       [(dashboard.button :s " > Open session"
                                          ":Telescope workspaces<cr>")
                        (dashboard.button :e " > Explore fs"
-                                         ":lua require('oil').open_float()<cr>")
+                                         ":Neotree<cr>")
                        (dashboard.button :l " > Load session for current dir"
                                          ":SessionManager load_current_dir_session<cr>")
                        (dashboard.button :f " > Find file" ":Pick files<cr>")])
