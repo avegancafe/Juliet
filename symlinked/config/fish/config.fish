@@ -213,11 +213,29 @@ end
 function vim --wraps "nvim"
     argparse --name="debug" d/debug -- $argv
 
+    function find_pipfile
+        set -l dir (pwd)
+        while test -d "$dir"
+            if test -f "$dir/Pipfile"
+                return 0
+            end
+            if test "$dir" = "/"
+                break
+            end
+            set dir (dirname "$dir")
+        end
+        return 1
+    end
+
     if test -n "$_flag_d"
         rm ~/vim.log
         nvim --startuptime ~/vim.log $argv
     else
-        nvim $argv
+        if find_pipfile
+            pipenv run nvim $argv
+        else
+            nvim $argv
+        end
     end
 end
 
