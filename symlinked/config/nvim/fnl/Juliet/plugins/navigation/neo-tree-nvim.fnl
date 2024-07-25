@@ -7,4 +7,5 @@
        :event :VeryLazy
        :dependencies [:nvim-lua/plenary.nvim
                       :nvim-tree/nvim-web-devicons
-                      :MunifTanjim/nui.nvim]})
+                      :MunifTanjim/nui.nvim]
+       :opts {:window {:mappings {:<cr> :open_tabnew}}}})
