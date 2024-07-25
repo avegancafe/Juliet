@@ -38,7 +38,7 @@
               (tset vim.opt :relativenumber true)
               (vim.cmd ":tabdo windo set relativenumber")))))
 
-(vim.cmd ":command! ToggleNumbers call v:lua.ToggleNumbers()")
+(vim.cmd ":command! -bar ToggleNumbers call v:lua.ToggleNumbers()")
 (vim.cmd ":command! Todo execute \"TodoTrouble cwd=\".getreg('%')")
 (vim.cmd ":abbreviate bgt BufferLineGroupToggle")
 (tset _G :ShowEditsInCurrentDir
@@ -120,7 +120,7 @@
           (if (> cur 1) (vim.cmd (.. "silent! 1," (- cur 1) :bd)))
           (if (< cur last) (vim.cmd (.. "silent! " (+ cur 1) "," last :bd))))))
 
-(vim.cmd ":command! IsolateBuffer call v:lua.IsolateBuffer()")
+(vim.cmd ":command! -bar IsolateBuffer call v:lua.IsolateBuffer()")
 
 (tset _G :ReloadConfig
       (fn []
@@ -176,7 +176,7 @@
             (set n-wipeouts (+ n-wipeouts 1))))
         (print (.. (- n-wipeouts 1) " buffer(s) wiped out"))))
 
-(vim.cmd ":command! WipeoutHiddenBuffers call v:lua.WipeoutHiddenBuffers()")
+(vim.cmd ":command! -bar WipeoutHiddenBuffers call v:lua.WipeoutHiddenBuffers()")
 
 (tset _G :CloseDuplicateTabs
       (fn []
@@ -196,4 +196,4 @@
                                           (vim.api.nvim_tabpage_get_number tab)))
                 (tset open-buffers buf (- (. open-buffers buf) 1))))))))
 
-(vim.cmd ":command! CloseDuplicateTabs call v:lua.CloseDuplicateTabs()")
+(vim.cmd ":command! -bar CloseDuplicateTabs call v:lua.CloseDuplicateTabs()")
