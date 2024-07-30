@@ -54,9 +54,17 @@ setup_fzf() {
 setup_fish() {
   mkdir -p ~/.config/fish
 
+
   if [[ ("$1" != "-n" && "$1" != "--no" ) && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to do a full fish install?") || $? == 0)) ]]; then
-    sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
-    chsh -s /opt/homebrew/bin/fish `whoami`
+    if [[ -z "$(cat /etc/shells | grep --color=never fish)" ]]; then
+      log "Adding fish to /etc/shells..."
+      sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
+    fi
+
+    if [[ "$SHELL" != "/opt/homebrew/bin/fish" ]]; then
+      log "Setting fish to default shell..."
+      chsh -s /opt/homebrew/bin/fish `whoami`
+    fi
   fi
 }
 
