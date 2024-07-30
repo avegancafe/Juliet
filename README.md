@@ -1,7 +1,7 @@
 To set up Juliet, run: 
 ```bash
 $ git clone --recursive git@github.com:avegancafe/Juliet ~/.config/Juliet
-$ ~/.config/Juliet/setup
+$ ~/.config/Juliet/bin/setup
 ```
 
 ## Downloads
