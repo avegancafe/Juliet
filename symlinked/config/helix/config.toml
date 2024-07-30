@@ -1,5 +1,9 @@
 theme = "bamboo"
 
+[editor]
+bufferline = "always"
+line-number = "relative"
+
 [keys.normal]
 tab = ":buffer-next"
 S-tab = ":buffer-previous"
@@ -12,6 +16,3 @@ C-c = "collapse_selection"
 
 [keys.insert]
 C-c = "normal_mode"
-
-[editor]
-bufferline = "always"
