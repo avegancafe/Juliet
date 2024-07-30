@@ -7,6 +7,9 @@ S-tab = ":buffer-previous"
 "}" = "goto_next_paragraph"
 C-c = "no_op"
 
+[keys.select]
+C-c = "collapse_selection"
+
 [keys.insert]
 C-c = "normal_mode"
 
