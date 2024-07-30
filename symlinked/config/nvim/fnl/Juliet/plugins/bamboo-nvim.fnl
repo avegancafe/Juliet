@@ -7,6 +7,9 @@
                    (bamboo.load)))
        :init (fn []
                (let [colors (require :bamboo.colors)]
+                 (vim.api.nvim_set_hl 0 :WhichKeyNormal {:bg colors.bg1})
+                 (vim.api.nvim_set_hl 0 :WhichKeyBorder {:bg colors.bg1})
+                 (vim.api.nvim_set_hl 0 :WhichKeyTitle {:bg colors.bg1})
                  (vim.api.nvim_set_hl 0 :FloatBorder {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :TelescopeResultsBorder
                                       {:fg colors.grey})
