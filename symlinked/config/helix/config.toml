@@ -1,0 +1,14 @@
+theme = "bamboo"
+
+[keys.normal]
+tab = ":buffer-next"
+S-tab = ":buffer-previous"
+"{" = "goto_prev_paragraph"
+"}" = "goto_next_paragraph"
+C-c = "no_op"
+
+[keys.insert]
+C-c = "normal_mode"
+
+[editor]
+bufferline = "always"
