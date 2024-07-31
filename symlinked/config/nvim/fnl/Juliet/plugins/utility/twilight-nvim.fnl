@@ -1,7 +1,7 @@
 (import-macros {: pack} :Juliet.macros)
 
 (pack :folke/twilight.nvim
-      {:opts {:context 30
+      {:opts {:context 5
               :expand [:function
                        :method
                        :table
