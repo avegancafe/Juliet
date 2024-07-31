@@ -9,7 +9,7 @@
 (fn on-attach [client bufnr]
   (when (= client.name :yamlls)
     (local ns (vim.lsp.diagnostic.get_namespace client.id))
-    (vim.diagnostic.disable nil ns))
+    (vim.diagnostic.enable false {:ns_id ns}))
   (when client.server_capabilities.documentSymbolProvider
     (navic.attach client bufnr))
 
