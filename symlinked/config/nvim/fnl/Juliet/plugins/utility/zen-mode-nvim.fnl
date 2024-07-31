@@ -10,6 +10,6 @@
                    "Enter zen mode")]
        :config true
        :opts {:window {:backdrop 1
-                       :height 0.9
+                       :height 1
                        :width 0.85
                        :options {:number false :relativenumber false}}}})
