@@ -1,4 +1,4 @@
-(import-macros {: pack} :Juliet.macros)
+(import-macros {: pack : key} :Juliet.macros)
 
 (pack :nvim-telescope/telescope.nvim
       {:dependencies [:nvim-tree/nvim-web-devicons
@@ -6,11 +6,15 @@
                       :nvim-lua/plenary.nvim
                       :ribru17/bamboo.nvim
                       :natecraddock/workspaces.nvim]
+       :lazy false
+       :keys [(key :<c-p> ":Telescope find_files<cr>" "Fuzzy find a file")
+              (key :<leader>p ":Telescope find_files<cr>" "Fuzzy find a file")
+              (key :<c-g> ":Telescope live_grep<cr>" "Live grep")
+              (key :<c-b> ":Telescope buffers<cr>" "Fuzzy list buffers")]
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.sources.telescope)
                        telescope (require :telescope)]
-
                    (telescope.setup {:defaults {:mappings {:i {:<c-j> actions.move_selection_next
                                                                :<c-k> actions.move_selection_previous
                                                                :<esc> actions.close
