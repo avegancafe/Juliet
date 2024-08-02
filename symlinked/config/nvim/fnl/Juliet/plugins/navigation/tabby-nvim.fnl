@@ -122,7 +122,7 @@
                                                                   :margin ""})))
                                  2 (line.spacer)
                                  3 (if (> (length (current-cal-event)) 0)
-                                       (current-cal-event)
+                                       (.. (current-cal-event) " ")
                                        ((. (line.wins_in_tab (line.api.get_current_tab))
                                            :foreach) (fn [win]
                                                                                                                                                 (local fin
