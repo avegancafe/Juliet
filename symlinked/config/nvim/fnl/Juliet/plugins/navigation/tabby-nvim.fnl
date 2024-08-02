@@ -95,7 +95,7 @@
                                                                (let [hl (or (and (tab.is_current)
                                                                                  theme.current_tab)
                                                                             theme.tab)]
-                                                                 {1 (line.sep "▎"
+                                                                 {1 (line.sep " "
                                                                               (or (and (tab.is_current)
                                                                                        theme.sep)
                                                                                   theme.fill)
