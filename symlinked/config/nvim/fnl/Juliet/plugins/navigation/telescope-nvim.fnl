@@ -21,21 +21,22 @@
                                                                :<c-o> trouble.open
                                                                :<enter> actions.select_tab
                                                                :<c-b> actions.select_default}}
-                                                :layout_config {:prompt_position :bottom}
                                                 :path_display {:shorten {:len 3
                                                                          :exclude [-1
-                                                                                   -2]}}}
+                                                                                   -2]}}
+                                                :theme :ivy
+                                                :layout_config {:prompt_position :bottom}
+                                                :layout_strategy :bottom_pane}
                                      :pickers {:find_files {:find_command [:fd
                                                                            :--hidden
-                                                                           :--glob
-                                                                           ""
+                                                                           :--no-follow
+                                                                           :--no-ignore
+                                                                           :--ignore-file
+                                                                           (vim.fn.expand :$HOME/.gitignore_global)
                                                                            :--type
                                                                            :file]}
                                                :live_grep {:file_ignore_patterns [:node_modules
                                                                                   :.git$]
-                                                           :theme :ivy
-                                                           :layout_config {:prompt_position :bottom}
-                                                           :layout_strategy :bottom_pane
                                                            :find_command :rg
                                                            :additional_args (fn []
                                                                               [:--no-heading
