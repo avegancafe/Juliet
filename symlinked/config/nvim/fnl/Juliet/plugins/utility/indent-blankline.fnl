@@ -3,7 +3,8 @@
 (pack :lukas-reineke/indent-blankline.nvim
       {:main :ibl
        :dependencies [:ribru17/bamboo.nvim]
-       :opts {:indent {:highlight [:CustomIndentGuide]}}
+       :opts {:indent {:highlight [:CustomIndentGuide]}
+              :scope {:enabled false}}
        :config (fn [_ opts]
                  (let [ibl (require :ibl)
                        colors (require :bamboo.colors)
