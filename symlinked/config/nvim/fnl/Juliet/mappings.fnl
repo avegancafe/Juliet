@@ -99,7 +99,8 @@
 (vim.keymap.set :n :<leader>bom ":call v:lua.GithubOpen('main')<cr>"
                 {:silent true :desc "Open file in gitlab on the `main` branch"})
 
-(vim.keymap.set :n :<leader>bi ":IsolateBuffer | CloseDuplicateTabs | WipeoutHiddenBuffers<cr>"
+(vim.keymap.set :n :<leader>bi
+                ":IsolateBuffer | CloseDuplicateTabs | WipeoutHiddenBuffers<cr>"
                 {:desc "Close all buffers except current"})
 
 (vim.keymap.set :n :<leader>bw ":WipeoutHiddenBuffers<cr>"
