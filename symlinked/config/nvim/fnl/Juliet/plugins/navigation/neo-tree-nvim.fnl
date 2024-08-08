@@ -8,4 +8,6 @@
        :dependencies [:nvim-lua/plenary.nvim
                       :nvim-tree/nvim-web-devicons
                       :MunifTanjim/nui.nvim]
-       :opts {:window {:mappings {:<cr> :open_tabnew}}}})
+       :opts {:window {:mappings {:<cr> :open_tabnew}}
+              :default_component_configs {:git_status {:symbols {:unstaged :M
+                                                                 :staged :U}}}}})

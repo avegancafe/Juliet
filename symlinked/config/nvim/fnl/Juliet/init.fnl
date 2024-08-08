@@ -35,6 +35,7 @@
 (set vim.opt.fdm :syntax)
 (set vim.opt.cursorline true)
 (vim.cmd "set completeopt-=preview")
+(vim.cmd "set sessionoptions-=folds")
 (vim.cmd "set noshowmode")
 (set vim.opt.termguicolors true)
 (set vim.opt.shiftwidth 2)
