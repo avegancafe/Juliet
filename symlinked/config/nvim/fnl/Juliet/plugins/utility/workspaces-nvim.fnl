@@ -29,7 +29,9 @@
                                                        (local command
                                                               (if (= (vim.api.nvim_buf_get_name 0)
                                                                      "")
-                                                                  (.. "tabNext | :q | SessionManager load_current_dir_session")
+                                                                  (do
+                                                                    (print "Empty buffer found when loading workspace session")
+                                                                    (.. "tabNext | :q | SessionManager load_current_dir_session"))
                                                                   (.. "SessionManager load_current_dir_session")))
                                                        (vim.cmd command))]}})
                    (let [dirs (workspaces.get)
