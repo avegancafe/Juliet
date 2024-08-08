@@ -69,8 +69,26 @@
 (vim.keymap.set :n :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
                 {:desc "Edit all changed files"})
 
-(vim.keymap.set :n :<leader>byy ":let @*=expand(\"%:p\")<cr>"
+(vim.keymap.set :n :<leader>byy
+                (fn []
+                  (let [path (vim.fn.expand "%:p")]
+                    (print (.. "Copied '" path "' to clipboard"))
+                    (vim.fn.setreg "*" path)))
                 {:silent true :desc "Copy buffer absolute path"})
+
+(vim.keymap.set :n :<leader>byr
+                (fn []
+                  (let [path (vim.fn.expand "%:.")]
+                    (print (.. "Copied '" path "' to clipboard"))
+                    (vim.fn.setreg "*" path)))
+                {:silent true :desc "Copy buffer relative path"})
+
+(vim.keymap.set :n :<leader>byf
+                (fn []
+                  (let [filename (vim.fn.expand "%:t")]
+                    (print (.. "Copied '" filename "' to clipboard"))
+                    (vim.fn.setreg "*" filename)))
+                {:silent true :desc "Copy buffer file name"})
 
 (vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>"
                 {:silent true :desc "Copy buffer relative path"})
