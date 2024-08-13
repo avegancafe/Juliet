@@ -23,10 +23,7 @@
                                                                :<c-b> actions.select_default}}
                                                 :path_display {:shorten {:len 3
                                                                          :exclude [-1
-                                                                                   -2]}}
-                                                :theme :ivy
-                                                :layout_config {:prompt_position :bottom}
-                                                :layout_strategy :bottom_pane}
+                                                                                   -2]}}}
                                      :pickers {:find_files {:find_command [:fd
                                                                            :--hidden
                                                                            :--no-follow
@@ -34,7 +31,8 @@
                                                                            :--ignore-file
                                                                            (vim.fn.expand :$HOME/.gitignore_global)
                                                                            :--type
-                                                                           :file]}
+                                                                           :file]
+                                                            :theme :dropdown}
                                                :live_grep {:file_ignore_patterns [:node_modules
                                                                                   :.git$]
                                                            :find_command :rg
@@ -44,8 +42,12 @@
                                                                                :--line-number
                                                                                :--column
                                                                                :--hidden
-                                                                               :--smart-case])}
-                                               :buffers {:mappings {:i {:<c-q> (+ actions.delete_buffer
+                                                                               :--smart-case])
+                                                           :theme :ivy
+                                                           :layout_config {:prompt_position :bottom}
+                                                           :layout_strategy :bottom_pane}
+                                               :buffers {:theme :dropdown
+                                                         :mappings {:i {:<c-q> (+ actions.delete_buffer
                                                                                   actions.move_to_top)}}}}})
                    (telescope.load_extension :ui-select)
                    (telescope.load_extension :workspaces)))})
