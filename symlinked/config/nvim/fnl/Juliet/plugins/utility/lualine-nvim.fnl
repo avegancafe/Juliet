@@ -51,13 +51,19 @@
                                                                                       " [%a%A]+"
                                                                                       "")))))
                                                             fin)]
-                                              :lualine_c [(fn []
+                                              :lualine_c []
+                                              :lualine_x [(fn []
                                                             (local Path
                                                                    (require :plenary.path))
                                                             (var p
                                                                  (Path:new (vim.api.nvim_buf_get_name 0)))
-                                                            (p:make_relative))]
-                                              :lualine_x [(if (= (vim.fn.exists "g:neovide")
+                                                            (p:make_relative))
+                                                          (fn []
+                                                            (if (not (= (vim.api.nvim_buf_get_name 0)
+                                                                        ""))
+                                                                "|"
+                                                                ""))
+                                                          (if (= (vim.fn.exists "g:neovide")
                                                                  0)
                                                               (fn []
                                                                 (.. "It's been "
@@ -67,9 +73,7 @@
                                                                     ":"
                                                                     (string.format "%02d"
                                                                                    time.minutes)))
-                                                              (fn [] ""))
-                                                          :branch
-                                                          :diagnostics]
+                                                              (fn [] ""))]
                                               :lualine_y [:filetype]
                                               :lualine_z []}
                                    :inactive_sections {:lualine_a []
