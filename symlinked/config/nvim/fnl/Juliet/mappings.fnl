@@ -198,7 +198,7 @@
                      (= (. known-buffers i) nil))
             (vim.cmd (.. "silent exec 'bwipeout'" i))
             (set n-wipeouts (+ n-wipeouts 1))))
-        (print (.. (- n-wipeouts 1) " buffer(s) wiped out"))))
+        (print (.. (math.max 0 (- n-wipeouts 1)) " buffer(s) wiped out"))))
 
 (vim.cmd ":command! -bar WipeoutHiddenBuffers call v:lua.WipeoutHiddenBuffers()")
 
