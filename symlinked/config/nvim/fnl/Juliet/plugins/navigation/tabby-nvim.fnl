@@ -53,8 +53,7 @@
        :keys [(key :<tab> :gt "Next tab")
               (key :<s-tab> :gT "Previous tab")
               (key :<leader><tab> ":+tabmove<cr>" "Move tab to the right")
-              (key :<leader><s-tab> ":-tabmove<cr>" "Move tab to the left")
-              (key :<leader><tab>o ":tabonly<cr>" "Isolate tab")]
+              (key :<leader><s-tab> ":-tabmove<cr>" "Move tab to the left")]
        :config (fn []
                  (local tabline (require :tabby.tabline))
                  (local theme {:current_tab :TabLineSel
