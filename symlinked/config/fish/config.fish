@@ -6,7 +6,8 @@ set -gx PATH "$GOPATH/bin" $PATH
 set -gx PATH "$HOME/.cargo/bin" $PATH
 set -gx PATH $PATH "$HOME/.foundry/bin"
 set -gx PATH "/opt/homebrew/opt/go@1.20/bin" $PATH
-set -gx PATH (pyenv root)/shims $PATH
+set -Ux PYENV_ROOT $HOME/.pyenv
+set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
 set -gx GOPATH "$HOME/go"
 set -gx EDITOR nvim
 set -gx GPG_TTY (tty)
@@ -498,3 +499,5 @@ function commit
     set -l initials $(test -n $GIT_INITIALS && echo $GIT_INITIALS || echo 'KH')
     git commit -m "[$initials] $argv"
 end
+
+pyenv init - | source
