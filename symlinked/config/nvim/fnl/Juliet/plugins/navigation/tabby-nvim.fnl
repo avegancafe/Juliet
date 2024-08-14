@@ -108,11 +108,32 @@
                                                                                   "")
                                                                               theme.tab
                                                                               theme.tab)
-                                                                  3 (if (> (num-of-bufs tab.id)
-                                                                           1)
-                                                                        (.. buffer-name
-                                                                            " (+)")
-                                                                        buffer-name)
+                                                                  3 (let [width (vim.fn.winwidth 0)
+                                                                          buf-info (vim.fn.getbufinfo {:buflisted 1})
+                                                                          buf-num (length buf-info)
+                                                                          ideal-max-width 30
+                                                                          equal-sized-width (vim.fn.float2nr (vim.fn.floor (/ width
+                                                                                                                              buf-num)))
+                                                                          actual-max-width (vim.fn.min [equal-sized-width
+                                                                                                        ideal-max-width])
+                                                                          full-text (if (> (num-of-bufs tab.id)
+                                                                                           1)
+                                                                                        (.. buffer-name
+                                                                                            " (+)")
+                                                                                        buffer-name)
+                                                                          suffix (if (> (length full-text)
+                                                                                        actual-max-width)
+                                                                                     "…"
+                                                                                     "")
+                                                                          len-text (if (> (length full-text)
+                                                                                          actual-max-width)
+                                                                                       (- actual-max-width
+                                                                                          1)
+                                                                                       (length full-text))
+                                                                          actual-text (.. (full-text:sub 0
+                                                                                                         len-text)
+                                                                                          suffix)]
+                                                                      actual-text)
                                                                   4 (line.sep " "
                                                                               theme.tab
                                                                               theme.tab)
