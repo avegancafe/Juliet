@@ -2,7 +2,7 @@
   "FTerm.nvim": { "branch": "master", "commit": "d1320892cc2ebab472935242d9d992a2c9570180" },
   "LuaSnip": { "branch": "master", "commit": "b84eeb3641b08324287587b426ec974b888390d9" },
   "aerial.nvim": { "branch": "master", "commit": "263beeb92961c15882b7853805f0ae2024f2e903" },
-  "alpha-nvim": { "branch": "close_on_tabnew", "commit": "d71ac03d91f8d61a6f10dfaeb4bfcfdd9369f068" },
+  "alpha-nvim": { "branch": "fix-close-on-new-tab-bug", "commit": "3767e71fef99da71298c960bea2a6f7c19ff9c51" },
   "bamboo.nvim": { "branch": "master", "commit": "49c0737fd76303f1294206f898680c6b9b174260" },
   "cellular-automaton.nvim": { "branch": "main", "commit": "11aea08aa084f9d523b0142c2cd9441b8ede09ed" },
   "cmp-buffer": { "branch": "main", "commit": "3022dbc9166796b644a841a02de8dd1cc1d311fa" },
