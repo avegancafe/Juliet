@@ -24,6 +24,7 @@
 	up = push
 	squash = rebase --autosquash main
 	fixup = commit --fixup
+	re = restore
 [push]
 	default = current
 	autoSetupRemote = true
