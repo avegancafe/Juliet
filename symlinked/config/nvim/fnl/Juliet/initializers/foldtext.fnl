@@ -6,7 +6,7 @@
                       (length (.. "" lines-count)) 14)]
     (.. line " " (string.rep "-" fill-count) " (" lines-count " L) --")))
 
-(vim.cmd "set foldtext=__juliet_fold_text()")
+(set vim.opt.foldtext "__juliet_fold_text()")
 (set vim.opt.fillchars "fold: ")
 (set vim.opt.foldmethod :expr)
 (set vim.opt.foldlevelstart 99)
