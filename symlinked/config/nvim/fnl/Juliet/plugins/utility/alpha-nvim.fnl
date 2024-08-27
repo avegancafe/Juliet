@@ -1,8 +1,8 @@
 (import-macros {: pack} :Juliet.macros)
 
-(pack :goolord/alpha-nvim
+(pack :avegancafe/alpha-nvim
       {:dependencies [:nvim-tree/nvim-web-devicons]
-       :branch :close_on_tabnew
+       :branch :fix-close-on-new-tab-bug
        :config (fn []
                  (var alpha (require :alpha))
                  (var dashboard (require :alpha.themes.dashboard))
