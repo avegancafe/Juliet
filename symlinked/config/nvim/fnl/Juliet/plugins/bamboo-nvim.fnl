@@ -28,5 +28,6 @@
                  (vim.api.nvim_set_hl 0 :TabLine {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :LineNr {:fg colors.bg3})
                  (vim.api.nvim_set_hl 0 :CursorLineNr {:fg colors.green})
+                 (vim.api.nvim_set_hl 0 :Folded {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :TabLineFill
                                       {:fg colors.black :bg colors.black})))})

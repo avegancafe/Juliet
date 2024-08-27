@@ -41,8 +41,6 @@
 (set vim.opt.shiftwidth 2)
 (set vim.opt.softtabstop 2)
 (set vim.opt.tabstop 2)
-(set vim.opt.foldmethod :expr)
-(set vim.opt.foldlevelstart 99)
 (set vim.opt.hidden true)
 (vim.cmd "augroup FiletypeGroup
   autocmd!
