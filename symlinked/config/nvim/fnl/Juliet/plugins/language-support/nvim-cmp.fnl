@@ -47,10 +47,6 @@
                                                                     :<cr> (cmp.mapping.confirm {:select true})
                                                                     :<C-k> (cmp.mapping {:i (fn []
                                                                                               (if (cmp.visible)
-                                                                                                  (do
-                                                                                                    ((require :notify) :visible)
-                                                                                                    (cmp.abort))
-                                                                                                  (do
-                                                                                                    ((require :notify) "not visible")
-                                                                                                    (cmp.complete))))})})
+                                                                                                  (cmp.abort)
+                                                                                                  (cmp.complete)))})})
                                :sources (cmp.config.sources [{:name :nvim_lsp}])})))})
