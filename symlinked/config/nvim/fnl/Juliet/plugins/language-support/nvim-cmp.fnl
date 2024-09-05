@@ -44,5 +44,13 @@
                                :window {:completion (cmp.config.window.bordered)
                                         :documentation (cmp.config.window.bordered)}
                                :mapping (cmp.mapping.preset.insert {:<c-e> (cmp.mapping.abort)
-                                                                    :<cr> (cmp.mapping.confirm {:select true})})
+                                                                    :<cr> (cmp.mapping.confirm {:select true})
+                                                                    :<C-k> (cmp.mapping {:i (fn []
+                                                                                              (if (cmp.visible)
+                                                                                                  (do
+                                                                                                    ((require :notify) :visible)
+                                                                                                    (cmp.abort))
+                                                                                                  (do
+                                                                                                    ((require :notify) "not visible")
+                                                                                                    (cmp.complete))))})})
                                :sources (cmp.config.sources [{:name :nvim_lsp}])})))})
