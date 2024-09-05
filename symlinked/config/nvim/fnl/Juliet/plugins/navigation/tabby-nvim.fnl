@@ -35,7 +35,7 @@
                      "• "
                      "") highlight-groups.tab
                  highlight-groups.tab)
-     3 (let [width (vim.fn.winwidth 0)
+     3 (let [width vim.opt.columns._value
              buf-info (vim.fn.getbufinfo {:buflisted 1})
              buf-num (length buf-info)
              ideal-max-width 30
