@@ -11,8 +11,9 @@
                        lspkind (require :lspkind)]
                    (cmp.setup {:completion {:autocomplete [cmp.TriggerEvent.InsertEnter
                                                            cmp.TriggerEvent.TextChanged]}
-                               :sorting {:comparators [cmp.config.compare.offset
-                                                       cmp.config.compare.exact
+                               :sorting {:comparators [
+                                                       cmp.config.compare.locality
+                                                       cmp.config.compare.recently_used
                                                        cmp.config.compare.score
                                                        (fn [entry1 entry2]
                                                          (var (_ entry1-under)
@@ -31,9 +32,7 @@
                                                              (< entry1-under
                                                                 entry2-under)
                                                              true))
-                                                       cmp.config.compare.kind
-                                                       cmp.config.compare.sort_text
-                                                       cmp.config.compare.length
+                                                       cmp.config.compare.offset
                                                        cmp.config.compare.order]}
                                :formatting {:format (lspkind.cmp_format {:mode :symbol_text
                                                                          :maxwidth 50
