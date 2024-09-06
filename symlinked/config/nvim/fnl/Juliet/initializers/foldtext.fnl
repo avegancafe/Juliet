@@ -1,5 +1,4 @@
 (fn vim.g.__juliet_fold_text []
-  (print " v  ")
   (let [line (vim.fn.getline vim.v.foldstart)
         lines-count (+ vim.v.foldend (- vim.v.foldstart) 1)
         fill-count (- (vim.fn.winwidth "%") (length line)
