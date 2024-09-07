@@ -12,6 +12,10 @@ function debuglog
   end
 end
 
+function warn
+  printf (tput setaf 3)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" "$argv"
+end
+
 function error
   printf (tput setaf 1)"==>"(tput sgr0)(tput bold)" %s"(tput sgr0)"\n" "$argv"
 end

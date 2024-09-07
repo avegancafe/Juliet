@@ -496,8 +496,61 @@ function logs
 end
 
 function commit
-    set -l initials $(test -n $GIT_INITIALS && echo $GIT_INITIALS || echo 'KH')
-    git commit -m "[$initials] $argv"
+    argparse --name="commit" s/short -- $argv
+    set -l message $argv
+
+    if test -z "$message"
+        error "Commit message provided— exiting..."
+        printf '\nUsage:\ncommit [-s] <message>\n\n'
+        return 1
+    end
+
+    if test -n "$_flag_s"
+        set -l initials $(test -n $GIT_INITIALS && echo $GIT_INITIALS || echo 'KH')
+
+        git commit --message "[$initials] $message"
+        log "Committing with message '[$initials] $message'..."
+        return 0
+    end
+
+    echo
+
+    set -l commit_type (gum choose --height 5 --header.foreground "#8fb573" --header "What type of commit is this?" feat fix chore)
+
+    if test -z "$commit_type"
+        error "No commit type selected— exiting..."
+        return 1
+    end
+
+    log "Commit type: $commit_type"
+
+    set -l scope ""
+
+    while test -z "$scope"
+        set scope (gum input --header.foreground "#8fb573" --header "What is the scope of this commit?")
+
+        set -l scope_status $status
+
+        if test $scope_status -ne 0
+            error "No scope selected— exiting..."
+            return 1
+        end
+
+        if test $scope_status -eq 0 && test -z "$scope"
+            warn "Scope cannot be empty— please try again"
+        end
+    end
+
+
+    log "Scope: $scope"
+
+    log "Committing with message '$commit_type($scope): $message'..."
+    git commit --message "$commit_type($scope): $message"
+
+    if test $status -ne 0
+        error "Commit failed. See error above— exiting..."
+        return 1
+    end
 end
 
 pyenv init - | source
