@@ -37,6 +37,7 @@ set -gx LESS_TERMCAP_us (tput setaf 4)
 set -gx LESS_TERMCAP_ue $RESET_CODE
 set -gx LESS_TERMCAP_so (tput setaf 1)
 set -gx LESS_TERMCAP_se $RESET_CODE
+set -gx PIPENV_SHELL_FANCY 1
 
 source ~/.config/fish/_util.fish
 
