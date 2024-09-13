@@ -35,7 +35,8 @@
                      "• "
                      "") highlight-groups.tab
                  highlight-groups.tab)
-     3 (let [width vim.opt.columns._value
+     3 (if (string.find buffer :dbt/target) "! " "")
+     4 (let [width vim.opt.columns._value
              buf-info (vim.fn.getbufinfo {:buflisted 1})
              buf-num (length buf-info)
              ideal-max-width 30
@@ -50,8 +51,8 @@
                           (length full-text))
              actual-text (.. (full-text:sub 0 len-text) suffix)]
          actual-text)
-     4 (line.sep " " highlight-groups.tab highlight-groups.tab)
-     5 (tab.close_btn " ")
+     5 (line.sep " " highlight-groups.tab highlight-groups.tab)
+     6 (tab.close_btn " ")
      : hl
      :margin ""}))
 
@@ -90,8 +91,7 @@
               (key :<leader><s-tab> ":-tabmove<cr>" "Move tab to the left")]
        :config (fn []
                  (local tabline (require :tabby.tabline))
-                 (tabline.set (fn [line]
-                                ; I don't know how to make this mutable to children so boxed var it is
+                 (tabline.set (fn [line] ; I don't know how to make this mutable to children so boxed var it is
                                 (var i {:value 0})
                                 {1 ((. (line.tabs) :foreach) (fn [tab]
                                                                (render-tab tab
