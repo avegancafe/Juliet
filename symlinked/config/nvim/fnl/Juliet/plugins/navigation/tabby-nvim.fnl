@@ -17,7 +17,7 @@
   (local parse-path
          (fn [full-path]
            (if (= full-path "") "[No Name]"
-               (string.match full-path "([%a%d-_%.:%s]*)$"))))
+               (string.match full-path "([%a%d-_%.:%s\\(\\)]*)$"))))
   (local parse-index (fn [full-path]
                        (string.gsub (string.match full-path
                                                   "([%a-_.]+/[%a.]+)$")
