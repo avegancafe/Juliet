@@ -9,6 +9,6 @@
                       :nvim-tree/nvim-web-devicons
                       :MunifTanjim/nui.nvim]
        :opts {:filesystem {:filtered_items {:hide_dotfiles false}}
-              :window {:mappings {:<cr> :open_tabnew}}
+              :window {:mappings {:<cr> :open_tabnew :<c-o> :open}}
               :default_component_configs {:git_status {:symbols {:unstaged :M
                                                                  :staged :U}}}}})
