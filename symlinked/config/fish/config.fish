@@ -41,8 +41,12 @@ set -gx PIPENV_SHELL_FANCY 1
 
 source ~/.config/fish/_util.fish
 
+if test -e ~/.config/local/fish/config.fish
+    source ~/.config/local/fish/config.fish
+end
+
 # welcome, here is your fortune for this shell
-if command -v fortune 2&> /dev/null && test -z "$FORTUNE"
+if command -v fortune 2&> /dev/null && test -n "$FORTUNE" && status --is-interactive
     fortune
 end
 
@@ -447,10 +451,6 @@ status --is-interactive; and source (nodenv init -|psub)
 
 if status --is-login
     set -gx PATH $HOME/.nodenv/versions $PATH
-end
-
-if test -e ~/.config/local/fish/config.fish
-    source ~/.config/local/fish/config.fish
 end
 
 # bun
