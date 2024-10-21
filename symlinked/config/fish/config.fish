@@ -580,3 +580,6 @@ pyenv init - | source
 function cursor
     env PYTHONPATH=. cursor
 end
+
+# J2 Initializers
+for file in ~/workspace/dev-env/initializers/fish/*; source $file; end
