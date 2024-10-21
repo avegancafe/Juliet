@@ -576,3 +576,7 @@ function run
 end
 
 pyenv init - | source
+
+function cursor
+    env PYTHONPATH=. cursor
+end
