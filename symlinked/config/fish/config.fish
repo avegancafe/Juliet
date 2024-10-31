@@ -575,6 +575,16 @@ function run
     gh run watch $run_id
 end
 
+function del
+    set current_branch (git symbolic-ref --short HEAD)
+    set commit_sha (git rev-parse $current_branch)
+    
+    git switch main
+    git branch -D $current_branch
+    
+    echo "$commit_sha" >> ~/.delog
+end
+
 pyenv init - | source
 
 function cursor
