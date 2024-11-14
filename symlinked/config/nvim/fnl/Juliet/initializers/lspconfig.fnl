@@ -22,6 +22,8 @@
                   {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
                   {:noremap true :silent true :desc "Show LSP hover"})
+  (buf-set-keymap :n :<leader>lt "<CMD>lua vim.lsp.buf.type_definition()<CR>"
+                  {:noremap true :silent true :desc "Go to type definition"})
   (buf-set-keymap :n :<leader>lr ":IncRename " {:noremap true :silent true})
   (buf-set-keymap :n :<leader>lu
                   ":lua require('telescope.builtin').lsp_references()<CR>"
