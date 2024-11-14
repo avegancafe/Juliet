@@ -588,6 +588,10 @@ function del
     echo "$commit_sha" >> ~/.delog
 end
 
+function gm
+    git rebase -i main
+end
+
 pyenv init - | source
 
 function cursor
