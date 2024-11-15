@@ -21,7 +21,9 @@
                        (dashboard.button :e " > Explore fs" ":Neotree<cr>")
                        (dashboard.button :l " > Load session for current dir"
                                          ":SessionManager load_current_dir_session<cr>")
-                       (dashboard.button :f " > Find file" ":Pick files<cr>")])
+                       (dashboard.button :f " > Find file" ":Pick files<cr>")
+                       (dashboard.button :q " > Quit dashboard" ":Alpha<cr>")
+                       ])
                  (local fortune (require :alpha.fortune))
                  (set dashboard.section.footer.val (fortune))
                  (alpha.setup dashboard.config))})
