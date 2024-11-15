@@ -32,6 +32,10 @@
 
 (vim.keymap.set :n :gF ":e <cfile><CR>" {:noremap true})
 (vim.keymap.set :x :gF ":e <cfile><CR>" {:noremap true})
+(vim.keymap.set :n :<left> :zt)
+(vim.keymap.set :n :<right> :zb)
+(vim.keymap.set :n :<up> :<c-y>)
+(vim.keymap.set :n :<down> :<c-e>)
 
 (tset _G :ToggleNumbers
       (fn []
