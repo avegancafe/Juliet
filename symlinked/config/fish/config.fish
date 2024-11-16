@@ -6,10 +6,8 @@ source $script_dir/_util.fish
 
 function sourcedir --description "Source all files in a directory"
     for file in $argv[1]/*
-        if test -f $file
+        if string match -r '.*.fish' $file 2&> 1 > /dev/null
             source $file
-        else
-            error "I didn't think you could get here, skipping sourcing $file..."
         end
     end
 end
@@ -24,4 +22,4 @@ if command -v fortune 2&> /dev/null && test -n "$FORTUNE" && status --is-interac
 end
 
 # J2 Initializers
-sourcedir ~/workspace/dev-env/initializers/fish
+for file in ~/workspace/dev-env/initializers/fish/*; source $file; end
