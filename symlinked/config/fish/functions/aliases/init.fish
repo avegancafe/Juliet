@@ -1,0 +1,29 @@
+set script_dir (dirname (status --current-filename))
+
+source $script_dir/pv.fish
+source $script_dir/g.fish
+source $script_dir/cursor.fish
+source $script_dir/watch.fish
+source $script_dir/cat.fish
+source $script_dir/gdiff.fish
+source $script_dir/current-branch.fish
+source $script_dir/clone.fish
+source $script_dir/update-kitty.fish
+source $script_dir/envsource.fish
+source $script_dir/reindex-spotlight.fish
+source $script_dir/current-sha.fish
+source $script_dir/has-pipfile.fish
+source $script_dir/vim.fish
+source $script_dir/nv.fish
+source $script_dir/gut.fish
+source $script_dir/dc.fish
+source $script_dir/st.fish
+source $script_dir/sudo.fish
+source $script_dir/git.fish
+source $script_dir/node.fish
+source $script_dir/curl.fish
+source $script_dir/ls.fish
+source $script_dir/note.fish
+source $script_dir/work.fish
+source $script_dir/logs.fish
+source $script_dir/run.fish

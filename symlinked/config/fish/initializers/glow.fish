@@ -1,0 +1,2 @@
+glow completion fish | source
+
