@@ -6,7 +6,7 @@ source $script_dir/_util.fish
 
 function sourcedir --description "Source all files in a directory"
     for file in $argv[1]/*
-        if string match -r '\.fish$' $file 2&>1 > /dev/null
+        if string match -r '\.fish$' $file 2>&1 > /dev/null
             source $file
         end
     end
