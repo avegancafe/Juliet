@@ -25,6 +25,9 @@
 	squash = rebase --autosquash main
 	fixup = commit --fixup
 	re = restore
+	pu = pull
+	o = open
+	open = !open https://github.com/$(git remote get-url origin | cut -d\":\" -f2)
 [push]
 	default = current
 	autoSetupRemote = true
