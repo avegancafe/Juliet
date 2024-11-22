@@ -55,7 +55,6 @@
 (vim.cmd " do User LspAttachBuffers ")
 (mason.setup)
 (local servers [{:name :bashls}
-                {:name :bufls}
                 {:name :cssls}
                 {:name :fennel_language_server
                  :opts {:settings {:fennel {:diagnostics {:globals [:vim]}
