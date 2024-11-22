@@ -6,33 +6,45 @@
 (local mason-lspconfig (require :mason-lspconfig))
 (local lspconfig-util (require :lspconfig.util))
 
-(fn on-attach [client bufnr]
+(fn on-attach [client buffer]
   (when (= client.name :yamlls)
     (local ns (vim.lsp.diagnostic.get_namespace client.id))
     (vim.diagnostic.enable false {:ns_id ns}))
   (when client.server_capabilities.documentSymbolProvider
-    (navic.attach client bufnr))
+    (navic.attach client buffer))
 
-  (fn buf-set-keymap [...] (vim.api.nvim_buf_set_keymap bufnr ...))
-
-  (fn buf-set-option [...] (vim.api.nvim_buf_set_option bufnr ...))
+  (fn buf-set-option [...] (vim.api.nvim_buf_set_option buffer ...))
 
   (buf-set-option :omnifunc "v:lua.vim.lsp.omnifunc")
-  (buf-set-keymap :n :K "<CMD>lua vim.lsp.buf.hover()<CR>"
-                  {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
-                  {:noremap true :silent true :desc "Show LSP hover"})
-  (buf-set-keymap :n :<leader>lt "<CMD>lua vim.lsp.buf.type_definition()<CR>"
-                  {:noremap true :silent true :desc "Go to type definition"})
-  (buf-set-keymap :n :<leader>lr ":IncRename " {:noremap true :silent true})
-  (buf-set-keymap :n :<leader>lu
+  (vim.keymap.set :n :K "<CMD>lua vim.lsp.buf.hover()<CR>"
+                  {: buffer :noremap true :silent true :desc "Show LSP hover"})
+  (vim.keymap.set :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
+                  {: buffer :noremap true :silent true :desc "Show LSP hover"})
+  (vim.keymap.set :n :<leader>lt "<CMD>lua vim.lsp.buf.type_definition()<CR>"
+                  {: buffer
+                   :noremap true
+                   :silent true
+                   :desc "Go to type definition"})
+  (vim.keymap.set :n :<leader>lr
+                  ":lua require('live-rename').rename({ insert = true })<CR>"
+                  {: buffer :noremap true :silent true :desc "Rename symbol"})
+  (vim.keymap.set :n :<leader>lu
                   ":lua require('telescope.builtin').lsp_references()<CR>"
-                  {:noremap true :silent true :desc "Show LSP references"})
-  (buf-set-keymap :n :<leader>ld
+                  {: buffer
+                   :noremap true
+                   :silent true
+                   :desc "Show LSP references"})
+  (vim.keymap.set :n :<leader>ld
                   ":lua require('telescope.builtin').lsp_references()<CR>"
-                  {:noremap true :silent true :desc "Show LSP references"})
-  (buf-set-keymap :n :<leader>lo :<CMD>AerialToggle<CR>
-                  {:noremap true :silent true :desc "Open LSP outline"}))
+                  {: buffer
+                   :noremap true
+                   :silent true
+                   :desc "Show LSP references"})
+  (vim.keymap.set :n :<leader>lo :<CMD>AerialToggle<CR>
+                  {: buffer
+                   :noremap true
+                   :silent true
+                   :desc "Open LSP outline"}))
 
 (local capabilities
        ((. cmp-nvim-lsp :default_capabilities) (vim.lsp.protocol.make_client_capabilities)))
