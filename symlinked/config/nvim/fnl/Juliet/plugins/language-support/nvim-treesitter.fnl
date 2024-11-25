@@ -32,8 +32,9 @@
                                                                                     :http
                                                                                     :javascript
                                                                                     :jsdoc
-                                                                                    :json
                                                                                     :json5
+                                                                                    :json
+                                                                                    :jsonc
                                                                                     :latex
                                                                                     :lua
                                                                                     :make
