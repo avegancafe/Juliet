@@ -18,7 +18,7 @@
                                                                    (local selection
                                                                           (. (action-state.get_selected_entry)
                                                                              1))
-                                                                   (os.execute (.. "switch-to-ticket \""
+                                                                   (os.execute (.. "switch-to-ticket '"
                                                                                    selection
-                                                                                   "\"")))))
+                                                                                   "'")))))
                                    true)}]}})
