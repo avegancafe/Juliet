@@ -48,13 +48,13 @@ function fco_preview -d "Fuzzy-find and checkout a branch while previewing incom
               --preview="git --no-pager log -150 --pretty=format:%s '..{2}'" \
               --header='ctrl-y: copy name — ctrl-x: delete branch' \
               --bind 'ctrl-y:execute-silent(echo {} | awk \'{print $2}\' | xargs printf "%s" | pbcopy)+abort' \
-              --bind 'ctrl-x:execute-silent(echo {} | awk \'{print $2}\' | xargs git branch -D)+abort' \
+              --bind 'ctrl-x:execute-silent(echo {} | awk \'{print $2}\' | xargs git branch -D && terminal-notifier -message "Deleted branch")' \
     )
 
     set fzf_status $status
 
     if test $fzf_status -ne 0
-        error "Operation cancelled-- Exiting...\n"
+        error "Operation cancelled-- Exiting..."
         echo
         commandline -f repaint
         return
