@@ -7,10 +7,24 @@
                       :ribru17/bamboo.nvim
                       :natecraddock/workspaces.nvim]
        :lazy false
-       :keys [(key :<c-p> ":Telescope find_files<cr>" "Fuzzy find a file")
-              (key :<leader>p ":Telescope find_files<cr>" "Fuzzy find a file")
-              (key :<c-g> ":Telescope live_grep<cr>" "Live grep")
-              (key :<c-b> ":Telescope buffers<cr>" "Fuzzy list buffers")]
+       :keys [(key :<c-p>
+                   (fn []
+                     (let [builtin (require :telescope.builtin)]
+                       (builtin.find_files {:layout_config {:width 120}})))
+                   "Fuzzy find a file")
+              (key :<leader>p
+                   (fn []
+                     (let [builtin (require :telescope.builtin)]
+                       (builtin.find_files {:layout_config {:width 120}})))
+                   "Fuzzy find a file")
+              (key :<c-g> (fn []
+                            (let [builtin (require :telescope.builtin)]
+                              (builtin.live_grep)))
+                   "Live grep")
+              (key :<c-b> (fn []
+                            (let [builtin (require :telescope.builtin)]
+                              (builtin.buffers {:layout_config {:width 120}})))
+                   "Fuzzy list buffers")]
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.sources.telescope)
