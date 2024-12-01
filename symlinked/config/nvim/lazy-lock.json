@@ -64,5 +64,6 @@
   "which-key.nvim": { "branch": "main", "commit": "bfec3d6bc0a9b0b2cb11644642f78c2c3915eef0" },
   "workspaces.nvim": { "branch": "master", "commit": "0b03d3f2ffe38729b1792905ec447405ed76cb6e" },
   "yajs.vim": { "branch": "master", "commit": "2bebc45ce94d02875803c67033b2d294a5375064" },
+  "yazi.nvim": { "branch": "main", "commit": "a54ec0506fc40afa8f0215931bcf462347d77331" },
   "zen-mode.nvim": { "branch": "main", "commit": "29b292bdc58b76a6c8f294c961a8bf92c5a6ebd6" }
 }
