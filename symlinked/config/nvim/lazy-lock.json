@@ -14,6 +14,7 @@
   "copilot.vim": { "branch": "release", "commit": "782461159655b259cff10ecff05efa761e3d4764" },
   "core.nvim": { "branch": "main", "commit": "26ada48758e73ff3763ac134a9a0da320a7762e4" },
   "do.nvim": { "branch": "main", "commit": "d3336b1ad88792445cda02231ab632643c162f39" },
+  "dooing": { "branch": "main", "commit": "80154ae4fa020d7d6d54cecd19565385b22e132f" },
   "easypick.nvim": { "branch": "main", "commit": "3ce209d05d402ba40e29e6b69b759eb8421b145a" },
   "fidget.nvim": { "branch": "main", "commit": "0ba1e16d07627532b6cae915cc992ecac249fb97" },
   "git-conflict.nvim": { "branch": "main", "commit": "bfd9fe6fba9a161fc199771d85996236a0d0faad" },
