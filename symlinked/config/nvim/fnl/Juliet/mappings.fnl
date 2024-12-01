@@ -37,37 +37,35 @@
 (vim.keymap.set :n :<up> :<c-y>)
 (vim.keymap.set :n :<down> :<c-e>)
 
-(tset _G :ToggleNumbers
-      (fn []
-        (if (= vim.opt.relativenumber._value true)
-            (do
-              (tset vim.opt :relativenumber false)
-              (vim.cmd ":tabdo windo set norelativenumber"))
-            (do
-              (tset vim.opt :relativenumber true)
-              (vim.cmd ":tabdo windo set relativenumber")))))
+(fn toggle-numbers []
+  (if (= vim.opt.relativenumber._value true)
+      (do
+        (tset vim.opt :relativenumber false)
+        (vim.cmd ":tabdo windo set norelativenumber"))
+      (do
+        (tset vim.opt :relativenumber true)
+        (vim.cmd ":tabdo windo set relativenumber"))))
 
-(vim.cmd ":command! -bar ToggleNumbers call v:lua.ToggleNumbers()")
-(vim.cmd ":command! Todo execute \"TodoTrouble cwd=\".getreg('%')")
-(vim.cmd ":abbreviate bgt BufferLineGroupToggle")
-(tset _G :ShowEditsInCurrentDir
-      (fn []
-        (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h") ":~:.")]
-          (vim.cmd (.. "TodoTrouble keywords=EDIT cwd=" cwd)))))
+(vim.api.nvim_create_user_command :ToggleNumbers toggle-numbers {:bar true})
+(vim.api.nvim_create_user_command :Todo
+                                  "execute \"TodoTrouble cwd=\".getreg('%')" {})
 
-(vim.cmd ":command! ShowEditsInCurrentDir call v:lua.ShowEditsInCurrentDir()")
+(fn show-edits-in-current-dir []
+  (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h") ":~:.")]
+    (vim.cmd (.. "TodoTrouble keywords=EDIT cwd=" cwd))))
+
+(vim.api.nvim_create_user_command :ShowEditsInCurrentDir
+                                  show-edits-in-current-dir {})
+
 (vim.keymap.set :n :<esc> ":w<cr>" {:silent true})
-(tset _G :GithubOpen (fn [branch]
-                       (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%")
-                                                                    ":~:."))
-                             row (unpack (vim.api.nvim_win_get_cursor 0))
-                             command (if (= branch nil)
-                                         (.. "fish -c 'gho -c " filepath "#L"
-                                             row "'")
-                                         (.. "fish -c 'gho " filepath "#L" row
-                                             "'"))]
-                         (os.capture command)
-                         (vim.cmd :mode))))
+(fn open-github [branch]
+  (let [filepath (vim.trim (vim.fn.fnamemodify (vim.fn.expand "%") ":~:."))
+        row (unpack (vim.api.nvim_win_get_cursor 0))
+        command (if (= branch nil)
+                    (.. "fish -c 'gho -c " filepath "#L" row "'")
+                    (.. "fish -c 'gho " filepath "#L" row "'"))]
+    (os.capture command)
+    (vim.cmd :mode)))
 
 (vim.keymap.set :n :<leader>x ":noh<cr>" {:silent true})
 (vim.keymap.set :n :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
@@ -97,10 +95,10 @@
 (vim.keymap.set :n :<leader>by ":let @*=expand(\"%\")<cr>"
                 {:silent true :desc "Copy buffer relative path"})
 
-(vim.keymap.set :n :<leader>boc ":call v:lua.GithubOpen()<cr>"
+(vim.keymap.set :n :<leader>boc open-github
                 {:silent true :desc "Open file in gitlab"})
 
-(vim.keymap.set :n :<leader>bom ":call v:lua.GithubOpen('main')<cr>"
+(vim.keymap.set :n :<leader>bom (fn [] (open-github :main))
                 {:silent true :desc "Open file in gitlab on the `main` branch"})
 
 (vim.keymap.set :n :<leader>bi
@@ -135,31 +133,31 @@
                               (string.gsub raw-file "%s+" ""))]
           (each [_ file (ipairs changed-files)] (vim.cmd (.. "tabedit " file))))))
 
-(tset _G :OpenPR (fn []
-                   (vim.api.nvim_exec "!git pr" true)))
+(fn open-pr []
+  (vim.api.nvim_exec "!git pr" true))
 
-(vim.cmd ":command! OpenPR call v:lua.OpenPR()")
-(vim.keymap.set :n :<leader>gpr ":OpenPR<cr>" {:desc "Open draft PR"})
+(vim.api.nvim_create_user_command :OpenPR open-pr {})
 
-(tset _G :IsolateBuffer
-      (fn []
-        (let [cur (vim.fn.bufnr "%")
-              last (vim.fn.bufnr "$")]
-          (if (> cur 1) (vim.cmd (.. "silent! 1," (- cur 1) :bd)))
-          (if (< cur last) (vim.cmd (.. "silent! " (+ cur 1) "," last :bd))))))
+(vim.keymap.set :n :<leader>gpr open-pr {:desc "Open draft PR"})
 
-(vim.cmd ":command! -bar IsolateBuffer call v:lua.IsolateBuffer()")
+(fn isolate-buffer []
+  (let [cur (vim.fn.bufnr "%")
+        last (vim.fn.bufnr "$")]
+    (if (> cur 1) (vim.cmd (.. "silent! 1," (- cur 1) :bd)))
+    (if (< cur last) (vim.cmd (.. "silent! " (+ cur 1) "," last :bd)))))
 
-(tset _G :ReloadConfig
-      (fn []
-        (let [luacache (. (or _G.__luacache {}) :cache)]
-          (each [pkg _ (pairs package.loaded)]
-            (when (and (pkg:match :^Juliet.+)
-                       (not (pkg:match :^Juliet.plugins)))
-              (tset package.loaded pkg nil)
-              (when luacache (tset luacache pkg nil))))
-          (dofile vim.env.MYVIMRC)
-          (vim.notify "Config reloaded!" vim.log.levels.INFO))))
+(vim.api.nvim_create_user_command :IsolateBuffer isolate-buffer {:bar true})
+
+(fn reload-config []
+  (let [luacache (. (or _G.__luacache {}) :cache)]
+    (each [pkg _ (pairs package.loaded)]
+      (when (and (pkg:match :^Juliet.+) (not (pkg:match :^Juliet.plugins)))
+        (tset package.loaded pkg nil)
+        (when luacache (tset luacache pkg nil))))
+    (dofile vim.env.MYVIMRC)
+    (vim.notify "Config reloaded!" vim.log.levels.INFO)))
+
+(vim.api.nvim_create_user_command :ReloadConfig reload-config {})
 
 (vim.api.nvim_create_autocmd [:BufWritePost]
                              {:group (vim.api.nvim_create_augroup :WritePostReload
@@ -167,17 +165,17 @@
                               :pattern (.. (vim.fn.expand "~")
                                            :/.config/Juliet/nvim/fnl/*.fnl)
                               :callback (fn []
-                                          (_G.ReloadConfig))})
-
-(vim.cmd ":command! ReloadConfig call v:lua.ReloadConfig()")
+                                          (reload-config))})
 
 (vim.cmd ":command! FixWhitespace %s/\\s*$//g | noh")
+(vim.api.nvim_create_user_command :FixWhitespace "%s/\\s*$//g | noh"
+                                  {:bar true})
 
-(tset _G :ReopenLastBuffer
-      (fn []
-        (vim.cmd (.. "tabedit " (vim.fn.expand "#")))))
+(fn reopen-last-buffer []
+  (vim.cmd (.. "tabedit " (vim.fn.expand "#"))))
 
-(vim.cmd ":command! ReopenLastBuffer call v:lua.ReopenLastBuffer()")
+(vim.api.nvim_create_user_command :ReopenLastBuffer reopen-last-buffer {})
+
 (vim.keymap.set :n :<leader>fl ":ReopenLastBuffer<cr>")
 
 (vim.keymap.set :t "<c-[>" "<c-\\><c-n>")
@@ -186,42 +184,41 @@
 (vim.keymap.set :i :jk :<esc>l)
 (vim.keymap.set :i :<d-v> :<c-r>* {:silent true})
 
-(tset _G :WipeoutHiddenBuffers
-      (fn []
-        (local tablist
-               (fcollect [i 0 (- (vim.fn.tabpagenr "$") 1)]
-                 (vim.fn.tabpagebuflist (+ i 1))))
-        (local known-buffers (accumulate [agg {} _ bufs (pairs tablist)]
-                               (do
-                                 (each [_ bufnr (ipairs bufs)]
-                                   (tset agg bufnr true))
-                                 agg)))
-        (var n-wipeouts 0)
-        (for [i 1 (vim.fn.bufnr "$")]
-          (when (and (vim.fn.bufexists i) (= (vim.fn.getbufvar i :&mod) 0)
-                     (= (. known-buffers i) nil))
-            (vim.cmd (.. "silent exec 'bwipeout'" i))
-            (set n-wipeouts (+ n-wipeouts 1))))
-        (print (.. (math.max 0 (- n-wipeouts 1)) " buffer(s) wiped out"))))
+(fn wipeout-hidden-buffers []
+  (local tablist (fcollect [i 0 (- (vim.fn.tabpagenr "$") 1)]
+                   (vim.fn.tabpagebuflist (+ i 1))))
+  (local known-buffers (accumulate [agg {} _ bufs (pairs tablist)]
+                         (do
+                           (each [_ bufnr (ipairs bufs)]
+                             (tset agg bufnr true))
+                           agg)))
+  (var n-wipeouts 0)
+  (for [i 1 (vim.fn.bufnr "$")]
+    (when (and (vim.fn.bufexists i) (= (vim.fn.getbufvar i :&mod) 0)
+               (= (. known-buffers i) nil))
+      (vim.cmd (.. "silent exec 'bwipeout'" i))
+      (set n-wipeouts (+ n-wipeouts 1))))
+  (print (.. (math.max 0 (- n-wipeouts 1)) " buffer(s) wiped out")))
 
-(vim.cmd ":command! -bar WipeoutHiddenBuffers call v:lua.WipeoutHiddenBuffers()")
+(vim.api.nvim_create_user_command :WipeoutHiddenBuffers wipeout-hidden-buffers
+                                  {:bar true})
 
-(tset _G :CloseDuplicateTabs
-      (fn []
-        (let [tabpages (vim.api.nvim_list_tabpages)
-              open-buffers {}]
-          (each [_ win (ipairs (vim.api.nvim_list_wins))]
-            (local buf (vim.api.nvim_win_get_buf win))
-            (if (. open-buffers buf)
-                (tset open-buffers buf (+ (. open-buffers buf) 1))
-                (tset open-buffers buf 1)))
-          (each [_ tab (ipairs tabpages)]
-            (local wins (vim.api.nvim_tabpage_list_wins tab))
-            (when (= (length wins) 1)
-              (local buf (vim.api.nvim_win_get_buf (. wins 1)))
-              (when (> (. open-buffers buf) 1)
-                (vim.api.nvim_command (.. "tabclose "
-                                          (vim.api.nvim_tabpage_get_number tab)))
-                (tset open-buffers buf (- (. open-buffers buf) 1))))))))
+(fn close-duplocate-tabs []
+  (let [tabpages (vim.api.nvim_list_tabpages)
+        open-buffers {}]
+    (each [_ win (ipairs (vim.api.nvim_list_wins))]
+      (local buf (vim.api.nvim_win_get_buf win))
+      (if (. open-buffers buf)
+          (tset open-buffers buf (+ (. open-buffers buf) 1))
+          (tset open-buffers buf 1)))
+    (each [_ tab (ipairs tabpages)]
+      (local wins (vim.api.nvim_tabpage_list_wins tab))
+      (when (= (length wins) 1)
+        (local buf (vim.api.nvim_win_get_buf (. wins 1)))
+        (when (> (. open-buffers buf) 1)
+          (vim.api.nvim_command (.. "tabclose "
+                                    (vim.api.nvim_tabpage_get_number tab)))
+          (tset open-buffers buf (- (. open-buffers buf) 1)))))))
 
-(vim.cmd ":command! -bar CloseDuplicateTabs call v:lua.CloseDuplicateTabs()")
+(vim.api.nvim_create_user_command :CloseDuplicateTabs close-duplocate-tabs
+                                  {:bar true})
