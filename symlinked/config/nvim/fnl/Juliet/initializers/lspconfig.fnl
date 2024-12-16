@@ -1,7 +1,8 @@
 (local nvim-lsp (require :lspconfig))
 (local navic (require :nvim-navic))
 (local {: merge} (require :Juliet.utils))
-(local cmp-nvim-lsp (require :cmp_nvim_lsp))
+; (local cmp-nvim-lsp (require :cmp_nvim_lsp))
+(local blink-cmp (require :blink.cmp))
 (local mason (require :mason))
 (local mason-lspconfig (require :mason-lspconfig))
 (local lspconfig-util (require :lspconfig.util))
@@ -46,8 +47,10 @@
                    :silent true
                    :desc "Open LSP outline"}))
 
-(local capabilities
-       ((. cmp-nvim-lsp :default_capabilities) (vim.lsp.protocol.make_client_capabilities)))
+; (local capabilities
+;        ((. cmp-nvim-lsp :default_capabilities) (vim.lsp.protocol.make_client_capabilities)))
+
+(local capabilities (blink-cmp.get_lsp_capabilities))
 
 (set capabilities.textDocument.foldingRange
      {:dynamicRegistration false :lineFoldingOnly true})
@@ -55,7 +58,7 @@
 (lambda get-opts [?opt-overrides]
   (local opt-settings {})
   (local opt-overrides (or ?opt-overrides {}))
-  (local opts {: capabilities
+  (local opts {:capabilities (blink-cmp.get_lsp_capabilities opt-overrides)
                :flags {:debounce_text_changes 150}
                :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
                                                 {:border :rounded})}
