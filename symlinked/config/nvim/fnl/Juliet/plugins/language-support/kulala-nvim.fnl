@@ -6,5 +6,5 @@
                      (let [kulala (require :kulala)]
                        (kulala.run)))
                    "Execute http request on current line in .http file")]
-       :lazy false
+       :lazy true
        :opts {:default_view :headers_body}})

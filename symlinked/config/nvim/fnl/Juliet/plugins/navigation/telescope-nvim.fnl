@@ -6,7 +6,7 @@
                       :nvim-lua/plenary.nvim
                       :ribru17/bamboo.nvim
                       :natecraddock/workspaces.nvim]
-       :lazy false
+       :lazy true
        :keys [(key :<c-p>
                    (fn []
                      (let [builtin (require :telescope.builtin)]
@@ -21,9 +21,10 @@
                             (let [builtin (require :telescope.builtin)]
                               (builtin.live_grep)))
                    "Live grep")
-              (key :<c-b> (fn []
-                            (let [builtin (require :telescope.builtin)]
-                              (builtin.buffers {:layout_config {:width 120}})))
+              (key :<c-b>
+                   (fn []
+                     (let [builtin (require :telescope.builtin)]
+                       (builtin.buffers {:layout_config {:width 120}})))
                    "Fuzzy list buffers")]
        :config (fn []
                  (let [actions (require :telescope.actions)
