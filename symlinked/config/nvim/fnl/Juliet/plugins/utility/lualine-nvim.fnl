@@ -74,7 +74,8 @@
                                                                     (string.format "%02d"
                                                                                    time.minutes)))
                                                               (fn [] ""))]
-                                              :lualine_y [:filetype]
+                                              :lualine_y [:diagnostics
+                                                          :filetype]
                                               :lualine_z []}
                                    :inactive_sections {:lualine_a []
                                                        :lualine_b []
