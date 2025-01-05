@@ -1,4 +1,5 @@
 format = """
+$line_break\
 $directory\
 $git_branch\
 $git_state\
@@ -13,7 +14,8 @@ command_timeout = 5000
 add_newline = false
 
 [fill]
-symbol = " "
+symbol = "—"
+style = "bold white"
 
 [python]
 format = 'via [${symbol}(\($virtualenv\) )]($style)'
