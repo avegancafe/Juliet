@@ -34,7 +34,6 @@
                                                                :<c-k> actions.move_selection_previous
                                                                :<esc> actions.close
                                                                :<c-o> trouble.open
-                                                               :<enter> actions.select_tab
                                                                :<c-b> actions.select_default}}
                                                 :path_display {:shorten {:len 3
                                                                          :exclude [-1
@@ -47,6 +46,7 @@
                                                                            (vim.fn.expand :$HOME/.gitignore_global)
                                                                            :--type
                                                                            :file]
+                                                            :mappings {:i {:<enter> actions.select_tab}}
                                                             :theme :dropdown}
                                                :live_grep {:file_ignore_patterns [:node_modules
                                                                                   :.git$]
@@ -59,10 +59,12 @@
                                                                                :--hidden
                                                                                :--smart-case])
                                                            :theme :ivy
+                                                           :mappings {:i {:<enter> actions.select_tab}}
                                                            :layout_config {:prompt_position :bottom}
                                                            :layout_strategy :bottom_pane}
                                                :buffers {:theme :dropdown
-                                                         :mappings {:i {:<c-q> (+ actions.delete_buffer
+                                                         :mappings {:i {:<enter> actions.select_tab
+                                                                        :<c-q> (+ actions.delete_buffer
                                                                                   actions.move_to_top)}}}}})
                    (telescope.load_extension :ui-select)
                    (telescope.load_extension :workspaces)))})
