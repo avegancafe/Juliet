@@ -49,19 +49,6 @@ function changed_files
     echo (git status --short | sed "s/[[:alnum:]?]\{1,2\}[[:space:]]\(.*\)/\1/g")
 end
 
-function del
-    set current_branch (git symbolic-ref --short HEAD)
-    set commit_sha (git rev-parse $current_branch)
-    
-    log "Switching to main..."
-    git switch main
-    log "Deleting $current_branch..."
-    git branch -D $current_branch
-    log "Done!"
-    
-    echo "$commit_sha" >> ~/.delog
-end
-
 function commit
     argparse --name="commit" s/short -- $argv
     set -l message $argv

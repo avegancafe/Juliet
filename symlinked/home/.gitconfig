@@ -28,6 +28,7 @@
 	pu = pull
 	o = open
 	open = !open https://github.com/$(git remote get-url origin | cut -d\":\" -f2)
+	del = !delete-current-branch
 [push]
 	default = current
 	autoSetupRemote = true

@@ -1,0 +1,12 @@
+#! /opt/homebrew/bin/fish
+
+set current_branch (git symbolic-ref --short HEAD)
+set commit_sha (git rev-parse $current_branch)
+
+log "Switching to main..."
+git switch main
+log "Deleting $current_branch..."
+git branch -D $current_branch
+log "Done!"
+
+echo "$commit_sha" >> ~/.delog
