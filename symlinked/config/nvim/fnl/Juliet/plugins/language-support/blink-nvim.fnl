@@ -15,7 +15,8 @@
                                                                      (if (<= ctx.idx
                                                                              9)
                                                                          (.. ""
-                                                                             ctx.idx)))}}}}
+                                                                             ctx.idx)
+                                                                         " "))}}}}
                            :documentation {:auto_show true
                                            :window {:border :rounded}}}
               :keymap {:<CR> [:select_and_accept :fallback]
