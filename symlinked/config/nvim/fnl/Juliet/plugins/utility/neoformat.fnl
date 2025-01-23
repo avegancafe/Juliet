@@ -4,6 +4,13 @@
                                      "Format buffer")]
                          :lazy false
                          :init (fn []
+                                 (vim.cmd "augroup NeoformatGroup
+                                           autocmd!
+                                           autocmd BufWritePre *.ts Neoformat
+                                           autocmd BufWritePre *.tsx Neoformat
+                                           autocmd BufWritePre *.css Neoformat
+                                           autocmd BufWritePre *.py Neoformat
+                                augroup END")
                                  (set vim.g.neoformat_enabled_sql [:sqlfluff])
                                  (set vim.g.neoformat_sql_sqlfluff
                                       {:exe :sqlfluff
