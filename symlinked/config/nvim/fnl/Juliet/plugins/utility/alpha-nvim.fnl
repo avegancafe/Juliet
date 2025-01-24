@@ -21,10 +21,14 @@
                        (dashboard.button :e " > Explore fs" ":Neotree<cr>")
                        (dashboard.button :l " > Load session for current dir"
                                          ":SessionManager load_current_dir_session<cr>")
-                       (dashboard.button :f " > Find file" ":Telescope find_files<cr>")
-                       (dashboard.button :t " > Open To-do List" ":Dooing<cr>")
-                       (dashboard.button :q " > Quit dashboard" ":Alpha<cr>")
-                       ])
+                       (dashboard.button :f " > Find file"
+                                         ":Telescope find_files<cr>")
+                       (dashboard.button :t " > Open To-do List"
+                                         (fn []
+                                           (local completionist
+                                                  (require :completionist))
+                                           (completionist.toggle)))
+                       (dashboard.button :q " > Quit dashboard" ":Alpha<cr>")])
                  (local fortune (require :alpha.fortune))
                  (set dashboard.section.footer.val (fortune))
                  (alpha.setup dashboard.config))})
