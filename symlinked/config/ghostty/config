@@ -2,6 +2,7 @@ theme = bamboo
 
 font-family = Iosevka Nerd Font Mono
 font-size = 16
+font-thicken = true
 
 keybind = global:ctrl+x=toggle_quick_terminal
 quick-terminal-animation-duration = 0
