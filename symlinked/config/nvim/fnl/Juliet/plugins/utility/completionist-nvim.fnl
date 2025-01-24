@@ -3,7 +3,7 @@
 (pack :avegancafe/completionist.nvim
       {:keys [(key "<leader>\\"
                    (fn [] (local completionist (require :completionist))
-                     (completionist.toggle)))]
+                     (completionist.toggle)) "Open notepad")]
        :dependencies [:nvim-lua/plenary.nvim :ribru17/bamboo.nvim]
        :config (fn []
                  (let [completionist (require :completionist)
