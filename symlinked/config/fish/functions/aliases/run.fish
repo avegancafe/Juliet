@@ -10,7 +10,7 @@ function run
     rlog "Running `gh workflow run $ref_arg $_flag_a $workflow_name`..."
     eval "gh workflow run $ref_arg $workflow_name $_flag_a "
 
-    gum spin sleep 5 --title "Waiting for workflow to start... (~5s)" -- $workflow
+    gum spin sleep 15 --title "Waiting for workflow to start... (~15s)" -- $workflow
     set -l run_id (gh run list --workflow=$workflow_name | grep -o 'in_progress.*workflow_dispatch[[:space:]]*[0-9]\{10,\}' | awk -F'workflow_dispatch[[:space:]]*' '{print $2}' | awk '{print substr($1, 1, 11); exit}')
 
     if test -z "$run_id"
