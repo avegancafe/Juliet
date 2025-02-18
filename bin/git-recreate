@@ -1,0 +1,14 @@
+#! /bin/zsh
+
+source ~/.config/Juliet/_util.bash
+
+set -e
+
+PREVIOUS_BRANCH=$(git branch | grep \* | cut -d ' ' -f2)
+delete-current-branch
+rlog "Fetch latest main..."
+git pull
+
+log "Recreating branch $PREVIOUS_BRANCH"
+git switch -c $PREVIOUS_BRANCH
+log "Done!"
