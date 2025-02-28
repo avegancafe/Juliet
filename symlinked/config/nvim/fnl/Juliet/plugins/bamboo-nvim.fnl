@@ -31,5 +31,7 @@
                  (vim.api.nvim_set_hl 0 :Folded {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :BlinkCmpSignatureHelpBorder
                                       {:fg colors.grey})
+                 (vim.api.nvim_set_hl 0 :PmenuExtra
+                                      {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :TabLineFill
                                       {:fg colors.black :bg colors.black})))})

@@ -2,7 +2,7 @@
 
 (pack :Saghen/blink.cmp
       {:lazy false
-       :version :0.7.6
+       :version "*"
        :opts {:completion {:menu {:border :rounded
                                   :draw {:columns [{1 :rank
                                                     2 :kind_icon
@@ -12,11 +12,14 @@
                                                     2 :label_description}]
                                          :components {:rank {:highlight :BlinkCmpSource
                                                              :text (fn [ctx]
-                                                                     (if (<= ctx.idx
-                                                                             9)
-                                                                         (.. ""
-                                                                             ctx.idx)
-                                                                         " "))}}}}
+                                                                     (if (= ctx.item.source_id
+                                                                            :cmdline)
+                                                                         ""
+                                                                         (if (<= ctx.idx
+                                                                                 9)
+                                                                             (.. ""
+                                                                                 ctx.idx)
+                                                                             " ")))}}}}
                            :documentation {:auto_show true
                                            :window {:border :rounded}}}
               :keymap {:<CR> [:select_and_accept :fallback]
