@@ -14,5 +14,5 @@ function cursor --wraps "cursor"
         set dir (dirname "$dir")
     end
 
-    env PYTHONPATH=$dir command cursor
+    env PYTHONPATH=$dir/server command cursor
 end

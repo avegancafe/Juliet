@@ -31,6 +31,7 @@
                                                                                     :html
                                                                                     :http
                                                                                     :javascript
+                                                                                    :jinja
                                                                                     :jsdoc
                                                                                     :json5
                                                                                     :json

@@ -45,6 +45,7 @@
 (vim.cmd "augroup FiletypeGroup
   autocmd!
   autocmd BufNewFile,BufRead *.jsx set filetype=javascript.jsx
+  autocmd BufNewFile,BufRead *.sql set filetype=jinja
   autocmd BufNewFile,BufRead *.mdx set filetype=markdown.mdx
   autocmd BufRead,BufNewFile *.md setlocal textwidth=80
   autocmd BufNewFile,BufRead Brewfile set filetype=ruby
