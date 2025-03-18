@@ -1,7 +1,8 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :avegancafe/completionist.nvim
-      {:keys [(key "<leader>\\"
+      {:lazy false
+       :keys [(key "<leader>\\"
                    (fn [] (local completionist (require :completionist))
                      (completionist.toggle)) "Open notepad")]
        :dependencies [:nvim-lua/plenary.nvim :ribru17/bamboo.nvim]

@@ -5,11 +5,13 @@
                       :nocksock/do.nvim
                       :natecraddock/workspaces.nvim
                       :ribru17/bamboo.nvim
-                      :nvim-lua/plenary.nvim]
+                      :nvim-lua/plenary.nvim
+                      :avegancafe/completionist.nvim]
        :config (fn []
                  (set vim.o.laststatus 3)
                  (let [lualine (require :lualine)
                        configpulse (require :configpulse)
+                       completionist (require :completionist)
                        time (configpulse.get_time)]
                    (lualine.setup {:winbar {:lualine_c [(fn []
                                                           ((. (require :do)
@@ -51,7 +53,11 @@
                                                                                       " [%a%A]+"
                                                                                       "")))))
                                                             fin)]
-                                              :lualine_c []
+                                              :lualine_c [{1 (fn []
+                                                               (completionist.current_task))
+                                                           :cond (fn []
+                                                                   (not (= (completionist.current_task)
+                                                                           "")))}]
                                               :lualine_x [(fn []
                                                             (local Path
                                                                    (require :plenary.path))
