@@ -10,6 +10,7 @@
                                            autocmd BufWritePre *.tsx Neoformat
                                            autocmd BufWritePre *.css Neoformat
                                            autocmd BufWritePre *.py Neoformat
+                                           autocmd BufWritePre *.fnl Neoformat
                                 augroup END")
                                  (set vim.g.neoformat_enabled_sql [:sqlfluff])
                                  (set vim.g.neoformat_sql_sqlfluff
