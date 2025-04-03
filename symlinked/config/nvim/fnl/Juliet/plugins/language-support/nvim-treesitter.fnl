@@ -59,6 +59,7 @@
                                                                                     :vim
                                                                                     :vimdoc
                                                                                     :vue
-                                                                                    :yaml]
+                                                                                    :yaml
+                                                                                    :zig]
                                                                  :highlight {:enable true
                                                                              :additional_vim_regex_highlighting true}}))})

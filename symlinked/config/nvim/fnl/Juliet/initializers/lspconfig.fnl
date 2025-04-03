@@ -91,7 +91,8 @@
                  :opts {:settings {:pylsp {:plugins {:pycodestyle {:enabled false}
                                                      :pyflakes {:enabled false}}}}}}
                 {:name :terraformls}
-                {:name :rust_analyzer}])
+                {:name :rust_analyzer}
+                {:name :zls}])
 
 (mason-lspconfig.setup {:ensure_installed (icollect [_ {: name} (ipairs servers)]
                                             name)})
