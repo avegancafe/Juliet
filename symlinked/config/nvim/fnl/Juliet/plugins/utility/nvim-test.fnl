@@ -9,5 +9,4 @@
                (let [pytest (require :nvim-test.runners.pytest)
                      homedir (os.getenv :HOME)]
                  (pytest:setup {:command (.. homedir
-                                             :/workspace/dev-env/bin/j2-test)
-                                :args [:--ignore=server/tests/e2e]})))})
+                                             :/workspace/dev-env/bin/j2-test)})))})
