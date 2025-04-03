@@ -2,7 +2,10 @@ theme = bamboo
 
 font-family = Iosevka Nerd Font Mono
 font-size = 16
-# font-thicken = true
+cursor-style = block
+cursor-style-blink = true
+shell-integration-features = no-cursor
 
 keybind = global:ctrl+x=toggle_quick_terminal
 quick-terminal-animation-duration = 0
+macos-titlebar-style = tabs
