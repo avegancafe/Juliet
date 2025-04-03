@@ -39,7 +39,7 @@
      4 (let [width vim.opt.columns._value
              buf-info (vim.fn.getbufinfo {:buflisted 1})
              buf-num (length buf-info)
-             ideal-max-width 30
+             ideal-max-width 42
              equal-sized-width (vim.fn.float2nr (vim.fn.floor (/ width buf-num)))
              actual-max-width (vim.fn.min [equal-sized-width ideal-max-width])
              full-text (if (> (num-of-bufs tab.id line) 1)
@@ -101,7 +101,6 @@
                                        (.. (current-cal-event) " ")
                                        ((. (line.wins_in_tab (line.api.get_current_tab))
                                            :foreach) (fn [win]
-                                                                                                                                                (render-buffers win
-                                                                                                                                                                line
-                                                                                                                                                                i))))
+                                                       (render-buffers win line
+                                                                       i))))
                                  :hl highlight-groups.fill})))})
