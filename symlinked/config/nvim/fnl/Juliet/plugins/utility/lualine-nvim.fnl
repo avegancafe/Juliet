@@ -6,7 +6,8 @@
                       :natecraddock/workspaces.nvim
                       :ribru17/bamboo.nvim
                       :nvim-lua/plenary.nvim
-                      :avegancafe/completionist.nvim]
+                      :avegancafe/completionist.nvim
+                      :SmiteshP/nvim-navic]
        :config (fn []
                  (set vim.o.laststatus 3)
                  (let [lualine (require :lualine)
@@ -59,6 +60,9 @@
                                                                    (not (= (completionist.current_task)
                                                                            "")))}]
                                               :lualine_x [(fn []
+                                                            (let [navic (require :nvim-navic)]
+                                                              (navic.get_location)))]
+                                              :lualine_y [(fn []
                                                             (local Path
                                                                    (require :plenary.path))
                                                             (var p
@@ -80,9 +84,8 @@
                                                                     (string.format "%02d"
                                                                                    time.minutes)))
                                                               (fn [] ""))]
-                                              :lualine_y [:diagnostics
-                                                          :filetype]
-                                              :lualine_z []}
+                                              :lualine_z [:diagnostics
+                                                          :filetype]}
                                    :inactive_sections {:lualine_a []
                                                        :lualine_b []
                                                        :lualine_c [:filename]

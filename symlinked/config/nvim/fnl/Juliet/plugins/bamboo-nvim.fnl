@@ -19,8 +19,6 @@
                                       {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :MiniPickBorder {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :MiniPickPrompt {:fg colors.fg})
-                 (vim.api.nvim_set_hl 0 :TabLineLogo
-                                      {:fg colors.red :bg colors.black})
                  (vim.api.nvim_set_hl 0 :TabLineSep {:bg colors.green})
                  (vim.api.nvim_set_hl 0 :TabLine
                                       {:bg colors.white :fg colors.white})
@@ -31,7 +29,6 @@
                  (vim.api.nvim_set_hl 0 :Folded {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :BlinkCmpSignatureHelpBorder
                                       {:fg colors.grey})
-                 (vim.api.nvim_set_hl 0 :PmenuExtra
-                                      {:fg colors.grey})
+                 (vim.api.nvim_set_hl 0 :PmenuExtra {:fg colors.grey})
                  (vim.api.nvim_set_hl 0 :TabLineFill
                                       {:fg colors.black :bg colors.black})))})
