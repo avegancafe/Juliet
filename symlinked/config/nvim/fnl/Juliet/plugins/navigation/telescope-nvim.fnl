@@ -29,7 +29,8 @@
        :config (fn []
                  (let [actions (require :telescope.actions)
                        trouble (require :trouble.sources.telescope)
-                       telescope (require :telescope)]
+                       telescope (require :telescope)
+                       themes (require :telescope.themes)]
                    (telescope.setup {:defaults {:mappings {:i {:<c-j> actions.move_selection_next
                                                                :<c-k> actions.move_selection_previous
                                                                :<esc> actions.close
@@ -65,6 +66,7 @@
                                                :buffers {:theme :dropdown
                                                          :mappings {:i {:<enter> actions.select_tab
                                                                         :<c-q> (+ actions.delete_buffer
-                                                                                  actions.move_to_top)}}}}})
+                                                                                  actions.move_to_top)}}}}
+                                     :extensions {:ui-select [(themes.get_cursor)]}})
                    (telescope.load_extension :ui-select)
                    (telescope.load_extension :workspaces)))})

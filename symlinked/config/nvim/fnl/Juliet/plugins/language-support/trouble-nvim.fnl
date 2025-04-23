@@ -3,5 +3,5 @@
 (pack :folke/trouble.nvim
       {:lazy false
        :config true
-       :keys [(key :<leader>la ":Trouble diagnostics<cr>"
+       :keys [(key :<leader>ld ":Trouble diagnostics<cr>"
                    "Document diagnostics")]})

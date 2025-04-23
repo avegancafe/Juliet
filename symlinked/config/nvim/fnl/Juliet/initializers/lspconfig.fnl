@@ -17,30 +17,32 @@
   (fn buf-set-option [...] (vim.api.nvim_buf_set_option buffer ...))
 
   (buf-set-option :omnifunc "v:lua.vim.lsp.omnifunc")
-  (vim.keymap.set :n :K "<CMD>lua vim.lsp.buf.hover()<CR>"
+  (vim.keymap.set :n :K (fn [] (vim.lsp.buf.hover))
                   {: buffer :noremap true :silent true :desc "Show LSP hover"})
-  (vim.keymap.set :n :<leader>lh "<CMD>lua vim.lsp.buf.hover()<CR>"
-                  {: buffer :noremap true :silent true :desc "Show LSP hover"})
-  (vim.keymap.set :n :<leader>lt "<CMD>lua vim.lsp.buf.type_definition()<CR>"
+  (vim.keymap.set :n :<leader>lh
+                  (fn [] (vim.lsp.buf.hover)
+                    {: buffer
+                     :noremap true
+                     :silent true
+                     :desc "Show LSP hover"})
+                  (vim.keymap.set :n :<leader>lt
+                                  (fn [] (vim.lsp.buf.type_definition)))
                   {: buffer
                    :noremap true
                    :silent true
                    :desc "Go to type definition"})
   (vim.keymap.set :n :<leader>lr
-                  ":lua require('live-rename').rename({ insert = true })<CR>"
+                  (fn []
+                    (let [live-rename (require :live-rename)]
+                      (live-rename.rename {:insert true})))
                   {: buffer :noremap true :silent true :desc "Rename symbol"})
+  (vim.keymap.set :n :<leader>la (fn [] (vim.lsp.buf.code_action))
+                  {: buffer :noremap true :silent true :desc "Run code action"})
   (vim.keymap.set :n :<leader>lu
-                  ":lua require('telescope.builtin').lsp_references()<CR>"
-                  {: buffer
-                   :noremap true
-                   :silent true
-                   :desc "Show LSP references"})
-  (vim.keymap.set :n :<leader>ld
-                  ":lua require('telescope.builtin').lsp_references()<CR>"
-                  {: buffer
-                   :noremap true
-                   :silent true
-                   :desc "Show LSP references"})
+                  (fn []
+                    (let [builtins (require :telescope.builtin)]
+                      (builtins.lsp_references)))
+                  {: buffer :noremap true :silent true :desc "Show LSP usages"})
   (vim.keymap.set :n :<leader>lo :<CMD>AerialToggle<CR>
                   {: buffer
                    :noremap true
