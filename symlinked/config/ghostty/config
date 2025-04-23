@@ -6,6 +6,6 @@ cursor-style = block
 cursor-style-blink = true
 shell-integration-features = no-cursor
 
-keybind = global:ctrl+x=toggle_quick_terminal
+keybind = global:ctrl+g=toggle_quick_terminal
 quick-terminal-animation-duration = 0
 macos-titlebar-style = tabs
