@@ -11,6 +11,7 @@ set -gx PATH "$HOME/.config/Juliet/bin/git-hoard/bin" $PATH
 set -gx PATH /usr/local/games/bin $PATH
 set -gx BUN_INSTALL "$HOME/.bun"
 set -gx PATH $BUN_INSTALL/bin $PATH
+set -gx MANPAGER 'nvim +Man!'
 
 # General system configs
 set -gx EDITOR nvim
