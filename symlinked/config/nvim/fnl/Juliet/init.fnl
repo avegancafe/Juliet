@@ -20,7 +20,13 @@
 (set vim.g.WebDevIconsUnicodeDecorateFolderNodesDefaultSymbol "")
 (set vim.g.go_fmt_command :goimports)
 (set vim.opt.timeoutlen 500)
-(set vim.opt.guifont "Iosevka Nerd Font Mono:h19")
+(if (= (vim.fn.exists "g:neovide") 1)
+    (do
+      (set vim.opt.guifont "Iosevka Nerd Font Mono:h14")
+      (vim.cmd "let g:neovide_cursor_trail_size = 0.2")
+      (vim.cmd "let g:neovide_cursor_animate_command_line = v:false"))
+    (set vim.opt.guifont "Iosevka Nerd Font Mono:h19"))
+
 (vim.cmd "filetype off")
 (vim.cmd "filetype plugin on")
 (vim.cmd "filetype plugin indent on")
