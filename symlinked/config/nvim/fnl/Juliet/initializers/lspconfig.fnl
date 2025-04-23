@@ -49,17 +49,11 @@
                    :silent true
                    :desc "Open LSP outline"}))
 
-; (local capabilities
-;        ((. cmp-nvim-lsp :default_capabilities) (vim.lsp.protocol.make_client_capabilities)))
-
-(local capabilities (blink-cmp.get_lsp_capabilities))
-
-(set capabilities.textDocument.foldingRange
-     {:dynamicRegistration false :lineFoldingOnly true})
-
 (lambda get-opts [?opt-overrides]
   (local opt-settings {})
-  (local opt-overrides (or ?opt-overrides {}))
+  (local opt-overrides (merge {:dynamicRegistraation false
+                               :lineFoldingOnly true}
+                              (or ?opt-overrides {})))
   (local opts {:capabilities (blink-cmp.get_lsp_capabilities opt-overrides)
                :flags {:debounce_text_changes 150}
                :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
