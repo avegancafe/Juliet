@@ -3,5 +3,5 @@ function nv --wraps "neovide"
         gum confirm "Neovide not installed. Install?" && brew install --cask neovide
     end
 
-    neovide $argv
+    neovide $argv &
 end
