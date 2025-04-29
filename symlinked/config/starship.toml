@@ -15,7 +15,7 @@ add_newline = false
 
 [fill]
 symbol = "—"
-style = "bold white"
+style = "#5a5b5e"
 
 [python]
 format = 'via [${symbol}(\($virtualenv\) )]($style)'
@@ -43,5 +43,5 @@ style = "red"
 
 [time]
 disabled = false
-style = "bold white"
+style = "bold #5a5b5e"
 format = "[$time]($style) "
