@@ -83,9 +83,7 @@
                 {:name :tailwindcss}
                 {:name :vtsls}
                 {:name :yamlls}
-                {:name :pylsp
-                 :opts {:settings {:pylsp {:plugins {:pycodestyle {:enabled false}
-                                                     :pyflakes {:enabled false}}}}}}
+                {:name :pyright}
                 {:name :terraformls}
                 {:name :rust_analyzer}
                 {:name :zls}])
