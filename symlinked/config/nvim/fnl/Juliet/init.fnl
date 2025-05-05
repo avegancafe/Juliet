@@ -23,6 +23,7 @@
 (if (= (vim.fn.exists "g:neovide") 1)
     (do
       (set vim.opt.guifont "Iosevka Nerd Font Mono:h14")
+      (set vim.g.neovide_input_macos_option_key_is_meta :only_left)
       (vim.cmd "let g:neovide_cursor_trail_size = 0.2")
       (vim.cmd "let g:neovide_cursor_animate_command_line = v:false"))
     (set vim.opt.guifont "Iosevka Nerd Font Mono:h19"))
