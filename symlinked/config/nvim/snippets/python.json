@@ -1,5 +1,5 @@
 {
-  "foo": {
+  "print_query() for printing the raw sql of django queries": {
     "prefix": "print_query",
     "body": [
       "# TODO: Remove me!",
