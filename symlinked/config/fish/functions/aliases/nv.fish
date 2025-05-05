@@ -3,5 +3,8 @@ function nv --wraps "neovide"
         gum confirm "Neovide not installed. Install?" && brew install --cask neovide
     end
 
-    neovide $argv &
+    nohup neovide $argv 2>&1 > /dev/null &
+
+    set -l pid (jobs -l | grep neovide | awk '{print $2}')
+    disown $pid
 end
