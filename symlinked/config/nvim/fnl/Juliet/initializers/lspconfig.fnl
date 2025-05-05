@@ -83,7 +83,7 @@
                 {:name :tailwindcss}
                 {:name :vtsls}
                 {:name :yamlls}
-                {:name :pyright}
+                {:name :jedi_language_server}
                 {:name :terraformls}
                 {:name :rust_analyzer}
                 {:name :zls}])
