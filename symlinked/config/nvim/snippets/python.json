@@ -3,7 +3,7 @@
     "prefix": "print_query",
     "body": [
       "# TODO: Remove me!",
-      "from web_app.utils.print_query import print_query",
+      "from shared.utils.print_query import print_query",
       "",
       "print()",
       "print()",
