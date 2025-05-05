@@ -42,3 +42,7 @@ require('Juliet')
 require('Juliet.plugins')
 require('Juliet.mappings')
 require('Juliet.initializers')
+
+if vim.g.juliet__restore_lazy_plugins then
+	require('lazy.manage').restore()
+end

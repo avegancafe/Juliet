@@ -1,0 +1,11 @@
+#! /bin/bash
+
+set -e
+
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source $SCRIPT_DIR/../_util.bash
+
+log "Clearing old lazy plugins..."
+rm -rf ~/.local/share/nvim/lazy/*
+log "Opening nvim and restoring lazy plugins..."
+nvim --cmd "let g:juliet__restore_lazy_plugins=1"
