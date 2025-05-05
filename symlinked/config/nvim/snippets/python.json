@@ -1,0 +1,10 @@
+{
+  "foo": {
+    "prefix": "print_query",
+    "body": [
+      "print(); print(); print(); print(); print();",
+      "print_query(${1:query})",
+      "print(); print(); print(); print(); print();"
+    ]
+  }
+}

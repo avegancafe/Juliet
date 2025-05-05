@@ -2,8 +2,9 @@
 
 (pack :Saghen/blink.cmp
       {:lazy false
-       :version "*"
-       :opts {:completion {:menu {:border :rounded
+       :version :1.*
+       :opts {:sources {:default [:lsp :path :snippets]}
+              :completion {:menu {:border :rounded
                                   :draw {:columns [{1 :rank
                                                     2 :kind_icon
                                                     :gap 2}
