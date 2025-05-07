@@ -11,7 +11,6 @@ set -gx PATH "$HOME/.config/Juliet/bin/git-hoard/bin" $PATH
 set -gx PATH /usr/local/games/bin $PATH
 set -gx BUN_INSTALL "$HOME/.bun"
 set -gx PATH $BUN_INSTALL/bin $PATH
-set -gx MANPAGER 'nvim +Man!'
 
 # General system configs
 set -gx EDITOR nvim
@@ -25,6 +24,7 @@ set -gx LESS_TERMCAP_us (tput setaf 4)
 set -gx LESS_TERMCAP_ue $RESET_CODE
 set -gx LESS_TERMCAP_so (tput setaf 1)
 set -gx LESS_TERMCAP_se $RESET_CODE
+set -gx MANPAGER 'nvim +Man!'
 
 # Language-specific configs
 set -Ux PYENV_ROOT $HOME/.pyenv
@@ -42,3 +42,5 @@ set -gx FOUNDRY_FMT_LINE_LENGTH 100
 set -gx FOUNDRY_FMT_TAB_WIDTH 2
 set -gx FOUNDRY_FMT_BRACKET_SPACING true
 set -gx FOUNDRY_FMT_QUOTE_STYLE single
+set -gx NEOVIDE_TITLE_HIDDEN 1
+set -gx NEOVIDE_FRAME buttonless
