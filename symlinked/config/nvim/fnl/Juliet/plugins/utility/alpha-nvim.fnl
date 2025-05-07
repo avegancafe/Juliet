@@ -18,7 +18,7 @@
                  (set dashboard.section.buttons.val
                       [(dashboard.button :s " > Open session"
                                          ":Telescope workspaces<cr>")
-                       (dashboard.button :e " > Explore fs" ":Neotree<cr>")
+                       (dashboard.button :e " > Explore fs" "<cmd>Yazi cwd<cr>")
                        (dashboard.button :l " > Load session for current dir"
                                          ":SessionManager load_current_dir_session<cr>")
                        (dashboard.button :f " > Find file"
