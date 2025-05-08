@@ -17,7 +17,7 @@
   (fn buf-set-option [...] (vim.api.nvim_buf_set_option buffer ...))
 
   (buf-set-option :omnifunc "v:lua.vim.lsp.omnifunc")
-  (vim.keymap.set :n :K (fn [] (vim.lsp.buf.hover))
+  (vim.keymap.set :n :K (fn [] (vim.lsp.buf.hover {:border :rounded}))
                   {: buffer :noremap true :silent true :desc "Show LSP hover"})
   (vim.keymap.set :n :<leader>lh
                   (fn [] (vim.lsp.buf.hover)
@@ -56,8 +56,6 @@
                               (or ?opt-overrides {})))
   (local opts {:capabilities (blink-cmp.get_lsp_capabilities opt-overrides)
                :flags {:debounce_text_changes 150}
-               :handlers {:textDocument/hover (vim.lsp.with vim.lsp.handlers.hover
-                                                {:border :rounded})}
                :on_attach on-attach
                :root_dir (nvim-lsp.util.root_pattern :.git)})
   (local settings (merge opt-settings (or opt-overrides.settings {})))
