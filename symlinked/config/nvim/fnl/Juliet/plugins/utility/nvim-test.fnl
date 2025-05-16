@@ -4,6 +4,7 @@
       {:opts {:termOpts {:go_back true}}
        :keys [(key :<leader>ft ":TestFile<cr>")
               (key :<leader>ftt ":TestFile<cr>")
+              (key :<leader>ftn ":TestNearest<cr>")
               (key :<leader>fts ":TestSuite<cr>")]
        :init (fn []
                (let [pytest (require :nvim-test.runners.pytest)
