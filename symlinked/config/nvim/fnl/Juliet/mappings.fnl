@@ -47,7 +47,12 @@
 
 (vim.api.nvim_create_user_command :ToggleNumbers toggle-numbers {:bar true})
 (vim.api.nvim_create_user_command :Todo
-                                  "execute \"TodoTrouble cwd=\".getreg('%')" {})
+                                  (fn []
+                                    (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h")
+                                                                  ":~:.")]
+                                      (print cwd)
+                                      (vim.cmd (.. "TodoTrouble cwd='" cwd "'"))))
+                                  {})
 
 (fn show-edits-in-current-dir []
   (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h") ":~:.")]
