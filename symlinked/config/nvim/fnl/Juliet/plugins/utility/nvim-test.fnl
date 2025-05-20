@@ -1,11 +1,12 @@
 (import-macros {: pack : key} :Juliet.macros)
 
 (pack :klen/nvim-test
-      {:opts {:termOpts {:go_back true}}
-       :keys [(key :<leader>ft ":TestFile<cr>")
-              (key :<leader>ftt ":TestFile<cr>")
-              (key :<leader>ftn ":TestNearest<cr>")
-              (key :<leader>fts ":TestSuite<cr>")]
+      {:opts {}
+       :keys [(key :<leader>ft ":TestLast<cr>" "Run tests for current file")
+              (key :<leader>ftt ":TestFile<cr>" "Run tests for current file")
+              (key :<leader>ftl ":TestLast<cr>" "Run last test command")
+              (key :<leader>ftn ":TestNearest<cr>" "Run nearest test")
+              (key :<leader>fts ":TestSuite<cr>" "Run test suite")]
        :init (fn []
                (let [pytest (require :nvim-test.runners.pytest)
                      homedir (os.getenv :HOME)]
