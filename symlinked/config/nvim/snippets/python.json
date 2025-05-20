@@ -17,5 +17,13 @@
       "print()",
       "print()"
     ]
+  },
+  "Insert set_trace() statement from ipdb": {
+    "prefix": "ipdb",
+    "body": [
+      "# TODO: Remove me!",
+      "import ipdb",
+      "ipdb.set_trace()"
+    ]
   }
 }
