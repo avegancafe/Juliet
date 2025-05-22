@@ -36,6 +36,20 @@
 (vim.keymap.set :n :<up> :<c-y>)
 (vim.keymap.set :n :<down> :<c-e>)
 
+(if (= (vim.fn.exists "g:neovide") 1)
+    (do
+      (vim.keymap.set :n :<d-s> ":w<cr>")
+      (vim.keymap.set :v :<d-c> :+y)
+      (vim.keymap.set :n :<d-v> :+P)
+      (vim.keymap.set :v :<d-v> :+P)
+      (vim.keymap.set :c :<d-v> :<C-R>+)
+      (vim.keymap.set :i :<d-v> "<ESC>l\"+Pa")))
+
+(vim.api.nvim_set_keymap "" :<d-v> :+p {:noremap true :silent true})
+(vim.api.nvim_set_keymap "!" :<d-v> :<C-R>+ {:noremap true :silent true})
+(vim.api.nvim_set_keymap :t :<d-v> :<C-R>+ {:noremap true :silent true})
+(vim.api.nvim_set_keymap :v :<d-v> :<C-R>+ {:noremap true :silent true})
+
 (fn toggle-numbers []
   (if (= vim.opt.relativenumber._value true)
       (do
