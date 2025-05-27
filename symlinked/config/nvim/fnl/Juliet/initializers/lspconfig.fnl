@@ -1,7 +1,6 @@
 (local nvim-lsp (require :lspconfig))
 (local navic (require :nvim-navic))
 (local {: merge} (require :Juliet.utils))
-; (local cmp-nvim-lsp (require :cmp_nvim_lsp))
 (local blink-cmp (require :blink.cmp))
 (local mason (require :mason))
 (local mason-lspconfig (require :mason-lspconfig))
@@ -86,7 +85,8 @@
                 {:name :rust_analyzer}
                 {:name :zls}])
 
-(mason-lspconfig.setup {:ensure_installed (icollect [_ {: name} (ipairs servers)]
+(mason-lspconfig.setup {:automatic_enable false
+                        :ensure_installed (icollect [_ {: name} (ipairs servers)]
                                             name)})
 
 (lambda setup-server [server ?opt-overrides]
