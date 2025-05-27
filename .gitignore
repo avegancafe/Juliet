@@ -2,3 +2,4 @@
 __pycache__
 symlinked/config/fish/config__local.fish
 Brewfile.lock.json
+fish_variables
