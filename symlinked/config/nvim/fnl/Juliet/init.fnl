@@ -26,6 +26,7 @@
       (set vim.g.neovide_padding_top 8)
       (set vim.g.neovide_padding_bottom 4)
       (set vim.g.neovide_opacity 0.97)
+      (set vim.g.neovide_floating_shadow false)
       (set vim.g.neovide_input_macos_option_key_is_meta :only_left)
       (vim.cmd "let g:neovide_cursor_trail_size = 0.2")
       (vim.cmd "let g:neovide_cursor_animate_command_line = v:false"))
