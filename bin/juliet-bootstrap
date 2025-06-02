@@ -2,12 +2,42 @@
 
 source ~/.config/Juliet/_util.bash
 
-setup_git() {
+setup-git() {
   mkdir -p ~/.config/local
   [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
 }
 
-setup_dependencies() {
+update-juliet() {
+	rlog "Updating Juliet repository..."
+	WORKDIR="$HOME/.config/Juliet"
+	if [ -d "$WORKDIR" ]; then
+		cd "$WORKDIR"
+
+		if ! git diff --quiet; then
+			warn "Warning: There are unstaged changes in ~/.config/Juliet. Skipping updating Juliet."
+			cd - > /dev/null
+			return
+		fi
+
+
+		DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+
+		CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+		if [ "$CURRENT_BRANCH" = "$DEFAULT_BRANCH" ]; then
+			git pull
+		else
+			warn "Warning: ~/.config/Juliet is not on the default branch. Current branch: $CURRENT_BRANCH"
+			return
+		fi
+
+		cd - > /dev/null
+	else
+		log "Error: Juliet directory not found at $WORKDIR"
+	fi
+}
+
+
+setup-dependencies() {
   if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
@@ -27,12 +57,12 @@ setup_dependencies() {
   fi
 }
 
-symlink_dotfiles() {
+symlink-dotfiles() {
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
 }
 
-setup_ssh() {
+setup-ssh() {
   if [[ ! -d $HOME/.ssh ]]; then
     mkdir $HOME/.ssh
     chmod 700 $HOME/.ssh
@@ -45,13 +75,13 @@ setup_ssh() {
   fi
 }
 
-setup_fzf() {
+setup-fzf() {
   if ! command -v fzf &> /dev/null; then
     /opt/homebrew/opt/fzf/install
   fi
 }
 
-setup_fish() {
+setup-fish() {
   mkdir -p ~/.config/fish
 
 
@@ -68,7 +98,7 @@ setup_fish() {
   fi
 }
 
-setup_gpg() {
+setup-gpg() {
   if [[ ! -d $HOME/.gnupg ]]; then
     mkdir ~/.gnupg
     touch ~/.gnupg/gpg-agent.conf
@@ -76,7 +106,7 @@ setup_gpg() {
   fi
 }
 
-setup_rust() {
+setup-rust() {
   if ! command -v stylua &> /dev/null; then
     cargo install stylua
   fi
@@ -86,7 +116,7 @@ setup_rust() {
   fi
 }
 
-setup_kitty() {
+setup-kitty() {
   if ! command -v kitty &> /dev/null; then
     curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
   fi
@@ -96,7 +126,7 @@ setup_kitty() {
   crontab $HOME/.config/kitty/update-kitty.crontab
 }
 
-setup_python() {
+setup-python() {
   if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
   fi
@@ -107,24 +137,26 @@ setup_python() {
 }
 
 rlog "Setting up git..."
-setup_git
+setup-git
+rlog "Updating Juliet repository..."
+update-juliet
 rlog "Setting up external dependencies..."
-setup_dependencies $1
+setup-dependencies $1
 log "Symlinking dotfiles..."
-symlink_dotfiles
+symlink-dotfiles
 log "Setting up ssh..."
-setup_ssh
+setup-ssh
 log "Installing fzf..."
-setup_fzf
+setup-fzf
 log "Installing fish..."
-setup_fish $1
+setup-fish $1
 log "Installing gpg..."
-setup_gpg
+setup-gpg
 log "Installing rust dependencies..."
-setup_rust
+setup-rust
 log "Installing kitty..."
-setup_kitty
+setup-kitty
 log "Setting up python..."
-setup_python
+setup-python
 
 log "Done!"
