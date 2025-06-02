@@ -85,6 +85,7 @@ brew "llvm"
 brew "lsd"
 brew "luarocks"
 brew "luv"
+brew "ncspot"
 brew "ncurses"
 brew "neovim", args: ["HEAD"]
 brew "netpbm"
