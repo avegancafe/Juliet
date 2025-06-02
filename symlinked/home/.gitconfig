@@ -40,7 +40,7 @@
 	excludesfile = ~/.gitignore_global
 	autocrlf = false
 	editor = nvim
-	pager = less -x1,5
+	pager = delta
 [github]
 	user = avegancafe
 [format]
@@ -85,3 +85,9 @@
 	enabled = true
 [gpg]
 	format = ssh
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+[merge]
+	conflictStyle = zdiff3
