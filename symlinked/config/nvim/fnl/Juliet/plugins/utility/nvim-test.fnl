@@ -9,6 +9,9 @@
               (key :<leader>fts ":TestSuite<cr>" "Run test suite")]
        :init (fn []
                (let [pytest (require :nvim-test.runners.pytest)
+                     jest (require :nvim-test.runners.jest)
                      homedir (os.getenv :HOME)]
+                 (jest:setup {:command (.. homedir :/.nodenv/shims/npm)
+                              :args [:test]})
                  (pytest:setup {:command (.. homedir
                                              :/workspace/dev-env/bin/j2-test)})))})
