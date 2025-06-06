@@ -60,20 +60,6 @@
         (vim.cmd ":tabdo windo set relativenumber"))))
 
 (vim.api.nvim_create_user_command :ToggleNumbers toggle-numbers {:bar true})
-(vim.api.nvim_create_user_command :Todo
-                                  (fn []
-                                    (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h")
-                                                                  ":~:.")]
-                                      (print cwd)
-                                      (vim.cmd (.. "TodoTrouble cwd='" cwd "'"))))
-                                  {})
-
-(fn show-edits-in-current-dir []
-  (let [cwd (vim.fn.fnamemodify (vim.fn.expand "%:h") ":~:.")]
-    (vim.cmd (.. "TodoTrouble keywords=EDIT cwd=" cwd))))
-
-(vim.api.nvim_create_user_command :ShowEditsInCurrentDir
-                                  show-edits-in-current-dir {})
 
 (vim.keymap.set :n :<esc> ":w<cr>" {:silent true})
 (fn open-github [branch]
