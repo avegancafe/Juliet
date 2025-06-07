@@ -6,6 +6,7 @@
   "bigfile.nvim": { "branch": "main", "commit": "33eb067e3d7029ac77e081cfe7c45361887a311a" },
   "blink.cmp": { "branch": "main", "commit": "022521a8910a5543b0251b21c9e1a1e989745796" },
   "cellular-automaton.nvim": { "branch": "main", "commit": "1606e9d5d04ff254023c3f3c62842d065708d6d3" },
+  "checkmate.nvim": { "branch": "main", "commit": "41c454d5ec17394f01d11cbbbaffa5377c877ee6" },
   "committia.vim": { "branch": "master", "commit": "c8c0f255e8090ed90dd9d5dd2e8672994f8e3671" },
   "completionist.nvim": { "branch": "main", "commit": "102c31bd838a17c9222daa14eac78b82bead0006" },
   "configpulse": { "branch": "main", "commit": "f045aabd4b070b39c70f1fe9a7b1e6e9d18a9660" },
