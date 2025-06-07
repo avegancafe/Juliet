@@ -70,7 +70,7 @@
                 {:name :gopls
                  :opts {:root_dir (lspconfig-util.root_pattern :go.mod)}}
                 {:name :lua_ls
-                 :opts {:settings {:Lua {:diagnostics {:globals [:vim]}
+                 :opts {:settings {:Lua {:diagnostics {:globals [:vim :hs]}
                                          :runtime {:version :LuaJIT}
                                          :telemetry {:enable false}
                                          :workspace {:checkThirdParty false
