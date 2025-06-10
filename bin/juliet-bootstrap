@@ -8,7 +8,6 @@ setup-git() {
 }
 
 update-juliet() {
-	rlog "Updating Juliet repository..."
 	WORKDIR="$HOME/.config/Juliet"
 	if [ -d "$WORKDIR" ]; then
 		cd "$WORKDIR"
