@@ -1,16 +1,16 @@
 {
   "print_query() for printing the raw sql of django queries": {
-    "prefix": "print_query",
+    "prefix": "print_queryset_sql",
     "body": [
       "# TODO: Remove me!",
-      "from shared.utils.print_query import print_query",
+      "from shared.utils.print_queryset_sql import print_queryset_sql",
       "",
       "print()",
       "print()",
       "print()",
       "print()",
       "print()",
-      "print_query(${1:query})",
+      "print_queryset_sql(${1:query})",
       "print()",
       "print()",
       "print()",
