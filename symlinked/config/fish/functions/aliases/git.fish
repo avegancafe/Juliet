@@ -50,8 +50,22 @@ function changed_files
 end
 
 function commit
-    argparse --name="commit" s/short -- $argv
+    argparse --name="commit" s/short r/retry -- $argv
     set -l message $argv
+
+    if test -n "$_flag_r"
+        set -l commit_message_file .git/COMMIT_EDITMSG
+
+        if test -f $commit_message_file
+            set message (cat $commit_message_file)
+            log "Committing and reusing message '$message'..."
+            git commit --message "$message"
+            return 0
+        else
+            error "No previous commit message found— exiting..."
+            return 1
+        end
+    end
 
     if test -z "$message"
         error "Commit message not provided— exiting..."
@@ -102,7 +116,8 @@ function commit
     git commit --message "$commit_type($scope): $message"
 
     if test $status -ne 0
-        error "Commit failed. See error above— exiting..."
+        error "Commit failed. Saving messaging and exiting..."
+        echo "$commit_type($scope): $message" > .git/COMMIT_EDITMSG
         return 1
     end
 end
