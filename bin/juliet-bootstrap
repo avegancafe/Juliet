@@ -8,31 +8,31 @@ setup-git() {
 }
 
 update-juliet() {
-	WORKDIR="$HOME/.config/Juliet"
-	if [ -d "$WORKDIR" ]; then
-		cd "$WORKDIR"
+  WORKDIR="$HOME/.config/Juliet"
+  if [ -d "$WORKDIR" ]; then
+    cd "$WORKDIR"
 
-		if ! git diff --quiet; then
-			warn "Warning: There are unstaged changes in ~/.config/Juliet. Skipping updating Juliet."
-			cd - > /dev/null
-			return
-		fi
+    if ! git diff --quiet; then
+      warn "Warning: There are unstaged changes in ~/.config/Juliet. Skipping updating Juliet."
+      cd - > /dev/null
+      return
+    fi
 
 
-		DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+    DEFAULT_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
 
-		CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-		if [ "$CURRENT_BRANCH" = "$DEFAULT_BRANCH" ]; then
-			git pull
-		else
-			warn "Warning: ~/.config/Juliet is not on the default branch. Current branch: $CURRENT_BRANCH"
-			return
-		fi
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+    if [ "$CURRENT_BRANCH" = "$DEFAULT_BRANCH" ]; then
+      git pull
+    else
+      warn "Warning: ~/.config/Juliet is not on the default branch. Current branch: $CURRENT_BRANCH"
+      return
+    fi
 
-		cd - > /dev/null
-	else
-		log "Error: Juliet directory not found at $WORKDIR"
-	fi
+    cd - > /dev/null
+  else
+    log "Error: Juliet directory not found at $WORKDIR"
+  fi
 }
 
 
