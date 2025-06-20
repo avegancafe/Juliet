@@ -11,5 +11,4 @@
                          :done {:key :<c-d>}}}
        :ft :markdown
        :keys [(key "<leader>\\"
-                   ":execute 'bo vs ' . stdpath('data') . '/todo.md' | vertical resize 80<cr>")
-              (key :q :<cmd>wq!<cr>)]})
+                   ":execute 'bo vs ' . stdpath('data') . '/todo.md' | vertical resize 80<cr>")]})
