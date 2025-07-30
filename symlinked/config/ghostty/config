@@ -9,3 +9,4 @@ shell-integration-features = no-cursor
 keybind = global:ctrl+g=toggle_quick_terminal
 quick-terminal-animation-duration = 0
 macos-titlebar-style = tabs
+keybind = shift+enter=text:\n
