@@ -92,32 +92,31 @@ function commit
 
     log "Commit type: $commit_type"
 
-    set -l scope ""
+    set -l scope (gum input --header.foreground "#8fb573" --header "What is the scope of this commit?")
 
-    while test -z "$scope"
-        set scope (gum input --header.foreground "#8fb573" --header "What is the scope of this commit?")
+    set -l scope_status $status
 
-        set -l scope_status $status
-
-        if test $scope_status -ne 0
-            error "No scope selected— exiting..."
-            return 1
-        end
-
-        if test $scope_status -eq 0 && test -z "$scope"
-            warn "Scope cannot be empty— please try again"
-        end
+    if test $scope_status -ne 0
+        error "No scope selected— exiting..."
+        return 1
     end
 
-
-    log "Scope: $scope"
-
-    log "Committing with message '$commit_type($scope): $message'..."
-    git commit --message "$commit_type($scope): $message"
+    if test -n "$scope"
+        log "Scope: $scope"
+        log "Committing with message '$commit_type($scope): $message'..."
+        git commit --message "$commit_type($scope): $message"
+    else
+        log "Committing with message '$commit_type: $message'..."
+        git commit --message "$commit_type: $message"
+    end
 
     if test $status -ne 0
         error "Commit failed. Saving messaging and exiting..."
-        echo "$commit_type($scope): $message" > .git/COMMIT_EDITMSG
+        if test -n "$scope"
+            echo "$commit_type($scope): $message" > .git/COMMIT_EDITMSG
+        else
+            echo "$commit_type: $message" > .git/COMMIT_EDITMSG
+        end
         return 1
     end
 end
