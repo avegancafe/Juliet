@@ -403,6 +403,26 @@
                         "vendor_id": 13364
                     },
                     "ignore": false
+                },
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": true,
+                        "product_id": 75,
+                        "vendor_id": 65534
+                    },
+                    "ignore": false,
+                    "ignore_vendor_events": true,
+                    "treat_as_built_in_keyboard": true
+                },
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "product_id": 75,
+                        "vendor_id": 65534
+                    },
+                    "ignore_vendor_events": true,
+                    "treat_as_built_in_keyboard": true
                 }
             ],
             "name": "Default profile",
