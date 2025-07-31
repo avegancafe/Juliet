@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/kyle/workspace/dev-env/",
+      "/Users/kyle/.config/Juliet/"
+    ],
+    "allow": [
+      "Bash(claude mcp:*)",
+      "Bash(docker compose logs:*)",
+      "Bash(docker logs:*)",
+      "Bash(gcloud builds list:*)",
+      "Bash(gcloud builds log:*)",
+      "Bash(gcloud container clusters describe:*)",
+      "Bash(gcloud container images list:*)",
+      "Bash(gcloud projects get-iam-policy:*)",
+      "Bash(gcloud secrets list:*)",
+      "Bash(gcloud secrets versions access:*)",
+      "Bash(gcloud secrets versions list:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr view:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(j2 test:*)",
+      "Bash(kubectl describe:*)",
+      "Bash(kubectl get deployment:*)",
+      "Bash(kubectl get deployment:*)",
+      "Bash(kubectl get pods:*)",
+      "Bash(kubectl get serviceaccount:*)",
+      "Bash(kubectl get:*)",
+      "Bash(kubectl logs:*)",
+      "Bash(kubectl rollout status:*)",
+      "Bash(kubectl top:*)",
+      "Bash(ls:*)",
+      "mcp__github__get_pull_request_comments",
+      "mcp__google-cloud-mcp__gcp-logging-query-logs",
+      "mcp__google-cloud-mcp__gcp-logging-query-time-range",
+      "mcp__google-cloud-mcp__gcp-logging-search-comprehensive",
+      "mcp__jira__jira_get_issue",
+      "mcp__prod-postgres__list_objects"
+    ],
+    "deny": []
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1753971061732
+  }
+}
