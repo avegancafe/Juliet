@@ -1,9 +1,5 @@
 {
   "permissions": {
-    "additionalDirectories": [
-      "/Users/kyle/workspace/dev-env/",
-      "/Users/kyle/.config/Juliet/"
-    ],
     "allow": [
       "Bash(claude mcp:*)",
       "Bash(docker compose logs:*)",
@@ -38,9 +34,13 @@
       "mcp__jira__jira_get_issue",
       "mcp__prod-postgres__list_objects"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "/Users/kyle/workspace/dev-env/",
+      "/Users/kyle/.config/Juliet/"
+    ]
   },
   "feedbackSurveyState": {
-    "lastShownTime": 1753971061732
+    "lastShownTime": 1754002642696
   }
 }
