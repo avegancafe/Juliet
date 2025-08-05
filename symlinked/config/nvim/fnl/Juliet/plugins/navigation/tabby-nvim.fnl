@@ -37,10 +37,10 @@
                  highlight-groups.tab)
      3 (if (string.find buffer :dbt/target) "! " "")
      4 (let [width vim.opt.columns._value
-             buf-info (vim.fn.getbufinfo {:buflisted 1})
-             buf-num (length buf-info)
+             tab-count (length (vim.api.nvim_list_tabpages))
              ideal-max-width 42
-             equal-sized-width (vim.fn.float2nr (vim.fn.floor (/ width buf-num)))
+             equal-sized-width (vim.fn.float2nr (vim.fn.floor (/ width
+                                                                 tab-count)))
              actual-max-width (vim.fn.min [equal-sized-width ideal-max-width])
              full-text (if (> (num-of-bufs tab.id line) 1)
                            (.. buffer-name " (+)")
