@@ -75,7 +75,7 @@
 (vim.keymap.set :n :<leader>sc ":call v:lua.EditChangedFiles()<cr>"
                 {:desc "Edit all changed files"})
 
-(vim.keymap.set :n :<leader>byy
+(vim.keymap.set :n :<leader>bya
                 (fn []
                   (let [path (vim.fn.expand "%:p")]
                     (print (.. "Copied '" path "' to clipboard"))
