@@ -1,6 +1,6 @@
 format = """
 $line_break\
-$directory$git_branch$git_state$git_status$git_metrics$python $fill   $jobs $cmd_duration $time
+$directory$git_branch$git_state$git_status$git_metrics$python $fill  ( $jobs)( $cmd_duration) $time
 $character"""
 command_timeout = 5000
 add_newline = false
