@@ -40,6 +40,11 @@
       "/Users/kyle/.config/Juliet/"
     ]
   },
+  "model": "opusplan",
+  "statusLine": {
+    "type": "command",
+    "command": "printf '📍 %s' \"$(pwd)\""
+  },
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
   }
