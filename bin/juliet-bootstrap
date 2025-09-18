@@ -115,16 +115,6 @@ setup-rust() {
   fi
 }
 
-setup-kitty() {
-  if ! command -v kitty &> /dev/null; then
-    curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
-  fi
-  [[ ! -f /usr/local/bin/kitty ]] && sudo ln -s /Applications/kitty.app/Contents/MacOS/kitty /usr/local/bin
-
-  [[ ! -f $HOME/Library/Fonts/3270-nerdfont-complete.ttf ]] && cp $HOME/.config/Juliet/etc/fonts/3270-nerdfont-complete.ttf $HOME/Library/Fonts/
-  crontab $HOME/.config/kitty/update-kitty.crontab
-}
-
 setup-python() {
   if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
@@ -153,8 +143,6 @@ log "Installing gpg..."
 setup-gpg
 log "Installing rust dependencies..."
 setup-rust
-log "Installing kitty..."
-setup-kitty
 log "Setting up python..."
 setup-python
 
