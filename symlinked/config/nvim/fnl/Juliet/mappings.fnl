@@ -226,3 +226,12 @@
 
 (vim.api.nvim_create_user_command :CloseDuplicateTabs close-duplocate-tabs
                                   {:bar true})
+
+(fn duplicate-line-selection []
+  (let [start-line (. (vim.fn.getpos "'<") 2)
+        end-line (. (vim.fn.getpos "'>") 2)
+        lines (vim.api.nvim_buf_get_lines 0 (- start-line 1) end-line false)]
+    (vim.api.nvim_buf_set_lines 0 end-line end-line false lines)))
+
+(vim.api.nvim_create_user_command :DuplicateLineSelection
+                                  duplicate-line-selection {:range true})
