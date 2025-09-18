@@ -1,10 +1,10 @@
 hs.application.enableSpotlightForNameSearches(true)
 
 local open_terminal = function()
-	local app = hs.application.get('kitty')
+	local app = hs.application.get('ghostty')
 
 	if app == nil then
-		hs.application.open('kitty')
+		hs.application.open('ghostty')
 		return
 	end
 
@@ -33,7 +33,6 @@ local open_chatgpt_prompt = function()
 end
 
 hs.hotkey.bind({}, 'f14', open_chatgpt_prompt)
-hs.hotkey.bind({ 'alt' }, 'space', open_chatgpt_prompt)
 hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
 
 hs.hotkey.bind({}, 'f15', function()
