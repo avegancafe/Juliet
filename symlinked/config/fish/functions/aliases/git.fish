@@ -83,7 +83,7 @@ function commit
 
     echo
 
-    set -l commit_type (gum choose --height 5 --header.foreground "#8fb573" --header "What type of commit is this?" feat fix chore)
+    set -l commit_type (gum choose --height 5 --header.foreground "#8fb573" --header "What type of commit is this?" feat fix chore tmp)
 
     if test -z "$commit_type"
         error "No commit type selected— exiting..."
