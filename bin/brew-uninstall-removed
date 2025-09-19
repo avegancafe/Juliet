@@ -1,0 +1,70 @@
+#!/opt/homebrew/bin/fish
+
+if test (count $argv) -eq 0
+    error "Usage: brew-uninstall-removed <commit-hash>"
+    exit 1
+end
+
+set commit_hash $argv[1]
+
+log "Analyzing removed formulae from commit $commit_hash"
+
+set removed_lines (git show $commit_hash | grep '^-' | grep -E '^-(brew|cask)')
+
+if test (count $removed_lines) -eq 0
+    log "No brew formulae or casks were removed in commit $commit_hash"
+    exit 0
+end
+
+log "Found "(count $removed_lines)" removed brew/cask entries"
+
+set failed_formulae
+set brewfile_path (git rev-parse --show-toplevel)/Brewfile
+
+for line in $removed_lines
+    set clean_line (echo $line | cut -c2-)
+
+    if string match -q 'brew "*"*' $clean_line
+        set formula_name (string match -r 'brew "([^"]+)"' $clean_line)[2]
+        set formula_type "brew"
+    else if string match -q 'cask "*"*' $clean_line
+        set formula_name (string match -r 'cask "([^"]+)"' $clean_line)[2]
+        set formula_type "cask"
+    else
+        continue
+    end
+
+    log "Attempting to uninstall $formula_type: $formula_name"
+
+    if test $formula_type = "cask"
+        set uninstall_result (brew uninstall --cask $formula_name 2>&1)
+    else
+        set uninstall_result (brew uninstall $formula_name 2>&1)
+    end
+
+    if test $status -eq 0
+        log "Successfully uninstalled $formula_name"
+    else
+        if string match -q "*because it is required by*" $uninstall_result
+            warn "$formula_name cannot be uninstalled due to dependencies"
+            set failed_formulae $failed_formulae $clean_line
+        else if string match -q "*No such keg*" $uninstall_result; or string match -q "*is not installed*" $uninstall_result
+            log "$formula_name was not installed"
+        else
+            warn "Failed to uninstall $formula_name: "(echo $uninstall_result | head -1)
+        end
+    end
+end
+
+if test (count $failed_formulae) -gt 0
+    warn "Re-adding "(count $failed_formulae)" formulae that couldn't be uninstalled due to dependencies"
+
+    for formula in $failed_formulae
+        echo $formula >> $brewfile_path
+        log "Re-added: $formula"
+    end
+
+    log "Updated $brewfile_path with failed formulae"
+else
+    log "All formulae were successfully processed"
+end
