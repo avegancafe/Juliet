@@ -33,6 +33,7 @@ local open_chatgpt_prompt = function()
 end
 
 hs.hotkey.bind({}, 'f14', open_chatgpt_prompt)
+hs.hotkey.bind({ 'option' }, 'space', open_chatgpt_prompt)
 hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
 
 hs.hotkey.bind({}, 'f15', function()
