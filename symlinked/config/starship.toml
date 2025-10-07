@@ -10,7 +10,7 @@ symbol = "—"
 style = "#5a5b5e"
 
 [python]
-format = '[(\($virtualenv\))]($style)'
+format = '[(🐍 $virtualenv)]($style)'
 
 [git_branch]
 format = "[$symbol$branch]($style) "
