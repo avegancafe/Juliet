@@ -8,7 +8,6 @@
       {:dependencies [:neovim/nvim-lspconfig
                       :nvim-telescope/telescope.nvim
                       :mfussenegger/nvim-lint]
-       :branch :regexp
        :opts {:settings {:options {:on_venv_activate_callback (fn []
                                                                 (let [lint (require :lint)]
                                                                   (lint.try_lint nil

@@ -1,10 +1,8 @@
-(local nvim-lsp (require :lspconfig))
 (local navic (require :nvim-navic))
 (local {: merge} (require :Juliet.utils))
 (local blink-cmp (require :blink.cmp))
 (local mason (require :mason))
 (local mason-lspconfig (require :mason-lspconfig))
-(local lspconfig-util (require :lspconfig.util))
 
 (fn on-attach [client buffer]
   (when (= client.name :yamlls)
@@ -55,8 +53,7 @@
                               (or ?opt-overrides {})))
   (local opts {:capabilities (blink-cmp.get_lsp_capabilities opt-overrides)
                :flags {:debounce_text_changes 150}
-               :on_attach on-attach
-               :root_dir (nvim-lsp.util.root_pattern :.git)})
+               :on_attach on-attach})
   (local settings (merge opt-settings (or opt-overrides.settings {})))
   (merge opts opt-overrides {: settings}))
 
@@ -67,8 +64,7 @@
                 {:name :fennel_language_server
                  :opts {:settings {:fennel {:diagnostics {:globals [:vim]}
                                             :workspace {:library (vim.api.nvim_list_runtime_paths)}}}}}
-                {:name :gopls
-                 :opts {:root_dir (lspconfig-util.root_pattern :go.mod)}}
+                {:name :gopls :opts {:root_dir (vim.fs.root 0 :go.mod)}}
                 {:name :lua_ls
                  :opts {:settings {:Lua {:diagnostics {:globals [:vim :hs]}
                                          :runtime {:version :LuaJIT}
@@ -89,8 +85,11 @@
                         :ensure_installed (icollect [_ {: name} (ipairs servers)]
                                             name)})
 
-(lambda setup-server [server ?opt-overrides]
-  ((. (. nvim-lsp server) :setup) (get-opts ?opt-overrides)))
+(lambda setup-server [server-name ?opt-overrides]
+  (local config (get-opts ?opt-overrides))
+  (local config-with-name (merge config {:name server-name}))
+  (vim.lsp.enable server-name)
+  (tset vim.lsp.config server-name config-with-name))
 
 (each [_ {: name : opts} (ipairs servers)]
   (setup-server name opts))
