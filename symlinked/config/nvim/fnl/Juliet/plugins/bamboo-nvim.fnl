@@ -3,7 +3,7 @@
 (pack :ribru17/bamboo.nvim
       {:config (fn []
                  (let [bamboo (require :bamboo)]
-                   (bamboo.setup {})
+                   (bamboo.setup {:transparent true})
                    (bamboo.load)))
        :init (fn []
                (let [colors (require :bamboo.colors)]
