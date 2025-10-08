@@ -37,9 +37,25 @@
                   {: buffer :noremap true :silent true :desc "Run code action"})
   (vim.keymap.set :n :<leader>lu
                   (fn []
-                    (let [builtins (require :telescope.builtin)]
-                      (builtins.lsp_references)))
-                  {: buffer :noremap true :silent true :desc "Show LSP usages"})
+                    (let [builtins (require :telescope.builtin)
+                          actions (require :telescope.actions)]
+                      (builtins.lsp_references {:attach_mappings (fn [prompt-bufnr
+                                                                      map]
+                                                                   (actions.select_default:replace (fn []
+                                                                                                     (actions.select_tab prompt-bufnr)))
+                                                                   true)})))
+                  {: buffer
+                   :noremap true
+                   :silent true
+                   :desc "Show LSP usages in new tab"})
+  (vim.keymap.set :n "<c-]>"
+                  (fn []
+                    (vim.cmd "tab split")
+                    (vim.lsp.buf.definition))
+                  {: buffer
+                   :noremap true
+                   :silent true
+                   :desc "Go to definition in new tab"})
   (vim.keymap.set :n :<leader>lo :<CMD>AerialToggle<CR>
                   {: buffer
                    :noremap true
