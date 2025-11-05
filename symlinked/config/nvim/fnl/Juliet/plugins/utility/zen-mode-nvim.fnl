@@ -11,5 +11,5 @@
        :config true
        :opts {:window {:backdrop 1
                        :height 1
-                       :width 0.85
+                       :width 0.4
                        :options {:number false :relativenumber false}}}})
