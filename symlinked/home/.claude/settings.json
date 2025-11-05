@@ -44,7 +44,7 @@
     "type": "command",
     "command": "printf '📍 %s' \"$(pwd)\""
   },
-  "alwaysThinkingEnabled": false,
+  "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
   }
