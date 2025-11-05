@@ -30,6 +30,7 @@
 	open = !open https://github.com/$(git remote get-url origin | cut -d\":\" -f2)
 	del = !delete-current-branch
 	bbranch = !better-branch
+	root = rev-parse --show-toplevel
 [push]
 	default = current
 	autoSetupRemote = true
