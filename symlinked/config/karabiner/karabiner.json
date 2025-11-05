@@ -433,6 +433,15 @@
                     },
                     "ignore": false,
                     "ignore_vendor_events": true
+                },
+                {
+                    "identifiers": {
+                        "is_keyboard": true,
+                        "is_pointing_device": true,
+                        "product_id": 33398,
+                        "vendor_id": 9306
+                    },
+                    "ignore": false
                 }
             ],
             "name": "Default profile",
