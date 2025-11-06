@@ -1,0 +1,104 @@
+# Miracle-WM Configuration
+# Generated for Fedora setup with sensible defaults
+
+# Terminal emulator
+terminal: ghostty
+
+# Primary modifier key (Super/Windows key)
+action_key: meta
+
+# Window gaps
+inner_gaps:
+  x: 10
+  y: 10
+outer_gaps:
+  x: 5
+  y: 5
+
+# Window borders with bamboo color scheme
+border:
+  size: 2
+  color: 0x3a403a        # Unfocused: dark earthy gray
+  focus_color: 0x8ba888  # Focused: bamboo green
+  radius: 8              # Rounded corners
+
+# Animations for smooth window and workspace transitions
+animations:
+  - event: window_open
+    type: grow
+    duration: 0.25
+    function: ease_in_out_back
+  - event: window_move
+    type: slide
+    duration: 0.2
+    function: ease_in_out_back
+  - event: window_close
+    type: shrink
+    duration: 0.2
+    function: ease_out_back
+  - event: workspace_switch
+    type: slide
+    duration: 0.175
+    function: ease_out_sine
+
+# Startup applications
+startup_apps:
+  # Status bar (shows workspaces, time, system info)
+  - command: waybar
+    restart_on_death: true
+
+  # Wallpaper
+  - command: swaybg -i /home/kyle/.config/Juliet/etc/wallpaper/1198589-2048x1128-desktop-hd-studio-ghibli-wallpaper-photo.jpg -m fill
+    restart_on_death: true
+
+  # Notification daemon
+  - command: mako
+    restart_on_death: true
+
+# Environment variables for Wayland compatibility
+environment_variables:
+  # Qt applications
+  - key: QT_QPA_PLATFORM
+    value: wayland;xcb
+
+  # Firefox/Mozilla applications
+  - key: MOZ_ENABLE_WAYLAND
+    value: 1
+
+  # Desktop identification
+  - key: XDG_CURRENT_DESKTOP
+    value: miracle
+
+  - key: XDG_SESSION_TYPE
+    value: wayland
+
+  # Cursor size
+  - key: XCURSOR_SIZE
+    value: 24
+
+  # Java application compatibility
+  - key: _JAVA_AWT_WM_NONREPARENTING
+    value: 1
+
+# Workspace configuration (10 workspaces, 0-9)
+workspaces:
+  - number: 0
+    layout: tiled
+  - number: 1
+    layout: tiled
+  - number: 2
+    layout: tiled
+  - number: 3
+    layout: tiled
+  - number: 4
+    layout: tiled
+  - number: 5
+    layout: tiled
+  - number: 6
+    layout: tiled
+  - number: 7
+    layout: tiled
+  - number: 8
+    layout: tiled
+  - number: 9
+    layout: tiled

@@ -1,0 +1,14 @@
+outputs:
+  - enabled: true
+    name: unknown-1
+    primary: true
+    position:
+      x: 0
+      y: 0
+    size:
+      width: 2560
+      height: 1440
+    refresh: 60
+    orientation: normal
+    scale: 1
+    group_id: 0
