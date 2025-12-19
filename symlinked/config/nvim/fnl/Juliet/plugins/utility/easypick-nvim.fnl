@@ -19,7 +19,12 @@
                                                                        (local selection
                                                                               (. (action-state.get_selected_entry)
                                                                                  1))
+                                                                       (local nonword-chars-pattern
+                                                                              "[^%w%s]")
+                                                                       (local escaped-selection
+                                                                              (selection:gsub nonword-chars-pattern
+                                                                                              "-"))
                                                                        (os.execute (.. "switch-to-ticket '"
-                                                                                       selection
+                                                                                       escaped-selection
                                                                                        "'")))))
                                    true)}]}})
