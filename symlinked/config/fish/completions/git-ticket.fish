@@ -1,0 +1,1 @@
+../../../../../../workspace/dev-env/stow/fish-completions/git-ticket.fish
