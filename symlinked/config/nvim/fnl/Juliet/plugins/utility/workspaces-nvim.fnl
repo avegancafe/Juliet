@@ -34,14 +34,16 @@
                                                                     (.. "tabNext | :q | SessionManager load_current_dir_session"))
                                                                   (.. "SessionManager load_current_dir_session")))
                                                        (vim.cmd command))]}})
-                   (let [dirs (workspaces.get)
-                         add-workspace (lambda [name path]
+                   (vim.schedule (fn []
+                                   (if (not= vim.bo.filetype :man)
+                                       (let [dirs (workspaces.get)
+                                             add-workspace (lambda [name path]
+                                                             (if (not (accumulate [found false _ dir (ipairs dirs)]
+                                                                        (or found (= dir.name name))))
+                                                                 (workspaces.add path name)))]
+                                         (add-workspace :config "~/.config/Juliet")
                                          (if (not (accumulate [found false _ dir (ipairs dirs)]
-                                                    (or found (= dir.name name))))
-                                             (workspaces.add path name)))]
-                     (add-workspace :config "~/.config/Juliet")
-                     (if (not (accumulate [found false _ dir (ipairs dirs)]
-                                (or found
-                                    (dir.path:match (.. ".*" :workspace ".*")))))
-                         (workspaces.add_dir "~/workspace")))
-                   (workspaces.sync_dirs)))})
+                                                    (or found
+                                                        (dir.path:match (.. ".*" :workspace ".*")))))
+                                             (workspaces.add_dir "~/workspace"))
+                                         (workspaces.sync_dirs)))))))})
