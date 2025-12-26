@@ -75,6 +75,14 @@ input {
 // Find more information on the wiki:
 // https://yalter.github.io/niri/Configuration:-Outputs
 // Remember to uncomment the node by removing "/-"!
+output "DP-1" {
+    position x=2560 y=0
+}
+
+output "HDMI-A-1" {
+    position x=0 y=0
+}
+
 /-output "eDP-1" {
     // Uncomment this line to disable this output.
     // off
