@@ -5,5 +5,6 @@ Brewfile.lock.json
 fish_variables
 .crush
 symlinked/config/crush/crush.json
+symlinked/home/.claude/
 
 .claude/*.local.json

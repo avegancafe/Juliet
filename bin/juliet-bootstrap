@@ -59,6 +59,7 @@ setup-dependencies() {
 symlink-dotfiles() {
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
+  stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
 }
 
 setup-ssh() {
