@@ -1,0 +1,35 @@
+# Juliet DNFfile - Fedora packages
+# Format:
+#   copr <user/repo>  - enables COPR repository
+#   <package>         - installs package
+
+# COPR Repositories
+copr scottames/ghostty
+copr solopasha/hyprland
+copr phracek/PyCharm
+copr avengemedia/dms
+
+# Terminal & Shell
+ghostty
+fish
+
+# Editors
+neovim
+
+# Window Manager / Desktop
+niri
+hyprlock
+
+# Development
+git
+
+# Applications
+discord
+steam
+vlc
+
+# Utilities
+bat
+ripgrep
+fzf
+stow

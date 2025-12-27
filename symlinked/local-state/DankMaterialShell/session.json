@@ -26,7 +26,9 @@
   "nightModeUseIPLocation": false,
   "nightModeLocationProvider": "",
   "pinnedApps": [],
-  "hiddenTrayIds": [],
+  "hiddenTrayIds": [
+    "Xwayland Video Bridge_pipewireToXProxy"
+  ],
   "selectedGpuIndex": 0,
   "nvidiaGpuTempEnabled": false,
   "nonNvidiaGpuTempEnabled": false,

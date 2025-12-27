@@ -2,6 +2,11 @@
 
 source ~/.config/Juliet/_util.bash
 
+# OS Detection
+is-fedora() {
+  [ -f /etc/fedora-release ]
+}
+
 setup-git() {
   mkdir -p ~/.config/local
   [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
@@ -36,7 +41,7 @@ update-juliet() {
 }
 
 
-setup-dependencies() {
+setup-brew() {
   if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
@@ -50,9 +55,59 @@ setup-dependencies() {
   if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to brew bundle?") || $? == 0)) ]] ; then
     brew bundle --file ~/.config/Juliet/Brewfile
   fi
+}
 
+setup-cargo() {
   if ! command -v cargo &> /dev/null; then
     rustup-init
+  fi
+}
+
+setup-dnf() {
+  if ! command -v gum &> /dev/null; then
+    sudo dnf install -y gum
+  fi
+
+  DNFFILE="$HOME/.config/Juliet/DNFfile"
+  if [[ ! -f "$DNFFILE" ]]; then
+    warn "DNFfile not found at $DNFFILE"
+    return
+  fi
+
+  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to install DNF packages?") || $? == 0)) ]]; then
+    # Enable COPR repos first
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      # Skip empty lines and comments
+      [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+      # Handle COPR repos
+      if [[ "$line" =~ ^copr[[:space:]]+ ]]; then
+        repo="${line#copr }"
+        log "Enabling COPR: $repo"
+        sudo dnf copr enable -y "$repo"
+      fi
+    done < "$DNFFILE"
+
+    # Collect packages
+    packages=()
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      # Skip empty lines, comments, and copr lines
+      [[ -z "$line" || "$line" =~ ^[[:space:]]*# || "$line" =~ ^copr[[:space:]]+ ]] && continue
+      packages+=("$line")
+    done < "$DNFFILE"
+
+    # Install packages
+    if [[ ${#packages[@]} -gt 0 ]]; then
+      log "Installing ${#packages[@]} packages..."
+      sudo dnf install -y "${packages[@]}"
+    fi
+  fi
+}
+
+os-specific-install() {
+  log "Checking for os-specific dependencies..."
+  if is-fedora; then
+    log "Detected Fedora, setting up DNF packages..."
+    setup-dnf $1
   fi
 }
 
@@ -130,8 +185,12 @@ rlog "Setting up git..."
 setup-git
 rlog "Updating Juliet repository..."
 update-juliet
-rlog "Setting up external dependencies..."
-setup-dependencies $1
+rlog "Setting up Homebrew..."
+setup-brew $1
+rlog "Setting up Cargo..."
+setup-cargo
+rlog "Installing OS-specific packages..."
+os-specific-install $1
 log "Symlinking dotfiles..."
 symlink-dotfiles
 log "Setting up ssh..."
