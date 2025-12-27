@@ -365,7 +365,7 @@ window-rule {
 // Open ghostty fullscreen at startup
 window-rule {
     match app-id="ghostty" at-startup=true
-    open-fullscreen true
+    open-fullscreen false
 }
 
 binds {
