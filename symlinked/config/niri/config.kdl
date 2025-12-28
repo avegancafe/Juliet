@@ -293,7 +293,7 @@ hotkey-overlay {
 // Additionally, clients will be informed that they are tiled, removing some client-side rounded corners.
 // This option will also fix border/focus ring drawing behind some semitransparent windows.
 // After enabling or disabling this, you need to restart the apps for this to take effect.
-// prefer-no-csd
+prefer-no-csd
 
 // You can change the path where screenshots are saved.
 // A ~ at the front will be expanded to the home directory.
@@ -351,7 +351,7 @@ window-rule {
 
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
-/-window-rule {
+window-rule {
     geometry-corner-radius 12
     clip-to-geometry true
 }
@@ -366,6 +366,18 @@ window-rule {
 window-rule {
     match app-id="ghostty" at-startup=true
     open-fullscreen false
+}
+
+// Minimize xwaylandvideobridge (needed for XWayland screen sharing)
+window-rule {
+    match app-id="xwaylandvideobridge"
+    open-floating true
+    open-focused false
+    min-width 1
+    max-width 1
+    min-height 1
+    max-height 1
+    default-floating-position x=0 y=0 relative-to="bottom-right"
 }
 
 binds {

@@ -1,0 +1,16 @@
+[SddmGreeterTheme]
+Name=Juliet
+Description=Juliet SDDM Theme (based on Breeze Fedora)
+Author=Kyle (Juliet dotfiles)
+Copyright=(c) 2014, David Edmundson
+License=CC-BY-SA
+Type=sddm-theme
+Version=1.0
+Website=https://github.com/avegancafe/Juliet
+Screenshot=preview.png
+MainScript=Main.qml
+ConfigFile=theme.conf
+TranslationsDirectory=translations
+Theme-Id=juliet
+Theme-API=2.0
+QtVersion=6

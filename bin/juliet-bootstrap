@@ -7,6 +7,10 @@ is-fedora() {
   [ -f /etc/fedora-release ]
 }
 
+is-macos() {
+  [[ "$OSTYPE" == "darwin"* ]]
+}
+
 setup-git() {
   mkdir -p ~/.config/local
   [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
@@ -44,15 +48,27 @@ update-juliet() {
 setup-brew() {
   if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> $HOME/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+
+    # Set up brew path based on OS
+    if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+      # Linux
+      BREW_SHELLENV='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+      if ! grep -q "linuxbrew" "$HOME/.bashrc" 2>/dev/null; then
+        echo "$BREW_SHELLENV" >> "$HOME/.bashrc"
+      fi
+      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    else
+      # macOS
+      echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+      eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
   fi
 
   if ! command -v gum &> /dev/null; then
     brew install gum
   fi
 
-  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to brew bundle?") || $? == 0)) ]] ; then
+  if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Would you like to brew bundle?"; }; then
     brew bundle --file ~/.config/Juliet/Brewfile
   fi
 }
@@ -74,7 +90,7 @@ setup-dnf() {
     return
   fi
 
-  if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to install DNF packages?") || $? == 0)) ]]; then
+  if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Would you like to install DNF packages?"; }; then
     # Enable COPR repos first
     while IFS= read -r line || [[ -n "$line" ]]; do
       # Skip empty lines and comments
@@ -82,8 +98,10 @@ setup-dnf() {
       # Handle COPR repos
       if [[ "$line" =~ ^copr[[:space:]]+ ]]; then
         repo="${line#copr }"
-        log "Enabling COPR: $repo"
-        sudo dnf copr enable -y "$repo"
+        if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
+          log "Enabling COPR: $repo"
+          sudo dnf copr enable -y "$repo"
+        fi
       fi
     done < "$DNFFILE"
 
@@ -124,7 +142,7 @@ setup-ssh() {
   fi
 
   if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
-    if [[ ("$1" != "-n" && "$1" != "--no") && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Looks like you don't have an SSH key, would you like to generate one?") || $? == 0)) ]] ; then
+    if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Looks like you don't have an SSH key, would you like to generate one?"; }; then
       ssh-keygen -t ed25519 -C "$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")" -f $HOME/.ssh/id_ed25519
     fi
   fi
@@ -139,16 +157,21 @@ setup-fzf() {
 setup-fish() {
   mkdir -p ~/.config/fish
 
+  FISH_PATH="$(command -v fish)"
+  if [[ -z "$FISH_PATH" ]]; then
+    warn "fish not found, skipping fish setup"
+    return
+  fi
 
-  if [[ ("$1" != "-n" && "$1" != "--no" ) && ("$1" == "-y" || "$1" == "--yes" || ($(gum confirm "Would you like to do a full fish install?") || $? == 0)) ]]; then
-    if [[ -z "$(cat /etc/shells | grep --color=never fish)" ]]; then
-      log "Adding fish to /etc/shells..."
-      sudo bash -c "echo '/opt/homebrew/bin/fish' >> /etc/shells"
+  if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Would you like to do a full fish install?"; }; then
+    if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
+      log "Adding $FISH_PATH to /etc/shells..."
+      sudo bash -c "echo '$FISH_PATH' >> /etc/shells"
     fi
 
-    if [[ "$SHELL" != "/opt/homebrew/bin/fish" ]]; then
+    if [[ "$SHELL" != "$FISH_PATH" ]]; then
       log "Setting fish to default shell..."
-      chsh -s /opt/homebrew/bin/fish `whoami`
+      chsh -s "$FISH_PATH" "$(whoami)"
     fi
   fi
 }
@@ -166,7 +189,7 @@ setup-rust() {
     cargo install stylua
   fi
 
-  if ! command -v silicon &> /dev/null; then
+  if is-macos && ! command -v silicon &> /dev/null; then
     cargo install silicon
   fi
 }
@@ -176,8 +199,73 @@ setup-python() {
     curl -sSL https://install.python-poetry.org | python3 -
   fi
 
-  if ! command -v md2pdf &> /dev/null; then
+  if is-macos && ! command -v md2pdf &> /dev/null; then
     pip3 install md2pdf
+  fi
+}
+
+setup-niri() {
+  if ! command -v niri &> /dev/null; then
+    return
+  fi
+
+  # Bind DMS to niri session (only runs with niri, not other DEs)
+  if command -v dms &> /dev/null; then
+    if ! systemctl --user list-dependencies niri.service 2>/dev/null | grep -q dms.service; then
+      log "Binding DMS to niri session..."
+      systemctl --user add-wants niri.service dms.service
+    fi
+  fi
+}
+
+setup-sddm() {
+  if ! is-fedora; then
+    return
+  fi
+
+  if ! command -v sddm &> /dev/null; then
+    return
+  fi
+
+  THEME_SRC="$HOME/.config/Juliet/etc/sddm-themes/juliet"
+  THEME_DEST="/usr/share/sddm/themes/juliet"
+
+  if [[ ! -d "$THEME_SRC" ]]; then
+    return
+  fi
+
+  # Always copy/update theme to system directory
+  log "Installing Juliet SDDM theme..."
+  sudo rm -rf "$THEME_DEST"
+  sudo cp -r "$THEME_SRC" "$THEME_DEST"
+  sudo cp "$HOME/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png" "$THEME_DEST/background.png"
+  sudo chmod -R 755 "$THEME_DEST"
+  sudo find "$THEME_DEST" -type f -exec chmod 644 {} \;
+
+  # Set theme in SDDM config
+  SDDM_CONF="/etc/sddm.conf.d/juliet.conf"
+  if [[ ! -f "$SDDM_CONF" ]]; then
+    log "Configuring SDDM to use Juliet theme..."
+    sudo tee "$SDDM_CONF" > /dev/null << 'EOF'
+[Theme]
+Current=juliet
+EOF
+  fi
+}
+
+setup-claude-code() {
+  if ! command -v claude &> /dev/null; then
+    curl -fsSL https://claude.ai/install.sh | bash
+  fi
+
+  # Add marketplace if not already registered
+  if ! claude plugin marketplace list 2>/dev/null | grep -q "superpowers-marketplace"; then
+    claude plugin marketplace add obra/superpowers-marketplace
+  fi
+
+  # Install plugin if not already installed
+  if ! claude plugin list 2>/dev/null | grep -q "superpowers@superpowers-marketplace"; then
+    claude plugin install superpowers@superpowers-marketplace
   fi
 }
 
@@ -185,12 +273,12 @@ rlog "Setting up git..."
 setup-git
 rlog "Updating Juliet repository..."
 update-juliet
+rlog "Installing OS-specific packages..."
+os-specific-install $1
 rlog "Setting up Homebrew..."
 setup-brew $1
 rlog "Setting up Cargo..."
 setup-cargo
-rlog "Installing OS-specific packages..."
-os-specific-install $1
 log "Symlinking dotfiles..."
 symlink-dotfiles
 log "Setting up ssh..."
@@ -201,9 +289,15 @@ log "Installing fish..."
 setup-fish $1
 log "Installing gpg..."
 setup-gpg
-log "Installing rust dependencies..."
+rlog "Installing rust dependencies..."
 setup-rust
-log "Setting up python..."
+rlog "Setting up python..."
 setup-python
+log "Setting up niri..."
+setup-niri
+log "Setting up SDDM theme..."
+setup-sddm
+rlog "Setting up Claude Code..."
+setup-claude-code
 
 log "Done!"

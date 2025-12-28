@@ -1,2 +1,6 @@
-ssh-add --apple-use-keychain 2>/dev/null
+# OS-specific SSH agent/keychain setup
+switch (uname)
+    case Darwin
+        source (dirname (status filename))/ssh-macos.fish
+end
 

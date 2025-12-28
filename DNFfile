@@ -19,6 +19,7 @@ neovim
 # Window Manager / Desktop
 niri
 hyprlock
+dms
 
 # Development
 git
@@ -27,9 +28,11 @@ git
 discord
 steam
 vlc
+nautilus
 
 # Utilities
 bat
 ripgrep
 fzf
 stow
+keychain
