@@ -38,9 +38,6 @@ Item {
         key: Qt.Key_CapsLock
     }
 
-    // Primary screen geometry for single-screen login display
-    readonly property rect primaryScreenGeometry: screenModel.geometry(screenModel.primary)
-
     Item {
         id: wallpaper
         anchors.fill: parent
@@ -138,15 +135,15 @@ Item {
             id: clock
             property Item shadow: clockShadow
             visible: y > 0 && config.showClock === "true"
-            x: root.primaryScreenGeometry.x + (root.primaryScreenGeometry.width - width) / 2
+            anchors.horizontalCenter: parent.horizontalCenter
             y: (userListComponent.userList.y + mainStack.y)/2 - height/2
             Layout.alignment: Qt.AlignBaseline
         }
 
         QQC2.StackView {
             id: mainStack
-            x: root.primaryScreenGeometry.x
-            width: root.primaryScreenGeometry.width
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: Math.min(parent.width, 600)
             height: root.height + Kirigami.Units.gridUnit * 3
 
             // this isn't implicit, otherwise items still get processed for the scenegraph
@@ -405,7 +402,7 @@ Item {
             id: logo
             visible: config.showlogo === "shown"
             source: config.logo
-            x: root.primaryScreenGeometry.x + (root.primaryScreenGeometry.width - width) / 2
+            anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: footer.top
             anchors.bottomMargin: Kirigami.Units.largeSpacing
             asynchronous: true
@@ -432,10 +429,10 @@ Item {
             id: footer
             anchors {
                 bottom: parent.bottom
+                left: parent.left
+                right: parent.right
                 margins: Kirigami.Units.smallSpacing
             }
-            x: root.primaryScreenGeometry.x
-            width: root.primaryScreenGeometry.width
             spacing: Kirigami.Units.smallSpacing
 
             Behavior on opacity {
