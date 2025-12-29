@@ -142,8 +142,8 @@ Item {
 
         QQC2.StackView {
             id: mainStack
-            anchors.horizontalCenter: parent.horizontalCenter
             width: Math.min(parent.width, 600)
+            x: (parent.width - width) / 2
             height: root.height + Kirigami.Units.gridUnit * 3
 
             // this isn't implicit, otherwise items still get processed for the scenegraph
