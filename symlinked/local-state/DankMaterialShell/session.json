@@ -1,6 +1,6 @@
 {
   "isLightMode": false,
-  "wallpaperPath": "/home/kyle/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png",
+  "wallpaperPath": "/home/kyle/.config/Juliet/etc/wallpaper/1198589-2048x1128-desktop-hd-studio-ghibli-wallpaper-photo.jpg",
   "perMonitorWallpaper": false,
   "monitorWallpapers": {},
   "perModeWallpaper": false,
@@ -53,6 +53,6 @@
     "portal"
   ],
   "recentColors": [],
-  "showThirdPartyPlugins": false,
+  "showThirdPartyPlugins": true,
   "configVersion": 1
 }
