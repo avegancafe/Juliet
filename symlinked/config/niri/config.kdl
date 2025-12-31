@@ -285,6 +285,12 @@ spawn-at-startup "discord"
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
 
+gestures {
+    hot-corners {
+        top-right
+    }
+}
+
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
     skip-at-startup
@@ -361,7 +367,7 @@ window-rule {
 // Dim inactive windows instead of using focus ring
 window-rule {
     match is-active=false
-    opacity 0.75
+    opacity 0.90
 }
 
 // Open ghostty fullscreen at startup
