@@ -369,6 +369,11 @@ window-rule {
     match is-active=false
     opacity 0.90
 }
+// Keep btop fully opaque even when unfocused
+window-rule {
+    match title=r"^btop"
+    opacity 1.0
+}
 
 // Open ghostty fullscreen at startup
 window-rule {
@@ -633,6 +638,9 @@ binds {
     // Windows in this column will appear as vertical tabs,
     // rather than stacked on top of each other.
     Mod+W { toggle-column-tabbed-display; }
+
+    // Toggle opacity rule for focused window (useful for keeping specific windows opaque)
+    Mod+Shift+O { toggle-window-rule-opacity; }
 
     // Actions to switch layouts.
     // Note: if you uncomment these, make sure you do NOT have
