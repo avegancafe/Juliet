@@ -34,7 +34,7 @@
   "nonNvidiaGpuTempEnabled": false,
   "enabledGpuPciIds": [],
   "wifiDeviceOverride": "",
-  "weatherHourlyDetailed": true,
+  "weatherHourlyDetailed": false,
   "wallpaperCyclingEnabled": false,
   "wallpaperCyclingMode": "interval",
   "wallpaperCyclingInterval": 300,

@@ -253,6 +253,33 @@ EOF
   fi
 }
 
+setup-icons() {
+  if ! is-fedora; then
+    return
+  fi
+
+  ICONS_DIR="$HOME/.local/share/icons"
+  ICON_PACK_DIR="$ICONS_DIR/gruvbox-plus-icon-pack"
+
+  mkdir -p "$ICONS_DIR"
+
+  if [[ ! -d "$ICON_PACK_DIR" ]]; then
+    log "Installing Gruvbox Plus icon pack..."
+    git clone https://github.com/SylEleuth/gruvbox-plus-icon-pack.git "$ICON_PACK_DIR"
+  else
+    log "Updating Gruvbox Plus icon pack..."
+    git -C "$ICON_PACK_DIR" pull
+  fi
+
+  # Create symlinks for icon themes
+  if [[ ! -L "$ICONS_DIR/Gruvbox-Plus-Dark" ]]; then
+    ln -s "$ICON_PACK_DIR/Gruvbox-Plus-Dark" "$ICONS_DIR/Gruvbox-Plus-Dark"
+  fi
+  if [[ ! -L "$ICONS_DIR/Gruvbox-Plus-Light" ]]; then
+    ln -s "$ICON_PACK_DIR/Gruvbox-Plus-Light" "$ICONS_DIR/Gruvbox-Plus-Light"
+  fi
+}
+
 setup-claude-code() {
   if ! command -v claude &> /dev/null; then
     curl -fsSL https://claude.ai/install.sh | bash
@@ -297,6 +324,8 @@ log "Setting up niri..."
 setup-niri
 log "Setting up SDDM theme..."
 setup-sddm
+log "Setting up icon themes..."
+setup-icons
 rlog "Setting up Claude Code..."
 setup-claude-code
 
