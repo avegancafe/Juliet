@@ -366,7 +366,7 @@ window-rule {
 }
 // Keep btop fully opaque even when unfocused
 window-rule {
-    match title=r"^btop"
+    match title=r"^(btop|GNU Image Manipulation)"
     opacity 1.0
 }
 
