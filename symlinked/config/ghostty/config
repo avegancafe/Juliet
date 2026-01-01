@@ -11,3 +11,5 @@ quick-terminal-animation-duration = 0
 quick-terminal-size = 100%
 macos-titlebar-style = tabs
 keybind = shift+enter=text:\n
+
+config-file = ?../local/ghostty/config
