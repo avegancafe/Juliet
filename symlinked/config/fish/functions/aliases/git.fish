@@ -101,6 +101,8 @@ function commit
         return 1
     end
 
+    set scope (string replace -r '^.' (string upper (string sub -l 1 -- $scope)) -- $scope)
+
     if test -n "$scope"
         log "Scope: $scope"
         log "Committing with message '$commit_type($scope): $message'..."
