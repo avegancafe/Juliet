@@ -12,13 +12,8 @@ input {
             // You can set rules, model, layout, variant and options.
             // For more information, see xkeyboard-config(7).
 
-            // For example:
-            // layout "us,ru"
-            // options "grp:win_space_toggle,compose:ralt,ctrl:nocaps"
-
-            // If this section is empty, niri will fetch xkb settings
-            // from org.freedesktop.locale1. You can control these using
-            // localectl set-x11-keymap.
+            // Make Caps Lock act as Menu key (used for app launcher)
+            options "caps:menu"
         }
 
         // Enable numlock on startup, omitting this setting disables it.
@@ -411,7 +406,7 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
-    Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
+    Menu hotkey-overlay-title="Run an Application: fuzzel" { spawn-sh "pkill fuzzel || fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
