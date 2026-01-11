@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Layout: Coding
+Comment=Ghostty+btop fullscreen on left, Ghostty fullscreen on right, Spotify on WS2
+Exec=niri-layout coding
+Type=Application
+Categories=Utility;
+Icon=utilities-terminal

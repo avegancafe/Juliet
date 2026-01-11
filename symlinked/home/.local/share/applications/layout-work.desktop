@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Layout: Work
+Comment=Slack+Spotify on left, Terminal+Firefox on right
+Exec=niri-layout work
+Type=Application
+Categories=Utility;
+Icon=applications-office

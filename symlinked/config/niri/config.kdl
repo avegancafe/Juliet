@@ -78,6 +78,28 @@ output "HDMI-A-1" {
     position x=0 y=0
 }
 
+// --- Layout workspaces ---
+workspace "coding-left" {
+    open-on-output "HDMI-A-1"
+}
+workspace "coding-right" {
+    open-on-output "DP-1"
+}
+
+workspace "gaming-left" {
+    open-on-output "HDMI-A-1"
+}
+workspace "gaming-right" {
+    open-on-output "DP-1"
+}
+
+workspace "work-left" {
+    open-on-output "HDMI-A-1"
+}
+workspace "work-right" {
+    open-on-output "DP-1"
+}
+
 /-output "eDP-1" {
     // Uncomment this line to disable this output.
     // off
@@ -366,7 +388,7 @@ window-rule {
 }
 // Keep btop fully opaque even when unfocused
 window-rule {
-    match title=r"^(btop|GNU Image Manipulation)"
+    match title=r"(btop|GNU Image Manipulation|Picture-in-Picture)"
     opacity 1.0
 }
 
@@ -388,6 +410,69 @@ window-rule {
     default-floating-position x=0 y=0 relative-to="bottom-right"
 }
 
+// Drop shadow for floating windows
+window-rule {
+    match is-floating=true
+    shadow {
+        on
+        softness 30
+        spread 3
+        offset x=0 y=5
+        color "#0007"
+    }
+}
+
+// ============================================================================
+// Layout window rules
+// Title convention: niri::<layout>::<app>
+// Native apps have "home" layout workspaces they always open to
+// ============================================================================
+
+// --- Coding layout ---
+window-rule {
+    match title=r"^niri::coding::btop$"
+    default-column-width { proportion 1.0; }
+    open-on-workspace "coding-left"
+}
+window-rule {
+    match title=r"^niri::coding::term$"
+    default-column-width { proportion 1.0; }
+    open-on-workspace "coding-right"
+}
+
+// --- Gaming layout (Discord, Firefox, Steam home here) ---
+window-rule {
+    match app-id=r"(?i)discord"
+    default-column-width { proportion 1.0; }
+    open-on-workspace "gaming-left"
+}
+window-rule {
+    match app-id=r"(?i)firefox"
+    open-on-workspace "gaming-right"
+}
+window-rule {
+    match title=r"^niri::gaming::term$"
+    open-on-workspace "gaming-right"
+}
+window-rule {
+    match app-id=r"^steam$"
+    open-on-workspace "gaming-right"
+}
+
+// --- Work layout (Slack, Spotify home here) ---
+window-rule {
+    match app-id=r"(?i)slack"
+    open-on-workspace "work-left"
+}
+window-rule {
+    match app-id=r"(?i)spotify"
+    open-on-workspace "work-left"
+}
+window-rule {
+    match title=r"^niri::work::term$"
+    open-on-workspace "work-right"
+}
+
 binds {
     // Keys consist of modifiers separated by + signs, followed by an XKB key name
     // in the end. To find an XKB name for a particular key, you may use a program
@@ -407,6 +492,7 @@ binds {
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Menu hotkey-overlay-title="Run an Application: fuzzel" { spawn-sh "pkill fuzzel || fuzzel"; }
+    Mod+Shift+Space hotkey-overlay-title="Layout Picker" { spawn-sh "niri-layout $(niri-layout --list | fuzzel --dmenu --prompt 'Layout: ')"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.

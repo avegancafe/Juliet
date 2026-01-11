@@ -1,0 +1,19 @@
+name = "Gaming"
+
+[[apps]]
+id = "discord"
+output = "HDMI-A-1"
+fullscreen = true
+
+[[apps]]
+id = "firefox"
+output = "DP-1"
+
+[[apps]]
+id = "ghostty"
+output = "DP-1"
+
+[[apps]]
+id = "steam"
+output = "DP-1"
+workspace = 2

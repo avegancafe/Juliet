@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Layout: Gaming
+Comment=Discord fullscreen on left, Firefox+Terminal on right, Steam on WS2
+Exec=niri-layout gaming
+Type=Application
+Categories=Utility;
+Icon=applications-games

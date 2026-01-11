@@ -1,0 +1,17 @@
+name = "Work"
+
+[[apps]]
+id = "Slack"
+output = "HDMI-A-1"
+
+[[apps]]
+id = "spotify"
+output = "HDMI-A-1"
+
+[[apps]]
+id = "ghostty"
+output = "DP-1"
+
+[[apps]]
+id = "firefox"
+output = "DP-1"

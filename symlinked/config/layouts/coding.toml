@@ -1,0 +1,19 @@
+name = "Coding"
+
+[[apps]]
+id = "btop"
+command = "ghostty --title=layout-btop -e btop"
+output = "HDMI-A-1"
+fullscreen = true
+
+[[apps]]
+id = "ghostty"
+command = "ghostty --title=layout-ghostty"
+output = "DP-1"
+fullscreen = true
+
+[[apps]]
+id = "spotify"
+output = "HDMI-A-1"
+workspace = 2
+fullscreen = true
