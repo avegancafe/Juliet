@@ -1,6 +1,6 @@
 (import-macros {: pack} :Juliet.macros)
 
-(pack :j-hui/fidget.nvim
-      {:config true
-       :tag :legacy
-       :opts {:text {:spinner :dots :done "✓"} :timer {:spinner_rate 50}}})
+(pack :j-hui/fidget.nvim {:config true
+                          :opts {:notification {:window {:winblend 0
+                                                         :border :none}}
+                                 :progress {:display {:done_icon "✓"}}}})

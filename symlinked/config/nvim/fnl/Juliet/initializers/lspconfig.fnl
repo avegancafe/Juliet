@@ -82,7 +82,11 @@
                                             :workspace {:library (vim.api.nvim_list_runtime_paths)}}}}}
                 {:name :gopls :opts {:root_dir (vim.fs.root 0 :go.mod)}}
                 {:name :lua_ls
-                 :opts {:settings {:Lua {:diagnostics {:globals [:vim :hs]}
+                 :opts {:root_markers [:.luarc.json
+                                       :.luarc.jsonc
+                                       :.stylua.toml
+                                       :stylua.toml]
+                        :settings {:Lua {:diagnostics {:globals [:vim :hs]}
                                          :runtime {:version :LuaJIT}
                                          :telemetry {:enable false}
                                          :workspace {:checkThirdParty false
@@ -104,8 +108,8 @@
 (lambda setup-server [server-name ?opt-overrides]
   (local config (get-opts ?opt-overrides))
   (local config-with-name (merge config {:name server-name}))
-  (vim.lsp.enable server-name)
-  (tset vim.lsp.config server-name config-with-name))
+  (tset vim.lsp.config server-name config-with-name)
+  (vim.lsp.enable server-name))
 
 (each [_ {: name : opts} (ipairs servers)]
   (setup-server name opts))

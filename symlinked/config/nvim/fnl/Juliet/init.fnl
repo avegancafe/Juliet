@@ -64,4 +64,41 @@
 augroup END
 ")
 
+(vim.api.nvim_create_autocmd :FileType
+                             {:callback (fn []
+                                          (vim.treesitter.start))
+                              :pattern [:js
+                                        :jsx
+                                        :ts
+                                        :tsx
+                                        :py
+                                        :lua
+                                        :fnl
+                                        :fennel
+                                        :go
+                                        :rs
+                                        :rb
+                                        :java
+                                        :c
+                                        :html
+                                        :css
+                                        :scss
+                                        :json
+                                        :json5
+                                        :toml
+                                        :yaml
+                                        :yml
+                                        :md
+                                        :lua
+                                        :fish
+                                        :bash
+                                        :Dockerfile
+                                        :http
+                                        :makefile
+                                        :proto
+                                        :regex
+                                        :svelte
+                                        :swift
+                                        :sql]})
+
 (vim.cmd "highlight MatchParen cterm=bold ctermfg=white ctermbg=black")
