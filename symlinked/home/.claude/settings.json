@@ -77,7 +77,8 @@
       "mcp__context7__get-library-docs",
       "Bash(git fetch:*)",
       "mcp__github__get_file_contents",
-      "Skill(*)"
+      "Skill(*)",
+      "Task(*)"
     ],
     "deny": [],
     "ask": [],
