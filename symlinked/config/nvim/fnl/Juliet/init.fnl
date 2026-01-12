@@ -71,7 +71,11 @@ augroup END
                                         :jsx
                                         :ts
                                         :tsx
+                                        :typescript
+                                        :typescriptreact
+                                        :javascript
                                         :py
+                                        :python
                                         :lua
                                         :fnl
                                         :fennel
