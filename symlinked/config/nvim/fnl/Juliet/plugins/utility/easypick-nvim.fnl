@@ -8,7 +8,7 @@
        :keys [(key :<leader>gt ":Easypick git-ticket<cr>")
               "Switch to another Jira ticket's branch"]
        :opts {:pickers [{:name :changed-files
-                         :command "git status --short | awk '{ print $2 }'"}
+                         :command "git status --short | grep -v '^D\\|^.D' | awk '{ print $2 }'"}
                         {:name :git-ticket
                          :command :my-active-tickets
                          :action (fn [buff-number]
