@@ -7,3 +7,4 @@ venv
 .ruff_cache
 __pycache__
 dbt/target
+.venv
