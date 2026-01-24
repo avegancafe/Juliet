@@ -14,35 +14,27 @@
       "Bash(head *)",
       "Bash(tail *)",
       "Bash(claude *)",
-
       "mcp__github__search_*",
       "mcp__github__list_*",
       "mcp__github__get_*",
       "mcp__github__pull_request_read",
       "mcp__github__issue_read",
-
       "mcp__sentry__whoami",
       "mcp__sentry__find_*",
       "mcp__sentry__get_*",
       "mcp__sentry__search_*",
-
       "mcp__notion__notion-search",
       "mcp__notion__notion-fetch",
       "mcp__notion__notion-get-*",
-
       "mcp__linear__list_*",
       "mcp__linear__get_*",
       "mcp__linear__search_*",
-
       "mcp__jira__jira_get_*",
       "mcp__jira__jira_search*",
       "mcp__jira__jira_download_*",
-
       "mcp__context7__*",
       "mcp__plugin_context7_context7__*",
-
       "mcp__playwright__*",
-
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.github.com)",
@@ -55,7 +47,6 @@
       "WebFetch(domain:stackoverflow.com)",
       "WebFetch(domain:npmjs.com)",
       "WebFetch(domain:pypi.org)",
-
       "Skill(*)",
       "Task(*)"
     ],
@@ -81,7 +72,11 @@
     "context7@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "backend-development@claude-code-workflows": true
+    "backend-development@claude-code-workflows": true,
+    "sentry@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "Notion@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {

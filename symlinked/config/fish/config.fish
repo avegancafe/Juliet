@@ -27,3 +27,6 @@ end
 
 # J2 Initializers
 for file in ~/workspace/dev-env/initializers/fish/*; source $file; end
+
+# J2 Man Pages
+set -gx MANPATH "$HOME/.local/share/man" $MANPATH
