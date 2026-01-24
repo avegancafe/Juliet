@@ -286,16 +286,18 @@ setup-claude-code() {
   fi
 
   # Define marketplaces to add (try adding official ones in case they're not registered by default)
-  declare -A marketplaces=(
-    ["superpowers-marketplace"]="obra/superpowers-marketplace"
-    ["claude-code-plugins"]="anthropics/claude-code-plugins"
-    ["claude-code-workflows"]="anthropics/claude-code-workflows"
-    ["claude-plugins-official"]="anthropics/claude-plugins-official"
+  # Format: "name:id" pairs (bash 3.2 compatible)
+  marketplaces=(
+    "superpowers-marketplace:obra/superpowers-marketplace"
+    "claude-code-plugins:anthropics/claude-code-plugins"
+    "claude-code-workflows:anthropics/claude-code-workflows"
+    "claude-plugins-official:anthropics/claude-plugins-official"
   )
 
   # Add marketplaces if not already registered
-  for marketplace_name in "${!marketplaces[@]}"; do
-    marketplace_id="${marketplaces[$marketplace_name]}"
+  for marketplace_pair in "${marketplaces[@]}"; do
+    marketplace_name="${marketplace_pair%%:*}"
+    marketplace_id="${marketplace_pair#*:}"
     if ! claude plugin marketplace list 2>/dev/null | grep -Fq "$marketplace_name"; then
       log "Adding $marketplace_name marketplace..."
       # Try to add, but don't fail if it's already registered by default
