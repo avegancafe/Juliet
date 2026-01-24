@@ -285,15 +285,53 @@ setup-claude-code() {
     curl -fsSL https://claude.ai/install.sh | bash
   fi
 
-  # Add marketplace if not already registered
-  if ! claude plugin marketplace list 2>/dev/null | grep -q "superpowers-marketplace"; then
-    claude plugin marketplace add obra/superpowers-marketplace
-  fi
+  # Define marketplaces to add (try adding official ones in case they're not registered by default)
+  declare -A marketplaces=(
+    ["superpowers-marketplace"]="obra/superpowers-marketplace"
+    ["claude-code-plugins"]="anthropics/claude-code-plugins"
+    ["claude-code-workflows"]="anthropics/claude-code-workflows"
+    ["claude-plugins-official"]="anthropics/claude-plugins-official"
+  )
 
-  # Install plugin if not already installed
-  if ! claude plugin list 2>/dev/null | grep -q "superpowers@superpowers-marketplace"; then
-    claude plugin install superpowers@superpowers-marketplace
-  fi
+  # Add marketplaces if not already registered
+  for marketplace_name in "${!marketplaces[@]}"; do
+    marketplace_id="${marketplaces[$marketplace_name]}"
+    if ! claude plugin marketplace list 2>/dev/null | grep -q "$marketplace_name"; then
+      log "Adding $marketplace_name marketplace..."
+      # Try to add, but don't fail if it's already registered by default
+      claude plugin marketplace add "$marketplace_id" 2>/dev/null || true
+    else
+      log "$marketplace_name already registered"
+    fi
+  done
+
+  # Define plugins to install (excluding ralph-loop)
+  plugins=(
+    "superpowers@superpowers-marketplace"
+    "frontend-design@claude-code-plugins"
+    "python-development@claude-code-workflows"
+    "kubernetes-operations@claude-code-workflows"
+    "cloud-infrastructure@claude-code-workflows"
+    "shell-scripting@claude-code-workflows"
+    "backend-development@claude-code-workflows"
+    "context7@claude-plugins-official"
+    "pyright-lsp@claude-plugins-official"
+    "typescript-lsp@claude-plugins-official"
+    "sentry@claude-plugins-official"
+    "linear@claude-plugins-official"
+    "Notion@claude-plugins-official"
+    "playwright@claude-plugins-official"
+  )
+
+  # Install plugins if not already installed
+  for plugin in "${plugins[@]}"; do
+    if ! claude plugin list 2>/dev/null | grep -q "$plugin"; then
+      log "Installing $plugin..."
+      claude plugin install "$plugin"
+    else
+      log "$plugin already installed"
+    fi
+  done
 }
 
 rlog "Setting up git..."
