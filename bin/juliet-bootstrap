@@ -296,7 +296,7 @@ setup-claude-code() {
   # Add marketplaces if not already registered
   for marketplace_name in "${!marketplaces[@]}"; do
     marketplace_id="${marketplaces[$marketplace_name]}"
-    if ! claude plugin marketplace list 2>/dev/null | grep -Fxq "$marketplace_name"; then
+    if ! claude plugin marketplace list 2>/dev/null | grep -Fq "$marketplace_name"; then
       log "Adding $marketplace_name marketplace..."
       # Try to add, but don't fail if it's already registered by default
       claude plugin marketplace add "$marketplace_id" 2>/dev/null || true
@@ -325,7 +325,7 @@ setup-claude-code() {
 
   # Install plugins if not already installed
   for plugin in "${plugins[@]}"; do
-    if ! claude plugin list 2>/dev/null | grep -Fxq "$plugin"; then
+    if ! claude plugin list 2>/dev/null | grep -Fq "$plugin"; then
       log "Installing $plugin..."
       claude plugin install "$plugin" || warn "Failed to install $plugin"
     else
