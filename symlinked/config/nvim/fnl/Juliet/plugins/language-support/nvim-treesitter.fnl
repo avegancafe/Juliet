@@ -58,6 +58,7 @@
                               :todotxt
                               :toml
                               :typescript
+                              :tsx
                               :vim
                               :vimdoc
                               :vue
