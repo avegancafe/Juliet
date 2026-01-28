@@ -2,6 +2,105 @@
 
 source ~/.config/Juliet/_util.bash
 
+# Global flags
+YES_ALL="false"
+NO_ALL="false"
+ENABLED_STEPS=()
+SKIPPED_STEPS=()
+SSH_EMAIL=""
+
+show-help() {
+  cat << 'EOF'
+Usage: juliet-bootstrap [OPTIONS]
+
+Options:
+  -y, --yes              Accept all prompts
+  -n, --no               Decline all prompts
+  --enable=STEPS         Only run these steps (comma-separated)
+  --skip=STEPS           Skip these steps (comma-separated)
+  --ssh-email=EMAIL      Email for SSH key generation
+  -h, --help             Show this help message
+
+Steps: brew, dnf, fish, ssh
+
+Examples:
+  juliet-bootstrap -y                    # Accept all prompts
+  juliet-bootstrap -y --skip=brew,dnf    # All except brew and dnf
+  juliet-bootstrap --enable=fish,ssh     # Only fish and ssh
+  juliet-bootstrap --enable=ssh --ssh-email=test@example.com
+EOF
+}
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -y|--yes)
+      YES_ALL="true"
+      shift
+      ;;
+    -n|--no)
+      NO_ALL="true"
+      shift
+      ;;
+    --enable=*)
+      IFS=',' read -ra ENABLED_STEPS <<< "${1#*=}"
+      shift
+      ;;
+    --skip=*)
+      IFS=',' read -ra SKIPPED_STEPS <<< "${1#*=}"
+      shift
+      ;;
+    --ssh-email=*)
+      SSH_EMAIL="${1#*=}"
+      shift
+      ;;
+    -h|--help)
+      show-help
+      exit 0
+      ;;
+    *)
+      warn "Unknown option: $1"
+      show-help
+      exit 1
+      ;;
+  esac
+done
+
+# Check if a step should run based on --enable and --skip flags
+should-run-step() {
+  local step="$1"
+
+  # If --enable was used, only run if step is in the list
+  if [[ ${#ENABLED_STEPS[@]} -gt 0 ]]; then
+    [[ " ${ENABLED_STEPS[*]} " =~ " $step " ]] && return 0 || return 1
+  fi
+
+  # If --skip was used, skip if step is in the list
+  if [[ " ${SKIPPED_STEPS[*]} " =~ " $step " ]]; then
+    return 1
+  fi
+
+  return 0
+}
+
+# Determine whether to prompt or auto-answer based on flags
+should-confirm() {
+  local step="$1"
+  local prompt="$2"
+
+  # Step was explicitly enabled via --enable
+  if [[ ${#ENABLED_STEPS[@]} -gt 0 ]] && [[ " ${ENABLED_STEPS[*]} " =~ " $step " ]]; then
+    return 0
+  fi
+
+  # Global yes/no flags
+  [[ "$YES_ALL" == "true" ]] && return 0
+  [[ "$NO_ALL" == "true" ]] && return 1
+
+  # Interactive prompt
+  gum confirm "$prompt"
+}
+
 # OS Detection
 is-fedora() {
   [ -f /etc/fedora-release ]
@@ -46,6 +145,8 @@ update-juliet() {
 
 
 setup-brew() {
+  should-run-step "brew" || return
+
   if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
@@ -68,7 +169,7 @@ setup-brew() {
     brew install gum
   fi
 
-  if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Would you like to brew bundle?"; }; then
+  if should-confirm "brew" "Would you like to brew bundle?"; then
     brew bundle --file ~/.config/Juliet/Brewfile
   fi
 }
@@ -80,6 +181,8 @@ setup-cargo() {
 }
 
 setup-dnf() {
+  should-run-step "dnf" || return
+
   if ! command -v gum &> /dev/null; then
     sudo dnf install -y gum
   fi
@@ -90,7 +193,7 @@ setup-dnf() {
     return
   fi
 
-  if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Would you like to install DNF packages?"; }; then
+  if should-confirm "dnf" "Would you like to install DNF packages?"; then
     # Enable COPR repos first
     while IFS= read -r line || [[ -n "$line" ]]; do
       # Skip empty lines and comments
@@ -125,7 +228,7 @@ os-specific-install() {
   log "Checking for os-specific dependencies..."
   if is-fedora; then
     log "Detected Fedora, setting up DNF packages..."
-    setup-dnf $1
+    setup-dnf
   fi
 }
 
@@ -136,14 +239,20 @@ symlink-dotfiles() {
 }
 
 setup-ssh() {
+  should-run-step "ssh" || return
+
   if [[ ! -d $HOME/.ssh ]]; then
     mkdir $HOME/.ssh
     chmod 700 $HOME/.ssh
   fi
 
   if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
-    if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Looks like you don't have an SSH key, would you like to generate one?"; }; then
-      ssh-keygen -t ed25519 -C "$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")" -f $HOME/.ssh/id_ed25519
+    if should-confirm "ssh" "Looks like you don't have an SSH key, would you like to generate one?"; then
+      local email="${SSH_EMAIL:-}"
+      if [[ -z "$email" ]]; then
+        email=$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")
+      fi
+      ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/id_ed25519
     fi
   fi
 }
@@ -155,6 +264,8 @@ setup-fzf() {
 }
 
 setup-fish() {
+  should-run-step "fish" || return
+
   mkdir -p ~/.config/fish
 
   FISH_PATH="$(command -v fish)"
@@ -163,7 +274,7 @@ setup-fish() {
     return
   fi
 
-  if [[ "$1" == "-y" || "$1" == "--yes" ]] || { [[ "$1" != "-n" && "$1" != "--no" ]] && gum confirm "Would you like to do a full fish install?"; }; then
+  if should-confirm "fish" "Would you like to do a full fish install?"; then
     if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
       log "Adding $FISH_PATH to /etc/shells..."
       sudo bash -c "echo '$FISH_PATH' >> /etc/shells"
@@ -341,9 +452,9 @@ setup-git
 rlog "Updating Juliet repository..."
 update-juliet
 rlog "Installing OS-specific packages..."
-os-specific-install $1
+os-specific-install
 rlog "Setting up Homebrew..."
-setup-brew $1
+setup-brew
 rlog "Setting up Cargo..."
 setup-cargo
 log "Symlinking dotfiles..."
@@ -353,7 +464,7 @@ setup-ssh
 log "Installing fzf..."
 setup-fzf
 log "Installing fish..."
-setup-fish $1
+setup-fish
 log "Installing gpg..."
 setup-gpg
 rlog "Installing rust dependencies..."
