@@ -21,13 +21,13 @@ Options:
   --ssh-email=EMAIL      Email for SSH key generation
   -h, --help             Show this help message
 
-Steps: brew, dnf, fish, ssh
+Steps: packages, dev, shell, security, desktop, claude
 
 Examples:
-  juliet-bootstrap -y                    # Accept all prompts
-  juliet-bootstrap -y --skip=brew,dnf    # All except brew and dnf
-  juliet-bootstrap --enable=fish,ssh     # Only fish and ssh
-  juliet-bootstrap --enable=ssh --ssh-email=test@example.com
+  juliet-bootstrap -y                        # Accept all prompts
+  juliet-bootstrap -y --skip=packages        # All except packages
+  juliet-bootstrap --enable=shell,security   # Only shell and security
+  juliet-bootstrap --enable=security --ssh-email=test@example.com
 EOF
 }
 
@@ -101,6 +101,31 @@ should-confirm() {
   gum confirm "$prompt"
 }
 
+# Category-level confirmation (combines should-run-step + should-confirm)
+confirm-category() {
+  local category="$1"
+  local description="$2"
+
+  if ! should-run-step "$category"; then
+    rlog "Skipping installing $category... (filtered)"
+    return 1
+  fi
+
+  [[ "$YES_ALL" == "true" ]] && return 0
+
+  if [[ "$NO_ALL" == "true" ]]; then
+    rlog "Skipping installing $category..."
+    return 1
+  fi
+
+  if ! gum confirm "$description"; then
+    rlog "Skipping installing $category..."
+    return 1
+  fi
+
+  return 0
+}
+
 # OS Detection
 is-fedora() {
   [ -f /etc/fedora-release ]
@@ -111,11 +136,13 @@ is-macos() {
 }
 
 setup-git() {
+  rlog "Setting up git..."
   mkdir -p ~/.config/local
   [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
 }
 
 update-juliet() {
+  rlog "Updating Juliet repository..."
   WORKDIR="$HOME/.config/Juliet"
   if [ -d "$WORKDIR" ]; then
     cd "$WORKDIR"
@@ -145,7 +172,7 @@ update-juliet() {
 
 
 setup-brew() {
-  should-run-step "brew" || return
+  rlog "Setting up Homebrew..."
 
   if ! command -v brew &> /dev/null; then
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
@@ -169,19 +196,18 @@ setup-brew() {
     brew install gum
   fi
 
-  if should-confirm "brew" "Would you like to brew bundle?"; then
-    brew bundle --file ~/.config/Juliet/Brewfile
-  fi
+  brew bundle --file ~/.config/Juliet/Brewfile
 }
 
 setup-cargo() {
+  rlog "Setting up Cargo..."
   if ! command -v cargo &> /dev/null; then
     rustup-init
   fi
 }
 
 setup-dnf() {
-  should-run-step "dnf" || return
+  log "Setting up DNF packages..."
 
   if ! command -v gum &> /dev/null; then
     sudo dnf install -y gum
@@ -193,53 +219,44 @@ setup-dnf() {
     return
   fi
 
-  if should-confirm "dnf" "Would you like to install DNF packages?"; then
-    # Enable COPR repos first
-    while IFS= read -r line || [[ -n "$line" ]]; do
-      # Skip empty lines and comments
-      [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-      # Handle COPR repos
-      if [[ "$line" =~ ^copr[[:space:]]+ ]]; then
-        repo="${line#copr }"
-        if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
-          log "Enabling COPR: $repo"
-          sudo dnf copr enable -y "$repo"
-        fi
+  # Enable COPR repos first
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    # Skip empty lines and comments
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    # Handle COPR repos
+    if [[ "$line" =~ ^copr[[:space:]]+ ]]; then
+      repo="${line#copr }"
+      if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
+        log "Enabling COPR: $repo"
+        sudo dnf copr enable -y "$repo"
       fi
-    done < "$DNFFILE"
-
-    # Collect packages
-    packages=()
-    while IFS= read -r line || [[ -n "$line" ]]; do
-      # Skip empty lines, comments, and copr lines
-      [[ -z "$line" || "$line" =~ ^[[:space:]]*# || "$line" =~ ^copr[[:space:]]+ ]] && continue
-      packages+=("$line")
-    done < "$DNFFILE"
-
-    # Install packages
-    if [[ ${#packages[@]} -gt 0 ]]; then
-      log "Installing ${#packages[@]} packages..."
-      sudo dnf install -y "${packages[@]}"
     fi
-  fi
-}
+  done < "$DNFFILE"
 
-os-specific-install() {
-  log "Checking for os-specific dependencies..."
-  if is-fedora; then
-    log "Detected Fedora, setting up DNF packages..."
-    setup-dnf
+  # Collect packages
+  packages=()
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    # Skip empty lines, comments, and copr lines
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# || "$line" =~ ^copr[[:space:]]+ ]] && continue
+    packages+=("$line")
+  done < "$DNFFILE"
+
+  # Install packages
+  if [[ ${#packages[@]} -gt 0 ]]; then
+    log "Installing ${#packages[@]} packages..."
+    sudo dnf install -y "${packages[@]}"
   fi
 }
 
 symlink-dotfiles() {
+  log "Symlinking dotfiles..."
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
   stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
 }
 
 setup-ssh() {
-  should-run-step "ssh" || return
+  log "Setting up SSH..."
 
   if [[ ! -d $HOME/.ssh ]]; then
     mkdir $HOME/.ssh
@@ -247,25 +264,22 @@ setup-ssh() {
   fi
 
   if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
-    if should-confirm "ssh" "Looks like you don't have an SSH key, would you like to generate one?"; then
-      local email="${SSH_EMAIL:-}"
-      if [[ -z "$email" ]]; then
-        email=$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")
-      fi
-      ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/id_ed25519
+    local email="${SSH_EMAIL:-}"
+    if [[ -z "$email" ]]; then
+      email=$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")
     fi
+    ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/id_ed25519
   fi
 }
 
 setup-fzf() {
   if ! command -v fzf &> /dev/null; then
+    log "Installing fzf..."
     /opt/homebrew/opt/fzf/install
   fi
 }
 
 setup-fish() {
-  should-run-step "fish" || return
-
   mkdir -p ~/.config/fish
 
   FISH_PATH="$(command -v fish)"
@@ -273,22 +287,22 @@ setup-fish() {
     warn "fish not found, skipping fish setup"
     return
   fi
+  log "Setting up fish..."
 
-  if should-confirm "fish" "Would you like to do a full fish install?"; then
-    if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
-      log "Adding $FISH_PATH to /etc/shells..."
-      sudo bash -c "echo '$FISH_PATH' >> /etc/shells"
-    fi
+  if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
+    log "Adding $FISH_PATH to /etc/shells..."
+    sudo bash -c "echo '$FISH_PATH' >> /etc/shells"
+  fi
 
-    if [[ "$SHELL" != "$FISH_PATH" ]]; then
-      log "Setting fish to default shell..."
-      chsh -s "$FISH_PATH" "$(whoami)"
-    fi
+  if [[ "$SHELL" != "$FISH_PATH" ]]; then
+    log "Setting fish to default shell..."
+    chsh -s "$FISH_PATH" "$(whoami)"
   fi
 }
 
 setup-gpg() {
   if [[ ! -d $HOME/.gnupg ]]; then
+    log "Setting up GPG..."
     mkdir ~/.gnupg
     touch ~/.gnupg/gpg-agent.conf
     echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
@@ -296,6 +310,7 @@ setup-gpg() {
 }
 
 setup-rust() {
+  rlog "Setting up Rust dependencies..."
   if ! command -v stylua &> /dev/null; then
     cargo install stylua
   fi
@@ -306,6 +321,7 @@ setup-rust() {
 }
 
 setup-python() {
+  rlog "Setting up Python..."
   if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
   fi
@@ -319,6 +335,7 @@ setup-niri() {
   if ! command -v niri &> /dev/null; then
     return
   fi
+  log "Setting up niri..."
 
   # Bind DMS to niri session (only runs with niri, not other DEs)
   if command -v dms &> /dev/null; then
@@ -337,6 +354,7 @@ setup-sddm() {
   if ! command -v sddm &> /dev/null; then
     return
   fi
+  log "Setting up SDDM theme..."
 
   THEME_SRC="$HOME/.config/Juliet/etc/sddm-themes/juliet"
   THEME_DEST="/usr/share/sddm/themes/juliet"
@@ -364,44 +382,16 @@ EOF
   fi
 }
 
-setup-icons() {
-  if ! is-fedora; then
-    return
-  fi
-
-  ICONS_DIR="$HOME/.local/share/icons"
-  ICON_PACK_DIR="$ICONS_DIR/gruvbox-plus-icon-pack"
-
-  mkdir -p "$ICONS_DIR"
-
-  if [[ ! -d "$ICON_PACK_DIR" ]]; then
-    log "Installing Gruvbox Plus icon pack..."
-    git clone https://github.com/SylEleuth/gruvbox-plus-icon-pack.git "$ICON_PACK_DIR"
-  else
-    log "Updating Gruvbox Plus icon pack..."
-    git -C "$ICON_PACK_DIR" pull
-  fi
-
-  # Create symlinks for icon themes
-  if [[ ! -L "$ICONS_DIR/Gruvbox-Plus-Dark" ]]; then
-    ln -s "$ICON_PACK_DIR/Gruvbox-Plus-Dark" "$ICONS_DIR/Gruvbox-Plus-Dark"
-  fi
-  if [[ ! -L "$ICONS_DIR/Gruvbox-Plus-Light" ]]; then
-    ln -s "$ICON_PACK_DIR/Gruvbox-Plus-Light" "$ICONS_DIR/Gruvbox-Plus-Light"
-  fi
-}
-
 setup-claude-code() {
+  rlog "Setting up Claude Code..."
   if ! command -v claude &> /dev/null; then
     curl -fsSL https://claude.ai/install.sh | bash
   fi
 
-  # Define marketplaces to add (try adding official ones in case they're not registered by default)
+  # Define marketplaces to add
   # Format: "name:id" pairs (bash 3.2 compatible)
   marketplaces=(
     "superpowers-marketplace:obra/superpowers-marketplace"
-    "claude-code-plugins:anthropics/claude-code-plugins"
-    "claude-code-workflows:anthropics/claude-code-workflows"
     "claude-plugins-official:anthropics/claude-plugins-official"
   )
 
@@ -411,22 +401,14 @@ setup-claude-code() {
     marketplace_id="${marketplace_pair#*:}"
     if ! claude plugin marketplace list 2>/dev/null | grep -Fq "$marketplace_name"; then
       log "Adding $marketplace_name marketplace..."
-      # Try to add, but don't fail if it's already registered by default
       claude plugin marketplace add "$marketplace_id" 2>/dev/null || true
-    else
-      log "$marketplace_name already registered"
     fi
   done
 
-  # Define plugins to install (excluding ralph-loop)
+  # Define plugins to install
   plugins=(
     "superpowers@superpowers-marketplace"
-    "frontend-design@claude-code-plugins"
-    "python-development@claude-code-workflows"
-    "kubernetes-operations@claude-code-workflows"
-    "cloud-infrastructure@claude-code-workflows"
-    "shell-scripting@claude-code-workflows"
-    "backend-development@claude-code-workflows"
+    "frontend-design@claude-plugins-official"
     "context7@claude-plugins-official"
     "pyright-lsp@claude-plugins-official"
     "typescript-lsp@claude-plugins-official"
@@ -441,43 +423,72 @@ setup-claude-code() {
     if ! claude plugin list 2>/dev/null | grep -Fq "$plugin"; then
       log "Installing $plugin..."
       claude plugin install "$plugin" || warn "Failed to install $plugin"
-    else
-      log "$plugin already installed"
     fi
   done
 }
 
-rlog "Setting up git..."
+# =============================================================================
+# Category Runner Functions
+# =============================================================================
+
+run-packages() {
+  confirm-category "packages" "Install system packages? (neovim, bat, ripgrep, fzf, gh, starship, ghostty...)" || return
+  if is-macos; then
+    setup-brew
+  elif is-fedora; then
+    setup-dnf
+  fi
+}
+
+run-dev() {
+  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry)" || return
+  setup-cargo
+  setup-rust
+  setup-python
+}
+
+run-shell() {
+  confirm-category "shell" "Configure shell? (fish as default, fzf keybindings)" || return
+  setup-fish
+  setup-fzf
+}
+
+run-security() {
+  confirm-category "security" "Set up security? (SSH key, GPG agent)" || return
+  setup-ssh
+  setup-gpg
+}
+
+run-desktop() {
+  # Only show on Linux with relevant tools
+  if ! is-fedora; then return; fi
+  if ! command -v niri &> /dev/null && ! command -v sddm &> /dev/null; then return; fi
+
+  confirm-category "desktop" "Configure desktop? (niri WM, sddm theme)" || return
+  setup-niri
+  setup-sddm
+}
+
+run-claude() {
+  confirm-category "claude" "Set up Claude Code? (CLI, superpowers, context7, LSP plugins)" || return
+  setup-claude-code
+}
+
+# =============================================================================
+# Main Execution
+# =============================================================================
+
+# Core setup (always runs)
 setup-git
-rlog "Updating Juliet repository..."
 update-juliet
-rlog "Installing OS-specific packages..."
-os-specific-install
-rlog "Setting up Homebrew..."
-setup-brew
-rlog "Setting up Cargo..."
-setup-cargo
-log "Symlinking dotfiles..."
 symlink-dotfiles
-log "Setting up ssh..."
-setup-ssh
-log "Installing fzf..."
-setup-fzf
-log "Installing fish..."
-setup-fish
-log "Installing gpg..."
-setup-gpg
-rlog "Installing rust dependencies..."
-setup-rust
-rlog "Setting up python..."
-setup-python
-log "Setting up niri..."
-setup-niri
-log "Setting up SDDM theme..."
-setup-sddm
-log "Setting up icon themes..."
-setup-icons
-rlog "Setting up Claude Code..."
-setup-claude-code
+
+# Category-based setup
+run-packages
+run-dev
+run-shell
+run-security
+run-desktop
+run-claude
 
 log "Done!"
