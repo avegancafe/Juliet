@@ -1,4 +1,4 @@
-function ls
+function ls --wraps eza
     set -l LS_CMD (which ls)
 
     if type -q eza
