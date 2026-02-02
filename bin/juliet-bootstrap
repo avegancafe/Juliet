@@ -107,19 +107,19 @@ confirm-category() {
   local description="$2"
 
   if ! should-run-step "$category"; then
-    rlog "Skipping installing $category... (filtered)"
+    rlog "Skipping $category install step(s)... (filtered)"
     return 1
   fi
 
   [[ "$YES_ALL" == "true" ]] && return 0
 
   if [[ "$NO_ALL" == "true" ]]; then
-    rlog "Skipping installing $category..."
+    rlog "Skipping $category install step(s)..."
     return 1
   fi
 
   if ! gum confirm "$description"; then
-    rlog "Skipping installing $category..."
+    rlog "Skipping $category install step(s)..."
     return 1
   fi
 
