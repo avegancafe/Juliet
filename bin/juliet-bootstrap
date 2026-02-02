@@ -28,8 +28,22 @@ Examples:
   juliet-bootstrap -y --skip=packages        # All except packages
   juliet-bootstrap --enable=shell,security   # Only shell and security
   juliet-bootstrap --enable=security --ssh-email=test@example.com
+
+Environment Variables:
+  JULIET_BOOTSTRAP_ARGS  Default arguments when no CLI args provided
+                         Any CLI argument disables the env var
+
+Environment variable example:
+  export JULIET_BOOTSTRAP_ARGS="-y --skip=packages"
+  juliet-bootstrap              # Uses env var
+  juliet-bootstrap --no         # Ignores env var, uses only CLI args
 EOF
 }
+
+# Parse environment variable arguments only if no CLI args provided
+if [[ $# -eq 0 && -n "${JULIET_BOOTSTRAP_ARGS:-}" ]]; then
+  eval "set -- $JULIET_BOOTSTRAP_ARGS"
+fi
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
