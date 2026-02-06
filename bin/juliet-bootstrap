@@ -264,6 +264,7 @@ setup-dnf() {
 
 symlink-dotfiles() {
   log "Symlinking dotfiles..."
+  mkdir ~/.claude 2>/dev/null || true
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
   stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
