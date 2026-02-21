@@ -1,0 +1,12 @@
+{
+  "appUsageRanking": {
+    "org.mozilla.firefox": {
+      "name": "Firefox",
+      "exec": "firefox %u",
+      "icon": "firefox",
+      "comment": "Browse the Web",
+      "usageCount": 1,
+      "lastUsed": 1770164897281
+    }
+  }
+}

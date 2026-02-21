@@ -1,0 +1,2 @@
+selector = fuzzel
+action = ["type", "copy"]
