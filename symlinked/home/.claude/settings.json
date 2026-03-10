@@ -76,6 +76,7 @@
     "frontend-design@claude-plugins-official": true,
     "ralph-skills@ralph-marketplace": true
   },
+  "effortLevel": "high",
   "alwaysThinkingEnabled": true,
   "skipDangerousModePermissionPrompt": true,
   "feedbackSurveyState": {
