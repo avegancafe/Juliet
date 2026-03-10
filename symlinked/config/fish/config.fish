@@ -4,6 +4,8 @@ else if test -f /home/linuxbrew/.linuxbrew/bin/brew
     eval (/home/linuxbrew/.linuxbrew/bin/brew shellenv)
 end
 
+set -gx DEBUG ''
+
 set script_dir (dirname (status --current-filename))
 source $script_dir/env.fish 2>/dev/null
 source $script_dir/_util.fish
@@ -11,6 +13,7 @@ source $script_dir/_util.fish
 function sourcedir --description "Source all files in a directory"
     for file in $argv[1]/*
         if string match -r '\.fish$' $file 2>&1 > /dev/null
+            debuglog "Sourcing $file..."
             source $file
         end
     end
