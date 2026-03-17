@@ -16,6 +16,7 @@
 	pdiff = "!git diff --name-only --relative --diff-filter=d | xargs bat --diff"
 	pf = push --force-with-lease
 	rb = rebase
+	rswitch = "!f() { git fetch && git switch \"$@\"; }; f"
 	s = switch
 	staash = stash --all
 	staged = diff --staged
