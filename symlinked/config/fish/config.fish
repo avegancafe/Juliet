@@ -33,3 +33,8 @@ for file in ~/workspace/dev-env/initializers/fish/*; source $file; end
 
 # J2 Man Pages
 set -gx MANPATH "$HOME/.local/share/man" $MANPATH
+
+# Local environment variables
+if test -f ~/.config/local/.env
+    envsource ~/.config/local/.env
+end
