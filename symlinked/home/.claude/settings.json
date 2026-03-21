@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(git *)",
@@ -48,7 +51,7 @@
     ],
     "deny": [],
     "ask": [],
-    "defaultMode": "plan",
+    "defaultMode": "bypassPermissions",
     "additionalDirectories": [
       "/Users/kyle/workspace/dev-env/",
       "/Users/kyle/.config/Juliet/"
