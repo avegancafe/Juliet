@@ -71,7 +71,8 @@
     "backend-development@claude-code-workflows": true,
     "playwright@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "ralph-skills@ralph-marketplace": true
+    "ralph-skills@ralph-marketplace": true,
+    "mgrep@Mixedbread-Grep": true
   },
   "alwaysThinkingEnabled": true,
   "skipDangerousModePermissionPrompt": true,

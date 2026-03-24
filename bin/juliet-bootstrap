@@ -403,7 +403,6 @@ setup-mgrep() {
     npm install -g @mixedbread/mgrep
   fi
   mgrep login
-  mgrep install-claude-code
 }
 
 setup-claude-code() {
@@ -417,6 +416,7 @@ setup-claude-code() {
   marketplaces=(
     "superpowers-marketplace:obra/superpowers-marketplace"
     "claude-plugins-official:anthropics/claude-plugins-official"
+    "Mixedbread-Grep:https://github.com/mixedbread-ai/mgrep"
   )
 
   # Add marketplaces if not already registered
@@ -440,6 +440,7 @@ setup-claude-code() {
     "linear@claude-plugins-official"
     "Notion@claude-plugins-official"
     "playwright@claude-plugins-official"
+    "mgrep@Mixedbread-Grep"
   )
 
   # Install plugins if not already installed
