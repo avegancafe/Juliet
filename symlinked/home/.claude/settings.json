@@ -85,7 +85,7 @@
     "cloud-infrastructure@claude-code-workflows": true,
     "code-review@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "everything-claude-code@everything-claude-code": true
+    "everything-claude-code@everything-claude-code": true,
     "figma@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "github@claude-plugins-official": true,
@@ -101,6 +101,7 @@
     "superpowers-developing-for-claude-code@superpowers-marketplace": true,
     "superpowers@superpowers-marketplace": true,
     "typescript-lsp@claude-plugins-official": true,
+    "mgrep@Mixedbread-Grep": true
   },
   "extraKnownMarketplaces": {
     "everything-claude-code": {
@@ -111,8 +112,8 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
   "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
   }
