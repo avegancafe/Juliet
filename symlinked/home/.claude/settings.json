@@ -85,6 +85,7 @@
     "cloud-infrastructure@claude-code-workflows": true,
     "code-review@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
+    "everything-claude-code@everything-claude-code": true
     "figma@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "github@claude-plugins-official": true,
@@ -99,8 +100,15 @@
     "shell-scripting@claude-code-workflows": true,
     "superpowers-developing-for-claude-code@superpowers-marketplace": true,
     "superpowers@superpowers-marketplace": true,
-    "superpowers@superpowers-marketplace": true,
-    "typescript-lsp@claude-plugins-official": true
+    "typescript-lsp@claude-plugins-official": true,
+  },
+  "extraKnownMarketplaces": {
+    "everything-claude-code": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/everything-claude-code"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
   "skipDangerousModePermissionPrompt": true,
