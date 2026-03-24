@@ -17,6 +17,7 @@
       "Bash(head *)",
       "Bash(tail *)",
       "Bash(claude *)",
+      "Bash(mgrep *)",
       "mcp__github__search_*",
       "mcp__github__list_*",
       "mcp__github__get_*",

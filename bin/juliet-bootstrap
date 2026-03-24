@@ -397,6 +397,15 @@ EOF
   fi
 }
 
+setup-mgrep() {
+  rlog "Setting up mgrep..."
+  if ! command -v mgrep &> /dev/null; then
+    npm install -g @mixedbread/mgrep
+  fi
+  mgrep login
+  mgrep install-claude-code
+}
+
 setup-claude-code() {
   rlog "Setting up Claude Code..."
   if ! command -v claude &> /dev/null; then
@@ -440,6 +449,8 @@ setup-claude-code() {
       claude plugin install "$plugin" || warn "Failed to install $plugin"
     fi
   done
+
+  setup-mgrep
 }
 
 # =============================================================================
