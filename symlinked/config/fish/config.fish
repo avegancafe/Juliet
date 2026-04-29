@@ -38,3 +38,6 @@ set -gx MANPATH "$HOME/.local/share/man" $MANPATH
 if test -f ~/.config/local/.env
     envsource ~/.config/local/.env
 end
+
+# Claude Code Agent Teams
+set -gx CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1
