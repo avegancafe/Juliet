@@ -10,6 +10,6 @@
                    "Enter zen mode")]
        :config true
        :opts {:window {:backdrop 1
-                       :height 1
-                       :width 0.4
+                       :height (fn [] (math.max 40 (- vim.o.lines vim.o.cmdheight 26)))
+                       :width 100
                        :options {:number false :relativenumber false}}}})
