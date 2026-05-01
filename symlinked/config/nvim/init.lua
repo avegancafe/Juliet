@@ -23,20 +23,14 @@ if not vim.loop.fs_stat(hotpot_path) then
 		'clone',
 		'--filter=blob:none',
 		'--single-branch',
+		'--branch=v2.0.0',
 		'https://github.com/rktjmp/hotpot.nvim.git',
 		hotpot_path,
 	})
 end
 vim.opt.rtp:prepend(hotpot_path)
 
-require('hotpot').setup({
-	provide_require_fennel = true,
-	compiler = {
-		modules = {
-			correlate = true,
-		},
-	},
-})
+require('hotpot')
 
 require('Juliet')
 require('Juliet.plugins')

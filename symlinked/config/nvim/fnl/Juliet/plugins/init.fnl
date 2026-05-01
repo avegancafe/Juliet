@@ -1,3 +1,5 @@
+(import-macros {: pack} :Juliet.macros)
+
 (local lazy-plugins-path (.. (vim.fn.stdpath :data) :/lazy))
 (local lazy-path (.. lazy-plugins-path :/lazy.nvim))
 
@@ -11,7 +13,7 @@
 
 (vim.opt.rtp:prepend lazy-path)
 
-(var plugins [[:rktjmp/hotpot.nvim]])
+(var plugins [(pack :rktjmp/hotpot.nvim {:version "^2.0.0"})])
 (local fnl-definition-paths (.. (vim.fn.stdpath :config) :/fnl/Juliet/plugins))
 
 (if (vim.loop.fs_stat fnl-definition-paths)
@@ -20,4 +22,10 @@
         (table.insert plugins
                       (require (.. :Juliet.plugins. (file:match "^(.*)%.fnl$")))))))
 
-((. (require :lazy) :setup) plugins {:ui {:border :rounded}})
+(local hotpot-context
+       (let [api (require :hotpot.api)]
+         (assert (api.context (vim.fn.stdpath :config)))))
+
+((. (require :lazy) :setup) plugins
+ {:ui {:border :rounded}
+  :performance {:rtp {:paths [(hotpot-context.locate :destination)]}}})
