@@ -18,49 +18,47 @@
                                                            (tset vim.opt
                                                                  :foldexpr
                                                                  "nvim_treesitter#foldexpr()"))})
-                 (local ts (require :nvim-treesitter))
-                 (ts.setup {:install_dir (.. (vim.fn.stdpath :data)
-                                             :/lazy/nvim-treesitter/parser)
+                 (local ts (require :nvim-treesitter.configs))
+                 (ts.setup {:ensure_installed [:bash
+                                               :cmake
+                                               :comment
+                                               :css
+                                               :dockerfile
+                                               :fennel
+                                               :fish
+                                               :gitignore
+                                               :go
+                                               :gomod
+                                               :graphql
+                                               :html
+                                               :http
+                                               :javascript
+                                               :jinja
+                                               :jsdoc
+                                               :json5
+                                               :json
+                                               :latex
+                                               :lua
+                                               :make
+                                               :markdown
+                                               :markdown_inline
+                                               :proto
+                                               :python
+                                               :regex
+                                               :ruby
+                                               :rust
+                                               :scss
+                                               :sql
+                                               :svelte
+                                               :swift
+                                               :todotxt
+                                               :toml
+                                               :typescript
+                                               :tsx
+                                               :vim
+                                               :vimdoc
+                                               :vue
+                                               :yaml
+                                               :zig]
                             :highlight {:enable true
-                                        :additional_vim_regex_highlighting true}})
-                 (ts.install [:bash
-                              :cmake
-                              :comment
-                              :css
-                              :dockerfile
-                              :fennel
-                              :fish
-                              :gitignore
-                              :go
-                              :gomod
-                              :graphql
-                              :html
-                              :http
-                              :javascript
-                              :jinja
-                              :jsdoc
-                              :json5
-                              :json
-                              :latex
-                              :lua
-                              :make
-                              :markdown
-                              :markdown_inline
-                              :proto
-                              :python
-                              :regex
-                              :ruby
-                              :rust
-                              :scss
-                              :sql
-                              :svelte
-                              :swift
-                              :todotxt
-                              :toml
-                              :typescript
-                              :tsx
-                              :vim
-                              :vimdoc
-                              :vue
-                              :yaml
-                              :zig]))})
+                                        :additional_vim_regex_highlighting true}}))})

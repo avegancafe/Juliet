@@ -10,7 +10,10 @@
   ],
   "packages": [
     "npm:pi-subagents",
-    "npm:pi-mcp-adapter"
+    "npm:pi-mcp-adapter",
+    "npm:pi-btw",
+    "npm:@plannotator/pi-extension",
+    "npm:pi-markdown-preview"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
@@ -18,5 +21,6 @@
   "collapseChangelog": false,
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
-  "theme": "bamboo"
+  "theme": "bamboo",
+  "lastChangelogVersion": "0.72.1"
 }

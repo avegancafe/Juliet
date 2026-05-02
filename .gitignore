@@ -13,3 +13,4 @@ symlinked/home/.claude/*
 # pi (~/.pi is symlinked file-by-file via stow; settings.json IS tracked)
 symlinked/home/.pi/agent/auth.json
 symlinked/home/.pi/agent/sessions/
+.pi/artifacts/

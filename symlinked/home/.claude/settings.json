@@ -51,7 +51,7 @@
     ],
     "deny": [],
     "ask": [],
-    "defaultMode": "bypassPermissions",
+    "defaultMode": "auto",
     "additionalDirectories": [
       "/Users/kyle/workspace/dev-env/",
       "/Users/kyle/.config/Juliet/"
@@ -73,9 +73,11 @@
     "ralph-skills@ralph-marketplace": true
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
   "effortLevel": "high",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-daltonized",
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
-  }
+  },
+  "skipAutoPermissionPrompt": true
 }
