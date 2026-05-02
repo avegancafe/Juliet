@@ -14,7 +14,8 @@
     "npm:pi-mcp-adapter",
     "npm:pi-btw",
     "npm:@plannotator/pi-extension",
-    "npm:pi-schedule-prompt"
+    "npm:pi-schedule-prompt",
+    "npm:pi-ask-user"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",

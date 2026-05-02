@@ -14,6 +14,8 @@ Pi's own first-party docs live under the `pi-coding-agent` package in `~/.nodenv
 - `plannotator-compound`
 
 **Prompt templates**
+- `/chef` — run the brigade strategy-to-implementation chain
+- `/runner` — bridge a chef-de-cuisine human gate through Plannotator
 - `/gather-context-and-clarify`
 - `/parallel-cleanup`
 - `/parallel-context-build`
@@ -21,8 +23,15 @@ Pi's own first-party docs live under the `pi-coding-agent` package in `~/.nodenv
 - `/parallel-research`
 - `/parallel-review`
 
+**User agents (kitchen brigade)**
+- `chef-de-cuisine`, `sous-chef`, `aboyeur`, `chef-de-partie`, `health-inspector`, `patissier`
+
+**Saved chains**
+- `strategy-to-impl` — strategy → plan → implement → review, with AI critique waves and human gates
+
 **Extensions**
 - `@plannotator/pi-extension`
+- `pi-ask-user`
 - `pi-btw`
 - `pi-intercom`
 - `pi-mcp-adapter`
@@ -85,6 +94,8 @@ The big one. Lets the parent session delegate work to child agents without burni
 
 **Prompt template shortcuts** (multi-agent recipes):
 
+- `/chef` — launch the kitchen-brigade `strategy-to-impl` chain end-to-end (see *The kitchen brigade* below)
+- `/runner` — bridge an open chef-de-cuisine human gate through Plannotator's annotation UI
 - `/parallel-review` — fresh-context reviewers with distinct angles, then synthesize
 - `/parallel-research` — `researcher` for external evidence + `scout` for local context
 - `/parallel-context-build` — parallel `context-builder` passes producing a planning handoff
@@ -135,15 +146,31 @@ Good for: "while you keep working on X, can you also tell me what file Y does?"
 
 ### `@plannotator/pi-extension` — visual plan review
 
-Plan-mode workflow with a browser UI for reviewing and annotating agent plans before execution.
+Plan-mode workflow with a browser UI for reviewing and annotating agent plans before execution. Also exposes a generic markdown annotator that the brigade workflow uses for human gates.
 
 | Command | What it does |
 |---|---|
 | `pi --plan` | Start pi in plan mode. |
 | `/plannotator [path]` | Toggle plan mode mid-session, optionally pointing at a file. |
+| `/plannotator-annotate <file.md>` | Open any markdown file in the annotation UI. Used by `/runner` for strategy/plan review. |
+| `/plannotator-review` | Open the current git diff in the code-review annotator. |
+| `/plannotator-last` | Annotate the agent's last response. |
 | `Ctrl+Alt+P` | Toggle plan mode keybind. |
 
 In plan mode, destructive commands are blocked and writes are limited to the plan file. The agent explores, writes a markdown checklist plan, then `plannotator_submit_plan` opens the review UI in your browser. You approve or annotate; execution follows the approved plan.
+
+For non-plan-mode review (annotating any markdown file or diff), use the dedicated commands above. Annotated feedback is delivered back to the agent as a follow-up message — the brigade `/runner` workflow translates that feedback into chef-de-cuisine's reply contract automatically.
+
+### `pi-ask-user` — interactive decision prompts
+
+Gives the agent an `ask_user` tool for collecting structured decisions during a turn. Searchable single-select or multi-select option lists, optional freeform fallback, optional comment field, configurable overlay vs inline display.
+
+| Surface | What it does |
+|---|---|
+| `ask_user({question, options, ...})` | Agent tool. Pauses the turn and shows a TUI picker. Returns the chosen option or freeform text. |
+| `Alt+O` (during prompt) | Temporarily hide/show the overlay so you can read prior agent output. |
+
+Shipped with an `ask-user` skill that nudges the agent to use it for high-stakes architectural choices, ambiguous requirements, or assumptions that would materially change implementation. The brigade `/runner` workflow uses this for the verb picker on denied gates.
 
 ### `pi-mcp-adapter` — MCP without context bloat
 
@@ -178,6 +205,75 @@ Reviewers run in fresh context with distinct angles (correctness, tests, simplic
 **Async background work.** When you want the agent to keep working *while* a child runs (e.g. running tests, doing deep research), launch the child with `async: true`. With `pi-intercom` active, the completion arrives as a push notification instead of needing manual polling.
 
 **Advisory thread without losing context.** When you want a sanity check on inherited decisions (drift, unstated assumptions), use `oracle` — it forks the current session so it sees your conversation history but reasons in a separate thread.
+
+**Strategy → implementation, brigade-style.** For larger work that needs explicit strategy + plan ratification before execution, see *The kitchen brigade* section below.
+
+---
+
+## The kitchen brigade
+
+A kitchen-themed pipeline of user agents and a saved chain (`strategy-to-impl`) that takes a project request through four stages: write strategy, write implementation plan, implement in parallel, and review. Each stage 1–2 has both an AI critique loop *and* a human approval gate — so you ratify the strategy and the plan before any code gets written.
+
+### The agents
+
+| Role | What they do |
+|---|---|
+| `chef-de-cuisine` | Executive chef. Writes `strategy.md` (MENU mode), then `implementation-plan.md` (PREP-LIST), then runs the implementation pass (SERVICE). Modal across stages. |
+| `sous-chef` | Adversarial reviewer. Steelmans the artifact, then critiques from a stated angle (tech-feasibility / business-risk / simplicity / etc.). Returns BLOCKING / NON-BLOCKING / AGREE. |
+| `aboyeur` | Expediter at the pass. Drives the code-review-and-fix-refire loop on the resulting diff. Spawns parallel reviewers, conditionally adds health-inspector and patissier. |
+| `chef-de-partie` | Focused implementer. TDD discipline, one ticket at a time, escalates ambiguity instead of guessing. Used both for fresh implementation and for fix refires. |
+| `health-inspector` | Security auditor. OWASP Top 10 + general checks. Runs only on diffs that touch auth, data, or external surfaces. |
+| `patissier` | Design-QA reviewer. Verifies UI fidelity against a provided design spec. Refuses to evaluate without a spec. |
+
+All six live in `~/.pi/agent/agents/*.md`. Inspect or tweak with `/agents`.
+
+### The chain (`strategy-to-impl`)
+
+```
+stage 1: chef-de-cuisine MENU      → strategy.md       → sous-chef waves → [HUMAN GATE]
+stage 2: chef-de-cuisine PREP-LIST → implementation-plan.md → sous-chef     → [HUMAN GATE]
+stage 3: chef-de-cuisine SERVICE   → chef-de-partie fan-out in worktrees per dependency batch
+stage 4: aboyeur            → review + refire loop → final-review-summary.md
+```
+
+Artifacts land under `.pi/artifacts/`. Worktree isolation is mandatory in stage 3 — the chain enforces clean git state before that stage.
+
+### Day-to-day commands
+
+| Command | What it does |
+|---|---|
+| `/chef <kickoff>` | Launch the full chain on a PRD, transcript, or freeform request. Add `"in the background"` / `"async"` to launch unattended; add `"autopilot"` / `"no review"` to skip human gates. |
+| `/runner` | When chef-de-cuisine pauses at a stage-1 or stage-2 human gate, type this to bridge the review through Plannotator's browser annotation UI. Auto-translates the result into the chain's reply contract. |
+
+### How a human gate flows with `/runner`
+
+1. `chef-de-cuisine` reaches the gate → posts a `contact_supervisor` ask in your terminal. The ask ends with `(Human shortcut: type /runner ...)`.
+2. You type `/runner`. The runner agent finds the pending ask, extracts the artifact path, prints the exact `/plannotator-annotate <path>` line for you to paste, and stops.
+3. You run `/plannotator-annotate <path>`. Browser opens. You annotate. Click Approve or Deny-with-feedback.
+4. Plannotator delivers the result to the runner agent as a follow-up.
+   - **Approved** → runner auto-sends `APPROVE` via `intercom reply`.
+   - **Denied with feedback** → runner uses `ask_user` to prompt for the verb (REVISE / MORE_WAVES / DENY) and sends the formatted reply.
+5. Chain advances or rewrites accordingly. No verb cap on human-gate iterations — you control when each gate ends.
+
+### Reply contract (for typing the verb manually)
+
+When you don't want the `/runner` workflow, reply directly to the gate:
+
+| Verb | Effect |
+|---|---|
+| `APPROVE` | Chain advances to the next stage. |
+| `REVISE: <feedback>` | chef-de-cuisine rewrites once with the feedback (optionally with one more sous-chef wave) and re-prompts the gate. |
+| `MORE_WAVES: <N> [angles=tech,scope,...]` | chef-de-cuisine spawns N more sous-chefs, optionally with the named angles, then re-prompts. |
+| `DENY: <reason>` | Chain step fails and chain stops. |
+
+### Where things live
+
+| Path | Purpose |
+|---|---|
+| `~/.pi/agent/chains/strategy-to-impl.chain.md` | The chain definition. |
+| `~/.pi/agent/agents/*.md` | Brigade agent definitions. |
+| `~/.pi/agent/prompts/chef.md`, `runner.md` | Slash-command bodies. |
+| `.pi/artifacts/strategy.md`, `implementation-plan.md`, `final-review-summary.md` | Stage outputs. Persistent across stages; read from disk each iteration. |
 
 ---
 
@@ -229,6 +325,8 @@ For project-specific overrides, drop a `.pi/settings.json` in the repo — it wi
 | MCP server not connecting | `/mcp` panel; check `.mcp.json` |
 | Plannotator UI not opening | check default browser; try `/plannotator` again |
 | Plan mode too restrictive | exit with `/plannotator` toggle |
+| `/runner` says "no chef-de-cuisine gate is pending" | the chain isn't paused at a gate — check `/subagents-status` or rerun `/chef` |
+| `/runner` finds an ask but it's not a gate | only stage-1/stage-2 human gates are bridged. Stage-3 escalations need a manual `intercom reply`. |
 
 Pi can also debug itself — describe the symptom to the agent and it'll usually run the right diagnostic.
 
