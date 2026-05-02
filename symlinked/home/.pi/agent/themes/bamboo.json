@@ -19,10 +19,9 @@
 		"cyan": "#83b5d1",
 		"cyanBright": "#42c6d9",
 
-		"gray": "#b2b8c3",
-		"dimGray": "#7a7b78",
-		"darkGray": "#5a5b5e",
-		"thinkingGray": "#b8b3a0",
+		"gray": "#b8b3a0",
+		"dimGray": "#878478",
+		"darkGray": "#5c5b54",
 
 		"selectedBg": "#3a3b35",
 		"userMsgBg": "#2d2e2a",
@@ -42,7 +41,7 @@
 		"muted": "gray",
 		"dim": "dimGray",
 		"text": "",
-		"thinkingText": "thinkingGray",
+		"thinkingText": "gray",
 
 		"selectedBg": "selectedBg",
 		"userMessageBg": "userMsgBg",
