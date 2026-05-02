@@ -39,17 +39,26 @@ The `clarify: false` flag skips the chain-launch TUI; pass `clarify: true` only 
 
 ## Mediating the human-gate notifications
 
-In stages 1 and 2, `chef-de-cuisine` calls `contact_supervisor` after the AI review plateau, asking for human review of `.pi/artifacts/strategy.md` and `.pi/artifacts/implementation-plan.md` respectively. When the notification arrives:
+In stages 1 and 2, `chef-de-cuisine` calls `contact_supervisor` after the AI review plateau, asking for human review of `.pi/artifacts/strategy.md` and `.pi/artifacts/implementation-plan.md` respectively. The reply contract chef-de-cuisine expects is `APPROVE` / `REVISE: <feedback>` / `MORE_WAVES: <N> [angles=...]` / `DENY: <reason>`. **Do not ask the user to pick that verb up-front.** Drive the review through Plannotator and only fall back to a verb picker if Plannotator returns feedback.
 
-1. Surface the artifact path to the user along with chef-de-cuisine's wave summary (which sous-chef angles ran, what they accepted, what got deferred).
-2. Wait for the user's reply. The reply contract is:
-   - `APPROVE` — chain advances.
-   - `REVISE: <feedback>` — chef-de-cuisine rewrites once with the feedback and re-prompts.
-   - `MORE_WAVES: <N> [angles=...]` — chef-de-cuisine spawns N more sous-chefs, optionally with the named angles.
-   - `DENY: <reason>` — chain step fails, chain stops.
-3. Forward the user's reply verbatim back through the intercom (`intercom({action:"reply", message: <user's reply>})`).
+When a gate notification arrives:
+
+1. **Identify the gate.** From the pending intercom ask, extract `senderTarget` (e.g. `subagent-chef-de-cuisine-…`), `replyTo` (the ask's message id), `artifactPath` (from the `Artifact ready for review at: …` line), and a one-line `stageHint` (MENU/strategy.md vs PREP-LIST/implementation-plan.md).
+2. **Surface a brief handoff** to the user — one short block with the artifact path, the stage, and chef-de-cuisine's wave summary (which sous-chef angles ran, what was accepted, what was deferred).
+3. **Run Plannotator directly.** Invoke the `plannotator-annotate` skill yourself with Bash: `plannotator annotate <artifactPath>`. Do not ask the user to type `/plannotator-annotate` and do not ask for a verb first — the browser annotation UI *is* the review surface for this gate. Wait for the command to return.
+4. **Process Plannotator's result and reply via intercom** with `intercom({action:"reply", to: senderTarget, replyTo: <ask id>, message: <formatted reply>})`:
+   - **Approved with no feedback** → reply `APPROVE` immediately. The browser click was the confirmation; do not run a redundant `ask_user`.
+   - **Returned feedback (denied / annotated).** Capture the feedback body verbatim, then run a single `ask_user` to pick the verb:
+     - `REVISE — re-run this gate with the feedback` → reply `REVISE: <feedback verbatim>`.
+     - `MORE_WAVES — spawn more sous-chef reviewers first` → ask one follow-up for `<N>` and optional `angles=…`, format as `MORE_WAVES: <N> [angles=…]`.
+     - `DENY — kill the chain step` → ask one follow-up to confirm and capture the reason, format as `DENY: <reason>`.
+   - **Plannotator session closed with no annotations and no approval signal** → ask the user once whether they want to APPROVE as-is or provide freeform feedback. If feedback, treat it like the feedback case above (verb picker → formatted reply).
+   - **Plannotator failed to launch / file missing / Bash error** → surface the error in one line, then fall back to freeform: ask them to read the artifact in their editor and reply with feedback. Treat their response like the feedback case above.
+5. **Loop on REVISE.** After a `REVISE` reply, chef-de-cuisine rewrites once and opens the gate again on the same artifact. When that next notification arrives, repeat from step 1 — i.e. re-run `plannotator annotate <artifactPath>` on the rewritten artifact so the user can re-annotate it. Keep looping until Plannotator returns approval (or the user picks `DENY`).
 
 There is no cap on human-gate iterations — the user controls when each gate ends. AI plateau loops within each iteration are still capped at 5 sous-chef waves.
+
+(The `/runner` slash prompt does the same bridging in a standalone turn if a gate notification arrives outside this orchestration. Inside `/chef`, do it inline as above — don't punt to `/runner`.)
 
 ## After the chain completes
 
