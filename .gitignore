@@ -14,3 +14,4 @@ symlinked/home/.claude/*
 symlinked/home/.pi/agent/auth.json
 symlinked/home/.pi/agent/sessions/
 .pi/artifacts/
+plans/

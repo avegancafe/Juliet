@@ -1,7 +1,7 @@
 {
   "defaultProvider": "anthropic",
   "defaultModel": "claude-opus-4-7",
-  "defaultThinkingLevel": "xhigh",
+  "defaultThinkingLevel": "high",
   "enableSkillCommands": true,
   "enabledModels": [
     "anthropic/claude-opus-4-7",
@@ -10,17 +10,20 @@
   ],
   "packages": [
     "npm:pi-subagents",
+    "npm:pi-intercom",
     "npm:pi-mcp-adapter",
     "npm:pi-btw",
     "npm:@plannotator/pi-extension",
-    "npm:pi-markdown-preview"
+    "npm:pi-schedule-prompt"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "collapseChangelog": false,
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
   "theme": "bamboo",
-  "lastChangelogVersion": "0.72.1"
+  "lastChangelogVersion": "0.72.1",
+  "quietStartup": false,
+  "editorPaddingX": 1
 }

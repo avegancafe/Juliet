@@ -1,0 +1,66 @@
+---
+argument-hint: <PRD, transcript, or kickoff transcript>
+description: Run the brigade pi-subagents chain end-to-end on a PRD, transcript, or freeform request. Chef-de-cuisine drafts a narrative ELI5 strategy onepager and a numbered implementation plan — each gated by parallel sous-chef AI review waves + your APPROVE/REVISE/MORE_WAVES/DENY approval. Then chef-de-cuisine fans out chef-de-partie implementers in parallel git worktrees per dependency batch, and aboyeur runs the code-review-and-fix-refire loop with conditional health-inspector (security) and patissier (design QA). Add "in the background" / "async" to launch unattended; "autopilot" / "no review" to skip human gates. Artifacts land in `.pi/artifacts/`.
+---
+
+Run the saved pi-subagents chain `strategy-to-impl` on the kickoff material below. The chain takes a project request through four sequential stages run by the kitchen-brigade agents:
+
+1. **chef-de-cuisine** (MENU mode) — writes `.pi/artifacts/strategy.md` (one-page narrative ELI5 strategy onepager), drives the AI review loop with `sous-chef` reviewers, then opens a human review gate via `contact_supervisor`.
+2. **chef-de-cuisine** (PREP-LIST mode) — writes `.pi/artifacts/implementation-plan.md` (numbered tasks + dependencies + lane labels + acceptance criteria), drives a single-reviewer AI loop, then opens the same human gate.
+3. **chef-de-cuisine** (SERVICE mode) — fans out N parallel `chef-de-partie` implementers per dependency batch in worktrees, validates each batch.
+4. **aboyeur** — code review + fix-refire loop on the resulting diff, with parallel `sous-chef` angle reviewers (correctness / tests / simplicity), conditional `health-inspector` (when the diff touches auth/data/external surfaces), conditional `patissier` (when a design spec was supplied). Routes BLOCKING fixes back to `chef-de-partie`. Writes `.pi/artifacts/final-review-summary.md`.
+
+## Pre-flight before launching
+
+1. **Artifacts dir.** If `.pi/artifacts/` does not exist in the current cwd, run `mkdir -p .pi/artifacts`. The chain writes its three durable artifacts there.
+2. **Clean git state.** Run `git status --porcelain`. Stage 3 uses `subagent({worktree: true})` for parallel implementers, which requires a clean working tree. If there are uncommitted changes, surface them and ask the user whether to stash, commit, or proceed anyway (some early stages may still be useful even if stage 3 will fail).
+3. **Confirm scope.** If the kickoff material below is unusually short or ambiguous, ask the user once to confirm what they want before launching — the chain runs at opus xhigh and burns real tokens; a malformed kickoff produces a malformed strategy.
+
+## Launching the chain
+
+Use the `subagent` tool. The chain is defined at `~/.pi/agent/chains/strategy-to-impl.chain.md`. Read that file, parse the four `## ` step headers and their bodies, then invoke:
+
+```typescript
+subagent({
+  chain: [
+    { agent: "chef-de-cuisine", task: <stage 1 body verbatim> },
+    { agent: "chef-de-cuisine", task: <stage 2 body verbatim>, reads: [".pi/artifacts/strategy.md"] },
+    { agent: "chef-de-cuisine", task: <stage 3 body verbatim>, reads: [".pi/artifacts/implementation-plan.md"] },
+    { agent: "aboyeur",         task: <stage 4 body verbatim> },
+  ],
+  task: <kickoff material from $@ below>,
+  clarify: false
+})
+```
+
+If the user asked to run it in the background ("in the background", "async", "while I keep working"), pass `async: true` as well — completion will arrive via intercom notification. Otherwise run foreground so you can mediate the human-gate notifications interactively.
+
+The `clarify: false` flag skips the chain-launch TUI; pass `clarify: true` only if the user explicitly asked to inspect or edit the chain before launch.
+
+## Mediating the human-gate notifications
+
+In stages 1 and 2, `chef-de-cuisine` calls `contact_supervisor` after the AI review plateau, asking for human review of `.pi/artifacts/strategy.md` and `.pi/artifacts/implementation-plan.md` respectively. When the notification arrives:
+
+1. Surface the artifact path to the user along with chef-de-cuisine's wave summary (which sous-chef angles ran, what they accepted, what got deferred).
+2. Wait for the user's reply. The reply contract is:
+   - `APPROVE` — chain advances.
+   - `REVISE: <feedback>` — chef-de-cuisine rewrites once with the feedback and re-prompts.
+   - `MORE_WAVES: <N> [angles=...]` — chef-de-cuisine spawns N more sous-chefs, optionally with the named angles.
+   - `DENY: <reason>` — chain step fails, chain stops.
+3. Forward the user's reply verbatim back through the intercom (`intercom({action:"reply", message: <user's reply>})`).
+
+There is no cap on human-gate iterations — the user controls when each gate ends. AI plateau loops within each iteration are still capped at 5 sous-chef waves.
+
+## After the chain completes
+
+Surface `.pi/artifacts/final-review-summary.md` to the user — that's aboyeur's output with the wave-by-wave findings, refire log, BLOCKING/NON-BLOCKING/AGREE counts, and plateau call. If the chain hit the wave cap (`STATUS: HIT_WAVE_CAP`) or any stage failed, explain what happened and what the user might do next (re-run with more waves, address open BLOCKINGs manually, etc.).
+
+## Skipping the human gates
+
+If the user wants to run unattended ("autopilot", "no review", "just run it through"), copy `~/.pi/agent/chains/strategy-to-impl.chain.md` to `~/.pi/agent/chains/strategy-to-impl-autopilot.chain.md` first, delete the two `[HUMAN GATE]` blocks (in stages 1 and 2), and invoke that chain instead. Mention this option in your pre-flight message if the user gives a kickoff that looks like throwaway/exploratory work.
+
+---
+
+Kickoff material from `/chef $@`:
+
+$@
