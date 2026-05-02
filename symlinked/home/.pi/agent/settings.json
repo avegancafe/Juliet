@@ -1,0 +1,22 @@
+{
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-4-7",
+  "defaultThinkingLevel": "xhigh",
+  "enableSkillCommands": true,
+  "enabledModels": [
+    "anthropic/claude-opus-4-7",
+    "anthropic/claude-sonnet-4-6",
+    "anthropic/claude-haiku-4-5"
+  ],
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-mcp-adapter"
+  ],
+  "steeringMode": "one-at-a-time",
+  "followUpMode": "one-at-a-time",
+  "hideThinkingBlock": false,
+  "collapseChangelog": false,
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "default",
+  "theme": "bamboo"
+}

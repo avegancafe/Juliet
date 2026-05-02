@@ -1,0 +1,98 @@
+{
+	"$schema": "https://raw.githubusercontent.com/badlogic/pi-mono/main/packages/coding-agent/src/modes/interactive/theme/theme-schema.json",
+	"name": "bamboo",
+	"vars": {
+		"bg": "#252623",
+		"bgSoft": "#2f312c",
+		"fg": "#f1e9d2",
+
+		"green": "#8fb573",
+		"greenBright": "#70be71",
+		"red": "#e75a7c",
+		"redBright": "#dc5b60",
+		"yellow": "#dbb671",
+		"yellowBright": "#fef063",
+		"blue": "#57a5e5",
+		"blueBright": "#53a4f3",
+		"magenta": "#aaaaff",
+		"magentaBright": "#bbbbff",
+		"cyan": "#83b5d1",
+		"cyanBright": "#42c6d9",
+
+		"gray": "#b2b8c3",
+		"dimGray": "#7a7b78",
+		"darkGray": "#5a5b5e",
+		"thinkingGray": "#b8b3a0",
+
+		"selectedBg": "#3a3b35",
+		"userMsgBg": "#2d2e2a",
+		"customMsgBg": "#2e2c36",
+		"toolPendingBg": "#2a2b27",
+		"toolSuccessBg": "#2b3328",
+		"toolErrorBg": "#38292c"
+	},
+	"colors": {
+		"accent": "green",
+		"border": "green",
+		"borderAccent": "cyanBright",
+		"borderMuted": "darkGray",
+		"success": "greenBright",
+		"error": "red",
+		"warning": "yellow",
+		"muted": "gray",
+		"dim": "dimGray",
+		"text": "",
+		"thinkingText": "thinkingGray",
+
+		"selectedBg": "selectedBg",
+		"userMessageBg": "userMsgBg",
+		"userMessageText": "",
+		"customMessageBg": "customMsgBg",
+		"customMessageText": "",
+		"customMessageLabel": "magenta",
+		"toolPendingBg": "toolPendingBg",
+		"toolSuccessBg": "toolSuccessBg",
+		"toolErrorBg": "toolErrorBg",
+		"toolTitle": "",
+		"toolOutput": "gray",
+
+		"mdHeading": "yellow",
+		"mdLink": "cyan",
+		"mdLinkUrl": "dimGray",
+		"mdCode": "green",
+		"mdCodeBlock": "green",
+		"mdCodeBlockBorder": "darkGray",
+		"mdQuote": "gray",
+		"mdQuoteBorder": "darkGray",
+		"mdHr": "darkGray",
+		"mdListBullet": "green",
+
+		"toolDiffAdded": "greenBright",
+		"toolDiffRemoved": "redBright",
+		"toolDiffContext": "gray",
+
+		"syntaxComment": "#6f8a5a",
+		"syntaxKeyword": "magenta",
+		"syntaxFunction": "yellow",
+		"syntaxVariable": "cyan",
+		"syntaxString": "green",
+		"syntaxNumber": "yellowBright",
+		"syntaxType": "cyanBright",
+		"syntaxOperator": "fg",
+		"syntaxPunctuation": "gray",
+
+		"thinkingOff": "darkGray",
+		"thinkingMinimal": "dimGray",
+		"thinkingLow": "cyan",
+		"thinkingMedium": "blue",
+		"thinkingHigh": "magenta",
+		"thinkingXhigh": "magentaBright",
+
+		"bashMode": "green"
+	},
+	"export": {
+		"pageBg": "#1c1d1a",
+		"cardBg": "#252623",
+		"infoBg": "#3a3528"
+	}
+}

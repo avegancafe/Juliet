@@ -21,7 +21,7 @@ Options:
   --ssh-email=EMAIL      Email for SSH key generation
   -h, --help             Show this help message
 
-Steps: packages, dev, shell, security, desktop, claude
+Steps: packages, dev, shell, security, desktop, claude, pi
 
 Examples:
   juliet-bootstrap -y                        # Accept all prompts
@@ -265,6 +265,7 @@ setup-dnf() {
 symlink-dotfiles() {
   log "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
+  mkdir -p ~/.pi/agent 2>/dev/null || true
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
   stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
   stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
@@ -397,6 +398,24 @@ EOF
   fi
 }
 
+setup-pi() {
+  rlog "Setting up pi..."
+
+  if ! command -v pi &> /dev/null; then
+    if command -v npm &> /dev/null; then
+      log "Installing @mariozechner/pi-coding-agent..."
+      npm install -g @mariozechner/pi-coding-agent
+    else
+      warn "npm not found, skipping pi install"
+      return
+    fi
+  fi
+
+  # All pi config (settings.json, themes, prompts, skills, extensions, etc.)
+  # lives under symlinked/home/.pi/ and is symlinked into place by
+  # symlink-dotfiles(). Nothing else to do here.
+}
+
 setup-claude-code() {
   rlog "Setting up Claude Code..."
   if ! command -v claude &> /dev/null; then
@@ -489,6 +508,11 @@ run-claude() {
   setup-claude-code
 }
 
+run-pi() {
+  confirm-category "pi" "Set up pi? (CLI; config symlinked via stow)" || return
+  setup-pi
+}
+
 # =============================================================================
 # Main Execution
 # =============================================================================
@@ -505,5 +529,6 @@ run-shell
 run-security
 run-desktop
 run-claude
+run-pi
 
 log "Done!"

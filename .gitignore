@@ -9,3 +9,7 @@ symlinked/home/.claude/*
 !symlinked/home/.claude/settings.json
 
 .claude/*.local.json
+
+# pi (~/.pi is symlinked file-by-file via stow; settings.json IS tracked)
+symlinked/home/.pi/agent/auth.json
+symlinked/home/.pi/agent/sessions/
