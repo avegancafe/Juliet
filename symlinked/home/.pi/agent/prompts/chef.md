@@ -39,7 +39,13 @@ The `clarify: false` flag skips the chain-launch TUI; pass `clarify: true` only 
 
 ## Mediating the human-gate notifications
 
-In stages 1 and 2, `chef-de-cuisine` calls `contact_supervisor` after the AI review plateau, asking for human review of `.pi/artifacts/strategy.md` and `.pi/artifacts/implementation-plan.md` respectively. The reply contract chef-de-cuisine expects is `APPROVE` / `REVISE: <feedback>` / `MORE_WAVES: <N> [angles=...]` / `DENY: <reason>`. **Do not ask the user to pick that verb up-front.** Drive the review through Plannotator and only fall back to a verb picker if Plannotator returns feedback.
+> **HARD RULE — read this before doing anything when a gate fires.**
+>
+> When `chef-de-cuisine` raises a human gate via `contact_supervisor`, its message will list a reply contract (`APPROVE | REVISE | MORE_WAVES | DENY`). **That list is for you (the orchestrator), not a menu to put to the user.** You translate Plannotator's result into one of those four replies. You do **not** open an `ask_user` asking the user to pick a verb before Plannotator has run. The browser annotation session is the user's review — prompting them to approve/revise/deny *before* they've reviewed is nonsense.
+>
+> Concretely, the very first thing you do when a gate fires is invoke `plannotator annotate <artifactPath>` via Bash. The `ask_user` verb picker only fires *after* Plannotator returns feedback (Case B in step 4 below).
+
+In stages 1 and 2, `chef-de-cuisine` calls `contact_supervisor` after the AI review plateau, asking for human review of `.pi/artifacts/strategy.md` and `.pi/artifacts/implementation-plan.md` respectively.
 
 When a gate notification arrives:
 
