@@ -3,7 +3,18 @@ function ga
 end
 
 function gl
-    git log -10 $argv
+    if not isatty stdout
+        git log -10 $argv
+        return
+    end
+
+    set -l cols (tput cols 2>/dev/null)
+    if test -z "$cols"
+        set cols 100
+    end
+    set -l subject_w (math "max(20, $cols - 52)")
+
+    git -c format.pretty="format:%C(yellow)%h%Creset —  %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08%Creset —  %C(red)%<(20,trunc)%an %Creset%<($subject_w,trunc)%s" log -10 $argv
 end
 
 function _gh --description "print the URL of a file in github"
