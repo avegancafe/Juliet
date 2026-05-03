@@ -34,27 +34,30 @@ Extract:
 - `artifactPath` — the path from `Artifact ready for review at: …`.
 - `stageHint` — read the first line of the message; it usually says which stage / which artifact (`MENU` / strategy.md vs `PREP-LIST` / implementation-plan.md).
 
-### Step 2 — Run Plannotator directly
+### Step 2 — Emit the slash-command instruction and end your turn
 
-Surface a one-line handoff to the user so they know what's about to happen:
+**Important environment note.** The `plannotator-annotate` skill's SKILL.md says to run `plannotator annotate <path>` via Bash. That is wrong for this environment — Plannotator is installed as a pi extension that registers a slash command (`/plannotator-annotate`) and there is no `plannotator` binary on PATH. Agents cannot invoke slash commands from inside their own turn. The user types the slash command in their TUI; you wait.
+
+Output a single plain-text block telling the user what to type. **Do not open an `ask_user`** for picking a review method, picking a verb, or confirming anything. Do not attempt the Bash invocation:
 
 ```
 Pending gate: chef-de-cuisine — <stageHint>
 Artifact:     <artifactPath>
-Opening Plannotator now…
+
+To review, type this in your TUI:
+
+    /plannotator-annotate <artifactPath>
+
+The browser annotation UI will open. Approve to advance the chain, or
+close with feedback to revise. Come back here with the result and I'll
+translate it into chef-de-cuisine's reply contract automatically.
 ```
 
-Then invoke the `plannotator-annotate` skill yourself via Bash:
+Then **stop**. End your turn. The chef-de-cuisine intercom ask stays pending; the next user message will arrive when Plannotator delivers its result (or when the user types something else).
 
-```
-plannotator annotate <artifactPath>
-```
+### Step 3 — Process Plannotator's response (next turn)
 
-The command blocks until the user closes the browser annotation session. When it returns, you have Plannotator's result in the same turn — proceed to Step 3 immediately. Do not ask the user to type `/plannotator-annotate`; do not end your turn here.
-
-### Step 3 — Process Plannotator's response
-
-Classify the result returned by `plannotator annotate`:
+When the user's next message arrives, classify what they brought back:
 
 **Case A — Plannotator approved.** The user (or Plannotator) reports approval with no feedback content. The proposed reply is `APPROVE`. Auto-send via Step 4 — no `ask_user` confirmation; the browser click already was the confirmation.
 
@@ -100,7 +103,7 @@ Branch on the verb:
   ```
   If cancelled, re-run the verb picker. Otherwise format as `DENY: <reason>`.
 
-**Case C — Session closed empty / Plannotator returned nothing.** If the command returned with no annotations and no approval signal (e.g. the user closed the tab without acting), tell the user "Plannotator session ended without feedback — standing down without sending a reply. Re-run /runner when you're ready to review." End your turn without calling `intercom reply`.
+**Case C — Session closed empty / user reports nothing useful happened.** If the user comes back with no annotations and no approval signal (e.g. they closed the browser without acting, or never opened it), ask once: "Plannotator returned no feedback — APPROVE as-is, or do you have notes to relay?" If notes, treat like Case B; if APPROVE, send `APPROVE` via intercom; if they want to abort, end your turn without calling `intercom reply` and tell them to re-run `/runner` when ready.
 
 ### Step 4 — Send the reply
 
@@ -119,14 +122,15 @@ Then confirm to the user with one line: `Sent <verb> to chef-de-cuisine.` and en
 
 ## Failure modes
 
-- **Plannotator can't open** (extension disabled, browser issue, `plannotator` binary missing, file not found). The Bash call returns an error. Surface the error to the user in one line, then fall back: ask them to read the artifact in `$EDITOR` and paste freeform feedback into the chat. When their feedback arrives, treat it like Case B (denied with feedback) and use the same `ask_user` verb picker. If they have no feedback, treat it like Case A (auto-`APPROVE`).
+- **Plannotator can't open / extension not installed** (`/plannotator-annotate` not recognized, browser issue, file not found). The user reports this in their reply. Surface the error in one line, then fall back: ask them to read the artifact in `$EDITOR` and paste freeform feedback into the chat. When their feedback arrives, treat it like Case B (denied with feedback) and use the same `ask_user` verb picker. If they have no feedback, treat it like Case A (auto-`APPROVE`).
 - **The artifact path doesn't exist on disk.** Surface the issue and stop — don't try to recover. The chain is in a weird state; the human needs to investigate.
 - **`intercom reply` fails (session not found).** This means chef-de-cuisine timed out or was killed. Tell the user; do not silently retry. They probably need to relaunch the chain.
 
 ## Important
 
-- **Run `plannotator annotate <path>` yourself via Bash.** Do not ask the user to type `/plannotator-annotate`. The `plannotator-annotate` skill is explicit: launch the command yourself, wait for the browser session to finish, then handle the returned annotations.
+- **The user types `/plannotator-annotate`, not you.** It is a pi slash command, not a shell binary. Do not attempt `plannotator annotate <path>` via Bash — there's no binary on PATH in this environment. Output the instruction; end your turn; wait for the user.
+- **No `ask_user` before Plannotator runs.** The slash-command instruction is plain text. The only `ask_user` in this whole flow is the verb picker that fires *after* Plannotator returns feedback (Case B).
 - **Do not invent feedback.** The REVISE body must be Plannotator's feedback verbatim. If feedback is empty, do not fabricate one — fall back to the user (Case C / failure mode).
 - **Do not bypass the verb picker** when Plannotator returns feedback. Even if the feedback obviously implies REVISE, force the explicit pick — it's the audit point.
 - **Do not change the artifact.** You bridge; chef-de-cuisine rewrites.
-- **One turn end-to-end.** Find the gate, run Plannotator, process the result, send the reply — all in this turn. The Bash invocation blocks until the browser session closes, so there's no reason to punt across turns.
+- **Two turns total.** Step 1–2 is one turn (find gate + emit instruction + end turn). Step 3–4 is the next turn (process Plannotator result + reply). Do not try to compress — the user types the slash command between turns.
