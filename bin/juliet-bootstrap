@@ -448,7 +448,6 @@ setup-claude-code() {
     "typescript-lsp@claude-plugins-official"
     "sentry@claude-plugins-official"
     "linear@claude-plugins-official"
-    "Notion@claude-plugins-official"
     "playwright@claude-plugins-official"
   )
 
