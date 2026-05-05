@@ -8,11 +8,18 @@ function gl
         return
     end
 
-    set -l cols (tput cols 2>/dev/null)
+    # Prefer fish's auto-maintained $COLUMNS (updated on SIGWINCH); fall back to tput cols, then 100.
+    # On some macOS/kitty combos `tput cols` returns a stale 80 even when stty/$COLUMNS report the real width.
+    set -l cols $COLUMNS
+    if test -z "$cols"
+        set cols (tput cols 2>/dev/null)
+    end
     if test -z "$cols"
         set cols 100
     end
-    set -l subject_w (math "max(20, $cols - 52)")
+    # Total visible line = 52-char prefix (7 hash + 4 sep + 16 date + 4 sep + 20 author + 1 space) + subject column.
+    # Cap line at 120 cols on wide terminals; fill the screen on narrow ones; floor subject at 20 chars.
+    set -l subject_w (math "max(20, min($cols, 120) - 52)")
 
     git -c format.pretty="format:%C(yellow)%h%Creset —  %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08%Creset —  %C(red)%<(20,trunc)%an %Creset%<($subject_w,trunc)%s" log -10 $argv
 end
