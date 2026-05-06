@@ -1,7 +1,4 @@
 {
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  },
   "permissions": {
     "allow": [
       "Bash(git *)",
@@ -57,6 +54,7 @@
       "/Users/kyle/.config/Juliet/"
     ]
   },
+  "model": "claude-opus-4-7",
   "statusLine": {
     "type": "command",
     "command": "printf '📍 %s' \"$(pwd)\""
@@ -64,7 +62,22 @@
   "enabledPlugins": {
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "Mixedbread-Grep": {
+      "source": {
+        "source": "github",
+        "repo": "mixedbread-ai/mgrep"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",

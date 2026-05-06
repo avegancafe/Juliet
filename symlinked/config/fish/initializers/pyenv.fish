@@ -1,1 +1,1 @@
-pyenv init - | source
+# pyenv init - | source

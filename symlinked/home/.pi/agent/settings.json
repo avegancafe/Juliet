@@ -19,12 +19,12 @@
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "collapseChangelog": false,
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
   "theme": "bamboo",
-  "lastChangelogVersion": "0.72.1",
+  "lastChangelogVersion": "0.73.0",
   "quietStartup": false,
   "editorPaddingX": 1
 }
