@@ -62,15 +62,9 @@
     "command": "printf '📍 %s' \"$(pwd)\""
   },
   "enabledPlugins": {
-    "python-development@claude-code-workflows": true,
-    "kubernetes-operations@claude-code-workflows": true,
-    "cloud-infrastructure@claude-code-workflows": true,
-    "shell-scripting@claude-code-workflows": true,
     "superpowers@superpowers-marketplace": true,
-    "backend-development@claude-code-workflows": true,
     "playwright@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "ralph-skills@ralph-marketplace": true
+    "frontend-design@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
