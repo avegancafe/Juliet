@@ -1,9 +1,52 @@
 (import-macros {: pack} :Juliet.macros)
 
 (pack :nvim-treesitter/nvim-treesitter
-      {:build ":TSUpdate"
+      {:branch "main"
+       :build ":TSUpdate"
        :lazy false
        :config (fn []
+                 (local ts (require :nvim-treesitter))
+                 (ts.install [:bash
+                              :cmake
+                              :comment
+                              :css
+                              :dockerfile
+                              :fennel
+                              :fish
+                              :gitignore
+                              :go
+                              :gomod
+                              :graphql
+                              :html
+                              :http
+                              :javascript
+                              :jinja
+                              :jsdoc
+                              :json5
+                              :json
+                              :latex
+                              :lua
+                              :make
+                              :markdown
+                              :markdown_inline
+                              :proto
+                              :python
+                              :regex
+                              :ruby
+                              :rust
+                              :scss
+                              :sql
+                              :svelte
+                              :swift
+                              :todotxt
+                              :toml
+                              :typescript
+                              :tsx
+                              :vim
+                              :vimdoc
+                              :vue
+                              :yaml
+                              :zig])
                  (vim.api.nvim_create_autocmd [:BufEnter
                                                :BufAdd
                                                :BufNew
@@ -17,48 +60,4 @@
                                                                  :expr)
                                                            (tset vim.opt
                                                                  :foldexpr
-                                                                 "nvim_treesitter#foldexpr()"))})
-                 (local ts (require :nvim-treesitter.configs))
-                 (ts.setup {:ensure_installed [:bash
-                                               :cmake
-                                               :comment
-                                               :css
-                                               :dockerfile
-                                               :fennel
-                                               :fish
-                                               :gitignore
-                                               :go
-                                               :gomod
-                                               :graphql
-                                               :html
-                                               :http
-                                               :javascript
-                                               :jinja
-                                               :jsdoc
-                                               :json5
-                                               :json
-                                               :latex
-                                               :lua
-                                               :make
-                                               :markdown
-                                               :markdown_inline
-                                               :proto
-                                               :python
-                                               :regex
-                                               :ruby
-                                               :rust
-                                               :scss
-                                               :sql
-                                               :svelte
-                                               :swift
-                                               :todotxt
-                                               :toml
-                                               :typescript
-                                               :tsx
-                                               :vim
-                                               :vimdoc
-                                               :vue
-                                               :yaml
-                                               :zig]
-                            :highlight {:enable true
-                                        :additional_vim_regex_highlighting true}}))})
+                                                                 "v:lua.vim.treesitter.foldexpr()"))}))})
