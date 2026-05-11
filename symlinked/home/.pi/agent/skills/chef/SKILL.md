@@ -1,9 +1,11 @@
 ---
-argument-hint: <PRD, transcript, or kickoff transcript>
+name: chef
 description: Run the brigade pi-subagents pipeline end-to-end on a PRD, transcript, or freeform request. Chef-de-cuisine drafts a narrative ELI5 strategy onepager (sous-chef AI review waves + your APPROVE/REVISE/MORE_WAVES/DENY approval) and then a numbered implementation plan (single sous-chef AI review, no human gate). Then chef-de-cuisine fans out chef-de-partie implementers in parallel git worktrees per dependency batch, and aboyeur runs the code-review-and-fix-refire loop with conditional health-inspector (security) and patissier (design QA). Add "in the background" / "async" to run stages 2–4 unattended after the strategy is approved; "autopilot" / "no review" to skip the strategy gate too. Artifacts land in `.pi/artifacts/`.
 ---
 
-Run the brigade pi-subagents pipeline `strategy-to-impl` on the kickoff material below. Four sequential stages run by the kitchen-brigade agents:
+# Chef — strategy-to-impl pipeline
+
+Run the brigade pi-subagents pipeline `strategy-to-impl` on the kickoff material the user provided after this skill block. Four sequential stages run by the kitchen-brigade agents:
 
 1. **chef-de-cuisine** (MENU mode) — writes `.pi/artifacts/strategy.md` (one-page narrative ELI5 strategy onepager), drives the AI review loop with `sous-chef` reviewers, then opens a human review gate via `contact_supervisor`. **Launched as a standalone subagent call** (not a chain step) so the orchestrator turn stays alive to mediate the gate — see "Why standalone-then-chain" below.
 2. **chef-de-cuisine** (PREP-LIST mode) — writes `.pi/artifacts/implementation-plan.md` (numbered tasks + dependencies + lane labels + acceptance criteria), drives a single-reviewer AI loop, then exits with an audit-trail summary. **No human gate**; the strategy was the human-judgment moment, the plan is mechanical fallout.
@@ -24,7 +26,7 @@ Stages 2–4 run together as a single chain after stage 1's approval, because no
 
 pi-subagents chains cannot survive an intercom-detached child. When a chain step calls `contact_supervisor`, pi-subagents detaches the child for intercom coordination and the chain runner returns immediately with "Chain detached for intercom coordination at step N" — it does not wait for the child to receive its supervisor reply, and `subagent-executor.ts:245` explicitly says detached children "cannot be revived safely from the remembered foreground state." The next chain step never spawns. (See `chain-execution.ts:861` and `:625` for the two return points.)
 
-Stage 1 has a human gate and therefore must be launched standalone, *outside* chain mode — the orchestrator turn (this prompt) stays alive to mediate the gate. Stages 2–4 are gateless on the happy path, so they can chain together and the chain runner survives end-to-end.
+Stage 1 has a human gate and therefore must be launched standalone, *outside* chain mode — the orchestrator turn (this skill invocation) stays alive to mediate the gate. Stages 2–4 are gateless on the happy path, so they can chain together and the chain runner survives end-to-end.
 
 The stage bodies live at `~/.pi/agent/chains/strategy-to-impl.chain.md`. Read that file once and parse the four `## ` step headers; you'll use stage 1 in Phase A and stages 2–4 in Phase B.
 
@@ -33,12 +35,12 @@ The stage bodies live at `~/.pi/agent/chains/strategy-to-impl.chain.md`. Read th
 ```typescript
 subagent({
   agent: "chef-de-cuisine",
-  task: <stage 1 body verbatim, with `{task}` substituted with the kickoff material below>,
+  task: <stage 1 body verbatim, with `{task}` substituted with the kickoff material>,
   clarify: false
 })
 ```
 
-Note: `chain` mode would auto-substitute `{task}` for you; in standalone mode you substitute it yourself before the call. The kickoff material is the `$@` block at the bottom of this file.
+Note: `chain` mode would auto-substitute `{task}` for you; in standalone mode you substitute it yourself before the call. The kickoff material is whatever text the user appended after `/skill:chef` — it appears below this skill block in the same user message. If they invoked `/skill:chef` with no args, ask them once for the kickoff before launching.
 
 When chef-de-cuisine raises the human gate, pi-subagents returns `Detached for intercom coordination: chef-de-cuisine. Reply to the supervisor request first.` — your turn is still alive. Mediate the gate (see "Mediating the strategy gate" below). On `REVISE`, chef-de-cuisine rewrites and re-opens the gate from inside the same detached child; loop until `APPROVE` or `DENY`.
 
@@ -132,7 +134,7 @@ After a `REVISE` reply, chef-de-cuisine rewrites once and opens the gate again o
 
 When Plannotator returns approval and you've sent `APPROVE` via intercom, chef-de-cuisine's child exits with a turn-final audit-trail summary. **Now launch Phase B** (stages 2–4 chain, see "Launching" above) with the audit-trail summary as the chain's `task` parameter so stage 2's `{previous}` placeholder has context to reference. If chef-de-cuisine's exact final response isn't easily recoverable from the intercom history, synthesize a one-paragraph summary yourself: number of AI waves, number of human-gate iterations, the key revisions accepted, and final disposition.
 
-(The `/runner` slash prompt does the same Phase A bridging in a standalone turn if a gate notification arrives outside this orchestration — e.g. when `/chef` was launched async or the orchestrator session crashed. Inside `/chef`, do Phase A inline as above; don't punt to `/runner`.)
+(The `/runner` slash prompt does the same Phase A bridging in a standalone turn if a gate notification arrives outside this orchestration — e.g. when `/skill:chef` was launched async or the orchestrator session crashed. Inside `/skill:chef`, do Phase A inline as above; don't punt to `/runner`.)
 
 ## After the chain completes
 
@@ -152,9 +154,3 @@ subagent({
 ```
 
 With the gate removed, nothing in stages 1–2 detaches; the chain runner survives end-to-end. (Stage 3 batch-failure escalations are still possible but rare on well-scoped kickoffs.) Mention this autopilot option in your pre-flight message if the user gives a kickoff that looks like throwaway/exploratory work.
-
----
-
-Kickoff material from `/chef $@`:
-
-$@

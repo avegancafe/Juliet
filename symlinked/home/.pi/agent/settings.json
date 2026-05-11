@@ -24,7 +24,7 @@
   "doubleEscapeAction": "tree",
   "treeFilterMode": "default",
   "theme": "bamboo",
-  "lastChangelogVersion": "0.73.0",
+  "lastChangelogVersion": "0.74.0",
   "quietStartup": false,
   "editorPaddingX": 1
 }
