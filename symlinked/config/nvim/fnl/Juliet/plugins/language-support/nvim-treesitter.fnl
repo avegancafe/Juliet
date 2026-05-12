@@ -47,6 +47,12 @@
                               :vue
                               :yaml
                               :zig])
+                 (vim.api.nvim_create_autocmd :FileType
+                                              {:group (vim.api.nvim_create_augroup :TS_START
+                                                                                   {})
+                                               :callback (fn [args]
+                                                           (pcall vim.treesitter.start
+                                                                  args.buf))})
                  (vim.api.nvim_create_autocmd [:BufEnter
                                                :BufAdd
                                                :BufNew
