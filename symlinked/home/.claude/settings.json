@@ -121,21 +121,8 @@
     "ask": [],
     "defaultMode": "auto",
     "additionalDirectories": [
-      "/Users/kyle/workspace/dev-env/",
-      "/Users/kyle/.config/Juliet/"
-    ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if command -v bd >/dev/null 2>&1; then bd prime --hook-json; fi"
-          }
-        ]
-      }
+      "/Users/jordanfrank/workspace/dev-env/",
+      "/Users/jordanfrank/.config/Juliet/"
     ]
   },
   "worktree": {
@@ -146,26 +133,21 @@
     "command": "claude-statusline prompt"
   },
   "enabledPlugins": {
-    "superpowers@superpowers-marketplace": true,
-    "playwright@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
     "codex@openai-codex": true,
-    "j2-presentations@j2-claude-plugins": true,
-    "dbt@dbt-agent-marketplace": true,
-    "python-lsp@j2-claude-plugins": true,
-    "typescript-lsp@j2-claude-plugins": true,
-    "j2-eng@j2-claude-plugins": true,
     "context7@claude-plugins-official": true,
+    "dbt@dbt-agent-marketplace": true,
+    "frontend-design@claude-plugins-official": true,
+    "j2-eng@j2-claude-plugins": true,
+    "j2-presentations@j2-claude-plugins": true,
     "linear@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "python-lsp@j2-claude-plugins": true,
+    "superpowers-developing-for-claude-code@superpowers-marketplace": true,
+    "superpowers@superpowers-marketplace": true,
+    "typescript-lsp@j2-claude-plugins": true,
     "beads@sttts-beads-skill": true
   },
   "extraKnownMarketplaces": {
-    "Mixedbread-Grep": {
-      "source": {
-        "source": "github",
-        "repo": "mixedbread-ai/mgrep"
-      }
-    },
     "openai-codex": {
       "source": {
         "source": "github",
@@ -206,11 +188,27 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark-daltonized",
   "verbose": true,
-  "fileCheckpointingEnabled": false,
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": true,
+  "teammateMode": "tmux",
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
+  "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v bd >/dev/null 2>&1; then bd prime --hook-json; fi"
+          }
+        ]
+      }
+    ]
   }
 }
