@@ -343,7 +343,11 @@ setup-python() {
   fi
 
   if is-macos && ! command -v md2pdf &> /dev/null; then
-    pip3 install md2pdf
+    if command -v pipx &> /dev/null; then
+      pipx install md2pdf
+    else
+      warn "pipx not found, skipping md2pdf install"
+    fi
   fi
 }
 
