@@ -412,6 +412,32 @@ setup-pi() {
   # symlink-dotfiles(). Nothing else to do here.
 }
 
+setup-lsp-servers() {
+  rlog "Setting up LSP servers for Claude Code..."
+
+  if ! command -v npm &> /dev/null; then
+    warn "npm not found, skipping LSP server install"
+    return
+  fi
+
+  # LSP binaries referenced by symlinked/home/.claude/settings.json lspServers.
+  # Each entry: "binary-to-check:npm-packages-to-install (space-separated)"
+  local -a lsp_packages=(
+    "pyright-langserver:pyright"
+    "typescript-language-server:typescript-language-server typescript"
+  )
+
+  for pair in "${lsp_packages[@]}"; do
+    local bin="${pair%%:*}"
+    local pkgs="${pair#*:}"
+    if ! command -v "$bin" &> /dev/null; then
+      log "Installing $pkgs..."
+      # shellcheck disable=SC2086
+      npm install -g $pkgs || warn "Failed to install $pkgs"
+    fi
+  done
+}
+
 setup-claude-code() {
   rlog "Setting up Claude Code..."
   if ! command -v claude &> /dev/null; then
@@ -499,8 +525,9 @@ run-desktop() {
 }
 
 run-claude() {
-  confirm-category "claude" "Set up Claude Code? (CLI, superpowers, context7, LSP plugins)" || return
+  confirm-category "claude" "Set up Claude Code? (CLI, superpowers, context7, LSP plugins + servers)" || return
   setup-claude-code
+  setup-lsp-servers
 }
 
 run-pi() {
