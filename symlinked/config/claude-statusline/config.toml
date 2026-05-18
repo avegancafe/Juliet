@@ -3,7 +3,7 @@
 
 preset = "default"
 
-format = '$directory [·](dim) $git_branch  [|](dim)  $model [·](dim) [ctx:](dim)$context [·](dim) $usage [·](dim) $session_timer'
+format = '$directory [·](dim) $git_branch  [|](dim)  $model [·](dim) $context [·](dim) $usage [·](dim) $session_timer'
 
 [directory]
 style = "bold cyan"
@@ -20,7 +20,7 @@ style = "magenta"
 disabled = true
 
 [context]
-format = '{{.Bar}} {{printf "%.0f" .UsedPct}}%'
+format = 'ctx {{.Bar}} {{printf "%.0f" .UsedPct}}%'
 style = "green"
 bar_width = 5
 bar_fill = "▓"
@@ -32,7 +32,7 @@ thresholds = [
 
 [usage]
 disabled = false
-format = '5h:{{.BlockBar}} {{printf "%.0f" .BlockPct}}% · resets in {{.BlockResets}}'
+format = '5h {{.BlockBar}} {{printf "%.0f" .BlockPct}}% · resets in {{.BlockResets}}'
 style = "green"
 bar_width = 5
 bar_fill = "▓"
