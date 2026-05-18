@@ -122,8 +122,8 @@
     "ask": [],
     "defaultMode": "auto",
     "additionalDirectories": [
-      "/Users/kyle/workspace/dev-env/",
-      "/Users/kyle/.config/Juliet/"
+      "/Users/jordanfrank/workspace/dev-env/",
+      "/Users/jordanfrank/.config/Juliet/"
     ]
   },
   "model": "opus[1m]",
@@ -148,50 +148,28 @@
     "command": "claude-statusline prompt"
   },
   "enabledPlugins": {
-    "superpowers@superpowers-marketplace": true,
-    "playwright@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "codex@openai-codex": true,
-    "j2-presentations@j2-claude-plugins": true,
-    "dbt@dbt-agent-marketplace": true,
-    "python-lsp@j2-claude-plugins": true,
-    "typescript-lsp@j2-claude-plugins": true,
-    "j2-eng@j2-claude-plugins": true,
-    "context7@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
-    "beads@sttts-beads-skill": true,
-    "kitchen-brigade@avegancafe-marketplace": true,
     "avegancafe@avegancafe-marketplace": true,
-    "superpowers@j2-claude-plugins": true,
+    "beads@sttts-beads-skill": true,
     "codex@j2-claude-plugins": true,
+    "context7@claude-plugins-official": true,
     "dbt@j2-claude-plugins": true,
-    "playwright@j2-claude-plugins": true,
+    "frontend-design@claude-plugins-official": true,
+    "j2-eng@j2-claude-plugins": true,
+    "j2-presentations@j2-claude-plugins": true,
+    "kitchen-brigade@avegancafe-marketplace": true,
+    "launchdarkly@j2-claude-plugins": true,
+    "linear@claude-plugins-official": true,
     "mattpocock-skills@j2-claude-plugins": true,
-    "launchdarkly@j2-claude-plugins": true
+    "python-lsp@j2-claude-plugins": true,
+    "superpowers@j2-claude-plugins": true,
+    "typescript-lsp@j2-claude-plugins": true,
+    "playwright@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
       "source": {
         "source": "git",
         "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
-      }
-    },
-    "Mixedbread-Grep": {
-      "source": {
-        "source": "github",
-        "repo": "mixedbread-ai/mgrep"
-      }
-    },
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    },
-    "superpowers-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "obra/superpowers-marketplace"
       }
     },
     "j2-claude-plugins": {
@@ -201,12 +179,6 @@
       },
       "autoUpdate": true
     },
-    "dbt-agent-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "dbt-labs/dbt-agent-skills"
-      }
-    },
     "sttts-beads-skill": {
       "source": {
         "source": "github",
@@ -215,7 +187,7 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "tui": "fullscreen",
@@ -223,10 +195,13 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark-daltonized",
   "verbose": true,
-  "fileCheckpointingEnabled": false,
+  "preferredNotifChannel": "auto",
+  "autoCompactEnabled": true,
+  "teammateMode": "tmux",
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
+  "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
   }
