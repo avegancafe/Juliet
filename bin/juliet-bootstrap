@@ -341,10 +341,6 @@ setup-python() {
   if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
   fi
-
-  if is-macos && ! command -v md2pdf &> /dev/null; then
-    pip3 install md2pdf
-  fi
 }
 
 setup-niri() {
