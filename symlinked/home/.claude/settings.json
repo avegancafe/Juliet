@@ -66,6 +66,8 @@
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
     "codex@openai-codex": true,
     "j2-presentations@j2-claude-skills": true
   },
@@ -92,30 +94,6 @@
       "source": {
         "source": "git",
         "url": "git@github.com:j2-health/claude-plugins.git"
-      }
-    }
-  },
-  "lspServers": {
-    "pyright": {
-      "command": "pyright-langserver",
-      "args": ["--stdio"],
-      "extensionToLanguage": {
-        "py": "python",
-        "pyi": "python"
-      }
-    },
-    "typescript": {
-      "command": "typescript-language-server",
-      "args": ["--stdio"],
-      "extensionToLanguage": {
-        "ts": "typescript",
-        "tsx": "typescriptreact",
-        "mts": "typescript",
-        "cts": "typescript",
-        "js": "javascript",
-        "jsx": "javascriptreact",
-        "mjs": "javascript",
-        "cjs": "javascript"
       }
     }
   },
