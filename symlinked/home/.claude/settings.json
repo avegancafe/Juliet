@@ -55,6 +55,9 @@
     ]
   },
   "model": "claude-opus-4-7",
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "statusLine": {
     "type": "command",
     "command": "claude-statusline prompt"
@@ -63,7 +66,8 @@
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "j2-presentations@j2-claude-skills": true
   },
   "extraKnownMarketplaces": {
     "Mixedbread-Grep": {
@@ -83,13 +87,22 @@
         "source": "github",
         "repo": "obra/superpowers-marketplace"
       }
+    },
+    "j2-claude-skills": {
+      "source": {
+        "source": "git",
+        "url": "git@github.com:j2-health/claude-plugins.git"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-daltonized",
   "verbose": true,
+  "fileCheckpointingEnabled": false,
+  "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "feedbackSurveyState": {
