@@ -1,5 +1,5 @@
 # claude-statusline — ports the previous bash script:
-#   cwd · branch  |  model · ctx · 5h · 7d · session
+#   cwd · branch  |  model · ctx · 5h · 5h-reset · session
 
 preset = "default"
 
@@ -32,7 +32,7 @@ thresholds = [
 
 [usage]
 disabled = false
-format = '5h:{{.BlockBar}} {{printf "%.0f" .BlockPct}}% · 7d:{{.WeeklyBar}} {{printf "%.0f" .WeeklyPct}}%'
+format = '5h:{{.BlockBar}} {{printf "%.0f" .BlockPct}}% · resets in {{.BlockResets}}'
 style = "green"
 bar_width = 5
 bar_fill = "▓"
