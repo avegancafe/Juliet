@@ -39,7 +39,7 @@ bar_fill = "▓"
 bar_empty = "░"
 thresholds = [
   { above = 50, style = "yellow" },
-  { above = 80, style = "red" },
+  { above = 90, style = "red" },
 ]
 
 [session_timer]
