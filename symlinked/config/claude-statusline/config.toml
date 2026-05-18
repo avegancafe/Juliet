@@ -1,0 +1,48 @@
+# claude-statusline — ports the previous bash script:
+#   cwd · branch  |  model · ctx · 5h · 7d · session
+
+preset = "default"
+
+format = '$directory [·](dim) $git_branch  [|](dim)  $model [·](dim) [ctx:](dim)$context [·](dim) $usage [·](dim) $session_timer'
+
+[directory]
+style = "bold cyan"
+
+[git_branch]
+format = "{{.Branch}}"
+style = "green"
+
+[model]
+format = "{{.DisplayName}}"
+style = "magenta"
+
+[cost]
+disabled = true
+
+[context]
+format = '{{.Bar}} {{printf "%.0f" .UsedPct}}%'
+style = "green"
+bar_width = 5
+bar_fill = "▓"
+bar_empty = "░"
+thresholds = [
+  { above = 50, style = "yellow" },
+  { above = 80, style = "red" },
+]
+
+[usage]
+disabled = false
+format = '5h:{{.BlockBar}} {{printf "%.0f" .BlockPct}}% · 7d:{{.WeeklyBar}} {{printf "%.0f" .WeeklyPct}}%'
+style = "green"
+bar_width = 5
+bar_fill = "▓"
+bar_empty = "░"
+thresholds = [
+  { above = 50, style = "yellow" },
+  { above = 80, style = "red" },
+]
+
+[session_timer]
+disabled = false
+format = '{{if .Hours}}{{.Hours}}h{{printf "%02d" .Minutes}}m{{else}}{{.Minutes}}m{{end}}'
+style = "dim"
