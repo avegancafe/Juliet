@@ -57,7 +57,7 @@
   "model": "claude-opus-4-7",
   "statusLine": {
     "type": "command",
-    "command": "printf '📍 %s' \"$(pwd)\""
+    "command": "bash ~/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
     "superpowers@superpowers-marketplace": true,
