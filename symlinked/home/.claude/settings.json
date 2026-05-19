@@ -67,7 +67,8 @@
     "playwright@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "codex@openai-codex": true,
-    "j2-presentations@j2-claude-skills": true
+    "j2-presentations@j2-claude-skills": true,
+    "j2-projects@j2-claude-skills": true
   },
   "extraKnownMarketplaces": {
     "Mixedbread-Grep": {
