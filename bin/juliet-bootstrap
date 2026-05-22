@@ -2,6 +2,26 @@
 
 source ~/.config/Juliet/_util.bash
 
+# Abort the whole script when the user hits Ctrl+C, instead of letting
+# individual prompts treat it as "No" and falling through to the next step.
+on-interrupt() {
+  echo
+  warn "Cancelled."
+  exit 130
+}
+trap on-interrupt INT
+
+# gum confirm exits 0 for yes, 1 for no, 130 for Ctrl+C. Treat anything other
+# than yes/no as a cancellation of the whole bootstrap.
+gum-confirm() {
+  gum confirm "$@"
+  local rc=$?
+  if [[ $rc -ne 0 && $rc -ne 1 ]]; then
+    on-interrupt
+  fi
+  return $rc
+}
+
 # Global flags
 YES_ALL="false"
 NO_ALL="false"
@@ -112,7 +132,7 @@ should-confirm() {
   [[ "$NO_ALL" == "true" ]] && return 1
 
   # Interactive prompt
-  gum confirm "$prompt"
+  gum-confirm "$prompt"
 }
 
 # Category-level confirmation (combines should-run-step + should-confirm)
@@ -132,7 +152,7 @@ confirm-category() {
     return 1
   fi
 
-  if ! gum confirm "$description"; then
+  if ! gum-confirm "$description"; then
     rlog "Skipping $category install step(s)..."
     return 1
   fi
@@ -283,6 +303,7 @@ setup-ssh() {
     local email="${SSH_EMAIL:-}"
     if [[ -z "$email" ]]; then
       email=$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")
+      [[ $? -ne 0 || -z "$email" ]] && on-interrupt
     fi
     ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/id_ed25519
   fi
