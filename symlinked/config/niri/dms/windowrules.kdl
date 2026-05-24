@@ -6,3 +6,15 @@ window-rule {
     match app-id="^steam$"
     open-on-workspace "gaming"
 }
+
+// @id=wr_1771717543880769610 @name=com.mitchellh.ghostty
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    open-on-workspace "coding"
+}
+
+// @id=wr_1771717584617660554 @name=org.mozilla.firefox
+window-rule {
+    match app-id="^org.mozilla.firefox$"
+    open-on-workspace "work"
+}
