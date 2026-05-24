@@ -41,7 +41,7 @@ Options:
   --ssh-email=EMAIL      Email for SSH key generation
   -h, --help             Show this help message
 
-Steps: packages, dev, shell, security, desktop, claude, pi
+Steps: packages (includes flatpak), dev, shell, security, desktop, claude, pi
 
 Examples:
   juliet-bootstrap -y                        # Accept all prompts
@@ -282,6 +282,33 @@ setup-dnf() {
   fi
 }
 
+setup-flatpak() {
+  log "Setting up Flatpak packages..."
+
+  FLATPAKFILE="$HOME/.config/Juliet/Flatpakfile"
+  if [[ ! -f "$FLATPAKFILE" ]]; then
+    warn "Flatpakfile not found at $FLATPAKFILE"
+    return
+  fi
+
+  # Add remotes first
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    if [[ "$line" =~ ^remote[[:space:]]+ ]]; then
+      read -r _ name url <<< "$line"
+      log "Adding Flatpak remote: $name"
+      flatpak remote-add --if-not-exists "$name" "$url"
+    fi
+  done < "$FLATPAKFILE"
+
+  # Install apps
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# || "$line" =~ ^remote[[:space:]]+ ]] && continue
+    log "Installing Flatpak: $line"
+    flatpak install -y flathub "$line"
+  done < "$FLATPAKFILE"
+}
+
 symlink-dotfiles() {
   log "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
@@ -487,6 +514,7 @@ run-packages() {
     setup-brew
   elif is-fedora; then
     setup-dnf
+    setup-flatpak
   fi
 }
 

@@ -1,0 +1,10 @@
+# Juliet Flatpakfile - Flatpak applications
+# Format:
+#   remote <name> <url>  - adds Flatpak remote
+#   <app-id>             - installs application
+
+# Remotes
+remote flathub https://flathub.org/repo/flathub.flatpakrepo
+
+# Music
+com.spotify.Client
