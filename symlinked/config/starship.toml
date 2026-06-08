@@ -1,5 +1,4 @@
 format = """
-$line_break\
 $directory$git_branch$git_state$git_status$git_metrics$python $fill  ( $jobs)( $cmd_duration) $time
 $character"""
 command_timeout = 5000
@@ -19,7 +18,9 @@ format = "[$symbol$branch]($style) "
 disabled = true
 
 [character]
-format = "λ "
+success_symbol = "[λ](bold green)"
+error_symbol = "[λ](bold red)"
+vimcmd_symbol = '[\[λ\]](bold yellow)'
 
 [jobs]
 symbol = "༼ つ ◕_◕ ༽つ"
