@@ -11,3 +11,5 @@ dbt/target
 
 # pi subagent artifacts (research, scout, plans, progress, etc.)
 .pi/artifacts/
+
+**/.claude/settings.local.json
