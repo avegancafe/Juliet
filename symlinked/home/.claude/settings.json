@@ -79,8 +79,6 @@
     "typescript-lsp@j2-claude-plugins": true,
     "j2-eng@j2-claude-plugins": true,
     "context7@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
     "linear@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
