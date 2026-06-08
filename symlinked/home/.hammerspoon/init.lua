@@ -1,15 +1,15 @@
 hs.application.enableSpotlightForNameSearches(true)
 
 local open_terminal = function()
-	local app = hs.application.get('ghostty')
+	local app = hs.application.get('cmux')
 
 	if app == nil then
-		hs.application.open('ghostty')
+		hs.application.open('cmux')
 		return
 	end
 
 	if not app:mainWindow() then
-		app:selectMenuItem({ 'Shell', 'New OS Window' })
+		app:selectMenuItem({ 'File', 'New Window' })
 	elseif app:isFrontmost() then
 		app:hide()
 	else
@@ -38,9 +38,9 @@ hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
 
 local focus_waiting_claude = function()
 	print("[focus_waiting_claude] fired")
-	local app = hs.application.get('ghostty')
+	local app = hs.application.get('cmux')
 	if app == nil then
-		print("[focus_waiting_claude] ghostty app not found")
+		print("[focus_waiting_claude] cmux app not found")
 		return
 	end
 
