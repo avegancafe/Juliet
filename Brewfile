@@ -130,6 +130,8 @@ cask "ngrok"
 cask "notion-calendar"
 cask "obsidian"
 cask "soundsource"
+cask "tolaria"
 cask "via"
 cask "visual-studio-code"
 cask "vlc", args: { appdir: "/Applications" }
+cask "zen"
