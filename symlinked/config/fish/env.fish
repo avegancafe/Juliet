@@ -29,6 +29,9 @@ set -gx MANPAGER 'nvim +Man!'
 # Language-specific configs
 set -Ux PYENV_ROOT $HOME/.pyenv
 set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
+# node-gyp picks the default `python3` (broken Homebrew python@3.14 — pyexpat fails
+# to load), so point native-addon builds at a working interpreter instead.
+set -gx PYTHON /opt/homebrew/bin/python3.11
 set -gx GOPATH "$HOME/go"
 set -gx PIPENV_SHELL_FANCY 1
 

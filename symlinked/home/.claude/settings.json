@@ -14,6 +14,56 @@
       "Bash(head *)",
       "Bash(tail *)",
       "Bash(claude *)",
+      "mcp__github__search_code",
+      "mcp__github__search_commits",
+      "mcp__github__search_issues",
+      "mcp__github__search_orgs",
+      "mcp__github__search_pull_requests",
+      "mcp__github__search_repositories",
+      "mcp__github__search_users",
+      "mcp__github__list_branches",
+      "mcp__github__list_code_scanning_alerts",
+      "mcp__github__list_commits",
+      "mcp__github__list_copilot_spaces",
+      "mcp__github__list_dependabot_alerts",
+      "mcp__github__list_discussion_categories",
+      "mcp__github__list_discussions",
+      "mcp__github__list_gists",
+      "mcp__github__list_global_security_advisories",
+      "mcp__github__list_issue_types",
+      "mcp__github__list_issues",
+      "mcp__github__list_labeled_repositories",
+      "mcp__github__list_notifications",
+      "mcp__github__list_org_repository_security_advisories",
+      "mcp__github__list_pull_requests",
+      "mcp__github__list_releases",
+      "mcp__github__list_repository_collaborators",
+      "mcp__github__list_repository_security_advisories",
+      "mcp__github__list_secret_scanning_alerts",
+      "mcp__github__list_starred_repositories",
+      "mcp__github__list_tags",
+      "mcp__github__get_code_scanning_alert",
+      "mcp__github__get_commit",
+      "mcp__github__get_copilot_space",
+      "mcp__github__get_dependabot_alert",
+      "mcp__github__get_discussion",
+      "mcp__github__get_discussion_comments",
+      "mcp__github__get_file_contents",
+      "mcp__github__get_gist",
+      "mcp__github__get_global_security_advisory",
+      "mcp__github__get_job_logs",
+      "mcp__github__get_label",
+      "mcp__github__get_latest_release",
+      "mcp__github__get_me",
+      "mcp__github__get_notification_details",
+      "mcp__github__get_release_by_tag",
+      "mcp__github__get_repository_tree",
+      "mcp__github__get_secret_scanning_alert",
+      "mcp__github__get_tag",
+      "mcp__github__get_team_members",
+      "mcp__github__get_teams",
+      "mcp__github__pull_request_read",
+      "mcp__github__issue_read",
       "mcp__sentry__whoami",
       "mcp__sentry__find_organizations",
       "mcp__sentry__find_projects",
@@ -25,8 +75,22 @@
       "mcp__sentry__get_issue_details",
       "mcp__sentry__get_event_details",
       "mcp__sentry__get_trace_details",
+      "mcp__sentry__get_ai_conversation_details",
+      "mcp__sentry__get_doc",
+      "mcp__sentry__get_event_attachment",
+      "mcp__sentry__get_issue_activity",
+      "mcp__sentry__get_issue_tag_values",
+      "mcp__sentry__get_latest_base_snapshot",
+      "mcp__sentry__get_profile",
+      "mcp__sentry__get_profile_details",
+      "mcp__sentry__get_release_details",
+      "mcp__sentry__get_replay_details",
+      "mcp__sentry__get_sentry_resource",
+      "mcp__sentry__get_snapshot",
+      "mcp__sentry__get_snapshot_image",
       "mcp__sentry__search_events",
       "mcp__sentry__search_issues",
+      "mcp__sentry__search_issue_events",
       "mcp__sentry__search_docs",
       "mcp__notion__notion-search",
       "mcp__notion__notion-fetch",
@@ -61,6 +125,19 @@
       "/Users/kyle/.config/Juliet/"
     ]
   },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v bd >/dev/null 2>&1; then bd prime --hook-json; fi"
+          }
+        ]
+      }
+    ]
+  },
   "worktree": {
     "baseRef": "fresh"
   },
@@ -79,7 +156,8 @@
     "typescript-lsp@j2-claude-plugins": true,
     "j2-eng@j2-claude-plugins": true,
     "context7@claude-plugins-official": true,
-    "linear@claude-plugins-official": true
+    "linear@claude-plugins-official": true,
+    "beads@sttts-beads-skill": true
   },
   "extraKnownMarketplaces": {
     "Mixedbread-Grep": {
@@ -112,10 +190,16 @@
         "source": "github",
         "repo": "dbt-labs/dbt-agent-skills"
       }
+    },
+    "sttts-beads-skill": {
+      "source": {
+        "source": "github",
+        "repo": "sttts/beads-skill"
+      }
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "effortLevel": "xhigh",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
