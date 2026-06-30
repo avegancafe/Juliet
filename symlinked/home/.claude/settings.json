@@ -9,6 +9,7 @@
       "Bash(npm *)",
       "Bash(pip *)",
       "Bash(j2 *)",
+      "Bash(bd update:*)",
       "Bash(ls *)",
       "Bash(cat *)",
       "Bash(head *)",
@@ -157,9 +158,18 @@
     "j2-eng@j2-claude-plugins": true,
     "context7@claude-plugins-official": true,
     "linear@claude-plugins-official": true,
-    "beads@sttts-beads-skill": true
+    "beads@sttts-beads-skill": true,
+    "kitchen-brigade@avegancafe-marketplace": true,
+    "avegancafe@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
+    "avegancafe-marketplace": {
+      "source": {
+        "source": "git",
+        "repo": "avegancafe/avegancafe-marketplace",
+        "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
+      }
+    },
     "Mixedbread-Grep": {
       "source": {
         "source": "github",
@@ -202,6 +212,7 @@
   "effortLevel": "xhigh",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "dark-daltonized",
