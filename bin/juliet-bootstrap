@@ -372,6 +372,22 @@ setup-gpg() {
   fi
 }
 
+setup-cyberduck() {
+  # macOS-only. Cyberduck offers every identity in the SSH agent, which trips
+  # strict servers' MaxAuthTries (and fail2ban) before the right key is tried.
+  # Tell it to ignore the agent and use only the key set per-bookmark instead.
+  if ! is-macos; then
+    return
+  fi
+
+  if [[ ! -d "/Applications/Cyberduck.app" && ! -d "$HOME/Applications/Cyberduck.app" ]]; then
+    return
+  fi
+
+  log "Configuring Cyberduck (ignore SSH agent, use per-bookmark key)..."
+  defaults write ch.sudo.cyberduck ssh.authentication.agent.enable -bool false
+}
+
 setup-rust() {
   rlog "Setting up Rust dependencies..."
   if ! command -v stylua &> /dev/null; then
@@ -447,6 +463,26 @@ setup-claude-code() {
     curl -fsSL https://claude.ai/install.sh | bash
   fi
 
+  # Configure git to authenticate GitHub over HTTPS via the gh CLI. Claude Code
+  # clones marketplaces/plugins over HTTPS, so private ones (e.g. the
+  # avegancafe-marketplace referenced in settings.json) fail to clone without an
+  # HTTPS credential helper. We write it to the machine-local gitconfig (included
+  # by the tracked ~/.gitconfig) rather than running `gh auth setup-git`, which
+  # would bake a machine-specific absolute gh path into the tracked dotfile. The
+  # `!gh ...` form resolves gh from PATH, so it stays portable across macOS/Fedora.
+  if command -v gh &> /dev/null; then
+    if gh auth status &> /dev/null; then
+      log "Configuring gh as the git credential helper for GitHub (HTTPS access to private repos)..."
+      mkdir -p "$HOME/.config/local"
+      git config --file "$HOME/.config/local/gitconfig" credential."https://github.com".helper "!gh auth git-credential"
+      git config --file "$HOME/.config/local/gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"
+    else
+      warn "gh is installed but not authenticated. Run 'gh auth login', then re-run this step, to enable HTTPS cloning of private repos (needed for private plugin marketplaces)."
+    fi
+  else
+    warn "gh not found; skipping git credential-helper setup. Private plugin marketplaces won't clone over HTTPS until gh is installed and authenticated."
+  fi
+
   # Define marketplaces to add
   # Format: "name:id" pairs (bash 3.2 compatible)
   marketplaces=(
@@ -514,6 +550,7 @@ run-security() {
   confirm-category "security" "Set up security? (SSH key, GPG agent)" || return
   setup-ssh
   setup-gpg
+  setup-cyberduck
 }
 
 run-desktop() {
