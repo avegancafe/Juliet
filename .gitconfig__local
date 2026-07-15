@@ -5,5 +5,6 @@
 [user]
 	email = kylelholzinger@gmail.com
 	# The tracked ~/.gitconfig signs commits over SSH with ~/.ssh/id_ed25519.
-	# Uncomment to sign with a dedicated per-machine key instead:
+	# juliet-bootstrap also generates a dedicated ~/.ssh/github_signing key
+	# (uploaded to GitHub as a signing key); uncomment to sign with it instead:
 	# signingkey = ~/.ssh/github_signing.pub

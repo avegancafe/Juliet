@@ -88,9 +88,17 @@
 	enabled = true
 [gpg]
 	format = ssh
+[gpg "ssh"]
+	# Created by juliet-bootstrap; maps author emails to the signing key so
+	# git can verify SSH-signed commits (git log --show-signature).
+	allowedSignersFile = ~/.ssh/allowed_signers
+[tag]
+	gpgsign = true
 [interactive]
 	diffFilter = delta --color-only
 [delta]
 	navigate = true
 [merge]
 	conflictStyle = zdiff3
+[credential "https://github.com"]
+	helper = !gh auth git-credential

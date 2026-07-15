@@ -1,6 +1,8 @@
 # Juliet Dotfiles
 
-Dotfiles repo for development environment. Configs managed via GNU Stow symlinks.
+Portable development environment for Kyle's personal systems. The goal is that a fresh machine — macOS or Fedora — can be brought to a fully working, consistent setup by cloning this repo and running `bin/juliet-bootstrap`. Configs are managed via GNU Stow symlinks; packages, tooling, and desktop setup are scripted per-OS.
+
+Anything done manually to set up a machine that this repo could have done is a gap: prefer scripting it in the bootstrap (or declaring it in the Brewfile/DNFfile/Flatpakfile) over one-off fixes.
 
 ## Quick Reference
 

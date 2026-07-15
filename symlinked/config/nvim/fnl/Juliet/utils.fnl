@@ -32,6 +32,8 @@
 (local event-cache {:refresh_interval 30 :timestamp nil :value nil})
 
 (fn current-cal-event []
+  (when (not= 1 (vim.fn.executable :osascript))
+    (lua "return \"\""))
   (let [now (_G.os.time)]
     (when (and event-cache.value
                (< (- now event-cache.timestamp) event-cache.refresh_interval))

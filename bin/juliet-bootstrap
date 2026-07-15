@@ -279,6 +279,16 @@ setup-dnf() {
     return
   fi
 
+  # Enable RPM Fusion (free + nonfree) first: some DNFfile packages (e.g.
+  # steam) only exist there and would otherwise be silently skipped by
+  # --skip-unavailable.
+  if ! rpm -q rpmfusion-free-release &> /dev/null || ! rpm -q rpmfusion-nonfree-release &> /dev/null; then
+    log "Enabling RPM Fusion repositories..."
+    sudo dnf install -y \
+      "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
+      "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+  fi
+
   # Enable COPR repos first
   while IFS= read -r line || [[ -n "$line" ]]; do
     # Skip empty lines and comments
@@ -365,13 +375,85 @@ setup-ssh() {
     chmod 700 $HOME/.ssh
   fi
 
-  if [[ ! -f $HOME/.ssh/id_ed25519 ]]; then
-    local email="${SSH_EMAIL:-}"
-    if [[ -z "$email" ]]; then
-      email=$(gum input --prompt "What is your email for your ssh key? " --placeholder "your_email@example.com")
-      [[ $? -ne 0 || -z "$email" ]] && on-interrupt
+  # Three keys: a general-purpose one, plus dedicated GitHub auth and signing
+  # keys. The tracked gitconfig signs commits over SSH, and the tracked
+  # ~/.config/ssh/github.conf pins the auth key for github.com.
+  local missing=()
+  local key
+  for key in id_ed25519 github_auth github_signing; do
+    [[ -f $HOME/.ssh/$key ]] || missing+=("$key")
+  done
+
+  local email="${SSH_EMAIL:-}"
+  if [[ ${#missing[@]} -gt 0 && -z "$email" ]]; then
+    email=$(gum input --prompt "What is your email for your ssh keys? " --placeholder "your_email@example.com")
+    [[ $? -ne 0 || -z "$email" ]] && on-interrupt
+  fi
+
+  for key in "${missing[@]}"; do
+    local comment="$email"
+    case "$key" in
+      github_auth) comment="$email (github auth)" ;;
+      github_signing) comment="$email (github signing)" ;;
+    esac
+    ssh-keygen -t ed25519 -C "$comment" -f "$HOME/.ssh/$key"
+  done
+
+  # allowed_signers maps git author emails to the signing key so git can
+  # verify SSH-signed commits locally (git log --show-signature). The tracked
+  # gitconfig points gpg.ssh.allowedSignersFile here.
+  local signers="$HOME/.ssh/allowed_signers"
+  local signing_pub
+  signing_pub=$(cut -d' ' -f1-2 "$HOME/.ssh/github_signing.pub")
+  local git_email
+  git_email=$(git config user.email 2>/dev/null || true)
+  for signer_email in "$git_email" "$email"; do
+    [[ -z "$signer_email" ]] && continue
+    if ! grep -qsF "$signer_email $signing_pub" "$signers"; then
+      echo "$signer_email $signing_pub" >> "$signers"
     fi
-    ssh-keygen -t ed25519 -C "$email" -f $HOME/.ssh/id_ed25519
+  done
+
+  # ~/.ssh can't be stowed (generated keys would land inside the repo), so the
+  # tracked GitHub host config lives at ~/.config/ssh/github.conf and gets
+  # wired in with an Include at the top of ~/.ssh/config.
+  local sshconf="$HOME/.ssh/config"
+  local include_line="Include ~/.config/ssh/github.conf"
+  if ! grep -qsxF "$include_line" "$sshconf"; then
+    log "Wiring tracked GitHub ssh config into ~/.ssh/config..."
+    {
+      echo "$include_line"
+      [[ -f "$sshconf" ]] && cat "$sshconf"
+    } > "$sshconf.juliet-tmp"
+    mv "$sshconf.juliet-tmp" "$sshconf"
+    chmod 600 "$sshconf"
+  fi
+
+  # Upload freshly generated GitHub keys via gh when possible. gh needs the
+  # admin:public_key / admin:ssh_signing_key scopes, which the default login
+  # doesn't grant — fall back to instructions if the add is rejected.
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    local uploaded=true
+    if command -v gh &> /dev/null && gh auth status &> /dev/null; then
+      for key in "${missing[@]}"; do
+        case "$key" in
+          github_auth)
+            gh ssh-key add "$HOME/.ssh/github_auth.pub" --type authentication --title "$(hostname) auth" || uploaded=false
+            ;;
+          github_signing)
+            gh ssh-key add "$HOME/.ssh/github_signing.pub" --type signing --title "$(hostname) signing" || uploaded=false
+            ;;
+        esac
+      done
+    else
+      uploaded=false
+    fi
+    if [[ "$uploaded" == "false" ]]; then
+      warn "Couldn't upload new SSH keys to GitHub automatically. Run:"
+      warn "  gh auth refresh -h github.com -s admin:public_key -s admin:ssh_signing_key"
+      warn "  gh ssh-key add ~/.ssh/github_auth.pub --type authentication --title \"$(hostname) auth\""
+      warn "  gh ssh-key add ~/.ssh/github_signing.pub --type signing --title \"$(hostname) signing\""
+    fi
   fi
 }
 
@@ -379,6 +461,15 @@ setup-fzf() {
   if ! command -v fzf &> /dev/null; then
     log "Installing fzf..."
     /opt/homebrew/opt/fzf/install
+  fi
+}
+
+setup-tmux-plugins() {
+  # tpm (tmux plugin manager) bootstraps the plugins declared in the tracked
+  # .tmux.conf; nothing installs it besides this clone.
+  if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
+    rlog "Installing tpm (tmux plugin manager)..."
+    git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
   fi
 }
 
@@ -454,6 +545,12 @@ setup-python() {
   # it from the Brewfile
   if is-fedora && ! command -v sqlfluff &> /dev/null; then
     pip install --user sqlfluff
+  fi
+
+  # pipenv (the pv alias) was dropped from Fedora's repos entirely; macOS gets
+  # it from the Brewfile
+  if is-fedora && ! command -v pipenv &> /dev/null; then
+    pip install --user pipenv
   fi
 }
 
@@ -602,9 +699,10 @@ run-dev() {
 }
 
 run-shell() {
-  confirm-category "shell" "Configure shell? (fish as default, fzf keybindings)" || return
+  confirm-category "shell" "Configure shell? (fish as default, fzf keybindings, tmux plugins)" || return
   setup-fish
   setup-fzf
+  setup-tmux-plugins
 }
 
 run-security() {
