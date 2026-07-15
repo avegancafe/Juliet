@@ -290,7 +290,7 @@ spawn-at-startup "discord"
 
 gestures {
     hot-corners {
-        off
+        bottom-right
     }
 }
 
