@@ -84,7 +84,7 @@ Options:
   --ssh-email=EMAIL      Email for SSH key generation
   -h, --help             Show this help message
 
-Steps: packages (includes flatpak), dev, shell, security, desktop, claude
+Steps: packages (includes flatpak), fonts, dev, shell, security, desktop, claude
 
 Examples:
   juliet-bootstrap -y                        # Accept all prompts
@@ -707,6 +707,69 @@ EOF
   fi
 }
 
+# Pinned Nerd Fonts release used for fonts too large to vendor (Iosevka).
+NERD_FONTS_VERSION="v3.4.0"
+
+# User-writable font directory for the current OS.
+font-dir() {
+  if is-macos; then
+    echo "$HOME/Library/Fonts"
+  else
+    echo "$HOME/.local/share/fonts"
+  fi
+}
+
+# Install fonts and refresh the font cache. Two sources:
+#   1. Small TTF/OTFs vendored in etc/fonts (3270, Berkeley Mono, JetBrains
+#      Mono, MonoLisa) — copied straight in.
+#   2. Iosevka Nerd Font Mono — the primary terminal/editor font
+#      (ghostty font-family, neovide guifont). Its v3.x weights are ~13MB
+#      each, too big to vendor, so the four core Mono weights are pulled from
+#      the pinned Nerd Fonts release and cached. The 374MB zip is only fetched
+#      when Iosevka isn't already installed, so re-runs are cheap.
+# Everything lands in <font-dir>/Juliet so the repo owns that subtree.
+setup-fonts() {
+  substep "Installing fonts..."
+  local dest="$(font-dir)/Juliet"
+  mkdir -p "$dest"
+
+  # 1. Vendored fonts (flattened into dest; fontconfig/CoreText recurse anyway)
+  local vendored="$HOME/.config/Juliet/etc/fonts"
+  if [[ -d "$vendored" ]]; then
+    find "$vendored" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
+      -exec cp -f {} "$dest/" \;
+  fi
+
+  # 2. Iosevka Nerd Font Mono (download + extract the four core Mono weights)
+  if [[ -f "$dest/IosevkaNerdFontMono-Regular.ttf" ]]; then
+    skip "Iosevka Nerd Font Mono already installed — skipping download"
+  else
+    local url="https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONTS_VERSION}/Iosevka.zip"
+    local tmp
+    tmp="$(mktemp -d)"
+    if spin "Downloading Iosevka Nerd Font Mono (${NERD_FONTS_VERSION}, ~374MB, one-time)..." \
+         curl -fL --retry 2 -o "$tmp/Iosevka.zip" "$url"; then
+      unzip -o -j "$tmp/Iosevka.zip" \
+        'IosevkaNerdFontMono-Regular.ttf' \
+        'IosevkaNerdFontMono-Bold.ttf' \
+        'IosevkaNerdFontMono-Italic.ttf' \
+        'IosevkaNerdFontMono-BoldItalic.ttf' \
+        -d "$dest" > /dev/null \
+        || bootstrap_error "Failed to extract Iosevka Nerd Font Mono from Iosevka.zip"
+    else
+      bootstrap_error "Failed to download Iosevka Nerd Font Mono" \
+        "Fetch manually from https://github.com/ryanoasis/nerd-fonts/releases/tag/${NERD_FONTS_VERSION}"
+    fi
+    rm -rf "$tmp"
+  fi
+
+  # 3. Refresh the font cache (macOS picks fonts up automatically and may not
+  # ship fc-cache, so only run it when present).
+  if command -v fc-cache &> /dev/null; then
+    fc-cache -f "$(font-dir)" > /dev/null 2>&1 || true
+  fi
+}
+
 setup-claude-code() {
   if ! command -v claude &> /dev/null; then
     rlog "Installing Claude CLI..."
@@ -788,6 +851,12 @@ run-packages() {
   fi
 }
 
+run-fonts() {
+  confirm-category "fonts" "Install fonts? (Iosevka Nerd Font Mono + vendored 3270/Berkeley/JetBrains/MonoLisa)" || return
+  rlog "🔤 Installing fonts..."
+  setup-fonts
+}
+
 run-dev() {
   confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint)" || return
   rlog "🛠️ Installing dev tools..."
@@ -845,6 +914,7 @@ symlink-dotfiles
 
 # Category-based setup
 run-packages
+run-fonts
 run-dev
 run-shell
 run-security
