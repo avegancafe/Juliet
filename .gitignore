@@ -10,6 +10,9 @@ symlinked/home/.claude/*
 
 .claude/*.local.json
 
+# noctalia downloads enabled plugins itself from the sourceUrl in plugins.json
+symlinked/config/noctalia/plugins/
+
 # pi (~/.pi is symlinked file-by-file via stow; settings.json IS tracked)
 symlinked/home/.pi/agent/auth.json
 symlinked/home/.pi/agent/sessions/
