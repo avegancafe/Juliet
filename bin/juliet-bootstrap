@@ -437,12 +437,36 @@ setup-rust() {
   if is-macos && ! command -v silicon &> /dev/null; then
     cargo install silicon
   fi
+
+  # tabiew (tw, used by the cq alias); macOS gets it from the Brewfile
+  if is-fedora && ! command -v tw &> /dev/null; then
+    cargo install tabiew
+  fi
 }
 
 setup-python() {
   rlog "Setting up Python..."
   if ! command -v poetry &> /dev/null; then
     curl -sSL https://install.python-poetry.org | python3 -
+  fi
+
+  # sqlfluff (neoformat's SQL formatter) has no Fedora dnf package; macOS gets
+  # it from the Brewfile
+  if is-fedora && ! command -v sqlfluff &> /dev/null; then
+    pip install --user sqlfluff
+  fi
+}
+
+setup-node-tools() {
+  rlog "Setting up Node tools..."
+  # prettier/eslint (neoformat/nvim-lint) have no Fedora dnf packages; macOS
+  # gets them from the Brewfile
+  if is-fedora; then
+    for tool in prettier eslint; do
+      if ! command -v "$tool" &> /dev/null; then
+        sudo npm install -g "$tool"
+      fi
+    done
   fi
 }
 
@@ -569,11 +593,12 @@ run-packages() {
 }
 
 run-dev() {
-  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv)" || return
+  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint)" || return
   setup-cargo
   setup-rust
   setup-python
   setup-nodenv
+  setup-node-tools
 }
 
 run-shell() {

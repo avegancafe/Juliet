@@ -9,6 +9,8 @@ copr scottames/ghostty
 copr solopasha/hyprland
 copr phracek/PyCharm
 copr zhangyi6324/noctalia-shell
+copr agraven/neovide
+copr pgdev/deno
 
 # Terminal & Shell
 ghostty
@@ -17,24 +19,54 @@ starship
 
 # Editors
 neovim
+neovide
+
+# Development
+git
+gh
+git-delta
+git-lfs
+rustup
+nodejs
+yarnpkg
+rbenv
+cmake
+python3-pip
+docker-cli
+kubernetes-client
+deno
+ruff
+golangci-lint
+golang-x-tools-goimports
 
 # Window Manager / Desktop
 niri
 hyprlock
 noctalia-shell
-
-# Development
-git
+fuzzel
+rofimoji
+wl-clipboard
+cliphist
+playerctl
+brightnessctl
+pavucontrol
 
 # Applications
 discord
 steam
 vlc
 nautilus
+firefox
+alacritty
 
 # Utilities
 bat
+btop
 eza
+fd-find
+fortune-mod
+glow
+gum
 jq
 ripgrep
 fzf
