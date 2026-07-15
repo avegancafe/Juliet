@@ -205,26 +205,52 @@ update-juliet() {
 }
 
 
+# Install Homebrew and wire it into PATH if it isn't already available.
+ensure-brew() {
+  if command -v brew &> /dev/null; then
+    return
+  fi
+
+  rlog "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+  # Set up brew path based on OS
+  if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    # Linux
+    BREW_SHELLENV='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
+    if ! grep -q "linuxbrew" "$HOME/.bashrc" 2>/dev/null; then
+      echo "$BREW_SHELLENV" >> "$HOME/.bashrc"
+    fi
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  else
+    # macOS
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+}
+
+# Install the tools bootstrap itself relies on before it uses them: stow (for
+# symlinking dotfiles in core setup) and gum (for the confirmation prompts).
+# The full package steps run later and are idempotent, so this early install is
+# just to satisfy the ordering dependency.
+ensure-bootstrap-deps() {
+  rlog "Installing bootstrap prerequisites (stow, gum)..."
+  if is-macos; then
+    ensure-brew
+    for tool in stow gum; do
+      command -v "$tool" &> /dev/null || brew install "$tool"
+    done
+  elif is-fedora; then
+    for tool in stow gum; do
+      command -v "$tool" &> /dev/null || sudo dnf install -y "$tool"
+    done
+  fi
+}
+
 setup-brew() {
   rlog "Setting up Homebrew..."
 
-  if ! command -v brew &> /dev/null; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-
-    # Set up brew path based on OS
-    if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
-      # Linux
-      BREW_SHELLENV='eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
-      if ! grep -q "linuxbrew" "$HOME/.bashrc" 2>/dev/null; then
-        echo "$BREW_SHELLENV" >> "$HOME/.bashrc"
-      fi
-      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-    else
-      # macOS
-      echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
-      eval "$(/opt/homebrew/bin/brew shellenv)"
-    fi
-  fi
+  ensure-brew
 
   if ! command -v gum &> /dev/null; then
     brew install gum
@@ -573,6 +599,7 @@ run-claude() {
 # =============================================================================
 
 # Core setup (always runs)
+ensure-bootstrap-deps
 setup-git
 update-juliet
 symlink-dotfiles
