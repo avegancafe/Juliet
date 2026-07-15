@@ -85,19 +85,6 @@ output "HDMI-A-1" {
     position x=0 y=0
 }
 
-// --- Layout workspaces ---
-workspace "coding" {
-    open-on-output "DP-1"
-}
-
-workspace "gaming" {
-    open-on-output "DP-1"
-}
-
-workspace "work" {
-    open-on-output "HDMI-A-1"
-}
-
 /-output "eDP-1" {
     // Uncomment this line to disable this output.
     // off
@@ -400,7 +387,6 @@ window-rule {
 // Minimize xwaylandvideobridge (needed for XWayland screen sharing)
 window-rule {
     match app-id="xwaylandvideobridge"
-    open-on-workspace "gaming"
     open-floating true
     open-focused false
     min-width 1
