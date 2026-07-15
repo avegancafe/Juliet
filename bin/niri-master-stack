@@ -1,0 +1,57 @@
+#! /bin/bash
+
+# Snap the focused workspace into a master+stack layout:
+# the focused column becomes the master at 2/3 width, and every
+# other window is consumed into a single 1/3-width stack column.
+#
+#   ┌──────────────────┬────────┐
+#   │                  │ stack  │
+#   │      master      ├────────┤
+#   │      (2/3)       │ stack  │
+#   │                  ├────────┤
+#   │                  │ stack  │
+#   └──────────────────┴────────┘
+#
+# Floating windows are left alone. Bound to Mod+M in niri config.
+
+set -euo pipefail
+
+focused-window() {
+  niri msg --json focused-window | jq "$1"
+}
+
+# If a floating window is focused, column actions wouldn't apply to the
+# tiling layout; switch focus to the tiled side first.
+if [[ $(focused-window '.is_floating') == "true" ]]; then
+  niri msg action switch-focus-between-floating-and-tiling
+fi
+
+workspace=$(niri msg --json workspaces | jq '.[] | select(.is_focused) | .id')
+tiled=$(niri msg --json windows |
+  jq --argjson ws "$workspace" \
+    '[.[] | select(.workspace_id == $ws and (.is_floating | not))] | length')
+
+if ((tiled < 2)); then
+  exit 0
+fi
+
+# Make the focused column the first (master) column.
+niri msg action move-column-to-first
+master=$(focused-window '.id')
+
+# If focus can't move right, the workspace has a single column — nothing to stack.
+niri msg action focus-column-right
+if [[ $(focused-window '.id') == "$master" ]]; then
+  exit 0
+fi
+
+# Swallow every column to the right into this one stack column.
+# consume-window-into-column is a no-op once nothing remains to the right,
+# so tiled-2 iterations always suffice (columns <= windows).
+for ((i = 0; i < tiled - 2; i++)); do
+  niri msg action consume-window-into-column
+done
+
+niri msg action set-column-width "33.333%"
+niri msg action focus-column-first
+niri msg action set-column-width "66.667%"

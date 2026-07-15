@@ -654,6 +654,11 @@ binds {
     // rather than stacked on top of each other.
     Mod+W { toggle-column-tabbed-display; }
 
+    // Snap the current workspace into a master+stack layout:
+    // focused column becomes the 2/3-width master, everything else
+    // stacks into a single 1/3-width column.
+    Mod+M hotkey-overlay-title="Snap to master+stack" { spawn-sh "$HOME/.config/Juliet/bin/niri-master-stack"; }
+
     // Toggle opacity rule for focused window (useful for keeping specific windows opaque)
     Mod+Shift+O { toggle-window-rule-opacity; }
 

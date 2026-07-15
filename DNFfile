@@ -34,6 +34,7 @@ nautilus
 
 # Utilities
 bat
+jq
 ripgrep
 fzf
 stow
