@@ -446,6 +446,16 @@ setup-python() {
   fi
 }
 
+setup-nodenv() {
+  # macOS gets nodenv from the Brewfile; Fedora has no dnf package, so use the
+  # official installer (clones nodenv + node-build into ~/.nodenv).
+  if command -v nodenv &> /dev/null || [[ -d "$HOME/.nodenv/bin" ]]; then
+    return
+  fi
+  rlog "Installing nodenv..."
+  curl -fsSL https://github.com/nodenv/nodenv-installer/raw/HEAD/bin/nodenv-installer | bash
+}
+
 setup-niri() {
   if ! command -v niri &> /dev/null; then
     return
@@ -574,10 +584,11 @@ run-packages() {
 }
 
 run-dev() {
-  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry)" || return
+  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv)" || return
   setup-cargo
   setup-rust
   setup-python
+  setup-nodenv
 }
 
 run-shell() {

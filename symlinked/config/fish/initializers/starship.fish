@@ -1,1 +1,1 @@
-eval (starship init fish)
+command -q starship; and eval (starship init fish)

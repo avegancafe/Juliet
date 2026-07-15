@@ -4,6 +4,7 @@
 #   <package>         - installs package
 
 # COPR Repositories
+copr atim/starship
 copr scottames/ghostty
 copr solopasha/hyprland
 copr phracek/PyCharm
@@ -12,6 +13,7 @@ copr avengemedia/dms
 # Terminal & Shell
 ghostty
 fish
+starship
 
 # Editors
 neovim
