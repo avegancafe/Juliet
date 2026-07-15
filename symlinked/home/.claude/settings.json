@@ -161,7 +161,12 @@
     "beads@sttts-beads-skill": true,
     "kitchen-brigade@avegancafe-marketplace": true,
     "avegancafe@avegancafe-marketplace": true,
-    "superpowers@j2-claude-plugins": true
+    "superpowers@j2-claude-plugins": true,
+    "codex@j2-claude-plugins": true,
+    "dbt@j2-claude-plugins": true,
+    "playwright@j2-claude-plugins": true,
+    "mattpocock-skills@j2-claude-plugins": true,
+    "launchdarkly@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
