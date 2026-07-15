@@ -9,7 +9,9 @@ copr scottames/ghostty
 copr solopasha/hyprland
 copr phracek/PyCharm
 copr zhangyi6324/noctalia-shell
-copr agraven/neovide
+# neovide has no official Fedora package; agraven/neovide is abandoned (empty
+# f44 repo) — bijumon/neovide-release tracks upstream releases with f44 builds
+copr bijumon/neovide-release
 copr pgdev/deno
 
 # Terminal & Shell
