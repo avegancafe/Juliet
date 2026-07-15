@@ -34,6 +34,7 @@ nautilus
 
 # Utilities
 bat
+eza
 jq
 ripgrep
 fzf
