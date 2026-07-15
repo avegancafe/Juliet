@@ -456,21 +456,6 @@ setup-nodenv() {
   curl -fsSL https://github.com/nodenv/nodenv-installer/raw/HEAD/bin/nodenv-installer | bash
 }
 
-setup-niri() {
-  if ! command -v niri &> /dev/null; then
-    return
-  fi
-  log "Setting up niri..."
-
-  # Bind DMS to niri session (only runs with niri, not other DEs)
-  if command -v dms &> /dev/null; then
-    if ! systemctl --user list-dependencies niri.service 2>/dev/null | grep -q dms.service; then
-      log "Binding DMS to niri session..."
-      systemctl --user add-wants niri.service dms.service
-    fi
-  fi
-}
-
 setup-sddm() {
   if ! is-fedora; then
     return
@@ -605,12 +590,13 @@ run-security() {
 }
 
 run-desktop() {
-  # Only show on Linux with relevant tools
+  # Only show on Linux with relevant tools. Noctalia (the niri shell) needs no
+  # setup step here: it's installed via the DNFfile and started by
+  # spawn-at-startup in the niri config.
   if ! is-fedora; then return; fi
-  if ! command -v niri &> /dev/null && ! command -v sddm &> /dev/null; then return; fi
+  if ! command -v sddm &> /dev/null; then return; fi
 
-  confirm-category "desktop" "Configure desktop? (niri WM, sddm theme)" || return
-  setup-niri
+  confirm-category "desktop" "Configure desktop? (sddm theme)" || return
   setup-sddm
 }
 

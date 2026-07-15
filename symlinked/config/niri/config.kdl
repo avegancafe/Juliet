@@ -291,8 +291,9 @@ layout {
 // See the binds section below for more spawn examples.
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
-// spawn-at-startup "waybar"  // Disabled: using DMS bar instead
+// spawn-at-startup "waybar"  // Disabled: using noctalia bar instead
 
+spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "ghostty"
 spawn-at-startup "steam"
 spawn-at-startup "discord"
@@ -700,6 +701,15 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 }
-include "dms/binds.kdl"
+include "windowrules.kdl"
 
-include "dms/windowrules.kdl"
+// Noctalia: allow notification actions and window activation from the shell.
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+
+// Noctalia: show the wallpaper blurred behind the overview backdrop.
+layer-rule {
+    match namespace="^noctalia-overview*"
+    place-within-backdrop true
+}

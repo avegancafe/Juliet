@@ -1,0 +1,16 @@
+// Per-app workspace assignments (originally created via DMS, now hand-managed)
+
+window-rule {
+    match app-id="^steam$"
+    open-on-workspace "gaming"
+}
+
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+    open-on-workspace "coding"
+}
+
+window-rule {
+    match app-id="^org.mozilla.firefox$"
+    open-on-workspace "work"
+}

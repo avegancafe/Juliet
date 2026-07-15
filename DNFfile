@@ -8,7 +8,7 @@ copr atim/starship
 copr scottames/ghostty
 copr solopasha/hyprland
 copr phracek/PyCharm
-copr avengemedia/dms
+copr zhangyi6324/noctalia-shell
 
 # Terminal & Shell
 ghostty
@@ -21,7 +21,7 @@ neovim
 # Window Manager / Desktop
 niri
 hyprlock
-dms
+noctalia-shell
 
 # Development
 git
