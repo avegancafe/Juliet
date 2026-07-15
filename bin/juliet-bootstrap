@@ -304,7 +304,21 @@ setup-dnf() {
   # Install packages
   if [[ ${#packages[@]} -gt 0 ]]; then
     log "Installing ${#packages[@]} packages..."
-    sudo dnf install -y "${packages[@]}"
+    # --skip-unavailable/--skip-broken keep one bad package (e.g. steam
+    # without RPM Fusion) from aborting the whole transaction.
+    sudo dnf install -y --skip-unavailable --skip-broken "${packages[@]}"
+
+    # Retry anything still missing individually so each failure surfaces its
+    # own error instead of being silently skipped.
+    failed=()
+    for pkg in "${packages[@]}"; do
+      rpm -q "$pkg" &> /dev/null && continue
+      log "Retrying $pkg individually..."
+      sudo dnf install -y "$pkg" || failed+=("$pkg")
+    done
+    if [[ ${#failed[@]} -gt 0 ]]; then
+      warn "Failed to install: ${failed[*]}"
+    fi
   fi
 }
 
