@@ -18,11 +18,13 @@ local lazy_plugins_path = vim.fn.stdpath('data') .. '/lazy'
 local hotpot_path = lazy_plugins_path .. '/hotpot.nvim'
 if not vim.loop.fs_stat(hotpot_path) then
 	vim.notify('Bootstrapping hotpot.nvim...', vim.log.levels.INFO)
+	-- No --single-branch: a single-branch clone of a tag has no origin/HEAD,
+	-- which makes lazy's lockfile update assert (lazy/manage/lock.lua) and
+	-- truncate lazy-lock.json.
 	vim.fn.system({
 		'git',
 		'clone',
 		'--filter=blob:none',
-		'--single-branch',
 		'--branch=v2.0.0',
 		'https://github.com/rktjmp/hotpot.nvim.git',
 		hotpot_path,
