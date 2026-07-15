@@ -282,8 +282,10 @@ layout {
 
 spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "ghostty"
-spawn-at-startup "steam"
-spawn-at-startup "discord"
+// Delay steam so noctalia can come up and paint the wallpaper first,
+// without competing for CPU/GPU/IO during login.
+spawn-sh-at-startup "sleep 8 && steam"
+// discord intentionally not autostarted
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
