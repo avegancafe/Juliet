@@ -320,6 +320,21 @@ setup-cargo() {
   fi
 }
 
+# A DNFfile entry may be satisfied by a differently-named package: Fedora 44
+# ships node only as versioned streams (nodejs -> nodejs22 via a virtual
+# provide), kubernetes-client -> kubernetes1.36-client, and dnf resolves
+# deno -> deno-bin through /usr/bin/deno binary provides. Checking only
+# `rpm -q <name>` misses all of these, so those entries got "retried"
+# (and reported failed on any transient dnf error) on every single run.
+dnf-satisfied() {
+  rpm -q "$1" &> /dev/null && return 0
+  rpm -q --whatprovides "$1" &> /dev/null && return 0
+  # Binary/file provides need dnf's resolver; --assumeno exits 0 only when
+  # the spec is already satisfied. The cache is fresh from the transaction
+  # that just ran, so --cacheonly keeps this fast and offline.
+  dnf --cacheonly install --assumeno "$1" &> /dev/null
+}
+
 setup-dnf() {
   substep "Setting up DNF packages..."
 
@@ -376,7 +391,7 @@ setup-dnf() {
     # own error instead of being silently skipped.
     failed=()
     for pkg in "${packages[@]}"; do
-      rpm -q "$pkg" &> /dev/null && continue
+      dnf-satisfied "$pkg" && continue
       substep "Retrying $pkg individually..."
       sudo dnf install -y "$pkg" || failed+=("$pkg")
     done
