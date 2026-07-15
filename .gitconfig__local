@@ -1,3 +1,9 @@
+# Machine-local git overrides. juliet-bootstrap copies this to
+# ~/.config/local/gitconfig, which the tracked ~/.gitconfig includes. Values
+# here override the tracked defaults (including the SSH signing key), so keep
+# only genuinely machine-specific settings.
 [user]
-	signingkey = <gpg --list-secret-keys --keyid-format=long>
 	email = kylelholzinger@gmail.com
+	# The tracked ~/.gitconfig signs commits over SSH with ~/.ssh/id_ed25519.
+	# Uncomment to sign with a dedicated per-machine key instead:
+	# signingkey = ~/.ssh/github_signing.pub
