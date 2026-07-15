@@ -25,7 +25,8 @@ dms
 git
 
 # Applications
-discord
+# NOTE: discord is not packaged for Fedora/RPM Fusion — installed via Flatpak instead (see Flatpakfile).
+# steam and vlc come from RPM Fusion (enabled automatically by juliet-bootstrap).
 steam
 vlc
 nautilus

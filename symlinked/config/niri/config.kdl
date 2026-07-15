@@ -288,7 +288,8 @@ layout {
 
 spawn-at-startup "ghostty"
 spawn-at-startup "steam"
-spawn-at-startup "discord"
+// discord is installed as a Flatpak on Fedora (see Flatpakfile), so launch it via flatpak.
+spawn-at-startup "flatpak" "run" "com.discordapp.Discord"
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"

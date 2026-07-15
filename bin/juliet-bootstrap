@@ -253,6 +253,22 @@ setup-dnf() {
     return
   fi
 
+  # Enable RPM Fusion (free + nonfree) first. Several packages in the DNFfile
+  # (steam, vlc, media codecs) live only in RPM Fusion. Without these repos the
+  # `dnf install` below fails to resolve them and — because dnf aborts the whole
+  # transaction on any unresolved package — nothing installs, including niri.
+  # That's what leaves niri missing from the login screen's session picker.
+  if ! rpm -q rpmfusion-free-release &> /dev/null; then
+    log "Enabling RPM Fusion (free)..."
+    sudo dnf install -y \
+      "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+  fi
+  if ! rpm -q rpmfusion-nonfree-release &> /dev/null; then
+    log "Enabling RPM Fusion (nonfree)..."
+    sudo dnf install -y \
+      "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+  fi
+
   # Enable COPR repos first
   while IFS= read -r line || [[ -n "$line" ]]; do
     # Skip empty lines and comments
@@ -275,10 +291,12 @@ setup-dnf() {
     packages+=("$line")
   done < "$DNFFILE"
 
-  # Install packages
+  # Install packages. --skip-unavailable keeps a single missing/renamed package
+  # from aborting the entire transaction, so core pieces like the niri compositor
+  # still install even if something else in the list can't be resolved.
   if [[ ${#packages[@]} -gt 0 ]]; then
     log "Installing ${#packages[@]} packages..."
-    sudo dnf install -y "${packages[@]}"
+    sudo dnf install -y --skip-unavailable "${packages[@]}"
   fi
 }
 
@@ -411,6 +429,14 @@ setup-niri() {
     return
   fi
   log "Setting up niri..."
+
+  # Validate the config before it ever reaches a login. An invalid config.kdl
+  # makes niri fail to start, which shows up as the login screen hanging on the
+  # loading spinner after you pick the niri session. Catch it here instead.
+  if ! niri validate &> /dev/null; then
+    warn "niri config failed validation — the niri session will not start until this is fixed:"
+    niri validate 2>&1 | sed 's/^/    /' || true
+  fi
 
   # Bind DMS to niri session (only runs with niri, not other DEs)
   if command -v dms &> /dev/null; then

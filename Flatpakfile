@@ -8,3 +8,6 @@ remote flathub https://flathub.org/repo/flathub.flatpakrepo
 
 # Music
 com.spotify.Client
+
+# Chat
+com.discordapp.Discord
