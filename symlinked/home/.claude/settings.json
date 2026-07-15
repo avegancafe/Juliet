@@ -160,13 +160,13 @@
     "linear@claude-plugins-official": true,
     "beads@sttts-beads-skill": true,
     "kitchen-brigade@avegancafe-marketplace": true,
-    "avegancafe@avegancafe-marketplace": true
+    "avegancafe@avegancafe-marketplace": true,
+    "superpowers@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
       "source": {
         "source": "git",
-        "repo": "avegancafe/avegancafe-marketplace",
         "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
       }
     },

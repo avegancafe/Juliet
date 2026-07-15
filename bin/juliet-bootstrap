@@ -22,6 +22,49 @@ gum-confirm() {
   return $rc
 }
 
+# Non-fatal error handling: an optional step that fails shouldn't abort the
+# whole bootstrap. Guard such steps with
+#   <step> || bootstrap_error "<summary>" ["<detail line>"...]
+# The summary is logged immediately (via error()) with any detail lines —
+# remedy commands, paths — indented under it, recorded, and the whole entry is
+# re-reported by print-bootstrap-summary at the end, while bootstrap keeps
+# going. Keep each line short; put commands on their own detail line instead
+# of inlining them in the summary.
+BOOTSTRAP_ERRORS=()
+
+bootstrap_error() {
+  local summary="$1"
+  shift
+  error "$summary"
+  local line
+  for line in "$@"; do
+    printf "      %s\n" "$line" >&2
+  done
+  BOOTSTRAP_ERRORS+=("$(printf '%s\n' "$summary" "$@")")
+}
+
+print-bootstrap-summary() {
+  if [[ ${#BOOTSTRAP_ERRORS[@]} -eq 0 ]]; then
+    log "✅ Done!"
+    return 0
+  fi
+  echo
+  warn "Bootstrap finished with ${#BOOTSTRAP_ERRORS[@]} error(s):"
+  local entry line printed
+  for entry in "${BOOTSTRAP_ERRORS[@]}"; do
+    printed=""
+    while IFS= read -r line; do
+      if [[ -z "$printed" ]]; then
+        error "  • $line"
+        printed=1
+      else
+        printf "        %s\n" "$line" >&2
+      fi
+    done <<< "$entry"
+  done
+  return 1
+}
+
 # Global flags
 YES_ALL="false"
 NO_ALL="false"
@@ -141,19 +184,24 @@ confirm-category() {
   local description="$2"
 
   if ! should-run-step "$category"; then
-    rlog "Skipping $category install step(s)... (filtered)"
+    skip "Skipping $category step(s) (filtered)"
     return 1
+  fi
+
+  # Explicitly enabled via --enable: run without prompting (matches should-confirm)
+  if [[ ${#ENABLED_STEPS[@]} -gt 0 ]] && [[ " ${ENABLED_STEPS[*]} " =~ " $category " ]]; then
+    return 0
   fi
 
   [[ "$YES_ALL" == "true" ]] && return 0
 
   if [[ "$NO_ALL" == "true" ]]; then
-    rlog "Skipping $category install step(s)..."
+    skip "Skipping $category step(s)"
     return 1
   fi
 
   if ! gum-confirm "$description"; then
-    rlog "Skipping $category install step(s)..."
+    skip "Skipping $category step(s)"
     return 1
   fi
 
@@ -170,13 +218,13 @@ is-macos() {
 }
 
 setup-git() {
-  rlog "Setting up git..."
+  substep "Setting up git..."
   mkdir -p ~/.config/local
   [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
 }
 
 update-juliet() {
-  rlog "Updating Juliet repository..."
+  substep "Updating Juliet repository..."
   WORKDIR="$HOME/.config/Juliet"
   if [ -d "$WORKDIR" ]; then
     cd "$WORKDIR"
@@ -200,7 +248,7 @@ update-juliet() {
 
     cd - > /dev/null
   else
-    log "Error: Juliet directory not found at $WORKDIR"
+    error "Juliet directory not found at $WORKDIR"
   fi
 }
 
@@ -234,34 +282,40 @@ ensure-brew() {
 # The full package steps run later and are idempotent, so this early install is
 # just to satisfy the ordering dependency.
 ensure-bootstrap-deps() {
-  rlog "Installing bootstrap prerequisites (stow, gum)..."
+  substep "Checking bootstrap prerequisites (stow, gum)..."
   if is-macos; then
     ensure-brew
     for tool in stow gum; do
-      command -v "$tool" &> /dev/null || brew install "$tool"
+      command -v "$tool" &> /dev/null && continue
+      rlog "Installing $tool via brew..."
+      brew install "$tool"
     done
   elif is-fedora; then
     for tool in stow gum; do
-      command -v "$tool" &> /dev/null || sudo dnf install -y "$tool"
+      command -v "$tool" &> /dev/null && continue
+      rlog "Installing $tool via dnf..."
+      sudo dnf install -y "$tool"
     done
   fi
 }
 
 setup-brew() {
-  rlog "Setting up Homebrew..."
-
   ensure-brew
 
   if ! command -v gum &> /dev/null; then
     brew install gum
   fi
 
-  brew bundle --file ~/.config/Juliet/Brewfile
+  rlog "Running brew bundle..."
+  brew bundle --file ~/.config/Juliet/Brewfile \
+    || bootstrap_error "brew bundle reported failures — check the output above." \
+      "Then re-run: juliet-bootstrap --enable=packages"
 }
 
 setup-cargo() {
-  rlog "Setting up Cargo..."
+  substep "Checking cargo..."
   if ! command -v cargo &> /dev/null; then
+    rlog "Installing Rust via rustup-init..."
     rustup-init
   fi
 }
@@ -282,7 +336,7 @@ dnf-satisfied() {
 }
 
 setup-dnf() {
-  log "Setting up DNF packages..."
+  substep "Setting up DNF packages..."
 
   if ! command -v gum &> /dev/null; then
     sudo dnf install -y gum
@@ -298,7 +352,7 @@ setup-dnf() {
   # steam) only exist there and would otherwise be silently skipped by
   # --skip-unavailable.
   if ! rpm -q rpmfusion-free-release &> /dev/null || ! rpm -q rpmfusion-nonfree-release &> /dev/null; then
-    log "Enabling RPM Fusion repositories..."
+    rlog "Enabling RPM Fusion repositories..."
     sudo dnf install -y \
       "https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm" \
       "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
@@ -312,7 +366,7 @@ setup-dnf() {
     if [[ "$line" =~ ^copr[[:space:]]+ ]]; then
       repo="${line#copr }"
       if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
-        log "Enabling COPR: $repo"
+        rlog "Enabling COPR: $repo"
         sudo dnf copr enable -y "$repo"
       fi
     fi
@@ -328,7 +382,7 @@ setup-dnf() {
 
   # Install packages
   if [[ ${#packages[@]} -gt 0 ]]; then
-    log "Installing ${#packages[@]} packages..."
+    rlog "Installing ${#packages[@]} DNF packages..."
     # --skip-unavailable/--skip-broken keep one bad package (e.g. steam
     # without RPM Fusion) from aborting the whole transaction.
     sudo dnf install -y --skip-unavailable --skip-broken "${packages[@]}"
@@ -338,17 +392,18 @@ setup-dnf() {
     failed=()
     for pkg in "${packages[@]}"; do
       dnf-satisfied "$pkg" && continue
-      log "Retrying $pkg individually..."
+      substep "Retrying $pkg individually..."
       sudo dnf install -y "$pkg" || failed+=("$pkg")
     done
     if [[ ${#failed[@]} -gt 0 ]]; then
-      warn "Failed to install: ${failed[*]}"
+      bootstrap_error "Failed to install DNF packages: ${failed[*]}" \
+        "Install them manually, then re-run: juliet-bootstrap --enable=packages"
     fi
   fi
 }
 
 setup-flatpak() {
-  log "Setting up Flatpak packages..."
+  substep "Setting up Flatpak packages..."
 
   FLATPAKFILE="$HOME/.config/Juliet/Flatpakfile"
   if [[ ! -f "$FLATPAKFILE" ]]; then
@@ -361,7 +416,7 @@ setup-flatpak() {
     [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
     if [[ "$line" =~ ^remote[[:space:]]+ ]]; then
       read -r _ name url <<< "$line"
-      log "Adding Flatpak remote: $name"
+      substep "Adding Flatpak remote: $name"
       flatpak remote-add --if-not-exists "$name" "$url"
     fi
   done < "$FLATPAKFILE"
@@ -369,21 +424,30 @@ setup-flatpak() {
   # Install apps
   while IFS= read -r line || [[ -n "$line" ]]; do
     [[ -z "$line" || "$line" =~ ^[[:space:]]*# || "$line" =~ ^remote[[:space:]]+ ]] && continue
-    log "Installing Flatpak: $line"
-    flatpak install -y flathub "$line"
+    spin "Installing Flatpak: $line..." flatpak install -y flathub "$line" \
+      || bootstrap_error "Failed to install Flatpak $line" \
+        "Retry manually: flatpak install flathub $line"
   done < "$FLATPAKFILE"
 }
 
 symlink-dotfiles() {
-  log "Symlinking dotfiles..."
+  substep "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
-  stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
-  stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
-  stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
+  stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
+    || bootstrap_error "stow home failed — conflicts with existing real files (see above)." \
+      "Resolve the conflicts, then re-run: juliet-bootstrap"
+  stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config \
+    || bootstrap_error "stow config failed — conflicts with existing real files (see above)." \
+      "Resolve the conflicts, then re-run: juliet-bootstrap"
+  # local-state only exists when something needs ~/.local/state files
+  if [[ -d $HOME/.config/Juliet/symlinked/local-state ]]; then
+    mkdir -p "$HOME/.local/state"
+    stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
+  fi
 }
 
 setup-ssh() {
-  log "Setting up SSH..."
+  substep "Setting up SSH keys..."
 
   if [[ ! -d $HOME/.ssh ]]; then
     mkdir $HOME/.ssh
@@ -435,7 +499,7 @@ setup-ssh() {
   local sshconf="$HOME/.ssh/config"
   local include_line="Include ~/.config/ssh/github.conf"
   if ! grep -qsxF "$include_line" "$sshconf"; then
-    log "Wiring tracked GitHub ssh config into ~/.ssh/config..."
+    substep "Wiring tracked GitHub ssh config into ~/.ssh/config..."
     {
       echo "$include_line"
       [[ -f "$sshconf" ]] && cat "$sshconf"
@@ -464,17 +528,18 @@ setup-ssh() {
       uploaded=false
     fi
     if [[ "$uploaded" == "false" ]]; then
-      warn "Couldn't upload new SSH keys to GitHub automatically. Run:"
-      warn "  gh auth refresh -h github.com -s admin:public_key -s admin:ssh_signing_key"
-      warn "  gh ssh-key add ~/.ssh/github_auth.pub --type authentication --title \"$(hostname) auth\""
-      warn "  gh ssh-key add ~/.ssh/github_signing.pub --type signing --title \"$(hostname) signing\""
+      bootstrap_error "Couldn't upload new SSH keys to GitHub automatically. To fix:" \
+        "gh auth refresh -h github.com -s admin:public_key -s admin:ssh_signing_key" \
+        "gh ssh-key add ~/.ssh/github_auth.pub --type authentication" \
+        "gh ssh-key add ~/.ssh/github_signing.pub --type signing"
     fi
   fi
 }
 
 setup-fzf() {
+  substep "Checking fzf..."
   if ! command -v fzf &> /dev/null; then
-    log "Installing fzf..."
+    rlog "Installing fzf..."
     /opt/homebrew/opt/fzf/install
   fi
 }
@@ -482,9 +547,11 @@ setup-fzf() {
 setup-tmux-plugins() {
   # tpm (tmux plugin manager) bootstraps the plugins declared in the tracked
   # .tmux.conf; nothing installs it besides this clone.
+  substep "Checking tpm (tmux plugin manager)..."
   if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
-    rlog "Installing tpm (tmux plugin manager)..."
-    git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+    spin "Installing tpm..." git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" \
+      || bootstrap_error "Failed to clone tpm" \
+        "Retry manually: git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm"
   fi
 }
 
@@ -496,22 +563,24 @@ setup-fish() {
     warn "fish not found, skipping fish setup"
     return
   fi
-  log "Setting up fish..."
+  substep "Setting up fish..."
 
   if ! grep -q "$FISH_PATH" /etc/shells 2>/dev/null; then
-    log "Adding $FISH_PATH to /etc/shells..."
+    substep "Adding $FISH_PATH to /etc/shells..."
     sudo bash -c "echo '$FISH_PATH' >> /etc/shells"
   fi
 
   if [[ "$SHELL" != "$FISH_PATH" ]]; then
-    log "Setting fish to default shell..."
+    substep "Setting fish to default shell..."
     chsh -s "$FISH_PATH" "$(whoami)"
+  else
+    skip "fish is already the default shell — skipping"
   fi
 }
 
 setup-gpg() {
   if [[ ! -d $HOME/.gnupg ]]; then
-    log "Setting up GPG..."
+    substep "Setting up GPG..."
     mkdir ~/.gnupg
     touch ~/.gnupg/gpg-agent.conf
     echo "pinentry-program /usr/local/bin/pinentry-mac" >> ~/.gnupg/gpg-agent.conf
@@ -530,53 +599,62 @@ setup-cyberduck() {
     return
   fi
 
-  log "Configuring Cyberduck (ignore SSH agent, use per-bookmark key)..."
+  substep "Configuring Cyberduck (ignore SSH agent, use per-bookmark key)..."
   defaults write ch.sudo.cyberduck ssh.authentication.agent.enable -bool false
 }
 
 setup-rust() {
-  rlog "Setting up Rust dependencies..."
+  substep "Checking Rust tools (stylua, silicon, tabiew)..."
   if ! command -v stylua &> /dev/null; then
-    cargo install stylua
+    spin "Installing stylua (cargo)..." cargo install stylua \
+      || bootstrap_error "Failed to install stylua — run 'cargo install stylua' manually."
   fi
 
   if is-macos && ! command -v silicon &> /dev/null; then
-    cargo install silicon
+    spin "Installing silicon (cargo)..." cargo install silicon \
+      || bootstrap_error "Failed to install silicon — run 'cargo install silicon' manually."
   fi
 
   # tabiew (tw, used by the cq alias); macOS gets it from the Brewfile
   if is-fedora && ! command -v tw &> /dev/null; then
-    cargo install tabiew
+    spin "Installing tabiew (cargo)..." cargo install tabiew \
+      || bootstrap_error "Failed to install tabiew — run 'cargo install tabiew' manually."
   fi
 }
 
 setup-python() {
-  rlog "Setting up Python..."
+  substep "Checking Python tools (poetry, sqlfluff, pipenv)..."
   if ! command -v poetry &> /dev/null; then
-    curl -sSL https://install.python-poetry.org | python3 -
+    spin "Installing poetry..." sh -c 'curl -sSL https://install.python-poetry.org | python3 -' \
+      || bootstrap_error "Failed to install poetry" \
+        "Retry manually: curl -sSL https://install.python-poetry.org | python3 -"
   fi
 
   # sqlfluff (neoformat's SQL formatter) has no Fedora dnf package; macOS gets
   # it from the Brewfile
   if is-fedora && ! command -v sqlfluff &> /dev/null; then
-    pip install --user sqlfluff
+    spin "Installing sqlfluff (pip)..." pip install --user sqlfluff \
+      || bootstrap_error "Failed to install sqlfluff — run 'pip install --user sqlfluff' manually."
   fi
 
   # pipenv (the pv alias) was dropped from Fedora's repos entirely; macOS gets
   # it from the Brewfile
   if is-fedora && ! command -v pipenv &> /dev/null; then
-    pip install --user pipenv
+    spin "Installing pipenv (pip)..." pip install --user pipenv \
+      || bootstrap_error "Failed to install pipenv — run 'pip install --user pipenv' manually."
   fi
 }
 
 setup-node-tools() {
-  rlog "Setting up Node tools..."
+  substep "Checking Node tools (prettier, eslint)..."
   # prettier/eslint (neoformat/nvim-lint) have no Fedora dnf packages; macOS
   # gets them from the Brewfile
   if is-fedora; then
     for tool in prettier eslint; do
       if ! command -v "$tool" &> /dev/null; then
-        sudo npm install -g "$tool"
+        rlog "Installing $tool via npm..."
+        sudo npm install -g "$tool" \
+          || bootstrap_error "Failed to install $tool — run 'sudo npm install -g $tool' manually."
       fi
     done
   fi
@@ -585,11 +663,12 @@ setup-node-tools() {
 setup-nodenv() {
   # macOS gets nodenv from the Brewfile; Fedora has no dnf package, so use the
   # official installer (clones nodenv + node-build into ~/.nodenv).
+  substep "Checking nodenv..."
   if command -v nodenv &> /dev/null || [[ -d "$HOME/.nodenv/bin" ]]; then
     return
   fi
-  rlog "Installing nodenv..."
-  curl -fsSL https://github.com/nodenv/nodenv-installer/raw/HEAD/bin/nodenv-installer | bash
+  spin "Installing nodenv..." sh -c 'curl -fsSL https://github.com/nodenv/nodenv-installer/raw/HEAD/bin/nodenv-installer | bash' \
+    || bootstrap_error "Failed to install nodenv — see https://github.com/nodenv/nodenv-installer."
 }
 
 setup-sddm() {
@@ -600,7 +679,7 @@ setup-sddm() {
   if ! command -v sddm &> /dev/null; then
     return
   fi
-  log "Setting up SDDM theme..."
+  substep "Setting up SDDM theme..."
 
   THEME_SRC="$HOME/.config/Juliet/etc/sddm-themes/juliet"
   THEME_DEST="/usr/share/sddm/themes/juliet"
@@ -610,7 +689,7 @@ setup-sddm() {
   fi
 
   # Always copy/update theme to system directory
-  log "Installing Juliet SDDM theme..."
+  substep "Installing Juliet SDDM theme..."
   sudo rm -rf "$THEME_DEST"
   sudo cp -r "$THEME_SRC" "$THEME_DEST"
   sudo cp "$HOME/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png" "$THEME_DEST/background.png"
@@ -620,7 +699,7 @@ setup-sddm() {
   # Set theme in SDDM config
   SDDM_CONF="/etc/sddm.conf.d/juliet.conf"
   if [[ ! -f "$SDDM_CONF" ]]; then
-    log "Configuring SDDM to use Juliet theme..."
+    substep "Configuring SDDM to use Juliet theme..."
     sudo tee "$SDDM_CONF" > /dev/null << 'EOF'
 [Theme]
 Current=juliet
@@ -629,9 +708,11 @@ EOF
 }
 
 setup-claude-code() {
-  rlog "Setting up Claude Code..."
   if ! command -v claude &> /dev/null; then
+    rlog "Installing Claude CLI..."
     curl -fsSL https://claude.ai/install.sh | bash
+  else
+    skip "Claude CLI already installed — skipping"
   fi
 
   # Configure git to authenticate GitHub over HTTPS via the gh CLI. Claude Code
@@ -643,15 +724,17 @@ setup-claude-code() {
   # `!gh ...` form resolves gh from PATH, so it stays portable across macOS/Fedora.
   if command -v gh &> /dev/null; then
     if gh auth status &> /dev/null; then
-      log "Configuring gh as the git credential helper for GitHub (HTTPS access to private repos)..."
+      substep "Configuring gh as the git credential helper for GitHub (HTTPS access to private repos)..."
       mkdir -p "$HOME/.config/local"
       git config --file "$HOME/.config/local/gitconfig" credential."https://github.com".helper "!gh auth git-credential"
       git config --file "$HOME/.config/local/gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"
     else
-      warn "gh is installed but not authenticated. Run 'gh auth login', then re-run this step, to enable HTTPS cloning of private repos (needed for private plugin marketplaces)."
+      warn "gh is installed but not authenticated — private plugin marketplaces won't clone over HTTPS."
+      warn "Run 'gh auth login', then re-run: juliet-bootstrap --enable=claude"
     fi
   else
-    warn "gh not found; skipping git credential-helper setup. Private plugin marketplaces won't clone over HTTPS until gh is installed and authenticated."
+    warn "gh not found; skipping git credential-helper setup."
+    warn "Private plugin marketplaces won't clone over HTTPS until gh is installed and authenticated."
   fi
 
   # Define marketplaces to add
@@ -666,8 +749,8 @@ setup-claude-code() {
     marketplace_name="${marketplace_pair%%:*}"
     marketplace_id="${marketplace_pair#*:}"
     if ! claude plugin marketplace list 2>/dev/null | grep -Fq "$marketplace_name"; then
-      log "Adding $marketplace_name marketplace..."
-      claude plugin marketplace add "$marketplace_id" 2>/dev/null || true
+      spin "Adding $marketplace_name marketplace..." claude plugin marketplace add "$marketplace_id" \
+        || warn "Failed to add $marketplace_name marketplace (non-fatal)."
     fi
   done
 
@@ -684,8 +767,8 @@ setup-claude-code() {
   # Install plugins if not already installed
   for plugin in "${plugins[@]}"; do
     if ! claude plugin list 2>/dev/null | grep -Fq "$plugin"; then
-      log "Installing $plugin..."
-      claude plugin install "$plugin" || warn "Failed to install $plugin"
+      spin "Installing $plugin..." claude plugin install "$plugin" \
+        || bootstrap_error "Failed to install $plugin — run 'claude plugin install $plugin' manually."
     fi
   done
 }
@@ -696,6 +779,7 @@ setup-claude-code() {
 
 run-packages() {
   confirm-category "packages" "Install system packages? (neovim, bat, ripgrep, fzf, gh, starship, ghostty...)" || return
+  rlog "📦 Installing system packages..."
   if is-macos; then
     setup-brew
   elif is-fedora; then
@@ -706,6 +790,7 @@ run-packages() {
 
 run-dev() {
   confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint)" || return
+  rlog "🛠️ Installing dev tools..."
   setup-cargo
   setup-rust
   setup-python
@@ -715,6 +800,7 @@ run-dev() {
 
 run-shell() {
   confirm-category "shell" "Configure shell? (fish as default, fzf keybindings, tmux plugins)" || return
+  log "🐚 Configuring shell..."
   setup-fish
   setup-fzf
   setup-tmux-plugins
@@ -722,6 +808,7 @@ run-shell() {
 
 run-security() {
   confirm-category "security" "Set up security? (SSH key, GPG agent)" || return
+  log "🔐 Setting up security..."
   setup-ssh
   setup-gpg
   setup-cyberduck
@@ -735,11 +822,13 @@ run-desktop() {
   if ! command -v sddm &> /dev/null; then return; fi
 
   confirm-category "desktop" "Configure desktop? (sddm theme)" || return
+  log "🖥️ Configuring desktop..."
   setup-sddm
 }
 
 run-claude() {
   confirm-category "claude" "Set up Claude Code? (CLI, superpowers, context7, LSP plugins)" || return
+  rlog "🤖 Setting up Claude Code..."
   setup-claude-code
 }
 
@@ -748,6 +837,7 @@ run-claude() {
 # =============================================================================
 
 # Core setup (always runs)
+log "🚀 Bootstrapping Juliet..."
 ensure-bootstrap-deps
 setup-git
 update-juliet
@@ -761,4 +851,4 @@ run-security
 run-desktop
 run-claude
 
-log "Done!"
+print-bootstrap-summary
