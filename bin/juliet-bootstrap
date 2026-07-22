@@ -434,8 +434,11 @@ symlink-dotfiles() {
   substep "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
   # Keep ~/.config/opencode a real dir so stow file-links only our tracked
-  # configs into it; opencode writes node_modules/package.json (its own
-  # bun-managed plugin deps) at that root, which must stay out of the repo.
+  # configs (tui.json, plugins/cmux.js) into it; opencode writes
+  # node_modules/package.json (its own bun-managed plugin deps) at that root,
+  # which must stay out of the repo. opencode.json itself is deliberately NOT
+  # stowed: dev-env owns the global file, Juliet layers overrides via
+  # OPENCODE_CONFIG (see setup-opencode).
   mkdir -p ~/.config/opencode 2>/dev/null || true
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
     || bootstrap_error "stow home failed — conflicts with existing real files (see above)." \
@@ -848,10 +851,36 @@ setup-opencode() {
     skip "opencode already installed — skipping"
   fi
 
-  # opencode config (opencode.json, tui.json) and the cmux notification plugin
-  # (plugins/cmux.js) are stow-symlinked into ~/.config/opencode by
-  # symlink-dotfiles — nothing to install here. The plugin auto-loads and rings
-  # the cmux workspace tab when the agent goes idle or errors. It's a no-op
+  # Config layering (revised — Juliet does NOT stow opencode.json):
+  #   global  ~/.config/opencode/opencode.json   owned by dev-env's `j2 bootstrap`
+  #           (fill-undefined merge: pinned j2 plugins, team MCP servers,
+  #           permission baseline, mcp/lsp fragments — yields to local values)
+  #   custom  $OPENCODE_CONFIG                    Juliet's opencode/config.json
+  #           (theme + future Juliet-only keys), exported from fish/env.fish
+  #   project <repo>/opencode.json                per-repo overrides
+  # opencode loads them in that precedence order, so Juliet's keys override the
+  # dev-env defaults without either bootstrap touching the other's file.
+  # tui.json and plugins/cmux.js are still stow-symlinked into ~/.config/opencode
+  # by symlink-dotfiles (dev-env doesn't manage those paths).
+
+  # Migration: an earlier revision of this branch stow-symlinked opencode.json
+  # into ~/.config/opencode. dev-env's jq merges write via mv(1), which would
+  # silently replace that symlink with a real file and break the stow link.
+  # Remove the stale Juliet-owned link so dev-env can manage the global file.
+  local oc_json="$HOME/.config/opencode/opencode.json"
+  if [[ -L "$oc_json" ]] && readlink "$oc_json" | grep -q "$HOME/.config/Juliet/"; then
+    rlog "Removing stale Juliet stow link for opencode.json (now layered via OPENCODE_CONFIG; run 'j2 bootstrap' to lay down the dev-env global file)"
+    rm "$oc_json"
+  fi
+
+  # OPENCODE_CONFIG is exported by the stowed fish/env.fish; it only reaches
+  # shells started after the stow run, so hint when the current shell lacks it.
+  if [[ -z "${OPENCODE_CONFIG:-}" ]]; then
+    warn "OPENCODE_CONFIG not set in this shell yet — open a new shell (or 'source ~/.config/fish/env.fish') so opencode picks up Juliet's override layer."
+  fi
+
+  # The cmux notification plugin (plugins/cmux.js) auto-loads and rings the
+  # cmux workspace tab when the agent goes idle or errors. It's a no-op
   # outside a cmux session, but warn if the cmux CLI is missing so the user
   # knows notifications won't fire.
   if ! command -v cmux &> /dev/null; then

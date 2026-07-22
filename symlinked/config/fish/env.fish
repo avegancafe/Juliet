@@ -47,3 +47,11 @@ set -gx FOUNDRY_FMT_BRACKET_SPACING true
 set -gx FOUNDRY_FMT_QUOTE_STYLE single
 set -gx NEOVIDE_TITLE_HIDDEN 1
 set -gx NEOVIDE_FRAME buttonless
+
+# Juliet-local opencode overrides, layered by opencode BETWEEN the global
+# ~/.config/opencode/opencode.json (owned by dev-env's `j2 bootstrap`: pinned
+# j2 plugin specs, team MCP servers, permission baseline, mcp/lsp fragments)
+# and per-project configs. Keep Juliet's file to Juliet-owned keys (theme,
+# future Juliet-specific tweaks) — do NOT add plugin/mcp/lsp keys here, that
+# forks the dev-env team baseline.
+set -gx OPENCODE_CONFIG "$HOME/.config/Juliet/opencode/config.json"
