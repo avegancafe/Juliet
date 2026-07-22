@@ -47,3 +47,19 @@ set -gx FOUNDRY_FMT_BRACKET_SPACING true
 set -gx FOUNDRY_FMT_QUOTE_STYLE single
 set -gx NEOVIDE_TITLE_HIDDEN 1
 set -gx NEOVIDE_FRAME buttonless
+
+# Juliet-local opencode overrides, layered by opencode BETWEEN the global
+# ~/.config/opencode/opencode.json (symlinked by dev-env's `j2 bootstrap` to
+# the org config: pinned j2 plugins, team MCP servers, permission baseline,
+# LSPs, default_agent — org-managed, read-only) and per-project configs.
+# Two rules for Juliet's file:
+#   1. Only Juliet-owned opencode.json keys — do NOT add plugin/mcp/lsp keys,
+#      that forks the dev-env org config.
+#   2. NEVER add the deprecated theme/tui/keybinds keys — opencode rewrites
+#      any config file containing them in place (verified on 1.18.0), which
+#      would dirty this repo. Theme lives in the seeded tui.json instead
+#      (see setup-opencode in bin/juliet-bootstrap).
+# Fallback semantics: opencode has ONE OPENCODE_CONFIG slot, so a machine may
+# claim it earlier (e.g. conf.d/00-*.fish pointing at a personal local.json
+# with `model`/`shell`); Juliet's layer applies where unclaimed.
+set -q OPENCODE_CONFIG; or set -gx OPENCODE_CONFIG "$HOME/.config/Juliet/opencode/config.json"
