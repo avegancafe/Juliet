@@ -51,7 +51,11 @@ set -gx NEOVIDE_FRAME buttonless
 # Juliet-local opencode overrides, layered by opencode BETWEEN the global
 # ~/.config/opencode/opencode.json (owned by dev-env's `j2 bootstrap`: pinned
 # j2 plugin specs, team MCP servers, permission baseline, mcp/lsp fragments)
-# and per-project configs. Keep Juliet's file to Juliet-owned keys (theme,
-# future Juliet-specific tweaks) — do NOT add plugin/mcp/lsp keys here, that
-# forks the dev-env team baseline.
+# and per-project configs. Two rules for Juliet's file:
+#   1. Only Juliet-owned opencode.json keys — do NOT add plugin/mcp/lsp keys,
+#      that forks the dev-env team baseline.
+#   2. NEVER add the deprecated theme/tui/keybinds keys — opencode rewrites
+#      any config file containing them in place (verified on 1.18.0), which
+#      would dirty this repo. Theme lives in the seeded tui.json instead
+#      (see setup-opencode in bin/juliet-bootstrap).
 set -gx OPENCODE_CONFIG "$HOME/.config/Juliet/opencode/config.json"

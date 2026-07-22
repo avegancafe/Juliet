@@ -434,11 +434,11 @@ symlink-dotfiles() {
   substep "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
   # Keep ~/.config/opencode a real dir so stow file-links only our tracked
-  # configs (tui.json, plugins/cmux.js) into it; opencode writes
-  # node_modules/package.json (its own bun-managed plugin deps) at that root,
-  # which must stay out of the repo. opencode.json itself is deliberately NOT
-  # stowed: dev-env owns the global file, Juliet layers overrides via
-  # OPENCODE_CONFIG (see setup-opencode).
+  # content (plugins/cmux.js) into it; opencode writes node_modules/
+  # package.json (its own bun-managed plugin deps) at that root, which must
+  # stay out of the repo. opencode.json and tui.json are deliberately NOT
+  # stowed — opencode/dev-env both write config files, and a write through a
+  # symlink would dirty this repo (see setup-opencode for the layering).
   mkdir -p ~/.config/opencode 2>/dev/null || true
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
     || bootstrap_error "stow home failed — conflicts with existing real files (see above)." \
@@ -851,17 +851,21 @@ setup-opencode() {
     skip "opencode already installed — skipping"
   fi
 
-  # Config layering (revised — Juliet does NOT stow opencode.json):
+  # Config layering (Juliet does NOT stow opencode.json or tui.json):
   #   global  ~/.config/opencode/opencode.json   owned by dev-env's `j2 bootstrap`
   #           (fill-undefined merge: pinned j2 plugins, team MCP servers,
   #           permission baseline, mcp/lsp fragments — yields to local values)
-  #   custom  $OPENCODE_CONFIG                    Juliet's opencode/config.json
-  #           (theme + future Juliet-only keys), exported from fish/env.fish
+  #   custom  $OPENCODE_CONFIG                    Juliet's opencode/config.json,
+  #           exported from fish/env.fish (opencode.json-space keys only —
+  #           NEVER the deprecated theme/tui/keybinds keys: opencode rewrites
+  #           any config file containing them in place, which would dirty
+  #           this repo; verified on 1.18.0)
   #   project <repo>/opencode.json                per-repo overrides
   # opencode loads them in that precedence order, so Juliet's keys override the
   # dev-env defaults without either bootstrap touching the other's file.
-  # tui.json and plugins/cmux.js are still stow-symlinked into ~/.config/opencode
-  # by symlink-dotfiles (dev-env doesn't manage those paths).
+  # plugins/cmux.js stays stow-symlinked (immutable content — nothing writes
+  # to plugins/). Interactive theme picks persist to
+  # ~/.local/state/opencode/kv.json, never a config file.
 
   # Migration: an earlier revision of this branch stow-symlinked opencode.json
   # into ~/.config/opencode. dev-env's jq merges write via mv(1), which would
@@ -871,6 +875,22 @@ setup-opencode() {
   if [[ -L "$oc_json" ]] && readlink "$oc_json" | grep -q "$HOME/.config/Juliet/"; then
     rlog "Removing stale Juliet stow link for opencode.json (now layered via OPENCODE_CONFIG; run 'j2 bootstrap' to lay down the dev-env global file)"
     rm "$oc_json"
+  fi
+
+  # tui.json is SEEDED (copied once), never symlinked: opencode itself writes
+  # tui.json (deprecated-key migrations), and a write through a symlink would
+  # dirty this repo. After the seed, your theme settings are yours.
+  local tui_src="$HOME/.config/Juliet/opencode/tui.json"
+  local tui_dst="$HOME/.config/opencode/tui.json"
+  if [[ -L "$tui_dst" ]] && readlink "$tui_dst" | grep -q "$HOME/.config/Juliet/"; then
+    rlog "Converting stow-linked tui.json to a real file (opencode writes tui.json; a link would dirty the repo)..."
+    rm "$tui_dst"
+    cp "$tui_src" "$tui_dst"
+  elif [[ ! -f "$tui_dst" ]]; then
+    substep "Seeding ~/.config/opencode/tui.json (theme: system)..."
+    cp "$tui_src" "$tui_dst"
+  else
+    skip "tui.json already present — leaving your theme settings alone"
   fi
 
   # OPENCODE_CONFIG is exported by the stowed fish/env.fish; it only reaches
