@@ -428,6 +428,15 @@ setup-flatpak() {
       || bootstrap_error "Failed to install Flatpak $line" \
         "Retry manually: flatpak install flathub $line"
   done < "$FLATPAKFILE"
+
+  # Flatpak bind-mounts host font *files* into every sandbox, but not the host's
+  # user fontconfig *config*. Without this, symlinked/config/fontconfig/fonts.conf
+  # is invisible inside the sandbox and generic families (sans-serif, monospace)
+  # fall back to the runtime's DejaVu instead of Iosevka Nerd Font Mono. Applies
+  # globally so future Flatpaks inherit it. User-level; no root needed.
+  substep "Granting Flatpaks read access to user fontconfig..."
+  flatpak override --user --filesystem=xdg-config/fontconfig:ro \
+    || warn "Could not set Flatpak fontconfig override — Flatpak apps will use DejaVu for generic families."
 }
 
 symlink-dotfiles() {
