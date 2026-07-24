@@ -1,0 +1,20 @@
+# Juliet mimeapps.list — user-level default application associations.
+#
+# Overrides the distro defaults in /usr/share/applications/mimeapps.list, which
+# is where Fedora's firefox-as-default-browser comes from.
+#
+# Scoped deliberately to web browsing: Zen also declares handlers for PDFs,
+# images, and media, but those are left to their own defaults rather than
+# routed through the browser.
+#
+# Caveat: some apps rewrite this file (xdg-settings, gio mime, "make me your
+# default browser" prompts). Because stow symlinks it into this repo, such a
+# write lands on the tracked file — check `git diff` here if a default changes
+# on its own.
+
+[Default Applications]
+x-scheme-handler/http=app.zen_browser.zen.desktop
+x-scheme-handler/https=app.zen_browser.zen.desktop
+text/html=app.zen_browser.zen.desktop
+application/xhtml+xml=app.zen_browser.zen.desktop
+x-scheme-handler/claude-cli=claude-code-url-handler.desktop
