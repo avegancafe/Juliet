@@ -825,6 +825,17 @@ setup-claude-code() {
     skip "Claude CLI already installed — skipping"
   fi
 
+  # claude-statusline renders the Claude Code status line — the `statusLine`
+  # block in symlinked/home/.claude/settings.json invokes it, and it reads
+  # symlinked/config/claude-statusline/config.toml. macOS gets it from the
+  # Brewfile (felipeelias/tap); Fedora has no package, so build it from source
+  # with the Go toolchain. It lands in $GOPATH/bin, which env.fish adds to PATH.
+  if is-fedora && ! command -v claude-statusline &> /dev/null; then
+    spin "Installing claude-statusline (go)..." go install github.com/felipeelias/claude-statusline@latest \
+      || bootstrap_error "Failed to install claude-statusline — the Claude Code status line will render nothing." \
+        "Retry manually: go install github.com/felipeelias/claude-statusline@latest"
+  fi
+
   # Configure git to authenticate GitHub over HTTPS via the gh CLI. Claude Code
   # clones marketplaces/plugins over HTTPS, so private ones (e.g. the
   # avegancafe-marketplace referenced in settings.json) fail to clone without an

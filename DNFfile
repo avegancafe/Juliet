@@ -41,6 +41,10 @@ docker-cli
 kubernetes-client
 deno
 ruff
+# golang: needed directly, not just as a lint-tool dependency — the
+# setup-claude-code bootstrap step `go install`s claude-statusline (the Claude
+# Code status line), which has no Fedora package.
+golang
 golangci-lint
 golang-x-tools-goimports
 
