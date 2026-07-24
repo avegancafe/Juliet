@@ -44,3 +44,6 @@ set -gx CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS 1
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/kyle/google-cloud-sdk/path.fish.inc' ]; . '/home/kyle/google-cloud-sdk/path.fish.inc'; end
+
+# opencode
+fish_add_path /home/kyle/.opencode/bin
