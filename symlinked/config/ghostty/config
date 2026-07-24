@@ -7,6 +7,8 @@ cursor-style-blink = true
 shell-integration-features = no-cursor
 
 keybind = global:ctrl+shift+g=toggle_quick_terminal
+keybind = super+d=new_split:right
+keybind = super+shift+d=new_split:down
 quick-terminal-animation-duration = 0
 quick-terminal-size = 100%
 macos-titlebar-style = tabs
