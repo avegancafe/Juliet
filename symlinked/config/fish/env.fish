@@ -1,4 +1,11 @@
 # PATH mutations
+# GOPATH is set here rather than with the other language configs below because
+# the PATH line for $GOPATH/bin needs it. Set later, it expanded to empty on a
+# fresh machine's first shell — $GOPATH/bin became "/bin" and go-installed
+# binaries (e.g. claude-statusline) stayed off PATH until a later shell
+# inherited the exported var.
+set -gx GOPATH "$HOME/go"
+
 set -gx PATH /usr/local/bin $PATH
 set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$GOPATH/bin" $PATH
@@ -32,7 +39,7 @@ set -U fish_user_paths $PYENV_ROOT/bin $fish_user_paths
 # node-gyp picks the default `python3` (broken Homebrew python@3.14 — pyexpat fails
 # to load), so point native-addon builds at a working interpreter instead.
 set -gx PYTHON /opt/homebrew/bin/python3.11
-set -gx GOPATH "$HOME/go"
+# GOPATH is set in the PATH block above (it's a dependency of that block).
 set -gx PIPENV_SHELL_FANCY 1
 
 
