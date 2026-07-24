@@ -11,3 +11,6 @@ com.spotify.Client
 
 # Communication
 com.slack.Slack
+
+# Browsers
+app.zen_browser.zen
