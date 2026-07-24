@@ -428,6 +428,11 @@ binds {
     Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
     Mod+Space hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Menu hotkey-overlay-title="Run an Application: fuzzel" { spawn-sh "pkill fuzzel || fuzzel"; }
+    // Tapping Super opens the noctalia Control Center (the bar's right-click
+    // menu). keyd gives leftmeta a dual role: hold = the Mod modifier (so every
+    // Mod+... bind below still works), tap = F13, which niri binds here.
+    // Requires the keyd setup — see etc/keyd/default.conf.
+    F13 hotkey-overlay-title="Noctalia Control Center: tap Super" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "controlCenter" "toggle"; }
     Mod+Shift+Period hotkey-overlay-title="Emoji/Unicode Picker: rofimoji" { spawn "rofimoji"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
 

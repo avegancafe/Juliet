@@ -714,6 +714,37 @@ EOF
   fi
 }
 
+# keyd gives the Super key (leftmeta) a dual role: hold = the Mod modifier for
+# niri, tap = F13 (bound to toggle the noctalia Control Center). keyd is a root
+# daemon that reads /etc/keyd, so its config can't be a stow symlink in $HOME —
+# copy the tracked config in and (re)load the service instead.
+setup-keyd() {
+  if ! is-fedora; then
+    return
+  fi
+
+  # keyd comes from the DNFfile (packages step); skip cleanly if it isn't here.
+  if ! command -v keyd &> /dev/null; then
+    return
+  fi
+  substep "Setting up keyd (dual-role Super: hold=Mod, tap=noctalia menu)..."
+
+  local src="$HOME/.config/Juliet/etc/keyd/default.conf"
+  if [[ ! -f "$src" ]]; then
+    return
+  fi
+
+  # install -D creates /etc/keyd if missing and sets 0644 in one step.
+  sudo install -Dm644 "$src" /etc/keyd/default.conf \
+    || bootstrap_error "Failed to install /etc/keyd/default.conf" \
+      "Copy it manually: sudo install -Dm644 $src /etc/keyd/default.conf"
+  sudo systemctl enable --now keyd \
+    || bootstrap_error "Failed to enable the keyd service" \
+      "Enable it manually: sudo systemctl enable --now keyd"
+  # Re-runs: pick up config changes without a restart (no-op on first enable).
+  sudo keyd reload &> /dev/null || true
+}
+
 # Pinned Nerd Fonts release used for fonts too large to vendor (Iosevka).
 NERD_FONTS_VERSION="v3.4.0"
 
@@ -958,13 +989,15 @@ run-security() {
 run-desktop() {
   # Only show on Linux with relevant tools. Noctalia (the niri shell) needs no
   # setup step here: it's installed via the DNFfile and started by
-  # spawn-at-startup in the niri config.
+  # spawn-at-startup in the niri config. Each setup-* step self-guards on the
+  # tool it configures, so only skip the whole category when none are present.
   if ! is-fedora; then return; fi
-  if ! command -v sddm &> /dev/null; then return; fi
+  if ! command -v sddm &> /dev/null && ! command -v keyd &> /dev/null; then return; fi
 
-  confirm-category "desktop" "Configure desktop? (sddm theme)" || return
+  confirm-category "desktop" "Configure desktop? (sddm theme, keyd Super-tap remap)" || return
   log "🖥️ Configuring desktop..."
   setup-sddm
+  setup-keyd
 }
 
 run-claude() {

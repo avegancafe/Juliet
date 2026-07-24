@@ -13,6 +13,9 @@ copr zhangyi6324/noctalia-shell
 # f44 repo) — bijumon/neovide-release tracks upstream releases with f44 builds
 copr bijumon/neovide-release
 copr pgdev/deno
+# keyd (key remapper) isn't in Fedora's repos; alternateved/keyd is the COPR the
+# upstream keyd README points to and it ships f44 builds
+copr alternateved/keyd
 
 # Terminal & Shell
 ghostty
@@ -45,6 +48,10 @@ golang-x-tools-goimports
 niri
 hyprlock
 noctalia-shell
+# keyd: system-level key remapper. Used to give leftmeta (Super) a dual role —
+# hold = the Mod modifier for niri, tap = F13 (bound to the noctalia menu).
+# Configured by the setup-keyd bootstrap step (/etc/keyd/default.conf).
+keyd
 fuzzel
 rofimoji
 wl-clipboard
