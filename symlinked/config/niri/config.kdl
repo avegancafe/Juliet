@@ -38,6 +38,10 @@ input {
         // drag false
         // drag-lock
         natural-scroll
+        // Multiplier on scroll distance — the stock 1.0 is uncomfortably fast
+        // on this touchpad. Lower is slower; niri hot-reloads this file, so it
+        // can be tuned live without a restart.
+        scroll-factor 0.5
         // accel-speed 0.2
         // accel-profile "flat"
         // scroll-method "two-finger"
