@@ -10,6 +10,7 @@ symlinked/home/.claude/*
 !symlinked/home/.claude/settings.json
 
 .claude/*.local.json
+.claude/worktrees
 
 # noctalia downloads enabled plugins itself from the sourceUrl in plugins.json
 symlinked/config/noctalia/plugins/
