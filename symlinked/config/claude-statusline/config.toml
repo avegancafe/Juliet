@@ -21,12 +21,21 @@
 
 preset = "default"
 
-format = '$directory$git_branch          $context[  ](bg:#2f312c)$usage$model'
+format = '$directory$git_branch$fill$context[  ](bg:#2f312c)$usage$model'
 
-# Claude Code renders the status line inside its own chrome and truncates content
-# that reaches the edge, which is why the reference sets MARGIN=3.
+# $fill is elastic whitespace: it absorbs the slack so the cluster and model sit
+# flush against the right edge, as the reference script's computed pad does.
+#
+# margin: Claude Code renders the status line inside its own chrome and truncates
+# content reaching the edge — the reference sets MARGIN=3 for the same reason.
+#
+# gap: the minimum columns $fill reserves when the line is MEASURED for fitting
+# (the reference's GAP=10). Emission expands the fill to absorb the slack, so
+# measuring it expanded would make every line exactly `usable` wide, the fit test
+# would always pass, and nothing would ever drop.
 [fit]
 margin = 3
+gap = 10
 
 [directory]
 # {{.RepoName}} is the git worktree's basename, matching the script's repo block.
