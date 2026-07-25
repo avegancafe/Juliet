@@ -695,6 +695,23 @@ setup-sddm() {
   if ! command -v sddm &> /dev/null; then
     return
   fi
+
+  # Make sddm the active display manager. Fedora's KDE spin installs
+  # plasma-login-manager (plasmalogin.service) and enables it; this machine
+  # runs niri, so sddm takes over as the greeter. display-manager.service is a
+  # symlink to whichever DM is enabled, so enabling sddm repoints it.
+  # This must happen BEFORE setup-deplasma removes plasma-login-manager,
+  # otherwise the box is left with no way to log in graphically.
+  if [[ "$(basename "$(readlink -f /etc/systemd/system/display-manager.service 2>/dev/null)" 2>/dev/null)" != "sddm.service" ]]; then
+    substep "Making sddm the display manager..."
+    if systemctl list-unit-files plasmalogin.service &> /dev/null; then
+      sudo systemctl disable plasmalogin.service &> /dev/null || true
+    fi
+    sudo systemctl enable sddm.service \
+      || bootstrap_error "Failed to enable sddm.service" \
+        "Enable it manually before rebooting: sudo systemctl enable sddm.service"
+  fi
+
   substep "Setting up SDDM theme..."
 
   THEME_SRC="$HOME/.config/Juliet/etc/sddm-themes/juliet"
@@ -708,18 +725,28 @@ setup-sddm() {
   substep "Installing Juliet SDDM theme..."
   sudo rm -rf "$THEME_DEST"
   sudo cp -r "$THEME_SRC" "$THEME_DEST"
+  # The theme renders solid black by default, matching the hyprlock lock
+  # screen, so this wallpaper is unused until theme.conf sets
+  # `background=background.png`. Copied anyway so making that switch is a
+  # one-word edit rather than a hunt for the file.
   sudo cp "$HOME/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png" "$THEME_DEST/background.png"
   sudo chmod -R 755 "$THEME_DEST"
   sudo find "$THEME_DEST" -type f -exec chmod 644 {} \;
 
-  # Set theme in SDDM config
+  # Select the theme. Written whenever the content differs rather than only when
+  # the file is absent: a create-once guard can't converge if the file drifts
+  # (hand-edited, or left over from an earlier theme name), which would leave the
+  # theme installed but not actually selected.
   SDDM_CONF="/etc/sddm.conf.d/juliet.conf"
-  if [[ ! -f "$SDDM_CONF" ]]; then
-    substep "Configuring SDDM to use Juliet theme..."
-    sudo tee "$SDDM_CONF" > /dev/null << 'EOF'
-[Theme]
-Current=juliet
-EOF
+  local want_conf
+  want_conf=$'[Theme]\nCurrent=juliet'
+  if [[ "$(cat "$SDDM_CONF" 2>/dev/null)" != "$want_conf" ]]; then
+    substep "Configuring SDDM to use the Juliet theme..."
+    sudo install -d -m 755 /etc/sddm.conf.d \
+      || bootstrap_error "Failed to create /etc/sddm.conf.d"
+    printf '%s\n' "$want_conf" | sudo tee "$SDDM_CONF" > /dev/null \
+      || bootstrap_error "Failed to write $SDDM_CONF" \
+        "Set it manually: printf '[Theme]\\nCurrent=juliet\\n' | sudo tee $SDDM_CONF"
   fi
 }
 
@@ -752,6 +779,130 @@ setup-keyd() {
       "Enable it manually: sudo systemctl enable --now keyd"
   # Re-runs: pick up config changes without a restart (no-op on first enable).
   sudo keyd reload &> /dev/null || true
+}
+
+# Plasma components that are dead weight — or actively harmful — on a machine
+# running niri. This box was installed from the Fedora KDE spin, so it carries
+# a full Plasma stack it never uses.
+#
+# The motivating failure: drkonqi (Plasma's crash handler) segfaults outside a
+# Plasma session, and systemd-coredump re-invokes it on every crash, forming a
+# feedback loop. Left alone it produced 106,222 coredumps / 4.1GB and pinned
+# the CPU package at 100°C for ten days (2026-07-15 → 2026-07-25).
+#
+# SCOPE IS DELIBERATELY LIMITED. plasma-desktop is a dnf *protected* package
+# (/etc/dnf/protected.d/plasma-desktop.conf, owned by
+# fedora-release-identity-kde-desktop) and it transitively pins
+# plasma-workspace, plasma-workspace-libs, plasma-integration,
+# plasma-systemsettings, plasma-activities{,-stats}, plasma-keyboard,
+# plasma-breeze, plasma-lookandfeel-fedora, polkit-kde and
+# xdg-desktop-portal-kde. Removing any of those first requires swapping the
+# release identity (`dnf swap fedora-release-identity-kde-desktop
+# fedora-release-identity-basic`), which rewrites /usr/lib/os-release and the
+# systemd presets. That's a bigger, upgrade-path-affecting change and is
+# deliberately NOT done here — the crash loop doesn't need it.
+#
+# plasma-integration-qt5 is excluded for a different reason: it drags the
+# entire Qt5 stack out with it, which would take vlc (a DNFfile package) along.
+#
+# This list was verified with `dnf remove --assumeno`: 61 packages, ~354MB,
+# and no DNFfile package touched. Re-verify the same way before extending it.
+PLASMA_CRUFT=(
+  plasma-drkonqi              # the crash-looping culprit
+  plasma-discover             # + its flatpak/kns/libs/notifier/packagekit subpackages
+  plasma-welcome              # + plasma-welcome-fedora
+  plasma-disks
+  plasma-thunderbolt          # pulls bolt; no TB devices enrolled on noelle
+  plasma-vault                # pulls cryfs/gocryptfs/fuse-encfs
+  plasma-systemmonitor
+  plasma-milou
+  plasma-browser-integration
+  plasma-print-manager        # + -libs
+  plasma-pa
+  plasma-nm                   # + 6 VPN applets; pulls openvpn/openconnect/vpnc/
+                              # pptp/libreswan. NetworkManager itself is kept,
+                              # and noelle has no VPN connections configured.
+  plasma-setup
+  plasma-desktop-doc
+  plasma-workspace-wallpapers
+)
+
+setup-deplasma() {
+  if ! is-fedora; then
+    return
+  fi
+
+  # Build the removal list from what's actually installed, so re-runs are a
+  # cheap no-op and a partially-removed system still converges.
+  local targets=()
+  local pkg
+  for pkg in "${PLASMA_CRUFT[@]}"; do
+    rpm -q "$pkg" &> /dev/null && targets+=("$pkg")
+  done
+
+  # plasma-login-manager is the Fedora KDE spin's display manager (there is no
+  # sddm on a stock KDE install). Only remove it once sddm has actually taken
+  # over, or the machine is left with no graphical login. setup-sddm runs first
+  # in run-desktop and does that switch; this guard is the backstop.
+  if rpm -q plasma-login-manager &> /dev/null; then
+    local active_dm
+    active_dm="$(basename "$(readlink -f /etc/systemd/system/display-manager.service 2>/dev/null)" 2>/dev/null)"
+    if [[ "$active_dm" == "sddm.service" ]]; then
+      targets+=(plasma-login-manager)
+    else
+      warn "Keeping plasma-login-manager: sddm is not the active display manager (found: ${active_dm:-none})."
+    fi
+  fi
+
+  if [[ ${#targets[@]} -eq 0 ]]; then
+    return
+  fi
+
+  substep "Removing ${#targets[@]} unused Plasma packages..."
+  sudo dnf remove -y "${targets[@]}" \
+    || bootstrap_error "Failed to remove the Plasma cruft" \
+      "Inspect the transaction manually: sudo dnf remove --assumeno ${targets[*]}"
+
+  # drkonqi's user units go with the package; drop the mask symlinks used to
+  # muzzle the crash loop while it was still installed.
+  rm -f "$HOME/.config/systemd/user/drkonqi-coredump-launcher.socket" \
+        "$HOME/.config/systemd/user/drkonqi-coredump-pickup.service" \
+        "$HOME/.config/systemd/user/drkonqi-coredump-cleanup.timer"
+
+  # Restore the stock coredump handler. Breaking the loop by hand means
+  # pointing kernel.core_pattern at /bin/false; with drkonqi gone,
+  # systemd-coredump is safe again. sysctl --system re-reads the shipped
+  # /usr/lib/sysctl.d/50-coredump.conf.
+  sudo sysctl --system &> /dev/null || true
+}
+
+# Cap how much disk systemd-coredump may consume. The drkonqi crash loop wrote
+# 4.1GB of cores over ten days without anything noticing; the stock default
+# (10% of the filesystem) is far too generous to act as a warning signal.
+# This is a backstop, not the fix — see setup-deplasma for the actual cause.
+setup-coredump-limits() {
+  if ! is-fedora; then
+    return
+  fi
+
+  local conf="/etc/systemd/coredump.conf.d/juliet.conf"
+  if [[ -f "$conf" ]]; then
+    return
+  fi
+
+  substep "Capping systemd-coredump disk usage..."
+  sudo install -d -m 755 /etc/systemd/coredump.conf.d \
+    || bootstrap_error "Failed to create /etc/systemd/coredump.conf.d" \
+      "Create it manually: sudo install -d -m 755 /etc/systemd/coredump.conf.d"
+  sudo tee "$conf" > /dev/null << 'EOF'
+# Managed by Juliet (bin/juliet-bootstrap :: setup-coredump-limits).
+# A runaway crash loop once wrote 4.1GB of cores here unnoticed; these caps
+# keep any repeat bounded.
+[Coredump]
+MaxUse=512M
+KeepFree=2G
+ProcessSizeMax=256M
+EOF
 }
 
 # Pinned Nerd Fonts release used for fonts too large to vendor (Iosevka).
@@ -815,6 +966,54 @@ setup-fonts() {
   if command -v fc-cache &> /dev/null; then
     fc-cache -f "$(font-dir)" > /dev/null 2>&1 || true
   fi
+}
+
+# claude-statusline renders the Claude Code status line (the `statusLine` block
+# in symlinked/home/.claude/settings.json), reading
+# symlinked/config/claude-statusline/config.toml.
+#
+# We install OUR FORK, not upstream: it adds width-aware per-module priorities
+# (rank a module with `priority = N` and it drops, with its separator, when the
+# line won't fit COLUMNS) plus a `[fit] margin` knob. Upstream has neither.
+#
+# The fork's go.mod declares the fork's own module path, so a plain `go install`
+# works. (It briefly kept upstream's path to stay PR-able upstream, which made
+# the fork uninstallable by its own URL — Go resolves module identity from go.mod
+# and rejects the mismatch. Ease of install won.)
+#
+# PINNED TO @main, AND NEITHER @latest NOR A BRANCH NAME. Two traps here:
+#   1. `@latest` resolves to the newest *semver tag*, and the fork inherited
+#      upstream's v0.7-v0.9 tags — so it installs a working binary silently
+#      missing the priorities feature we forked for. Verified.
+#   2. `go install pkg@some/branch` is rejected outright: "invalid version …
+#      disallowed version string". Version queries can't contain a slash, so
+#      feat/module-priorities is unusable here. The feature branch was
+#      fast-forwarded into the fork's main to give a slash-free ref.
+#
+# No `command -v` guard: main moves, so re-running picks up new commits. Go's
+# module cache keeps that cheap when nothing changed. (First install of a new
+# module path can be slow while proxy.golang.org fetches it; subsequent ones are
+# fast, and it's already warmed.)
+CLAUDE_STATUSLINE_PKG="github.com/avegancafe/claude-statusline"
+CLAUDE_STATUSLINE_REF="main"
+
+setup-claude-statusline() {
+  if ! command -v go &> /dev/null; then
+    bootstrap_error "go not found — cannot install claude-statusline." \
+      "Fedora: the 'golang' DNFfile entry. macOS: 'brew \"go\"' in the Brewfile." \
+      "Then re-run: juliet-bootstrap --enable=claude"
+    return
+  fi
+
+  # GOPRIVATE bypasses proxy.golang.org and the checksum DB for this module only.
+  # Without it, `@main` is served from the proxy's cached branch resolution, which
+  # lags behind the real tip — observed installing a commit old enough to predate
+  # a field the tracked config.toml references, producing "(statusline error)" with
+  # a green exit. A personal fork wants the direct fetch.
+  spin "Installing claude-statusline (${CLAUDE_STATUSLINE_REF})..." \
+    env GOPRIVATE='github.com/avegancafe/*' go install "${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}" \
+    || bootstrap_error "Failed to install claude-statusline — the Claude Code status line will render nothing." \
+      "Retry manually: go install ${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}"
 }
 
 setup-claude-code() {
@@ -951,49 +1150,6 @@ setup-opencode() {
 # =============================================================================
 # Category Runner Functions
 # =============================================================================
-# claude-statusline renders the Claude Code status line (the `statusLine` block
-# in symlinked/home/.claude/settings.json), reading
-# symlinked/config/claude-statusline/config.toml.
-#
-# We install OUR FORK, not upstream: it adds width-aware per-module priorities
-# (rank a module with `priority = N` and it drops, with its separator, when the
-# line won't fit COLUMNS) plus a `[fit] margin` knob. Upstream has neither.
-#
-# The fork's go.mod declares the fork's own module path, so a plain `go install`
-# works. (It briefly kept upstream's path to stay PR-able upstream, which made
-# the fork uninstallable by its own URL — Go resolves module identity from go.mod
-# and rejects the mismatch. Ease of install won.)
-#
-# PINNED TO @main, AND NEITHER @latest NOR A BRANCH NAME. Two traps here:
-#   1. `@latest` resolves to the newest *semver tag*, and the fork inherited
-#      upstream's v0.7-v0.9 tags — so it installs a working binary silently
-#      missing the priorities feature we forked for. Verified.
-#   2. `go install pkg@some/branch` is rejected outright: "invalid version …
-#      disallowed version string". Version queries can't contain a slash, so
-#      feat/module-priorities is unusable here. The feature branch was
-#      fast-forwarded into the fork's main to give a slash-free ref.
-#
-# No `command -v` guard: main moves, so re-running picks up new commits. Go's
-# module cache keeps that cheap when nothing changed. (First install of a new
-# module path can be slow while proxy.golang.org fetches it; subsequent ones are
-# fast, and it's already warmed.)
-CLAUDE_STATUSLINE_PKG="github.com/avegancafe/claude-statusline"
-CLAUDE_STATUSLINE_REF="main"
-
-setup-claude-statusline() {
-  if ! command -v go &> /dev/null; then
-    bootstrap_error "go not found — cannot install claude-statusline." \
-      "Fedora: the 'golang' DNFfile entry. macOS: 'brew \"go\"' in the Brewfile." \
-      "Then re-run: juliet-bootstrap --enable=claude"
-    return
-  fi
-
-  spin "Installing claude-statusline (${CLAUDE_STATUSLINE_REF})..." \
-    go install "${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}" \
-    || bootstrap_error "Failed to install claude-statusline — the Claude Code status line will render nothing." \
-      "Retry manually: go install ${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}"
-}
-
 
 run-packages() {
   confirm-category "packages" "Install system packages? (neovim, bat, ripgrep, fzf, gh, starship, ghostty...)" || return
@@ -1044,11 +1200,21 @@ run-desktop() {
   # spawn-at-startup in the niri config. Each setup-* step self-guards on the
   # tool it configures, so only skip the whole category when none are present.
   if ! is-fedora; then return; fi
-  if ! command -v sddm &> /dev/null && ! command -v keyd &> /dev/null; then return; fi
+  # setup-deplasma has work to do even when neither greeter nor keyd is
+  # installed yet, so leftover Plasma cruft also keeps the category alive.
+  if ! command -v sddm &> /dev/null \
+    && ! command -v keyd &> /dev/null \
+    && ! rpm -q plasma-drkonqi &> /dev/null; then
+    return
+  fi
 
-  confirm-category "desktop" "Configure desktop? (sddm theme, keyd Super-tap remap)" || return
+  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma cleanup)" || return
   log "🖥️ Configuring desktop..."
+  # Order matters: setup-sddm must enable sddm as the display manager before
+  # setup-deplasma removes plasma-login-manager, or there's no way to log in.
   setup-sddm
+  setup-deplasma
+  setup-coredump-limits
   setup-keyd
 }
 
@@ -1056,6 +1222,7 @@ run-claude() {
   confirm-category "claude" "Set up Claude Code? (CLI, statusline, superpowers, context7, LSP plugins)" || return
   rlog "🤖 Setting up Claude Code..."
   setup-claude-code
+  setup-claude-statusline
 }
 
 run-opencode() {
@@ -1086,4 +1253,3 @@ run-claude
 run-opencode
 
 print-bootstrap-summary
-  setup-claude-statusline

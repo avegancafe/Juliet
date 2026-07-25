@@ -1,48 +1,94 @@
-# claude-statusline — ports the previous bash script:
-#   cwd · branch  |  model · ctx · 5h · 5h-reset · session
+# claude-statusline — bamboo lualine blocks, matching the dev-env bash script
+# (~/.claude/statusline-command.sh; contract: dev-env/tests/statusline_spec.md).
+#
+#   [repo][branch]   <transparent gap>   [ctx  5h  ↻][model]
+#
+# Colours are the bamboo.nvim vulgaris palette, i.e. the Juliet lualine theme in
+# normal mode: accent #8fb573 for the repo block, bg1 #2f312c for branch and the
+# token cluster, bg2 #383b35 for model, cream #f1e9d2 for block text, and
+# green/yellow/red #8fb573/#dbb651/#e75a7c for the bar thresholds.
+#
+# WHY EVERY SPAN REPEATS bg:#2f312c: Style.Wrap emits `ESC[…m<text>ESC[0m`, so
+# every span self-terminates. The bash script opens the cluster's background once
+# and only switches foreground inside it; here the band has to be re-declared per
+# span, including on the 2-space joins (`[  ](bg:#2f312c)`) and inside every
+# threshold style — omit it there and the background drops out the moment a bar
+# crosses 40%.
+#
+# Priorities mirror the spec's drop order (repo > reset/5h > model > branch > ctx).
+# $directory is deliberately unranked: the script always shows the repo block and
+# tolerates overflow rather than dropping it.
 
 preset = "default"
 
-format = '$directory [·](dim) $git_branch  [|](dim)  $model [·](dim) $context [·](dim) $usage [·](dim) $session_timer'
+format = '$directory$git_branch          $context[  ](bg:#2f312c)$usage$model'
+
+# Claude Code renders the status line inside its own chrome and truncates content
+# that reaches the edge, which is why the reference sets MARGIN=3.
+[fit]
+margin = 3
 
 [directory]
-style = "bold cyan"
+# {{.RepoName}} is the git worktree's basename, matching the script's repo block.
+# It stays pinned to the repo root as you cd into subdirectories (where {{.Base}}
+# would change) and falls back to the leaf directory outside a repo. It's a lazy
+# template method in the fork, so the `git rev-parse` only runs because this
+# format references it.
+format = ' {{.RepoName}} '
+style = "bg:#8fb573 fg:#252623 bold"
 
 [git_branch]
-format = "{{.Branch}}"
-style = "green"
+format = ' {{.Branch}} '
+style = "bg:#2f312c fg:#f1e9d2"
+priority = 20
+
+[context]
+format = ' ctx: {{.Bar}} {{printf "%.0f" .UsedPct}}%'
+style = "bg:#2f312c fg:#8fb573"
+bar_width = 4
+bar_fill = "⣿"
+bar_empty = "⣉"
+thresholds = [
+  { above = 40, style = "bg:#2f312c fg:#dbb651" },
+  { above = 73, style = "bg:#2f312c fg:#e75a7c" },
+]
+priority = 10
+
+[usage]
+# The 5-hour block plus its reset countdown. Unlike the bash script these cannot
+# be ranked or coloured separately — both are template fields of this one module,
+# so the ↻ timer shares the bar's threshold colour instead of staying grey.
+disabled = false
+format = '5h: {{.BlockBar}} {{printf "%.0f" .BlockPct}}%  ↻  {{.BlockResets}} '
+style = "bg:#2f312c fg:#8fb573"
+bar_width = 4
+bar_fill = "⣿"
+bar_empty = "⣉"
+thresholds = [
+  { above = 40, style = "bg:#2f312c fg:#dbb651" },
+  { above = 73, style = "bg:#2f312c fg:#e75a7c" },
+]
+priority = 30
 
 [model]
-format = "{{.DisplayName}}"
-style = "magenta"
+format = ' {{.DisplayName}} '
+style = "bg:#383b35 fg:#f1e9d2"
+priority = 40
 
 [cost]
 disabled = true
 
-[context]
-format = 'ctx {{.Bar}} {{printf "%.0f" .UsedPct}}%'
-style = "green"
-bar_width = 5
-bar_fill = "▓"
-bar_empty = "░"
-thresholds = [
-  { above = 50, style = "yellow" },
-  { above = 80, style = "red" },
-]
-
-[usage]
-disabled = false
-format = '5h {{.BlockBar}} {{printf "%.0f" .BlockPct}}% · resets in {{.BlockResets}}'
-style = "green"
-bar_width = 5
-bar_fill = "▓"
-bar_empty = "░"
-thresholds = [
-  { above = 50, style = "yellow" },
-  { above = 90, style = "red" },
-]
-
 [session_timer]
-disabled = false
-format = '{{if .Hours}}{{.Hours}}h{{printf "%02d" .Minutes}}m{{else}}{{.Minutes}}m{{end}}'
-style = "dim"
+disabled = true
+
+[lines_changed]
+disabled = true
+
+[version]
+disabled = true
+
+[vim_mode]
+disabled = true
+
+[agent_name]
+disabled = true

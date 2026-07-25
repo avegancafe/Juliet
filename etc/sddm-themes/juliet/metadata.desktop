@@ -1,16 +1,13 @@
 [SddmGreeterTheme]
 Name=Juliet
-Description=Juliet SDDM Theme (based on Breeze Fedora)
+Description=Minimal black greeter matching the hyprlock lock screen. No KDE/Plasma dependencies.
 Author=Kyle (Juliet dotfiles)
-Copyright=(c) 2014, David Edmundson
-License=CC-BY-SA
+License=MIT
 Type=sddm-theme
-Version=1.0
+Version=2.0
 Website=https://github.com/avegancafe/Juliet
-Screenshot=preview.png
 MainScript=Main.qml
 ConfigFile=theme.conf
-TranslationsDirectory=translations
 Theme-Id=juliet
 Theme-API=2.0
 QtVersion=6

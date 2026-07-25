@@ -52,12 +52,31 @@ golang-x-tools-goimports
 niri
 hyprlock
 noctalia-shell
+# sddm: the display manager. Fedora 44's KDE spin ships plasma-login-manager
+# instead, but this machine runs niri, not Plasma — and the whole Plasma stack
+# is removed by the setup-deplasma step. sddm is the greeter Juliet themes
+# (etc/sddm-themes/juliet, applied by setup-sddm). sddm-wayland-generic
+# provides the Wayland session support sddm needs to launch niri.
+sddm
+sddm-wayland-generic
 # keyd: system-level key remapper. Used to give leftmeta (Super) a dual role —
 # hold = the Mod modifier for niri, tap = F13 (bound to the noctalia menu).
 # Configured by the setup-keyd bootstrap step (/etc/keyd/default.conf).
 keyd
 fuzzel
 rofimoji
+# lxqt-policykit: the polkit authentication agent niri spawns at startup (see
+# the spawn-at-startup line in niri/config.kdl). A bare compositor starts no
+# agent, so without it polkit prompts never appear. polkit-gnome — the usual
+# choice in sway/hyprland guides — was retired from Fedora, and Plasma's
+# polkit-kde only runs inside a Plasma session.
+lxqt-policykit
+# bolt: Thunderbolt device authorization daemon (boltd/boltctl). This XPS 15
+# 9500 has a Thunderbolt controller at security level "user", meaning devices
+# must be authorized before they work at all. bolt arrived as a dependency of
+# plasma-thunderbolt (the Plasma GUI for it) and left with it; the daemon
+# itself is DE-agnostic and is what actually does the authorizing.
+bolt
 wl-clipboard
 cliphist
 playerctl
@@ -75,6 +94,10 @@ alacritty
 # Utilities
 bat
 btop
+# lm_sensors: `sensors` for CPU/fan/voltage readings. Absent by default on
+# Fedora, which made a 100°C thermal runaway needlessly hard to diagnose —
+# without it the only source is reading /sys/class/thermal/thermal_zone*/temp.
+lm_sensors
 evtest
 tmux
 eza

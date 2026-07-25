@@ -280,6 +280,14 @@ layout {
 // This line starts waybar, a commonly used bar for Wayland compositors.
 // spawn-at-startup "waybar"  // Disabled: using noctalia bar instead
 
+// Polkit authentication agent. Unlike a full desktop environment, a bare
+// compositor starts no agent of its own — without this, anything needing
+// privilege escalation through polkit (nautilus mounting a drive, a flatpak
+// install, GUI service management) silently fails with no prompt.
+// Plasma's agent (polkit-kde) is still installed but only ever ran as part of
+// a Plasma session; polkit-gnome was retired from Fedora, so lxqt-policykit
+// is the maintained, DE-agnostic Qt agent.
+spawn-at-startup "/usr/libexec/lxqt-policykit-agent"
 spawn-at-startup "qs" "-c" "noctalia-shell"
 spawn-at-startup "ghostty"
 // Delay steam so noctalia can come up and paint the wallpaper first,

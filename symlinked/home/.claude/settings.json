@@ -126,6 +126,7 @@
       "/Users/kyle/.config/Juliet/"
     ]
   },
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "SessionStart": [
       {

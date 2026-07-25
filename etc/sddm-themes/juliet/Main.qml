@@ -1,540 +1,340 @@
-/*
-    SPDX-FileCopyrightText: 2016 David Edmundson <davidedmundson@kde.org>
+// Juliet SDDM theme — minimal, and deliberately free of any org.kde.* import.
+//
+// The previous incarnation was a copy of Breeze and imported
+// org.kde.plasma.components, org.kde.plasma.private.keyboardindicator and
+// org.kde.breeze.components. Those are what kept plasma-workspace and
+// libplasma installed on a machine that runs niri: the greeter was the last
+// thing tethering the system to Plasma. This version imports only QtQuick and
+// QtQuick.Controls, both shipped with Qt itself.
+//
+// The visual language mirrors symlinked/config/hypr/hyprlock.conf so the login
+// screen and the lock screen (Super+Alt+L) read as the same surface: solid
+// black, Iosevka Nerd Font Mono, and a single bordered box whose top edge is
+// notched by an "Authenticate" legend.
 
-    SPDX-License-Identifier: LGPL-2.0-or-later
-*/
+// Delegates below reference outer ids (sessionBox) and declare their model
+// data as required properties; Bound is what makes that well-defined.
+pragma ComponentBehavior: Bound
 
 import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15 as QQC2
-import Qt5Compat.GraphicalEffects
+import QtQuick.Controls 2.15
 
-import org.kde.plasma.components 3.0 as PlasmaComponents3
-import org.kde.plasma.private.keyboardindicator as KeyboardIndicator
-import org.kde.kirigami 2.20 as Kirigami
-
-import org.kde.breeze.components
-
-Item {
+Rectangle {
     id: root
 
-    // If we're using software rendering, draw outlines instead of shadows
-    // See https://bugs.kde.org/show_bug.cgi?id=398317
-    readonly property bool softwareRendering: GraphicsInfo.api === GraphicsInfo.Software
+    // SDDM sizes the root item to the screen; these are only fallbacks.
+    width: 1920
+    height: 1080
+    color: "black"
 
-    Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
-    Kirigami.Theme.inherit: false
+    // Palette and metrics kept deliberately in sync with hyprlock.conf.
+    readonly property color fgDim: Qt.rgba(216 / 255, 222 / 255, 233 / 255, 0.80)
+    readonly property color fgBright: "white"
+    readonly property color fgClock: Qt.rgba(200 / 255, 200 / 255, 200 / 255, 1.0)
+    readonly property color fgFail: Qt.rgba(1, 100 / 255, 100 / 255, 1.0)
+    readonly property string mono: config.font || "Iosevka Nerd Font Mono"
 
-    width: 1600
-    height: 900
-
-    property string notificationMessage
-
-    LayoutMirroring.enabled: Qt.application.layoutDirection === Qt.RightToLeft
-    LayoutMirroring.childrenInherit: true
-
-    KeyboardIndicator.KeyState {
-        id: capsLockState
-        key: Qt.Key_CapsLock
+    function refreshClock() {
+        clock.text = Qt.formatDateTime(new Date(), "dddd, MMMM d - hh:mm AP")
     }
 
-    Item {
-        id: wallpaper
+    function attemptLogin() {
+        statusText.text = ""
+        sddm.login(userField.text, passwordField.text, sessionBox.currentIndex)
+    }
+
+    // theme.conf may point `background` at an image file. Left empty — the
+    // default — it stays the solid black the lock screen uses.
+    Image {
         anchors.fill: parent
-        Repeater {
-            model: screenModel
-
-            Background {
-                x: geometry.x; y: geometry.y; width: geometry.width; height: geometry.height
-                sceneBackgroundType: config.type
-                sceneBackgroundColor: config.color
-                sceneBackgroundImage: config.background
-            }
-        }
+        source: config.background || ""
+        visible: source.toString() !== ""
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: true
     }
 
-    RejectPasswordAnimation {
-        id: rejectPasswordAnimation
-        target: mainStack
-    }
+    // ----------------------------------------------------------------- clock
+    Text {
+        id: clock
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: authBox.top
+        anchors.bottomMargin: 300
+        color: root.fgClock
+        font.family: root.mono
+        font.pixelSize: 18
 
-    MouseArea {
-        id: loginScreenRoot
-        anchors.fill: parent
-
-        property bool uiVisible: true
-        property bool blockUI: mainStack.depth > 1 || userListComponent.mainPasswordBox.text.length > 0 || inputPanel.keyboardActive || config.type !== "image"
-
-        hoverEnabled: true
-        drag.filterChildren: true
-        onPressed: uiVisible = true;
-        onPositionChanged: uiVisible = true;
-        onUiVisibleChanged: {
-            if (blockUI) {
-                fadeoutTimer.running = false;
-            } else if (uiVisible) {
-                fadeoutTimer.restart();
-            }
-        }
-        onBlockUIChanged: {
-            if (blockUI) {
-                fadeoutTimer.running = false;
-                uiVisible = true;
-            } else {
-                fadeoutTimer.restart();
-            }
-        }
-
-        Keys.onPressed: event => {
-            uiVisible = true;
-            event.accepted = false;
-        }
-
-        //takes one full minute for the ui to disappear
         Timer {
-            id: fadeoutTimer
+            interval: 1000
             running: true
-            interval: 60000
-            onTriggered: {
-                if (!loginScreenRoot.blockUI) {
-                    userListComponent.mainPasswordBox.showPassword = false;
-                    loginScreenRoot.uiVisible = false;
-                }
-            }
-        }
-        WallpaperFader {
-            visible: config.type === "image"
-            anchors.fill: parent
-            state: loginScreenRoot.uiVisible ? "on" : "off"
-            source: wallpaper
-            mainStack: mainStack
-            footer: footer
-            clock: clock
-        }
-
-        DropShadow {
-            id: clockShadow
-            anchors.fill: clock
-            source: clock
-            visible: !softwareRendering && config.showClock === "true"
-            radius: 7
-            verticalOffset: 0.8
-            samples: 15
-            spread: 0.2
-            color : Qt.rgba(0, 0, 0, 0.7)
-            opacity: loginScreenRoot.uiVisible ? 0 : 1
-            Behavior on opacity {
-                OpacityAnimator {
-                    duration: Kirigami.Units.veryLongDuration * 2
-                    easing.type: Easing.InOutQuad
-                }
-            }
-        }
-
-        Clock {
-            id: clock
-            property Item shadow: clockShadow
-            visible: y > 0 && config.showClock === "true"
-            anchors.horizontalCenter: parent.horizontalCenter
-            y: (userListComponent.userList.y + mainStack.y)/2 - height/2
-            Layout.alignment: Qt.AlignBaseline
-        }
-
-        QQC2.StackView {
-            id: mainStack
-            width: Math.min(parent.width, 600)
-            x: (parent.width - width) / 2
-            height: root.height + Kirigami.Units.gridUnit * 3
-
-            // this isn't implicit, otherwise items still get processed for the scenegraph
-            visible: opacity > 0
-
-            // If true (depends on the style and environment variables), hover events are always accepted
-            // and propagation stopped. This means the parent MouseArea won't get them and the UI won't be shown.
-            // Disable capturing those events while the UI is hidden to avoid that, while still passing events otherwise.
-            // One issue is that while the UI is visible, mouse activity won't keep resetting the timer, but when it
-            // finally expires, the next event should immediately set uiVisible = true again.
-            hoverEnabled: loginScreenRoot.uiVisible ? undefined : false
-
-            focus: true //StackView is an implicit focus scope, so we need to give this focus so the item inside will have it
-
-            Timer {
-                //SDDM has a bug in 0.13 where even though we set the focus on the right item within the window, the window doesn't have focus
-                //it is fixed in 6d5b36b28907b16280ff78995fef764bb0c573db which will be 0.14
-                //we need to call "window->activate()" *After* it's been shown. We can't control that in QML so we use a shoddy timer
-                //it's been this way for all Plasma 5.x without a huge problem
-                running: true
-                repeat: false
-                interval: 200
-                onTriggered: mainStack.forceActiveFocus()
-            }
-
-            initialItem: Login {
-                id: userListComponent
-                userListModel: userModel
-                loginScreenUiVisible: loginScreenRoot.uiVisible
-                userListCurrentIndex: userModel.lastIndex >= 0 ? userModel.lastIndex : 0
-                lastUserName: userModel.lastUser
-                showUserList: {
-                    if (!userListModel.hasOwnProperty("count")
-                        || !userListModel.hasOwnProperty("disableAvatarsThreshold")) {
-                        return false
-                    }
-
-                    if (userListModel.count === 0 ) {
-                        return false
-                    }
-
-                    if (userListModel.hasOwnProperty("containsAllUsers") && !userListModel.containsAllUsers) {
-                        return false
-                    }
-
-                    return userListModel.count <= userListModel.disableAvatarsThreshold
-                }
-
-                notificationMessage: {
-                    const parts = [];
-                    if (capsLockState.locked) {
-                        parts.push(i18nd("plasma-desktop-sddm-theme", "Caps Lock is on"));
-                    }
-                    if (root.notificationMessage) {
-                        parts.push(root.notificationMessage);
-                    }
-                    return parts.join(" • ");
-                }
-
-                actionItemsVisible: !inputPanel.keyboardActive
-                actionItems: [
-                    ActionButton {
-                        icon.name: "system-hibernate"
-                        text: i18ndc("plasma-desktop-sddm-theme", "Suspend to disk", "Hibernate")
-                        onClicked: sddm.hibernate()
-                        enabled: sddm.canHibernate
-                    },
-                    ActionButton {
-                        icon.name: "system-suspend"
-                        text: i18ndc("plasma-desktop-sddm-theme", "Suspend to RAM", "Sleep")
-                        onClicked: sddm.suspend()
-                        enabled: sddm.canSuspend
-                    },
-                    ActionButton {
-                        icon.name: "system-reboot"
-                        text: i18nd("plasma-desktop-sddm-theme", "Restart")
-                        onClicked: sddm.reboot()
-                        enabled: sddm.canReboot
-                    },
-                    ActionButton {
-                        icon.name: "system-shutdown"
-                        text: i18nd("plasma-desktop-sddm-theme", "Shut Down")
-                        onClicked: sddm.powerOff()
-                        enabled: sddm.canPowerOff
-                    },
-                    ActionButton {
-                        icon.name: "system-user-prompt"
-                        text: i18ndc("plasma-desktop-sddm-theme", "For switching to a username and password prompt", "Other…")
-                        onClicked: mainStack.push(userPromptComponent)
-                        visible: !userListComponent.showUsernamePrompt
-                    }]
-
-                onLoginRequest: {
-                    root.notificationMessage = ""
-                    sddm.login(username, password, sessionButton.currentIndex)
-                }
-            }
-
-            Behavior on opacity {
-                OpacityAnimator {
-                    duration: Kirigami.Units.longDuration
-                }
-            }
-
-            readonly property real zoomFactor: 1.5
-
-            popEnter: Transition {
-                ScaleAnimator {
-                    from: mainStack.zoomFactor
-                    to: 1
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            popExit: Transition {
-                ScaleAnimator {
-                    from: 1
-                    to: 1 / mainStack.zoomFactor
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            pushEnter: Transition {
-                ScaleAnimator {
-                    from: 1 / mainStack.zoomFactor
-                    to: 1
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-                OpacityAnimator {
-                    from: 0
-                    to: 1
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
-
-            pushExit: Transition {
-                ScaleAnimator {
-                    from: 1
-                    to: mainStack.zoomFactor
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-                OpacityAnimator {
-                    from: 1
-                    to: 0
-                    duration: Kirigami.Units.veryLongDuration
-                    easing.type: Easing.OutCubic
-                }
-            }
-        }
-
-        VirtualKeyboardLoader {
-            id: inputPanel
-
-            z: 1
-
-            screenRoot: root
-            mainStack: mainStack
-            mainBlock: userListComponent
-            passwordField: userListComponent.mainPasswordBox
-        }
-
-        Component {
-            id: userPromptComponent
-            Login {
-                showUsernamePrompt: true
-                notificationMessage: root.notificationMessage
-                loginScreenUiVisible: loginScreenRoot.uiVisible
-                fontSize: Kirigami.Theme.defaultFont.pointSize + 2
-
-                // using a model rather than a QObject list to avoid QTBUG-75900
-                userListModel: ListModel {
-                    ListElement {
-                        name: ""
-                        icon: ""
-                    }
-                    Component.onCompleted: {
-                        // as we can't bind inside ListElement
-                        setProperty(0, "name", i18nd("plasma-desktop-sddm-theme", "Type in Username and Password"));
-                        setProperty(0, "icon", Qt.resolvedUrl("faces/.face.icon"))
-                    }
-                }
-
-                onLoginRequest: {
-                    root.notificationMessage = ""
-                    sddm.login(username, password, sessionButton.currentIndex)
-                }
-
-                actionItemsVisible: !inputPanel.keyboardActive
-                actionItems: [
-                    ActionButton {
-                        icon.name: "system-suspend"
-                        text: i18ndc("plasma-desktop-sddm-theme", "Suspend to RAM", "Sleep")
-                        onClicked: sddm.suspend()
-                        enabled: sddm.canSuspend
-                    },
-                    ActionButton {
-                        icon.name: "system-reboot"
-                        text: i18nd("plasma-desktop-sddm-theme", "Restart")
-                        onClicked: sddm.reboot()
-                        enabled: sddm.canReboot
-                    },
-                    ActionButton {
-                        icon.name: "system-shutdown"
-                        text: i18nd("plasma-desktop-sddm-theme", "Shut Down")
-                        onClicked: sddm.powerOff()
-                        enabled: sddm.canPowerOff
-                    },
-                    ActionButton {
-                        icon.name: "system-user-list"
-                        text: i18nd("plasma-desktop-sddm-theme", "List Users")
-                        onClicked: mainStack.pop()
-                    }
-                ]
-            }
-        }
-
-        DropShadow {
-            id: logoShadow
-            anchors.fill: logo
-            source: logo
-            visible: !softwareRendering && config.showlogo === "shown"
-            horizontalOffset: 1
-            verticalOffset: 1
-            radius: 6
-            samples: 14
-            spread: 0.3
-            color : "black" // shadows should always be black
-            opacity: loginScreenRoot.uiVisible ? 0 : 1
-            Behavior on opacity {
-                //OpacityAnimator when starting from 0 is buggy (it shows one frame with opacity 1)"
-                NumberAnimation {
-                    duration: Kirigami.Units.longDuration
-                    easing.type: Easing.InOutQuad
-                }
-            }
-        }
-
-        Image {
-            id: logo
-            visible: config.showlogo === "shown"
-            source: config.logo
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.bottom: footer.top
-            anchors.bottomMargin: Kirigami.Units.largeSpacing
-            asynchronous: true
-            sourceSize.height: height
-            opacity: loginScreenRoot.uiVisible ? 0 : 1
-            fillMode: Image.PreserveAspectFit
-            height: Math.round(Kirigami.Units.gridUnit * 3.5)
-            Behavior on opacity {
-                // OpacityAnimator when starting from 0 is buggy (it shows one frame with opacity 1)"
-                NumberAnimation {
-                    duration: Kirigami.Units.longDuration
-                    easing.type: Easing.InOutQuad
-                }
-            }
-        }
-
-        // Note: Containment masks stretch clickable area of their buttons to
-        // the screen edges, essentially making them adhere to Fitts's law.
-        // Due to virtual keyboard button having an icon, buttons may have
-        // different heights, so fillHeight is required.
-        //
-        // Note for contributors: Keep this in sync with LockScreenUi.qml footer.
-        RowLayout {
-            id: footer
-            anchors {
-                bottom: parent.bottom
-                left: parent.left
-                right: parent.right
-                margins: Kirigami.Units.smallSpacing
-            }
-            spacing: Kirigami.Units.smallSpacing
-
-            Behavior on opacity {
-                OpacityAnimator {
-                    duration: Kirigami.Units.longDuration
-                }
-            }
-
-            PlasmaComponents3.ToolButton {
-                id: virtualKeyboardButton
-
-                text: i18ndc("plasma-desktop-sddm-theme", "Button to show/hide virtual keyboard", "Virtual Keyboard")
-                icon.name: inputPanel.keyboardActive ? "input-keyboard-virtual-on" : "input-keyboard-virtual-off"
-                onClicked: {
-                    // Otherwise the password field loses focus and virtual keyboard
-                    // keystrokes get eaten
-                    userListComponent.mainPasswordBox.forceActiveFocus();
-                    inputPanel.showHide()
-                }
-                visible: false
-
-                Layout.fillHeight: true
-                containmentMask: Item {
-                    parent: virtualKeyboardButton
-                    anchors.fill: parent
-                    anchors.leftMargin: -footer.anchors.margins
-                    anchors.bottomMargin: -footer.anchors.margins
-                }
-            }
-
-            KeyboardButton {
-                id: keyboardButton
-
-                onKeyboardLayoutChanged: {
-                    // Otherwise the password field loses focus and virtual keyboard
-                    // keystrokes get eaten
-                    userListComponent.mainPasswordBox.forceActiveFocus();
-                }
-
-                Layout.fillHeight: true
-                containmentMask: Item {
-                    parent: keyboardButton
-                    anchors.fill: parent
-                    anchors.leftMargin: virtualKeyboardButton.visible ? 0 : -footer.anchors.margins
-                    anchors.bottomMargin: -footer.anchors.margins
-                }
-            }
-
-            SessionButton {
-                id: sessionButton
-
-                onSessionChanged: {
-                    // Otherwise the password field loses focus and virtual keyboard
-                    // keystrokes get eaten
-                    userListComponent.mainPasswordBox.forceActiveFocus();
-                }
-
-                Layout.fillHeight: true
-                containmentMask: Item {
-                    parent: sessionButton
-                    anchors.fill: parent
-                    anchors.leftMargin: virtualKeyboardButton.visible || keyboardButton.visible
-                        ? 0 : -footer.anchors.margins
-                    anchors.bottomMargin: -footer.anchors.margins
-                }
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
-
-            Battery {}
+            repeat: true
+            triggeredOnStart: true
+            onTriggered: root.refreshClock()
         }
     }
 
+    // -------------------------------------------------------------- auth box
+    Rectangle {
+        id: authBox
+        width: 500
+        height: 100
+        color: "transparent"
+        border.color: root.fgBright
+        border.width: 2
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenterOffset: -150
+
+        // A black patch sitting astride the border turns the label into a
+        // notch, the way a fieldset legend interrupts its frame.
+        Rectangle {
+            color: "black"
+            height: 22
+            width: legendLabel.implicitWidth + 20
+            anchors.left: parent.left
+            anchors.leftMargin: 45
+            anchors.verticalCenter: parent.top
+
+            Text {
+                id: legendLabel
+                anchors.centerIn: parent
+                text: "Authenticate"
+                color: root.fgDim
+                font.family: root.mono
+                font.pixelSize: 16
+            }
+        }
+
+        Item {
+            anchors.fill: parent
+            anchors.leftMargin: 30
+            anchors.rightMargin: 30
+
+            // The username is an editable field rather than static text so the
+            // greeter still works if userModel.lastUser comes back empty.
+            Row {
+                anchors.left: parent.left
+                anchors.bottom: parent.verticalCenter
+                anchors.bottomMargin: 5
+                spacing: 8
+
+                Text {
+                    text: "Username:"
+                    color: root.fgDim
+                    font.family: root.mono
+                    font.pixelSize: 14
+                    font.bold: true
+                }
+
+                TextInput {
+                    id: userField
+                    width: 250
+                    color: root.fgBright
+                    font.family: root.mono
+                    font.pixelSize: 14
+                    font.bold: true
+                    text: userModel.lastUser || ""
+                    onAccepted: root.attemptLogin()
+                    KeyNavigation.tab: passwordField
+
+                    // Take the keyboard on load so you can type straight away
+                    // instead of having to click the field first. forceActiveFocus
+                    // in Component.onCompleted rather than `focus: true` because
+                    // this TextInput is nested inside a Row inside a Rectangle —
+                    // `focus: true` only marks it focused *within its scope*, and
+                    // the enclosing items don't forward focus, so the field would
+                    // never actually receive key events.
+                    Component.onCompleted: forceActiveFocus()
+                }
+            }
+
+            Row {
+                anchors.left: parent.left
+                anchors.top: parent.verticalCenter
+                anchors.topMargin: 5
+                spacing: 8
+
+                Text {
+                    text: "Password:"
+                    color: root.fgDim
+                    font.family: root.mono
+                    font.pixelSize: 14
+                    font.bold: true
+                }
+
+                TextInput {
+                    id: passwordField
+                    width: 250
+                    color: root.fgBright
+                    font.family: root.mono
+                    font.pixelSize: 14
+                    echoMode: TextInput.Password
+                    passwordCharacter: "*"
+                    passwordMaskDelay: 0
+                    onAccepted: root.attemptLogin()
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------ status / failure
+    Text {
+        id: statusText
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: authBox.bottom
+        anchors.topMargin: 40
+        horizontalAlignment: Text.AlignHCenter
+        color: root.fgFail
+        font.family: root.mono
+        font.pixelSize: 14
+        text: ""
+    }
+
+    Text {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: statusText.bottom
+        anchors.topMargin: 8
+        color: root.fgDim
+        font.family: root.mono
+        font.pixelSize: 13
+        visible: keyboard.capsLock
+        text: "Caps Lock is on"
+    }
+
+    // -------------------------------------------------------- session picker
+    // Both niri and plasma register wayland sessions, so this has to be
+    // visible and changeable — a wrong lastIndex would otherwise strand login.
+    Row {
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.margins: 24
+        spacing: 8
+
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Session:"
+            color: root.fgDim
+            font.family: root.mono
+            font.pixelSize: 13
+        }
+
+        ComboBox {
+            id: sessionBox
+            model: sessionModel
+            textRole: "name"
+            currentIndex: sessionModel.lastIndex
+            font.family: root.mono
+            font.pixelSize: 13
+            implicitWidth: 220
+
+            background: Rectangle {
+                color: "black"
+                border.color: root.fgDim
+                border.width: 1
+            }
+
+            contentItem: Text {
+                leftPadding: 8
+                rightPadding: 8
+                text: sessionBox.displayText
+                color: root.fgBright
+                font: sessionBox.font
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+
+            delegate: ItemDelegate {
+                id: sessionDelegate
+
+                required property var model
+                required property int index
+
+                width: sessionBox.width
+                highlighted: sessionBox.highlightedIndex === index
+
+                background: Rectangle {
+                    color: sessionDelegate.highlighted ? "#222222" : "black"
+                    border.color: root.fgDim
+                    border.width: 1
+                }
+
+                contentItem: Text {
+                    text: sessionDelegate.model.name
+                    color: root.fgBright
+                    font.family: root.mono
+                    font.pixelSize: 13
+                    verticalAlignment: Text.AlignVCenter
+                    elide: Text.ElideRight
+                }
+            }
+        }
+    }
+
+    // --------------------------------------------------------- power actions
+    Row {
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 24
+        spacing: 20
+
+        Repeater {
+            model: [
+                { label: "Suspend", available: sddm.canSuspend, action: "suspend" },
+                { label: "Restart", available: sddm.canReboot, action: "reboot" },
+                { label: "Shut Down", available: sddm.canPowerOff, action: "powerOff" }
+            ]
+
+            Text {
+                id: powerItem
+
+                required property var modelData
+
+                text: powerItem.modelData.label
+                visible: powerItem.modelData.available
+                color: hoverHandler.hovered ? root.fgBright : root.fgDim
+                font.family: root.mono
+                font.pixelSize: 13
+
+                HoverHandler {
+                    id: hoverHandler
+                    cursorShape: Qt.PointingHandCursor
+                }
+
+                TapHandler {
+                    onTapped: {
+                        if (powerItem.modelData.action === "suspend") {
+                            sddm.suspend()
+                        } else if (powerItem.modelData.action === "reboot") {
+                            sddm.reboot()
+                        } else {
+                            sddm.powerOff()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------- logic
     Connections {
         target: sddm
+
         function onLoginFailed() {
-            notificationMessage = i18nd("plasma-desktop-sddm-theme", "Login Failed")
-            footer.enabled = true
-            mainStack.enabled = true
-            userListComponent.userList.opacity = 1
-            rejectPasswordAnimation.start()
+            statusText.text = "Authentication failed"
+            passwordField.text = ""
+            passwordField.forceActiveFocus()
         }
-        function onLoginSucceeded() {
-            //note SDDM will kill the greeter at some random point after this
-            //there is no certainty any transition will finish, it depends on the time it
-            //takes to complete the init
-            mainStack.opacity = 0
-            footer.opacity = 0
+
+        function onInformationMessage(message) {
+            statusText.text = message
         }
     }
 
-    onNotificationMessageChanged: {
-        if (notificationMessage) {
-            notificationResetTimer.start();
+    Component.onCompleted: {
+        root.refreshClock()
+        if (userField.text === "") {
+            userField.forceActiveFocus()
+        } else {
+            passwordField.forceActiveFocus()
         }
-    }
-
-    Timer {
-        id: notificationResetTimer
-        interval: 3000
-        onTriggered: notificationMessage = ""
     }
 }
