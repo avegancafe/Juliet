@@ -1,0 +1,20 @@
+[Desktop Entry]
+# Managed by Juliet. Per-user override of the xorg-x11-drv-nvidia autostart
+# entry at /etc/xdg/autostart/nvidia-settings-user.desktop.
+#
+# `nvidia-settings -l` re-applies GPU settings saved in ~/.nvidia-settings-rc.
+# There is no such file here, so it has nothing to load — and it fails anyway:
+# nvidia-settings is an X client, and the generated unit is ordered only
+# After=graphical-session.target, which under niri is reached BEFORE
+# xwayland-satellite starts. It gets DISPLAY=:0 with no X server behind it yet
+# and exits 1, ~1s of CPU for nothing, every login.
+#
+# The .desktop file ships X-GNOME-Autostart-Delay=30 to dodge exactly that race,
+# but systemd-xdg-autostart-generator silently drops that GNOME-specific key —
+# the generated unit has no ExecStartPre and no delay. So under systemd the race
+# is unavoidable; hide the entry instead. Nothing else depends on it: the driver
+# loads via akmods/MOK (see setup-nvidia-secureboot), not via this.
+Type=Application
+Name=nvidia-settings
+Exec=nvidia-settings -l
+Hidden=true

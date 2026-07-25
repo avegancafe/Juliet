@@ -1,0 +1,18 @@
+[Desktop Entry]
+# Managed by Juliet. Per-user override of the abrt-gui autostart entry at
+# /etc/xdg/autostart/org.freedesktop.problems.applet.desktop.
+#
+# abrt-applet (Fedora's crash-reporter frontend) posts an "Oops!" notification
+# at every login for each crash abrtd recorded but never reported. On this
+# machine that was two popups a boot, both nagging about copilot-language-server
+# SIGABRTs — reports that go nowhere, about a crash in a third-party language
+# server. abrtd itself is deliberately kept: its history plus coredumpctl is
+# what made the drkonqi crash loop diagnosable (see setup-deplasma).
+#
+# Hidden=true is the XDG-spec way to disable a system autostart entry per-user.
+# systemd-xdg-autostart-generator honours it by not generating the unit at all,
+# rather than generating one that starts and fails.
+Type=Application
+Name=Problem Reporting
+Exec=abrt-applet --gapplication-service
+Hidden=true

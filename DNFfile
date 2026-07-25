@@ -77,6 +77,21 @@ lxqt-policykit
 # plasma-thunderbolt (the Plasma GUI for it) and left with it; the daemon
 # itself is DE-agnostic and is what actually does the authorizing.
 bolt
+# nvidia (RPM Fusion nonfree — setup-dnf enables those repos before installing).
+# This XPS 15 9500 is an Optimus laptop: Intel UHD drives the display, the
+# GTX 1650 Ti sits at 01:00.0 and idles in D3cold until something asks for it.
+# akmod-nvidia pulls the whole driver stack (xorg-x11-drv-nvidia + -libs,
+# kmodsrc, nvidia-modprobe, nvidia-settings, nvidia-persistenced) and rebuilds
+# the kernel module on every kernel bump; the -cuda subpackage adds nvidia-smi
+# and the CUDA runtime.
+#
+# akmods signs the module it builds with a key generated on this machine, which
+# Secure Boot will not trust until it's enrolled — until then the kernel
+# silently refuses the module and nvidia-fallback.service loads nouveau instead.
+# mokutil is what stages that enrollment; see setup-nvidia-secureboot.
+akmod-nvidia
+xorg-x11-drv-nvidia-cuda
+mokutil
 wl-clipboard
 cliphist
 playerctl

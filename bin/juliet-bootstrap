@@ -827,6 +827,27 @@ PLASMA_CRUFT=(
   plasma-workspace-wallpapers
 )
 
+# KDE PIM — the spin's mail/calendar/contacts suite. Not Plasma proper, hence a
+# separate list, but the same class of leftover.
+#
+# kalendarac ("Calendar Reminders", from akonadi-calendar) autostarted and died
+# at every login with a symbol lookup error: messagelib wants
+# setFormatTypes(const QFlags<...>&) while ktextaddons-qt6 2.0.1 ships it by
+# value. The soname stayed .so.1 across that ABI break, so RPM's dependency
+# check never caught it — nothing to fix locally, and none of this suite is used
+# here (no mail account, calendar, or address book was ever configured).
+#
+# akonadi-calendar drags the rest of the suite out with it: calendarsupport,
+# eventviews, incidenceeditor, kdepim-addons, kdepim-runtime, kmail, kontact,
+# korganizer and their -libs. akregator and kaddressbook are NOT in that
+# closure, so they're listed explicitly — leaving either behind keeps the whole
+# akonadi server stack alive, which defeats the point.
+KDEPIM_CRUFT=(
+  akonadi-calendar
+  akregator
+  kaddressbook
+)
+
 setup-deplasma() {
   if ! is-fedora; then
     return
@@ -836,7 +857,7 @@ setup-deplasma() {
   # cheap no-op and a partially-removed system still converges.
   local targets=()
   local pkg
-  for pkg in "${PLASMA_CRUFT[@]}"; do
+  for pkg in "${PLASMA_CRUFT[@]}" "${KDEPIM_CRUFT[@]}"; do
     rpm -q "$pkg" &> /dev/null && targets+=("$pkg")
   done
 
@@ -858,10 +879,22 @@ setup-deplasma() {
     return
   fi
 
-  substep "Removing ${#targets[@]} unused Plasma packages..."
+  substep "Removing ${#targets[@]} unused Plasma / KDE PIM packages..."
   sudo dnf remove -y "${targets[@]}" \
-    || bootstrap_error "Failed to remove the Plasma cruft" \
+    || bootstrap_error "Failed to remove the Plasma / KDE PIM cruft" \
       "Inspect the transaction manually: sudo dnf remove --assumeno ${targets[*]}"
+
+  # With the PIM suite gone, akonadi's database under ~/.local/share/akonadi is
+  # orphaned — on this machine ~113MB of an empty MariaDB instance the server
+  # creates on first start. Deliberately NOT deleted automatically: telling an
+  # empty akonadi from one holding a real local mail store means inspecting the
+  # resource data, and no heuristic worth trusting fits in a bootstrap step. A
+  # fresh machine never accumulates it, so it isn't reproducible state either.
+  # Report it and let the operator decide.
+  if [[ -d "$HOME/.local/share/akonadi" ]]; then
+    notice "Orphaned akonadi DB left at ~/.local/share/akonadi ($(du -sh "$HOME/.local/share/akonadi" 2> /dev/null | cut -f1))."
+    notice "If no mail/calendar was ever configured: rm -rf ~/.local/share/akonadi ~/.config/akonadi"
+  fi
 
   # drkonqi's user units go with the package; drop the mask symlinks used to
   # muzzle the crash loop while it was still installed.
@@ -926,6 +959,161 @@ font-dir() {
 #      the pinned Nerd Fonts release and cached. The 374MB zip is only fetched
 #      when Iosevka isn't already installed, so re-runs are cheap.
 # Everything lands in <font-dir>/Juliet so the repo owns that subtree.
+# The RPMFusion nvidia driver is compiled locally by akmods and signed with a
+# key this machine generates itself (/etc/pki/akmods/certs/public_key.der). With
+# Secure Boot on, the kernel refuses to load a module whose key isn't enrolled in
+# the firmware's MOK store — and nothing announces it: nvidia-fallback.service
+# quietly loads nouveau instead, so the display works and the breakage hides.
+# The cost is real though — CUDA is dead despite the -cuda packages being
+# installed, nouveau can't reclock Turing so the dGPU runs slow, and
+# nvidia-powerd fails with "Allocate Root client failed". The only visible
+# symptom was nvidia-settings failing at login with "NVIDIA driver is not
+# loaded".
+#
+# `mokutil --import` only *stages* the key and sets a one-time password; the
+# enrollment itself happens in the firmware's MOK Manager screen on the next
+# boot and deliberately cannot be automated — physical presence is the point.
+setup-nvidia-secureboot() {
+  if ! is-fedora; then
+    return
+  fi
+  if ! rpm -q akmod-nvidia &> /dev/null; then
+    return
+  fi
+  # Secure Boot off means unsigned modules load fine — nothing to enroll.
+  if ! mokutil --sb-state 2> /dev/null | grep -q 'SecureBoot enabled'; then
+    return
+  fi
+  # The proprietary module loading at all proves the key is already trusted.
+  # Tested via /proc/driver/nvidia rather than lsmod: the in-tree
+  # nvidia-wmi-ec-backlight module (present on this Dell) loads as
+  # "nvidia_wmi_ec_backlight" and would false-match a /^nvidia/ grep, silently
+  # skipping enrollment forever. Only the real driver creates this directory.
+  if [[ -d /proc/driver/nvidia ]]; then
+    skip "nvidia driver loaded (MOK key already enrolled)"
+    return
+  fi
+  # A key staged by an earlier run is still waiting on the reboot; importing
+  # again would just overwrite the pending request with a new password.
+  if mokutil --list-new 2> /dev/null | grep -q .; then
+    warn "An akmods key is already staged. Reboot and complete MOK Manager to finish."
+    return
+  fi
+
+  local key=/etc/pki/akmods/certs/public_key.der
+  if ! sudo test -f "$key"; then
+    bootstrap_error "akmods signing key not found at $key" \
+      "Rebuild the module first: sudo akmods --force"
+    return
+  fi
+
+  substep "Enrolling the akmods signing key so Secure Boot will load nvidia..."
+  notice "mokutil asks for a one-time password — you re-enter it in MOK Manager on reboot."
+  # Interactive (prompts twice for the password), so deliberately not wrapped in
+  # spin() — the spinner would hide the prompt and look like a hang.
+  if sudo mokutil --import "$key"; then
+    warn "Reboot to finish: MOK Manager -> Enroll MOK -> Continue -> Yes -> that password."
+  else
+    bootstrap_error "Failed to stage the akmods key for MOK enrollment" \
+      "Retry manually: sudo mokutil --import $key"
+  fi
+}
+
+# The nvidia driver ships Runtime D3 disabled — /proc/driver/nvidia/gpus/*/power
+# reports "Runtime D3 status: Disabled by default" — so on a laptop the dGPU
+# stays powered from boot even when nothing is using it. Under nouveau this
+# machine's GTX 1650 Ti idled in D3cold; the first boot on the proprietary
+# driver had it in D0 for the entire session (runtime_suspended_time 0, active
+# 555s). That is pure battery drain and heat on a box whose history includes a
+# 100°C thermal runaway — so enabling RTD3 is part of switching drivers, not an
+# optional extra.
+#
+# 0x02 is NVIDIA's most aggressive tier: power the GPU down, video memory
+# included, once idle. It needs Turing or newer (this is TU117) plus hardware
+# support, both confirmed here — "Video Memory Off: Supported" and "S0ix Platform
+# Support: Supported". Where unsupported the driver simply won't engage it.
+#
+# The udev half already ships with the driver (80-nvidia-pm.rules sets
+# power/control=auto on bind for PCI class 0x030200), and nvidia is not in the
+# initramfs — no nvidia arguments on the kernel cmdline, and the module loads
+# after root is mounted — so modprobe.d alone is enough. No dracut regeneration,
+# but it does need a reboot to take effect.
+setup-nvidia-powermgmt() {
+  if ! is-fedora; then
+    return
+  fi
+  if ! rpm -q akmod-nvidia &> /dev/null; then
+    return
+  fi
+
+  local conf="/etc/modprobe.d/juliet-nvidia-pm.conf"
+  if [[ -f "$conf" ]]; then
+    return
+  fi
+
+  substep "Enabling nvidia Runtime D3 so the dGPU powers down when idle..."
+  sudo tee "$conf" > /dev/null << 'EOF'
+# Managed by Juliet (bin/juliet-bootstrap :: setup-nvidia-powermgmt).
+# The driver leaves Runtime D3 off by default, which keeps the dGPU powered for
+# the whole session on a laptop. 0x02 powers it down (video memory included)
+# once idle. Verify after a reboot with:
+#   cat /proc/driver/nvidia/gpus/*/power
+#   cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status
+options nvidia NVreg_DynamicPowerManagement=0x02
+EOF
+  if [[ ! -f "$conf" ]]; then
+    bootstrap_error "Failed to write $conf" \
+      "Create it manually with: options nvidia NVreg_DynamicPowerManagement=0x02"
+    return
+  fi
+  notice "nvidia Runtime D3 takes effect on the next reboot."
+}
+
+# How long crash evidence is worth keeping. Long enough to debug something that
+# happened "the other day", short enough that a crash loop can't quietly hoard
+# disk between bootstrap runs.
+CRASH_RETENTION_DAYS=7
+
+# Age-based purge of accumulated crash data. setup-coredump-limits already caps
+# systemd-coredump's *size*, but nothing bounded abrt's spool: the drkonqi loop
+# left 45 stale reports there, one with a repeat count of 46515. Expressed as a
+# retention window rather than a one-shot wipe so it stays idempotent and keeps
+# converging on every run.
+setup-crash-purge() {
+  if ! is-fedora; then
+    return
+  fi
+
+  # abrt problem directories are named ccpp-<date>-... and owned by root; -mtime
+  # is what decides, not the name, so a clock skew can't delete recent evidence.
+  if [[ -d /var/spool/abrt ]]; then
+    local stale
+    stale=$(sudo find /var/spool/abrt -mindepth 1 -maxdepth 1 -type d \
+      -mtime +"$CRASH_RETENTION_DAYS" 2> /dev/null | wc -l)
+    if [[ "$stale" -gt 0 ]]; then
+      substep "Purging $stale abrt report(s) older than ${CRASH_RETENTION_DAYS}d..."
+      sudo find /var/spool/abrt -mindepth 1 -maxdepth 1 -type d \
+        -mtime +"$CRASH_RETENTION_DAYS" -exec rm -rf {} + \
+        || bootstrap_error "Failed to purge the stale abrt spool" \
+          "Inspect it manually: sudo du -sh /var/spool/abrt/*"
+    fi
+  fi
+
+  # coredumpctl has no age-based vacuum of its own, so drive it off the files.
+  if [[ -d /var/lib/systemd/coredump ]]; then
+    local cores
+    cores=$(find /var/lib/systemd/coredump -type f \
+      -mtime +"$CRASH_RETENTION_DAYS" 2> /dev/null | wc -l)
+    if [[ "$cores" -gt 0 ]]; then
+      substep "Purging $cores core dump(s) older than ${CRASH_RETENTION_DAYS}d..."
+      sudo find /var/lib/systemd/coredump -type f \
+        -mtime +"$CRASH_RETENTION_DAYS" -delete \
+        || bootstrap_error "Failed to purge old core dumps" \
+          "Inspect them manually: coredumpctl list"
+    fi
+  fi
+}
+
 setup-fonts() {
   substep "Installing fonts..."
   local dest="$(font-dir)/Juliet"
@@ -1201,20 +1389,26 @@ run-desktop() {
   # tool it configures, so only skip the whole category when none are present.
   if ! is-fedora; then return; fi
   # setup-deplasma has work to do even when neither greeter nor keyd is
-  # installed yet, so leftover Plasma cruft also keeps the category alive.
+  # installed yet, so leftover Plasma / KDE PIM cruft also keeps the category
+  # alive — as does an nvidia driver still waiting on MOK enrollment.
   if ! command -v sddm &> /dev/null \
     && ! command -v keyd &> /dev/null \
-    && ! rpm -q plasma-drkonqi &> /dev/null; then
+    && ! rpm -q plasma-drkonqi &> /dev/null \
+    && ! rpm -q akonadi-calendar &> /dev/null \
+    && ! rpm -q akmod-nvidia &> /dev/null; then
     return
   fi
 
-  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma cleanup)" || return
+  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot)" || return
   log "🖥️ Configuring desktop..."
   # Order matters: setup-sddm must enable sddm as the display manager before
   # setup-deplasma removes plasma-login-manager, or there's no way to log in.
   setup-sddm
   setup-deplasma
   setup-coredump-limits
+  setup-crash-purge
+  setup-nvidia-secureboot
+  setup-nvidia-powermgmt
   setup-keyd
 }
 
