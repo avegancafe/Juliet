@@ -825,17 +825,6 @@ setup-claude-code() {
     skip "Claude CLI already installed — skipping"
   fi
 
-  # claude-statusline renders the Claude Code status line — the `statusLine`
-  # block in symlinked/home/.claude/settings.json invokes it, and it reads
-  # symlinked/config/claude-statusline/config.toml. macOS gets it from the
-  # Brewfile (felipeelias/tap); Fedora has no package, so build it from source
-  # with the Go toolchain. It lands in $GOPATH/bin, which env.fish adds to PATH.
-  if is-fedora && ! command -v claude-statusline &> /dev/null; then
-    spin "Installing claude-statusline (go)..." go install github.com/felipeelias/claude-statusline@latest \
-      || bootstrap_error "Failed to install claude-statusline — the Claude Code status line will render nothing." \
-        "Retry manually: go install github.com/felipeelias/claude-statusline@latest"
-  fi
-
   # Configure git to authenticate GitHub over HTTPS via the gh CLI. Claude Code
   # clones marketplaces/plugins over HTTPS, so private ones (e.g. the
   # avegancafe-marketplace referenced in settings.json) fail to clone without an
@@ -962,6 +951,49 @@ setup-opencode() {
 # =============================================================================
 # Category Runner Functions
 # =============================================================================
+# claude-statusline renders the Claude Code status line (the `statusLine` block
+# in symlinked/home/.claude/settings.json), reading
+# symlinked/config/claude-statusline/config.toml.
+#
+# We install OUR FORK, not upstream: it adds width-aware per-module priorities
+# (rank a module with `priority = N` and it drops, with its separator, when the
+# line won't fit COLUMNS) plus a `[fit] margin` knob. Upstream has neither.
+#
+# The fork's go.mod declares the fork's own module path, so a plain `go install`
+# works. (It briefly kept upstream's path to stay PR-able upstream, which made
+# the fork uninstallable by its own URL — Go resolves module identity from go.mod
+# and rejects the mismatch. Ease of install won.)
+#
+# PINNED TO @main, AND NEITHER @latest NOR A BRANCH NAME. Two traps here:
+#   1. `@latest` resolves to the newest *semver tag*, and the fork inherited
+#      upstream's v0.7-v0.9 tags — so it installs a working binary silently
+#      missing the priorities feature we forked for. Verified.
+#   2. `go install pkg@some/branch` is rejected outright: "invalid version …
+#      disallowed version string". Version queries can't contain a slash, so
+#      feat/module-priorities is unusable here. The feature branch was
+#      fast-forwarded into the fork's main to give a slash-free ref.
+#
+# No `command -v` guard: main moves, so re-running picks up new commits. Go's
+# module cache keeps that cheap when nothing changed. (First install of a new
+# module path can be slow while proxy.golang.org fetches it; subsequent ones are
+# fast, and it's already warmed.)
+CLAUDE_STATUSLINE_PKG="github.com/avegancafe/claude-statusline"
+CLAUDE_STATUSLINE_REF="main"
+
+setup-claude-statusline() {
+  if ! command -v go &> /dev/null; then
+    bootstrap_error "go not found — cannot install claude-statusline." \
+      "Fedora: the 'golang' DNFfile entry. macOS: 'brew \"go\"' in the Brewfile." \
+      "Then re-run: juliet-bootstrap --enable=claude"
+    return
+  fi
+
+  spin "Installing claude-statusline (${CLAUDE_STATUSLINE_REF})..." \
+    go install "${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}" \
+    || bootstrap_error "Failed to install claude-statusline — the Claude Code status line will render nothing." \
+      "Retry manually: go install ${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}"
+}
+
 
 run-packages() {
   confirm-category "packages" "Install system packages? (neovim, bat, ripgrep, fzf, gh, starship, ghostty...)" || return
@@ -1021,7 +1053,7 @@ run-desktop() {
 }
 
 run-claude() {
-  confirm-category "claude" "Set up Claude Code? (CLI, superpowers, context7, LSP plugins)" || return
+  confirm-category "claude" "Set up Claude Code? (CLI, statusline, superpowers, context7, LSP plugins)" || return
   rlog "🤖 Setting up Claude Code..."
   setup-claude-code
 }
@@ -1054,3 +1086,4 @@ run-claude
 run-opencode
 
 print-bootstrap-summary
+  setup-claude-statusline

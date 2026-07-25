@@ -144,7 +144,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline-command.sh"
+    "command": "claude-statusline prompt"
   },
   "enabledPlugins": {
     "superpowers@superpowers-marketplace": true,
