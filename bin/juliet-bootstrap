@@ -1333,6 +1333,20 @@ setup-claude-statusline() {
     return
   fi
 
+  # Homebrew's felipeelias/tap/claude-statusline is the upstream this fork came
+  # from, and it installs the same binary name into /opt/homebrew/bin — which
+  # sits ahead of ~/go/bin on PATH. Since the tracked settings.json invokes a
+  # bare `claude-statusline prompt`, leaving the formula installed silently
+  # runs upstream instead of the fork, and the fork-only config keys in the
+  # tracked config.toml render as "(statusline error)". Deliberately kept out
+  # of the Brewfile, so remove it rather than letting it win.
+  if command -v brew &> /dev/null && brew list --formula claude-statusline &> /dev/null; then
+    spin "Removing the conflicting Homebrew claude-statusline (shadows the fork)..." \
+      brew uninstall --formula claude-statusline \
+      || bootstrap_error "Couldn't remove the Homebrew claude-statusline — it will keep shadowing the fork on PATH." \
+        "Remove it manually: brew uninstall claude-statusline"
+  fi
+
   # GOPRIVATE bypasses proxy.golang.org and the checksum DB for this module only.
   # Without it, `@main` is served from the proxy's cached branch resolution, which
   # lags behind the real tip — observed installing a commit old enough to predate
