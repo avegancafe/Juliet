@@ -55,10 +55,15 @@ noctalia-shell
 # sddm: the display manager. Fedora 44's KDE spin ships plasma-login-manager
 # instead, but this machine runs niri, not Plasma — and the whole Plasma stack
 # is removed by the setup-deplasma step. sddm is the greeter Juliet themes
-# (etc/sddm-themes/juliet, applied by setup-sddm). sddm-wayland-generic
-# provides the Wayland session support sddm needs to launch niri.
+# (etc/sddm-themes/juliet, applied by setup-sddm).
+#
+# sddm also needs a Wayland greeter session (a sddm-greeter-displayserver
+# provider) to launch niri, but that is NOT listed here: the providers all
+# conflict with each other, and a machine that came from the KDE spin already
+# has sddm-wayland-plasma installed, so naming sddm-wayland-generic makes the
+# transaction unresolvable. setup-sddm installs the generic one only when no
+# provider is present.
 sddm
-sddm-wayland-generic
 # keyd: system-level key remapper. Used to give leftmeta (Super) a dual role —
 # hold = the Mod modifier for niri, tap = F13 (bound to the noctalia menu).
 # Configured by the setup-keyd bootstrap step (/etc/keyd/default.conf).

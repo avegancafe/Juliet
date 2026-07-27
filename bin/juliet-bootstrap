@@ -696,6 +696,19 @@ setup-sddm() {
     return
   fi
 
+  # sddm needs a Wayland greeter session to launch niri. Every provider of
+  # sddm-greeter-displayserver conflicts with every other one, so this can't
+  # live in the DNFfile: the KDE spin preinstalls sddm-wayland-plasma, and
+  # asking for sddm-wayland-generic on top of it makes the whole transaction
+  # unresolvable. Any provider works for our purposes, so only install the
+  # generic one when the machine has none.
+  if ! rpm -q --whatprovides sddm-greeter-displayserver &> /dev/null; then
+    substep "Installing sddm Wayland greeter session..."
+    sudo dnf install -y sddm-wayland-generic \
+      || bootstrap_error "Failed to install sddm-wayland-generic" \
+        "Install it manually: sudo dnf install sddm-wayland-generic"
+  fi
+
   # Make sddm the active display manager. Fedora's KDE spin installs
   # plasma-login-manager (plasmalogin.service) and enables it; this machine
   # runs niri, so sddm takes over as the greeter. display-manager.service is a
