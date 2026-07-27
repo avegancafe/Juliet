@@ -299,12 +299,52 @@ ensure-bootstrap-deps() {
   fi
 }
 
+# Homebrew 6.0 refuses to load formulae and casks from third-party taps until
+# they're explicitly trusted, so `brew bundle` hard-fails on any tap-qualified
+# Brewfile entry ("Refusing to load formula ... from untrusted tap"). Grant
+# that trust up front, deriving the list from the Brewfile itself so a newly
+# added entry can't reintroduce the failure, and scoping each grant to the one
+# formula the Brewfile actually asks for rather than to the whole tap — the
+# error message suggests either, but whole-tap trust also covers every future
+# formula that tap ever publishes.
+trust-brewfile-entries() {
+  # Pre-6.0 Homebrew has no trust model and no such subcommand.
+  local already
+  already=$(brew trust --json v1 2> /dev/null) || return 0
+
+  local brewfile="$HOME/.config/Juliet/Brewfile"
+  [[ -f "$brewfile" ]] || return 0
+
+  local kind name tap flag
+  while read -r kind name; do
+    [[ -z "$name" ]] && continue
+    # The Brewfile keyword and the trust flag disagree: a `brew` line names a
+    # formula, so it needs --formula, not --brew.
+    case "$kind" in
+      brew) flag="--formula" ;;
+      cask) flag="--cask" ;;
+      *) continue ;;
+    esac
+    # Skip anything already granted, either by name or by a broader whole-tap
+    # grant, so repeat runs stay silent.
+    tap="${name%/*}"
+    grep -qF "\"$name\"" <<< "$already" && continue
+    grep -qF "\"$tap\"" <<< "$already" && continue
+    substep "Trusting $name (third-party tap)..."
+    brew trust "$flag" "$name" \
+      || bootstrap_error "Failed to trust $name." \
+        "Retry manually: brew trust $flag $name"
+  done < <(sed -nE 's#^[[:space:]]*(brew|cask)[[:space:]]+"([^"/]+/[^"/]+/[^"]+)".*#\1 \2#p' "$brewfile")
+}
+
 setup-brew() {
   ensure-brew
 
   if ! command -v gum &> /dev/null; then
     brew install gum
   fi
+
+  trust-brewfile-entries
 
   rlog "Running brew bundle..."
   brew bundle --file ~/.config/Juliet/Brewfile \
