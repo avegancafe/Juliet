@@ -318,6 +318,18 @@ setup-cargo() {
     rlog "Installing Rust via rustup-init..."
     rustup-init
   fi
+
+  # `brew bundle` installs a formula but never upgrades one already present, so
+  # a long-lived machine keeps whatever rustc it first got while the crates in
+  # setup-rust keep adopting new language features (libsqlite3-sys 0.38 needs
+  # cfg_select, stable only after 1.92). The result is that every `cargo
+  # install` below dies with an E0658 that reads like a broken crate rather
+  # than a stale compiler — so keep brew's rust current before we build.
+  if command -v brew &> /dev/null && brew list --formula rust &> /dev/null \
+    && [[ -n "$(brew outdated --formula rust 2> /dev/null)" ]]; then
+    spin "Upgrading rust (Homebrew)..." brew upgrade rust \
+      || bootstrap_error "Failed to upgrade rust — run 'brew upgrade rust' manually."
+  fi
 }
 
 # A DNFfile entry may be satisfied by a differently-named package: Fedora 44
