@@ -1,42 +1,146 @@
 #!/opt/homebrew/bin/fish
 
-if test (count $argv) -eq 0
-    error "Usage: brew-uninstall-removed <commit-hash>"
+# Uninstall the formulae and casks that a given commit removed from the Brewfile.
+#
+# Removals recorded in an old commit are not necessarily still desired: an entry
+# pruned months ago may have been re-added since, and the commit diff has no way
+# to know that. So the current Brewfile — not the commit — is the authority on
+# what must stay installed. Anything it still declares is skipped.
+#
+# Usage: brew-uninstall-removed [--dry-run] <commit-hash>
+
+set -l dry_run 0
+set -l positional
+
+for arg in $argv
+    switch $arg
+        case --dry-run -n
+            set dry_run 1
+        case '-*'
+            error "Unknown option: $arg"
+            error "Usage: brew-uninstall-removed [--dry-run] <commit-hash>"
+            exit 1
+        case '*'
+            set positional $positional $arg
+    end
+end
+
+if test (count $positional) -ne 1
+    error "Usage: brew-uninstall-removed [--dry-run] <commit-hash>"
     exit 1
 end
 
-set commit_hash $argv[1]
+set -l commit_hash $positional[1]
 
-log "Analyzing removed formulae from commit $commit_hash"
+if not git rev-parse --verify --quiet "$commit_hash^{commit}" >/dev/null
+    error "Not a valid commit: $commit_hash"
+    exit 1
+end
 
-set removed_lines (git show $commit_hash | grep '^-' | grep -E '^-(brew|cask)')
+set -l repo_root (git rev-parse --show-toplevel)
+set -l brewfile_path $repo_root/Brewfile
+
+# Restrict the diff to the Brewfile. Scanning the whole commit would treat a
+# removed "-brew ..." line in a README or plan doc as an uninstall instruction.
+set -l removed_lines (git -C $repo_root show $commit_hash -- Brewfile | grep -E '^-(brew|cask) ')
 
 if test (count $removed_lines) -eq 0
-    log "No brew formulae or casks were removed in commit $commit_hash"
+    log "No Brewfile formulae or casks were removed in commit $commit_hash"
     exit 0
 end
 
-log "Found "(count $removed_lines)" removed brew/cask entries"
+log "Found "(count $removed_lines)" removed brew/cask entries in $commit_hash"
 
-set failed_formulae
-set brewfile_path (git rev-parse --show-toplevel)/Brewfile
+# Everything the Brewfile declares today, so re-added entries are never removed.
+set -l current_entries
+set -l current_brews
+set -l current_casks
+
+if test -f $brewfile_path
+    for entry in (grep -E '^(brew|cask) "' $brewfile_path)
+        set -l trimmed (string trim -- $entry)
+        set -a current_entries $trimmed
+
+        if string match -q -- 'brew "*' $trimmed
+            # Compare on the bare name so "opencode" matches "some/tap/opencode".
+            set -a current_brews (basename (string match -r -- 'brew "([^"]+)"' $trimmed)[2])
+        else if string match -q -- 'cask "*' $trimmed
+            set -a current_casks (basename (string match -r -- 'cask "([^"]+)"' $trimmed)[2])
+        end
+    end
+end
+
+# Insert an entry next to its own kind instead of appending to the end of the
+# file, which would otherwise strand a brew line below the vscode block.
+function __insert_brewfile_entry --argument-names path entry kind
+    set -l lines (cat $path)
+    set -l last 0
+
+    for i in (seq (count $lines))
+        if string match -q -- "$kind \"*" $lines[$i]
+            set last $i
+        end
+    end
+
+    if test $last -eq 0
+        echo $entry >>$path
+        return
+    end
+
+    set -l rebuilt $lines[1..$last] $entry
+    if test $last -lt (count $lines)
+        set -a rebuilt $lines[(math $last + 1)..-1]
+    end
+
+    printf '%s\n' $rebuilt >$path
+end
+
+set -l uninstalled
+set -l skipped
+set -l failed
+set -l needs_readding
 
 for line in $removed_lines
-    set clean_line (echo $line | cut -c2-)
+    # The "--" matters: these lines start with "-", which string would otherwise
+    # parse as an option.
+    set -l clean_line (string trim -- (string sub --start 2 -- $line))
 
-    if string match -q 'brew "*"*' $clean_line
-        set formula_name (string match -r 'brew "([^"]+)"' $clean_line)[2]
-        set formula_type "brew"
-    else if string match -q 'cask "*"*' $clean_line
-        set formula_name (string match -r 'cask "([^"]+)"' $clean_line)[2]
-        set formula_type "cask"
+    if string match -q -- 'brew "*' $clean_line
+        set -l full_name (string match -r -- 'brew "([^"]+)"' $clean_line)[2]
+        set formula_name $full_name
+        set short_name (basename $full_name)
+        set formula_type brew
+    else if string match -q -- 'cask "*' $clean_line
+        set -l full_name (string match -r -- 'cask "([^"]+)"' $clean_line)[2]
+        set formula_name $full_name
+        set short_name (basename $full_name)
+        set formula_type cask
     else
+        continue
+    end
+
+    # Rule 1: the current Brewfile wins.
+    if test $formula_type = brew; and contains -- $short_name $current_brews
+        log "Skipping $short_name — still declared in the Brewfile"
+        set -a skipped $short_name
+        continue
+    end
+
+    if test $formula_type = cask; and contains -- $short_name $current_casks
+        log "Skipping cask $short_name — still declared in the Brewfile"
+        set -a skipped $short_name
+        continue
+    end
+
+    if test $dry_run -eq 1
+        log "[dry-run] Would uninstall $formula_type: $formula_name"
+        set -a uninstalled $short_name
         continue
     end
 
     log "Attempting to uninstall $formula_type: $formula_name"
 
-    if test $formula_type = "cask"
+    if test $formula_type = cask
         set uninstall_result (brew uninstall --cask $formula_name 2>&1)
     else
         set uninstall_result (brew uninstall $formula_name 2>&1)
@@ -44,27 +148,44 @@ for line in $removed_lines
 
     if test $status -eq 0
         log "Successfully uninstalled $formula_name"
+        set -a uninstalled $short_name
     else
         if string match -q "*because it is required by*" $uninstall_result
-            warn "$formula_name cannot be uninstalled due to dependencies"
-            set failed_formulae $failed_formulae $clean_line
+            warn "$formula_name cannot be uninstalled — another formula depends on it"
+            set -a needs_readding $clean_line
+            set -a failed $short_name
         else if string match -q "*No such keg*" $uninstall_result; or string match -q "*is not installed*" $uninstall_result
             log "$formula_name was not installed"
         else
             warn "Failed to uninstall $formula_name: "(echo $uninstall_result | head -1)
+            set -a failed $short_name
         end
     end
 end
 
-if test (count $failed_formulae) -gt 0
-    warn "Re-adding "(count $failed_formulae)" formulae that couldn't be uninstalled due to dependencies"
-
-    for formula in $failed_formulae
-        echo $formula >> $brewfile_path
-        log "Re-added: $formula"
+# Rule 2: only re-add an entry the Brewfile does not already contain, so a
+# repeated run cannot accumulate duplicate lines.
+for entry in $needs_readding
+    if contains -- $entry $current_entries
+        log "Already declared, not re-adding: $entry"
+        continue
     end
 
-    log "Updated $brewfile_path with failed formulae"
+    if test $dry_run -eq 1
+        log "[dry-run] Would re-add to the Brewfile: $entry"
+        continue
+    end
+
+    set -l kind (string split -- ' ' $entry)[1]
+    __insert_brewfile_entry $brewfile_path $entry $kind
+    set -a current_entries $entry
+    log "Re-added (still required as a dependency): $entry"
+end
+
+functions -e __insert_brewfile_entry
+
+if test $dry_run -eq 1
+    log "Dry run: "(count $uninstalled)" would be uninstalled, "(count $skipped)" skipped as still declared"
 else
-    log "All formulae were successfully processed"
+    log "Done: "(count $uninstalled)" uninstalled, "(count $skipped)" skipped as still declared, "(count $failed)" failed"
 end
