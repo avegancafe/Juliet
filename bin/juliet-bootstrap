@@ -1754,12 +1754,11 @@ run-desktop() {
     && ! command -v keyd &> /dev/null \
     && ! rpm -q plasma-drkonqi &> /dev/null \
     && ! rpm -q akonadi-calendar &> /dev/null \
-    && ! rpm -q akmod-nvidia &> /dev/null \
-    && rpm -q claude-desktop-unofficial &> /dev/null; then
+    && ! rpm -q akmod-nvidia &> /dev/null; then
     return
   fi
 
-  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot, Goodix fingerprint driver, Claude Desktop)" || return
+  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot, Goodix fingerprint driver)" || return
   log "🖥️ Configuring desktop..."
   # Order matters: setup-sddm must enable sddm as the display manager before
   # setup-deplasma removes plasma-login-manager, or there's no way to log in.
@@ -1773,14 +1772,16 @@ run-desktop() {
   # After setup-sddm: this edits /etc/pam.d/sddm, which is only worth doing once
   # sddm is actually the display manager.
   setup-fingerprint
-  setup-claude-desktop
 }
 
 run-claude() {
-  confirm-category "claude" "Set up Claude Code? (CLI, statusline, superpowers, context7, LSP plugins)" || return
-  rlog "🤖 Setting up Claude Code..."
+  confirm-category "claude" "Set up Claude? (Code CLI, statusline, superpowers, context7, LSP plugins, Claude Desktop)" || return
+  rlog "🤖 Setting up Claude..."
   setup-claude-code
   setup-claude-statusline
+  # Claude tooling, not desktop-environment config — and it self-guards on
+  # Fedora, so it's a no-op on macOS.
+  setup-claude-desktop
 }
 
 run-opencode() {
@@ -1793,16 +1794,24 @@ run-opencode() {
 # Main Execution
 # =============================================================================
 
-# Core setup (always runs)
+# Core setup (always runs).
+#
+# The phase boundary that matters is update-juliet: it may exec a freshly
+# pulled copy of this script, so everything ABOVE it runs twice on a
+# self-update and everything below runs once. Keep the pre-pull phase to the
+# bare minimum needed to reach the pull — stow and gum — and put every step
+# that consumes repo content after it, so it reads the version just pulled.
 log "🚀 Bootstrapping Juliet..."
 ensure-bootstrap-deps
 
-log "🔧 Setting up git..."
-setup-git
-
-log "🔄 Checking Juliet is up to date..."
+log "🔄 Updating Juliet..."
 update-juliet
 
+# Both steps materialize config into $HOME — setup-git seeds the one git file
+# that can't be stowed (machine-local identity, gitignored), symlink-dotfiles
+# stows the tracked rest — so they belong in one phase, after the pull.
+log "🔗 Linking dotfiles..."
+setup-git
 symlink-dotfiles
 
 # Category-based setup
