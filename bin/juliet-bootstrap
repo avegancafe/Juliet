@@ -2,6 +2,11 @@
 
 source ~/.config/Juliet/_util.bash
 
+# Captured before any arg parsing touches "$@" (the JULIET_BOOTSTRAP_ARGS env
+# var below reassigns it via `set --`), so a self re-exec after a git pull
+# (see update-juliet) can replay the invocation exactly as the user typed it.
+ORIGINAL_ARGS=("$@")
+
 # Abort the whole script when the user hits Ctrl+C, instead of letting
 # individual prompts treat it as "No" and falling through to the next step.
 on-interrupt() {
@@ -240,7 +245,27 @@ update-juliet() {
 
     CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     if [ "$CURRENT_BRANCH" = "$DEFAULT_BRANCH" ]; then
+      local self="$WORKDIR/bin/juliet-bootstrap"
+      local old_hash=""
+      [[ -f "$self" ]] && old_hash=$(sha256sum "$self" | cut -d' ' -f1)
+
       git pull
+
+      # If the pull changed this very script, the rest of this run would
+      # execute against the stale, already-loaded copy in memory. Re-exec the
+      # freshly pulled version with the exact original arguments instead, so
+      # any new steps/fixes take effect immediately rather than on the next
+      # invocation. Guarded by JULIET_BOOTSTRAP_REEXEC so a re-exec loop can't
+      # happen even if the script kept changing underneath itself.
+      if [[ -n "$old_hash" && -z "${JULIET_BOOTSTRAP_REEXEC:-}" ]]; then
+        local new_hash
+        new_hash=$(sha256sum "$self" | cut -d' ' -f1)
+        if [[ "$new_hash" != "$old_hash" ]]; then
+          substep "juliet-bootstrap was updated by the pull — re-executing the new version..."
+          cd - > /dev/null
+          JULIET_BOOTSTRAP_REEXEC=1 exec "$self" "${ORIGINAL_ARGS[@]}"
+        fi
+      fi
     else
       warn "Warning: ~/.config/Juliet is not on the default branch. Current branch: $CURRENT_BRANCH"
       return
