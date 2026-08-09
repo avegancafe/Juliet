@@ -64,6 +64,14 @@ noctalia-shell
 # transaction unresolvable. setup-sddm installs the generic one only when no
 # provider is present.
 sddm
+sddm-wayland-generic
+# adwaita-cursor-theme: the greeter's mouse pointer. sddm's greeter runs as a
+# Wayland client under `weston --shell=kiosk`, where the pointer image is drawn
+# by the client and nothing paints a fallback — so if the theme named by
+# CursorTheme in setup-sddm is absent, the login screen has no visible mouse at
+# all. Present on this box only as someone else's dependency; named explicitly
+# so a fresh machine doesn't inherit an invisible cursor.
+adwaita-cursor-theme
 # keyd: system-level key remapper. Used to give leftmeta (Super) a dual role —
 # hold = the Mod modifier for niri, tap = F13 (bound to the noctalia menu).
 # Configured by the setup-keyd bootstrap step (/etc/keyd/default.conf).

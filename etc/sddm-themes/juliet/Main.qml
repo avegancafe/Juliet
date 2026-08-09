@@ -38,9 +38,39 @@ Rectangle {
         clock.text = Qt.formatDateTime(new Date(), "dddd, MMMM d - hh:mm AP")
     }
 
+    // SDDM runs exactly one PAM conversation at a time. Because pam_fprintd sits
+    // first in /etc/pam.d/sddm, that conversation opens by blocking on the
+    // reader — so every further sddm.login() is rejected outright ("Existing
+    // authentication ongoing, aborting" in the journal) and the keypress looks
+    // like it did nothing at all. Tracking the in-flight state lets the greeter
+    // explain itself instead of swallowing Enter in silence.
+    property bool authInFlight: false
+
+    function showStatus(message, isError) {
+        statusText.text = message
+        statusText.isError = isError
+    }
+
     function attemptLogin() {
-        statusText.text = ""
+        if (root.authInFlight) {
+            root.showStatus("Still authenticating — touch the reader, or wait for it to time out", false)
+            return
+        }
+        root.authInFlight = true
+        root.showStatus("", false)
         sddm.login(userField.text, passwordField.text, sessionBox.currentIndex)
+    }
+
+    // The username comes prefilled from userModel.lastUser, so the password is
+    // the field that actually needs typing. Deferred through Qt.callLater
+    // because userModel can populate *after* Component.onCompleted runs —
+    // checking synchronously would see an empty field and focus the username.
+    function applyInitialFocus() {
+        if (userField.text === "") {
+            userField.forceActiveFocus()
+        } else {
+            passwordField.forceActiveFocus()
+        }
     }
 
     // theme.conf may point `background` at an image file. Left empty — the
@@ -136,14 +166,11 @@ Rectangle {
                     onAccepted: root.attemptLogin()
                     KeyNavigation.tab: passwordField
 
-                    // Take the keyboard on load so you can type straight away
-                    // instead of having to click the field first. forceActiveFocus
-                    // in Component.onCompleted rather than `focus: true` because
-                    // this TextInput is nested inside a Row inside a Rectangle —
-                    // `focus: true` only marks it focused *within its scope*, and
-                    // the enclosing items don't forward focus, so the field would
-                    // never actually receive key events.
-                    Component.onCompleted: forceActiveFocus()
+                    // Initial focus is decided centrally by root.applyInitialFocus
+                    // rather than grabbed here. This field used to call
+                    // forceActiveFocus() in its own Component.onCompleted, which
+                    // fights the root handler for the keyboard and made the
+                    // outcome depend on completion order.
                 }
             }
 
@@ -179,11 +206,20 @@ Rectangle {
     // ------------------------------------------------------ status / failure
     Text {
         id: statusText
+
+        // PAM speaks through here too, not just failures — pam_fprintd's "Place
+        // your finger on the fingerprint reader" arrives as an information
+        // message. Rendering those in the failure red would be a lie, so the
+        // colour follows the kind of message.
+        property bool isError: false
+
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: authBox.bottom
         anchors.topMargin: 40
+        width: 700
         horizontalAlignment: Text.AlignHCenter
-        color: root.fgFail
+        wrapMode: Text.WordWrap
+        color: statusText.isError ? root.fgFail : root.fgDim
         font.family: root.mono
         font.pixelSize: 14
         text: ""
@@ -318,23 +354,51 @@ Rectangle {
     Connections {
         target: sddm
 
+        // Defensive: SDDM's exact signal set varies across releases, and an
+        // unrecognised handler here would otherwise warn (or worse) at component
+        // creation. A greeter that fails to load is unrecoverable without a TTY,
+        // so tolerate the mismatch rather than risk the whole screen.
+        ignoreUnknownSignals: true
+
         function onLoginFailed() {
-            statusText.text = "Authentication failed"
+            root.authInFlight = false
+            root.showStatus("Authentication failed", true)
             passwordField.text = ""
             passwordField.forceActiveFocus()
         }
 
-        function onInformationMessage(message) {
-            statusText.text = message
+        // Without clearing the flag on success the greeter would refuse to
+        // retry if a session ever fails to start after PAM has accepted.
+        function onLoginSucceeded() {
+            root.authInFlight = false
         }
+
+        // A failed step *within* a conversation — a rejected fingerprint, say —
+        // arrives as error(), NOT as loginFailed(). Releasing the guard here too
+        // is what stops a mid-stack failure from latching the greeter shut and
+        // making Enter a no-op for the rest of the session.
+        function onError(message) {
+            root.authInFlight = false
+            root.showStatus(message, true)
+        }
+
+        function onInformationMessage(message) {
+            root.showStatus(message, false)
+        }
+    }
+
+    // Backstop. Nothing is allowed to latch this greeter shut: if a conversation
+    // ends without any signal we recognise, release the guard anyway. A stray
+    // "Existing authentication ongoing, aborting" in the journal is vastly
+    // preferable to a login screen that has stopped listening to the keyboard.
+    Timer {
+        interval: 20000
+        running: root.authInFlight
+        onTriggered: root.authInFlight = false
     }
 
     Component.onCompleted: {
         root.refreshClock()
-        if (userField.text === "") {
-            userField.forceActiveFocus()
-        } else {
-            passwordField.forceActiveFocus()
-        }
+        Qt.callLater(root.applyInitialFocus)
     }
 }

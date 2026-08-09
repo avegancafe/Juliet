@@ -877,16 +877,29 @@ setup-sddm() {
   # the file is absent: a create-once guard can't converge if the file drifts
   # (hand-edited, or left over from an earlier theme name), which would leave the
   # theme installed but not actually selected.
+  # CursorTheme is what exports XCURSOR_THEME into the greeter, and without it
+  # the login screen has no visible mouse pointer at all. The greeter runs under
+  # `weston --shell=kiosk` (sddm-wayland-generic), and on Wayland the pointer
+  # image is drawn entirely by the client — weston's kiosk shell paints no
+  # fallback — so a greeter that can't load a cursor theme renders nothing while
+  # the mouse still works. The KDE spin's kde_settings.conf used to supply this;
+  # setup-deplasma takes that file with it, so Juliet has to own it now.
   SDDM_CONF="/etc/sddm.conf.d/juliet.conf"
   local want_conf
-  want_conf=$'[Theme]\nCurrent=juliet'
+  want_conf=$'[Theme]\nCurrent=juliet\nCursorTheme=Adwaita'
   if [[ "$(cat "$SDDM_CONF" 2>/dev/null)" != "$want_conf" ]]; then
     substep "Configuring SDDM to use the Juliet theme..."
     sudo install -d -m 755 /etc/sddm.conf.d \
       || bootstrap_error "Failed to create /etc/sddm.conf.d"
     printf '%s\n' "$want_conf" | sudo tee "$SDDM_CONF" > /dev/null \
       || bootstrap_error "Failed to write $SDDM_CONF" \
-        "Set it manually: printf '[Theme]\\nCurrent=juliet\\n' | sudo tee $SDDM_CONF"
+        "Set it manually: printf '[Theme]\\nCurrent=juliet\\nCursorTheme=Adwaita\\n' | sudo tee $SDDM_CONF"
+  fi
+
+  # The cursor theme named above has to actually exist for the greeter, which
+  # runs as the sddm user and only searches system icon dirs.
+  if [[ ! -d /usr/share/icons/Adwaita/cursors ]]; then
+    warn "Cursor theme Adwaita is missing — the greeter will have an invisible mouse pointer. Install adwaita-cursor-theme."
   fi
 }
 
@@ -919,6 +932,147 @@ setup-keyd() {
       "Enable it manually: sudo systemctl enable --now keyd"
   # Re-runs: pick up config changes without a restart (no-op on first enable).
   sudo keyd reload &> /dev/null || true
+}
+
+# The Goodix 27c6:533c reader in this XPS 15 9500 is a match-on-chip sensor that
+# Fedora's libfprint cannot drive: the open goodixmoc driver doesn't cover the
+# 53xc family, so a stock install enumerates the hardware fine but fprintd still
+# reports "No devices available". The only working driver is Goodix's
+# proprietary TOD (Touch OEM Driver) blob, and that needs libfprint rebuilt with
+# TOD support — a package that REPLACES Fedora's stock libfprint.
+#
+# Two COPRs, deliberately, because neither is complete on its own:
+#   antiderivative/libfprint-tod-goodix-0.0.9 supplies libfprint-tod, genuinely
+#     rebuilt for f44. Its own goodix package is excluded: that one is the 550a
+#     driver, whose device table covers 5117/5381/5750 but NOT 533c.
+#   manciukic/libfprint-tod-goodix supplies libfprint-tod-goodix 0.0.6, the
+#     "53xc" blob that does list 27c6:533c. Its libfprint-tod is excluded: that
+#     chroot only ever got fc40 binaries forked forward to f44.
+# Pairing the two is safe — the blob links against nothing but
+# libfprint-2-tod.so.1 and glibc, so the fc40 build runs fine on the fc44 core.
+# The excludepkgs pins matter beyond first install: without them a later `dnf
+# upgrade` pulls goodix 0.0.9 over 0.0.6 and silently kills the sensor.
+#
+# To undo all of this:
+#   sudo dnf swap libfprint-tod libfprint
+#   sudo dnf copr disable antiderivative/libfprint-tod-goodix-0.0.9
+#   sudo dnf copr disable manciukic/libfprint-tod-goodix
+setup-fingerprint() {
+  if ! is-fedora; then
+    return
+  fi
+
+  # Only meaningful on hardware carrying this exact sensor. Read from sysfs
+  # rather than lsusb so the step doesn't depend on usbutils being installed.
+  local dev found=""
+  for dev in /sys/bus/usb/devices/*/; do
+    if [[ "$(cat "$dev/idVendor" 2>/dev/null)" == "27c6" \
+      && "$(cat "$dev/idProduct" 2>/dev/null)" == "533c" ]]; then
+      found=1
+      break
+    fi
+  done
+  if [[ -z "$found" ]]; then
+    return
+  fi
+
+  if ! rpm -q libfprint-tod-goodix &> /dev/null; then
+    substep "Installing the Goodix TOD fingerprint driver..."
+
+    local repo
+    for repo in antiderivative/libfprint-tod-goodix-0.0.9 manciukic/libfprint-tod-goodix; do
+      if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
+        sudo dnf copr enable -y "$repo" \
+          || bootstrap_error "Failed to enable COPR $repo" \
+            "Enable it manually: sudo dnf copr enable -y $repo"
+      fi
+    done
+
+    # Pin each COPR to the half it is authoritative for. The repo files are
+    # located by their baseurl rather than by filename so this doesn't depend on
+    # how dnf spells the generated _copr:... filename.
+    local pin_repo pin_excludes repo_file
+    for pin_repo in \
+      "antiderivative/libfprint-tod-goodix-0.0.9=libfprint-tod-goodix" \
+      "manciukic/libfprint-tod-goodix=libfprint-tod,libfprint-tod-devel"; do
+      pin_excludes="${pin_repo#*=}"
+      pin_repo="${pin_repo%%=*}"
+      repo_file="$(grep -rlsF "results/${pin_repo}/" /etc/yum.repos.d/ 2>/dev/null | head -1)"
+      if [[ -z "$repo_file" ]]; then
+        bootstrap_error "Could not find the .repo file for COPR $pin_repo" \
+          "Add 'excludepkgs=$pin_excludes' to it by hand under /etc/yum.repos.d"
+        continue
+      fi
+      if ! grep -q "^excludepkgs=" "$repo_file"; then
+        sudo sed -i "/^\[/a excludepkgs=$pin_excludes" "$repo_file" \
+          || bootstrap_error "Failed to pin COPR $pin_repo" \
+            "Add 'excludepkgs=$pin_excludes' to $repo_file by hand"
+      fi
+    done
+
+    # libfprint-tod Obsoletes only `libfprint = 1.94.5`, so it does not supersede
+    # Fedora's newer libfprint on its own, and the two both own five files
+    # (libfprint-2.so.2 among them). swap replaces it in a single transaction
+    # instead of failing the install on the file conflict. Nothing but fprintd
+    # depends on libfprint, and fprintd needs only the libfprint-2.so.2 soname,
+    # which libfprint-tod provides — so the swap is contained.
+    if ! rpm -q libfprint-tod &> /dev/null; then
+      sudo dnf swap -y libfprint libfprint-tod \
+        || bootstrap_error "Failed to swap libfprint for libfprint-tod" \
+          "Run it manually: sudo dnf swap -y libfprint libfprint-tod"
+    fi
+    sudo dnf install -y libfprint-tod-goodix \
+      || bootstrap_error "Failed to install libfprint-tod-goodix" \
+        "Run it manually: sudo dnf install -y libfprint-tod-goodix"
+
+    # fprintd enumerates drivers at startup, so a daemon already running won't
+    # see the new blob. It is D-Bus activated, so stopping is enough: the next
+    # call starts a fresh one that picks the driver up.
+    sudo systemctl stop fprintd.service &> /dev/null || true
+  fi
+
+  # SDDM's PAM stack includes password-auth, which authselect deliberately keeps
+  # fingerprint-free (it also serves remote logins, where a reader makes no
+  # sense). system-auth already gets pam_fprintd from `authselect ...
+  # with-fingerprint`, which covers sudo and console login, so only the greeter
+  # needs wiring up by hand.
+  #
+  # sufficient, and placed first: a swipe logs you in, and any failure — no
+  # enrolled print, reader disabled in BIOS, driver broken by an update — falls
+  # straight through to the password prompt rather than locking you out.
+  #
+  # max-tries and timeout are load-bearing, not tuning. SDDM runs exactly one
+  # PAM conversation at a time, and pam_fprintd holds it open while waiting on
+  # the reader. With the stock retry count, a typed password therefore does
+  # NOTHING until the fingerprint attempts are exhausted — every Enter is
+  # discarded and the journal fills with "Existing authentication ongoing,
+  # aborting". Capping it at a single short attempt keeps swipe-to-login while
+  # letting the password through quickly. (pam_fprintd clamps a timeout below
+  # its own floor and logs that it did, so a low value is safe.)
+  local pam_sddm="/etc/pam.d/sddm"
+  local fprintd_line="auth        sufficient    pam_fprintd.so max-tries=1 timeout=10"
+  if [[ -f "$pam_sddm" ]]; then
+    # Keep a pristine copy: /etc/pam.d/sddm is package-owned, and a botched auth
+    # stack is only fixable from a TTY.
+    sudo cp -n "$pam_sddm" "$pam_sddm.juliet-orig" &> /dev/null || true
+
+    if ! grep -q "pam_fprintd.so" "$pam_sddm"; then
+      substep "Enabling fingerprint auth at the SDDM greeter..."
+      sudo sed -i \
+        "s|^auth\([[:space:]]\{1,\}\)substack\([[:space:]]\{1,\}\)password-auth|$fprintd_line\nauth\1substack\2password-auth|" \
+        "$pam_sddm" \
+        || bootstrap_error "Failed to add pam_fprintd to $pam_sddm" \
+          "Add this above the password-auth line: $fprintd_line"
+    elif [[ "$(grep -m1 'pam_fprintd\.so' "$pam_sddm")" != "$fprintd_line" ]]; then
+      # Converge a line written by an older bootstrap (or by hand) onto the
+      # current options, instead of leaving it stale because "some pam_fprintd
+      # line exists".
+      substep "Updating the SDDM fingerprint PAM options..."
+      sudo sed -i "s|^.*pam_fprintd\.so.*\$|$fprintd_line|" "$pam_sddm" \
+        || bootstrap_error "Failed to update pam_fprintd options in $pam_sddm" \
+          "Set the line to: $fprintd_line"
+    fi
+  fi
 }
 
 # Plasma components that are dead weight — or actively harmful — on a machine
@@ -1553,7 +1707,7 @@ run-desktop() {
     return
   fi
 
-  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot)" || return
+  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot, Goodix fingerprint driver)" || return
   log "🖥️ Configuring desktop..."
   # Order matters: setup-sddm must enable sddm as the display manager before
   # setup-deplasma removes plasma-login-manager, or there's no way to log in.
@@ -1564,6 +1718,9 @@ run-desktop() {
   setup-nvidia-secureboot
   setup-nvidia-powermgmt
   setup-keyd
+  # After setup-sddm: this edits /etc/pam.d/sddm, which is only worth doing once
+  # sddm is actually the display manager.
+  setup-fingerprint
 }
 
 run-claude() {

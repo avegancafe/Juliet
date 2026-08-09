@@ -98,12 +98,6 @@
                     "showBadge": true,
                     "showLabelsOnlyWhenOccupied": true,
                     "unfocusedIconsOpacity": 1
-                },
-                {
-                    "colorName": "primary",
-                    "hideWhenIdle": true,
-                    "id": "AudioVisualizer",
-                    "width": 200
                 }
             ],
             "left": [
@@ -153,6 +147,12 @@
             ],
             "right": [
                 {
+                    "colorName": "primary",
+                    "hideWhenIdle": true,
+                    "id": "AudioVisualizer",
+                    "width": 200
+                },
+                {
                     "blacklist": [
                     ],
                     "chevronColor": "none",
@@ -198,7 +198,7 @@
                 {
                     "clockColor": "none",
                     "customFont": "",
-                    "formatHorizontal": "HH:mm ddd, MMM dd",
+                    "formatHorizontal": "HH:mm t",
                     "formatVertical": "HH mm - dd MM",
                     "id": "Clock",
                     "tooltipFormat": "HH:mm ddd, MMM dd",

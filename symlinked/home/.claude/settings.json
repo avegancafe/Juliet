@@ -126,7 +126,6 @@
       "/Users/kyle/.config/Juliet/"
     ]
   },
-  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -143,6 +142,7 @@
   "worktree": {
     "baseRef": "fresh"
   },
+  "enableWorkflows": true,
   "statusLine": {
     "type": "command",
     "command": "claude-statusline prompt"
@@ -215,15 +215,17 @@
     }
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
+  "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
+  "askUserQuestionTimeout": "never",
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
   "theme": "dark-daltonized",
   "verbose": true,
   "fileCheckpointingEnabled": false,
+  "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
