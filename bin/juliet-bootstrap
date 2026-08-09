@@ -1796,8 +1796,13 @@ run-opencode() {
 # Core setup (always runs)
 log "🚀 Bootstrapping Juliet..."
 ensure-bootstrap-deps
+
+log "🔧 Setting up git..."
 setup-git
+
+log "🔄 Checking Juliet is up to date..."
 update-juliet
+
 symlink-dotfiles
 
 # Category-based setup
