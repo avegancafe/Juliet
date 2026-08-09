@@ -1578,6 +1578,32 @@ setup-claude-code() {
   done
 }
 
+# Anthropic doesn't ship an official Fedora/RPM build of Claude Desktop — only
+# a Debian/Ubuntu .deb. aaddrick/claude-desktop-debian repackages that .deb
+# into an .rpm (plus a launcher for Linux-specific quirks) and publishes it via
+# its own DNF repo, so this stays a real `dnf install`/`dnf upgrade` with an
+# update path instead of a one-off hand-extracted .deb.
+setup-claude-desktop() {
+  if ! is-fedora; then
+    return
+  fi
+
+  local repo_file="/etc/yum.repos.d/claude-desktop-unofficial.repo"
+  if [[ ! -f "$repo_file" ]]; then
+    substep "Adding the claude-desktop-unofficial DNF repo..."
+    sudo curl -fsSL https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo -o "$repo_file" \
+      || bootstrap_error "Failed to add the claude-desktop-unofficial repo" \
+        "Add it manually: sudo curl -fsSL https://pkg.claude-desktop-debian.dev/rpm/claude-desktop-unofficial.repo -o $repo_file"
+  fi
+
+  if ! rpm -q claude-desktop-unofficial &> /dev/null; then
+    substep "Installing Claude Desktop (claude-desktop-unofficial)..."
+    sudo dnf install -y claude-desktop-unofficial \
+      || bootstrap_error "Failed to install claude-desktop-unofficial" \
+        "Install it manually: sudo dnf install -y claude-desktop-unofficial"
+  fi
+}
+
 setup-opencode() {
   if ! command -v opencode &> /dev/null; then
     rlog "Installing opencode CLI..."
@@ -1703,11 +1729,12 @@ run-desktop() {
     && ! command -v keyd &> /dev/null \
     && ! rpm -q plasma-drkonqi &> /dev/null \
     && ! rpm -q akonadi-calendar &> /dev/null \
-    && ! rpm -q akmod-nvidia &> /dev/null; then
+    && ! rpm -q akmod-nvidia &> /dev/null \
+    && rpm -q claude-desktop-unofficial &> /dev/null; then
     return
   fi
 
-  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot, Goodix fingerprint driver)" || return
+  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot, Goodix fingerprint driver, Claude Desktop)" || return
   log "🖥️ Configuring desktop..."
   # Order matters: setup-sddm must enable sddm as the display manager before
   # setup-deplasma removes plasma-login-manager, or there's no way to log in.
@@ -1721,6 +1748,7 @@ run-desktop() {
   # After setup-sddm: this edits /etc/pam.d/sddm, which is only worth doing once
   # sddm is actually the display manager.
   setup-fingerprint
+  setup-claude-desktop
 }
 
 run-claude() {
