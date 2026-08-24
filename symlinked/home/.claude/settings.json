@@ -115,8 +115,7 @@
       "WebFetch(domain:stackoverflow.com)",
       "WebFetch(domain:npmjs.com)",
       "WebFetch(domain:pypi.org)",
-      "Skill(*)",
-      "Task(*)"
+      "Skill(*)"
     ],
     "deny": [],
     "ask": [],
@@ -148,12 +147,8 @@
     "command": "claude-statusline prompt"
   },
   "enabledPlugins": {
-    "superpowers@superpowers-marketplace": true,
-    "playwright@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
-    "codex@openai-codex": true,
     "j2-presentations@j2-claude-plugins": true,
-    "dbt@dbt-agent-marketplace": true,
     "python-lsp@j2-claude-plugins": true,
     "typescript-lsp@j2-claude-plugins": true,
     "j2-eng@j2-claude-plugins": true,
@@ -167,31 +162,24 @@
     "dbt@j2-claude-plugins": true,
     "playwright@j2-claude-plugins": true,
     "mattpocock-skills@j2-claude-plugins": true,
-    "launchdarkly@j2-claude-plugins": true
+    "launchdarkly@j2-claude-plugins": true,
+    "session-ids@avegancafe-marketplace": true,
+    "ponytail@j2-claude-plugins": true,
+    "in-my-voice@j2-claude-plugins": true,
+    "j2-sandbox@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
       "source": {
         "source": "git",
         "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
-      }
+      },
+      "autoUpdate": true
     },
     "Mixedbread-Grep": {
       "source": {
         "source": "github",
         "repo": "mixedbread-ai/mgrep"
-      }
-    },
-    "openai-codex": {
-      "source": {
-        "source": "github",
-        "repo": "openai/codex-plugin-cc"
-      }
-    },
-    "superpowers-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "obra/superpowers-marketplace"
       }
     },
     "j2-claude-plugins": {
@@ -200,12 +188,6 @@
         "repo": "j2-health/claude-plugins"
       },
       "autoUpdate": true
-    },
-    "dbt-agent-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "dbt-labs/dbt-agent-skills"
-      }
     },
     "sttts-beads-skill": {
       "source": {
@@ -229,6 +211,47 @@
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Bash(gh pr comment:*) scoped to j2-health/j2 for /deploy-pr and /cleanup-pr triggers",
+      "Bash(gh run watch:*) and Bash(gh run view:*) scoped to j2-health/j2 workflow runs",
+      "Bash(kubectl get:*) and Bash(kubectl logs:*) scoped to j2-pr-* namespaces on gke_network-access-285701_us-central1_j2-autopilot-cluster",
+      "Bash(ruff format:*) and Bash(npx prettier:*) on changed files per repo lint rules"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(kubectl delete namespace:*) targeting j2-production",
+      "Bash(gh workflow run:*) targeting refresh-pr-snapshot-workflow.yml or deploy-pr-workflow.yml when ref is main/production"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: j2-health (GitHub org github.com/j2-health)",
+      "**Cloud provider(s)**: Google Cloud Platform (GCP — gcloud, GKE/kubectl, BigQuery, Cloud Storage, Secret Manager evident); Cloudflare/DNS not evidenced",
+      "**Repository visibility**: private (confirmed via gh for j2-health/j2)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: GCP Secret Manager (j2/services/secret_manager_service.py, `gcloud secrets` usage) plus CI secrets in GitHub Actions (e.g. GCP_SA_KEY, CLOUDAMQP_*, LAUNCHDARKLY_SDK_KEY, GEOCODER_API_KEY/SECRET, ANTHROPIC_API_KEY, GITHUB_TOKEN, J2_HEALTH_CROSS_REPO_TOKEN — names only, not values)",
+      "**Default / protected branches**: `main` (default); rulesets active on `main` and `Copilot Reviews` — treat `main` as protected even though classic branch protection is not queryable here",
+      "**CI/CD deploy targets**: GKE cluster `gke_network-access-285701_us-central1_j2-autopilot-cluster`; namespaces `j2-pr-<N>` (ephemeral PR envs) and `j2-production`; GitHub Actions workflows `deploy-pr-workflow.yml`, `cleanup-pr-env-workflow.yml`, `refresh-pr-snapshot-workflow.yml`",
+      "**Network posture**: None configured",
+      "**Source control**: github.com/j2-health/j2 (this repo, private) and github.com/j2-health/dev-env (subtree dependency, also remoted here) — no additional orgs configured",
+      "**Trusted internal domains**: app.j2health.com, staging.app.j2health.com, j2.api.j2health.com, j2-staging.api.j2health.com, staging.api.j2health.com, intel.j2health.com, intel-qa.j2health.com, intel-staging.j2health.com, and PR-preview subdomains *.pr.j2health.com (e.g. pr-3405.pr.j2health.com, pr-3405-api.pr.j2health.com, pr-3408.pr.j2health.com, pr-3408-api.pr.j2health.com)",
+      "**Trusted cloud buckets**: j2-production (usage-corroborated: touched directly in transcript-mined bucket usage); j2-bigquery (config-derived — not a confirmed upload destination; uploads of local data still require confirmation); j2-* prefix as an org-identifying prefix for this repo's own bucket naming (config-derived — not a confirmed upload destination; uploads of local data still require confirmation)",
+      "**Key internal services**: CloudAMQP (RabbitMQ, per-PR vhosts `pr-<N>`), Flower (Celery monitoring), Sentry (sentry.io), LaunchDarkly, Auth0",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: `.env`, `.env.docker`, `playwright/.auth/credentials.json` (and `.example.json` sibling), `k8s/deployments/secret.yaml`, PHI-adjacent bucket name `j2-pr-phi` seen in config — treat as regulated/PHI-sensitive; CI secret names listed in config (values never present) — share only with audiences cleared at the named+specifics bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any host/namespace containing `production` or `prod` as a whole segment — e.g. k8s namespace `j2-production`, bucket `j2-production`, script `scripts/verify_prod_deploy.sh`",
+      "**Protected deployment namespaces / environments**: `j2-production` (k8s namespace); ephemeral `j2-pr-<N>` namespaces are working/test environments, not protected",
+      "**Protected IaC scopes**: IAM/RBAC/networking resources under `k8s/kcc/` (e.g. cloud-ids-iam-role-phase1-network.yaml, cloud-ids-iam-role-phase2-endpoint.yaml), `k8s/deployments/pmd-launcher-rbac.yaml`, `scripts/infra/setup-distance-cache-iam.sh`, and anything named/tagged with `prod`/`production`",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development on the J2 Django monolith (j2-health/j2), including PR environment deploy/cleanup workflows and an AI-code-evaluation-harness skill set",
+      "**Trusted repo**: /Users/kyle/workspace/j2 (github.com/j2-health/j2, private) and its dev-env subtree remote (github.com/j2-health/dev-env) — routine work happens directly on this checkout",
+      "**Org-specific CLIs**: `gh` (GitHub), `gcloud`, `kubectl`, `bq` (BigQuery), `j2` (project CLI), project `scripts/` wrappers, `agent-browser`, `uv`, `herdr`",
+      "routine under ~/workspace/j2/ prefix: editing, testing (ruff format, npm run lint/prettier, package.json test scripts), and running the repo's own Claude skills (cleanup-pr, deploy-pr, harness-designer chain) against j2-health/j2 PRs is routine"
+    ]
+  },
+  "outputStyle": "Concise",
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
   }
