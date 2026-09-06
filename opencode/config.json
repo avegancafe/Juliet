@@ -1,5 +1,32 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "enabled_providers": [
+    "anthropic",
+    "openai",
+    "fireworks-ai"
+  ],
+  "provider": {
+    "anthropic": {
+      "whitelist": [
+        "claude-opus-5",
+        "claude-fable-5",
+        "claude-sonnet-5",
+        "claude-haiku-4-5"
+      ]
+    },
+    "openai": {
+      "whitelist": [
+        "gpt-5.6-sol",
+        "gpt-5.6-luna"
+      ]
+    },
+    "fireworks-ai": {
+      "whitelist": [
+        "accounts/fireworks/models/kimi-k3",
+        "accounts/fireworks/models/deepseek-v4-pro-0813"
+      ]
+    }
+  },
   "mcp": {
     "launchdarkly": { "enabled": false },
     "notion": { "enabled": false }
