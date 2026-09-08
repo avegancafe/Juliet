@@ -361,7 +361,7 @@
         "animationDisabled": true,
         "animationSpeed": 1,
         "autoStartAuth": false,
-        "avatarImage": "/home/kyle/.face",
+        "avatarImage": "~/.face",
         "boxRadiusRatio": 1,
         "clockFormat": "hh\\nmm",
         "clockStyle": "custom",
@@ -647,7 +647,7 @@
     },
     "wallpaper": {
         "automationEnabled": false,
-        "directory": "/home/kyle/.config/Juliet/etc/wallpaper",
+        "directory": "~/.config/Juliet/etc/wallpaper",
         "enableMultiMonitorDirectories": false,
         "enabled": true,
         "favorites": [
