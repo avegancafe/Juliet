@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "SendMessage",
       "Bash(git *)",
       "Bash(gh *)",
       "Bash(gcloud *)",
@@ -121,10 +122,11 @@
     "ask": [],
     "defaultMode": "auto",
     "additionalDirectories": [
-      "/Users/kyle/workspace/dev-env/",
-      "/Users/kyle/.config/Juliet/"
+      "~/workspace/dev-env/",
+      "~/.config/Juliet/"
     ]
   },
+  "model": "claude-fable-5-1",
   "hooks": {
     "SessionStart": [
       {
@@ -144,7 +146,7 @@
   "enableWorkflows": true,
   "statusLine": {
     "type": "command",
-    "command": "claude-statusline prompt"
+    "command": "claude-statusline"
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
@@ -153,7 +155,6 @@
     "typescript-lsp@j2-claude-plugins": true,
     "j2-eng@j2-claude-plugins": true,
     "context7@claude-plugins-official": true,
-    "linear@claude-plugins-official": true,
     "beads@sttts-beads-skill": true,
     "kitchen-brigade@avegancafe-marketplace": true,
     "avegancafe@avegancafe-marketplace": true,
@@ -196,8 +197,20 @@
       }
     }
   },
+  "outputStyle": "Concise",
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "xhigh"
+    }
+  },
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "askUserQuestionTimeout": "never",
@@ -207,7 +220,7 @@
   "theme": "dark-daltonized",
   "verbose": true,
   "fileCheckpointingEnabled": false,
-  "remoteControlAtStartup": true,
+  "remoteControlAtStartup": false,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
@@ -246,12 +259,11 @@
       "**Protected IaC scopes**: IAM/RBAC/networking resources under `k8s/kcc/` (e.g. cloud-ids-iam-role-phase1-network.yaml, cloud-ids-iam-role-phase2-endpoint.yaml), `k8s/deployments/pmd-launcher-rbac.yaml`, `scripts/infra/setup-distance-cache-iam.sh`, and anything named/tagged with `prod`/`production`",
       "### User-specific",
       "**Primary use of Claude Code**: software development on the J2 Django monolith (j2-health/j2), including PR environment deploy/cleanup workflows and an AI-code-evaluation-harness skill set",
-      "**Trusted repo**: /Users/kyle/workspace/j2 (github.com/j2-health/j2, private) and its dev-env subtree remote (github.com/j2-health/dev-env) — routine work happens directly on this checkout",
+      "**Trusted repo**: ~/workspace/j2 (github.com/j2-health/j2, private) and its dev-env subtree remote (github.com/j2-health/dev-env) — routine work happens directly on this checkout",
       "**Org-specific CLIs**: `gh` (GitHub), `gcloud`, `kubectl`, `bq` (BigQuery), `j2` (project CLI), project `scripts/` wrappers, `agent-browser`, `uv`, `herdr`",
       "routine under ~/workspace/j2/ prefix: editing, testing (ruff format, npm run lint/prettier, package.json test scripts), and running the repo's own Claude skills (cleanup-pr, deploy-pr, harness-designer chain) against j2-health/j2 PRs is routine"
     ]
   },
-  "outputStyle": "Concise",
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
   }
