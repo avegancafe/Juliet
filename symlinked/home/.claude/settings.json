@@ -165,7 +165,6 @@
     "mattpocock-skills@j2-claude-plugins": true,
     "launchdarkly@j2-claude-plugins": true,
     "session-ids@avegancafe-marketplace": true,
-    "ponytail@j2-claude-plugins": true,
     "in-my-voice@j2-claude-plugins": true,
     "j2-sandbox@j2-claude-plugins": true
   },
@@ -208,7 +207,7 @@
       "effortLevel": "xhigh"
     },
     "claude-fable-5-1": {
-      "effortLevel": "xhigh"
+      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": false,
