@@ -19,6 +19,8 @@ Portable development environment for Kyle's personal systems. The goal is that a
 | A user-level config file | `symlinked/` via stow (see the architecture rules) |
 | Anything else system-level — a service, a file under `/etc`, a system default, input remapping, a daemon | a `setup-*` step in `bin/juliet-bootstrap`, wired into the right `run-*` category (see `setup-keyd` / `setup-sddm` for the pattern) |
 
+**Package sources are declarative, both ways.** Bootstrap treats the `tap` lines in the `Brewfile` and the `copr` lines in the `DNFfile` as the full list: what's declared gets enabled (and, for Homebrew 7, its tap-qualified formulae trusted), and what's enabled on the machine but *not* declared gets untapped / `dnf copr remove`d — packages still coming from it are re-homed onto the remaining repos first, and a repo that is the only source of something installed is left alone with a warning. So tapping or enabling something by hand doesn't stick: declare it in the `Brewfile` / `DNFfile` instead.
+
 **Practical note on sudo:** system changes need root, and Claude Code's Bash tool runs non-interactively — it *cannot* run `sudo` (the password prompt has no TTY, and the `!`-prefix trick fails the same way). So the workflow is always: script the change into bootstrap, then have the user run `juliet-bootstrap` (or the relevant `--enable=<category>`). Don't hand the user one-off `sudo` commands to paste when the change belongs in bootstrap — put it there first.
 
 ## Quick Reference

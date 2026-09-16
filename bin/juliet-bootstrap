@@ -302,6 +302,38 @@ ensure-brew() {
   fi
 }
 
+# trust-brewfile-entries covers the taps the Brewfile still asks for, but a tap
+# that was dropped from the Brewfile (or tapped by hand once) stays cloned
+# forever, and Homebrew 7 warns about every such untrusted tap on *every* brew
+# command. Trusting them would be wrong — nothing here wants them — so prune
+# them instead, which is also what keeps the machine's tap list matching the
+# Brewfile rather than accumulating whatever was ever tried.
+prune-undeclared-taps() {
+  local brewfile="$HOME/.config/Juliet/Brewfile"
+  [[ -f "$brewfile" ]] || return 0
+
+  local declared installed
+  declared=$(sed -nE 's/^[[:space:]]*tap[[:space:]]+"([^"]+)".*/\1/p' "$brewfile")
+
+  for installed in $(brew tap); do
+    # Official taps are trusted implicitly and get tapped as a side effect of
+    # other brew commands — never prune those.
+    [[ "$installed" == homebrew/* ]] && continue
+    printf '%s\n' "$declared" | grep -qxF "$installed" && continue
+
+    # Untapping a tap that owns an installed formula orphans it, so leave
+    # those be and say so.
+    if brew list --full-name 2> /dev/null | grep -q "^$installed/"; then
+      warn "Tap $installed isn't in the Brewfile but still owns installed packages — left alone."
+      continue
+    fi
+
+    spin "Untapping unused $installed..." brew untap "$installed" \
+      || bootstrap_error "Failed to untap $installed." \
+        "Run: brew untap $installed"
+  done
+}
+
 # Install the tools bootstrap itself relies on before it uses them: stow (for
 # symlinking dotfiles in core setup) and gum (for the confirmation prompts).
 # The full package steps run later and are idempotent, so this early install is
@@ -370,6 +402,7 @@ setup-brew() {
   fi
 
   trust-brewfile-entries
+  prune-undeclared-taps
 
   rlog "Running brew bundle..."
   brew bundle --file ~/.config/Juliet/Brewfile \
@@ -392,8 +425,137 @@ setup-cargo() {
   # than a stale compiler — so keep brew's rust current before we build.
   if command -v brew &> /dev/null && brew list --formula rust &> /dev/null \
     && [[ -n "$(brew outdated --formula rust 2> /dev/null)" ]]; then
-    spin "Upgrading rust (Homebrew)..." brew upgrade rust \
+    spin "Upgrading rust (Homebrew)..." brew upgrade rust -y \
       || bootstrap_error "Failed to upgrade rust — run 'brew upgrade rust' manually."
+  fi
+}
+
+# Every enabled COPR is consulted on every dnf transaction, so a copr that
+# stops building for this Fedora release becomes a 404 banner on *every* dnf
+# command: solopasha/hyprland dropped all of its stable chroots (rawhide only
+# now) once Hyprland itself landed in Fedora, and nothing here noticed because
+# the repo file stays enabled forever once `dnf copr enable` has run.
+#
+# So the DNFfile's `copr` lines are the source of truth in both directions:
+# every declared copr gets enabled (and checked for a build for this release),
+# and every enabled copr the DNFfile no longer declares gets removed — after
+# moving any package still installed from it onto whatever the remaining repos
+# offer, so pruning a stale copr can't strand its packages.
+sync-copr-repos() {
+  local dnffile="$1"
+  local declared repo release arch enabled owned pkg missing repofile ids id
+  local -a disable
+
+  declared=$(sed -nE 's/^copr[[:space:]]+([^[:space:]]+).*/\1/p' "$dnffile")
+  release=$(rpm -E %fedora)
+  arch=$(uname -m)
+
+  for repo in $declared; do
+    if ! dnf copr list 2> /dev/null | grep -q "^copr.fedorainfracloud.org/$repo\( \|$\)"; then
+      rlog "Enabling COPR: $repo"
+      sudo dnf copr enable -y "$repo" \
+        || bootstrap_error "Failed to enable COPR $repo." \
+          "Run: sudo dnf copr enable $repo"
+    fi
+
+    # Name the broken copr ourselves rather than leaving the user to decode
+    # dnf's "Status code: 404 for .../repomd.xml" on every later command.
+    if ! curl -sfLI -o /dev/null \
+      "https://download.copr.fedorainfracloud.org/results/$repo/fedora-$release-$arch/repodata/repomd.xml"; then
+      warn "COPR $repo has no fedora-$release-$arch build — dnf will 404 on it until the DNFfile points somewhere that does."
+    fi
+  done
+
+  # `dnf copr list` prints "copr.fedorainfracloud.org/<owner>/<project>", plus a
+  # trailing "[eternal_deps]" marker for a copr that dragged in a dependency
+  # repo of its own (those dep repos are removed along with their parent).
+  for enabled in $(dnf copr list 2> /dev/null | awk '{print $1}' \
+    | sed 's|^copr.fedorainfracloud.org/||'); do
+    printf '%s\n' "$declared" | grep -qxF "$enabled" && continue
+
+    # One copr can own several repo ids: its own
+    # copr:copr.fedorainfracloud.org:<owner>:<project>, plus a
+    # coprdep:...:<owner>:<other> section per dependency repo it pulled in
+    # (avengemedia/dms carries avengemedia/danklinux that way, and that is
+    # where cliphist and matugen actually come from). They all live in the one
+    # .repo file that `dnf copr remove` deletes, so read the ids out of it
+    # rather than guessing from the copr name.
+    repofile="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:${enabled%/*}:${enabled#*/}.repo"
+    ids=$(sed -nE 's/^\[(.+)\]$/\1/p' "$repofile" 2> /dev/null)
+    if [[ -z "$ids" ]]; then
+      ids="copr:copr.fedorainfracloud.org:${enabled%/*}:${enabled#*/}"
+    fi
+
+    owned=$(dnf repoquery --installed --qf '%{name} %{from_repo}\n' 2> /dev/null \
+      | grep -F -f <(printf '%s\n' "$ids" | sed 's/^/ /') | awk '{print $1}')
+
+    if [[ -n "$owned" ]]; then
+      disable=()
+      for id in $ids; do
+        disable+=(--disablerepo="$id")
+      done
+      missing=""
+      for pkg in $owned; do
+        dnf repoquery "${disable[@]}" --available \
+          --qf '%{name}\n' "$pkg" 2> /dev/null | grep -qx "$pkg" || missing="$missing $pkg"
+      done
+
+      if [[ -n "$missing" ]]; then
+        warn "COPR $enabled is not in the DNFfile but is the only source of:$missing — left enabled."
+        warn "Declare it in the DNFfile (or drop those packages) to settle it."
+        continue
+      fi
+    fi
+
+    substep "Removing COPR $enabled (not declared in the DNFfile)..."
+    sudo dnf copr remove -y "$enabled" \
+      || bootstrap_error "Failed to remove COPR $enabled." \
+        "Run: sudo dnf copr remove $enabled"
+  done
+
+  rehome-orphaned-copr-packages
+}
+
+# A package installed from a copr that no longer exists on the system keeps
+# working, but it stays pinned to a version no enabled repo knows about: dnf
+# won't upgrade it, and `dnf install <pkg>` sees it as already satisfied. So
+# sweep for them by from_repo (this is deliberately not folded into the prune
+# above: a run interrupted between removing a copr and re-homing its packages
+# would otherwise leave them stranded forever, since the repo it keyed off is
+# already gone) and distro-sync each onto whichever enabled repo provides it.
+rehome-orphaned-copr-packages() {
+  local enabled_ids orphans stranded rehome pkg
+
+  enabled_ids=$(dnf repolist --enabled 2> /dev/null | tail -n +2 | awk '{print $1}')
+  orphans=$(dnf repoquery --installed --qf '%{name} %{from_repo}\n' 2> /dev/null \
+    | grep -E '^[^ ]+ copr(dep)?:' \
+    | while read -r pkg id; do
+      printf '%s\n' "$enabled_ids" | grep -qxF "$id" || echo "$pkg"
+    done)
+  [[ -z "$orphans" ]] && return
+
+  # distro-sync errors out on a package nothing provides any more, which would
+  # take the packages that *can* be re-homed down with it.
+  rehome=""
+  stranded=""
+  for pkg in $orphans; do
+    if dnf repoquery --available --qf '%{name}\n' "$pkg" 2> /dev/null | grep -qx "$pkg"; then
+      rehome="$rehome $pkg"
+    else
+      stranded="$stranded $pkg"
+    fi
+  done
+
+  if [[ -n "$stranded" ]]; then
+    warn "Installed but no longer in any enabled repo:$stranded"
+    warn "Declare a copr that ships them in the DNFfile, or remove them."
+  fi
+
+  if [[ -n "$rehome" ]]; then
+    substep "Re-homing$rehome onto the enabled repos..."
+    sudo dnf distro-sync -y $rehome \
+      || bootstrap_error "Failed to re-home packages from a removed copr:$rehome" \
+        "Run: sudo dnf distro-sync$rehome"
   fi
 }
 
@@ -435,19 +597,8 @@ setup-dnf() {
       "https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
   fi
 
-  # Enable COPR repos first
-  while IFS= read -r line || [[ -n "$line" ]]; do
-    # Skip empty lines and comments
-    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
-    # Handle COPR repos
-    if [[ "$line" =~ ^copr[[:space:]]+ ]]; then
-      repo="${line#copr }"
-      if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
-        rlog "Enabling COPR: $repo"
-        sudo dnf copr enable -y "$repo"
-      fi
-    fi
-  done < "$DNFFILE"
+  # Enable the declared COPRs (and retire undeclared ones) first
+  sync-copr-repos "$DNFFILE"
 
   # Collect packages
   packages=()
@@ -476,6 +627,55 @@ setup-dnf() {
       bootstrap_error "Failed to install DNF packages: ${failed[*]}" \
         "Install them manually, then re-run: juliet-bootstrap --enable=packages"
     fi
+  fi
+}
+
+# noctalia-shell 4.7 moved off the generic `quickshell` package onto its own
+# `noctalia-qs` build, and the two conflict. On a machine that ever ran
+# DankMaterialShell, the danklinux copr's pinned quickshell
+# (0.2.1.1+pin713) is already installed and still satisfies noctalia-shell
+# 4.5.0, so dnf sees no way forward: `dnf upgrade noctalia-shell` reports
+# "nothing to do" (even with --allowerasing) and the machine sits on 4.5.0
+# indefinitely.
+#
+# That pin is not cosmetic. noctalia 4.5.0 rewrites this repo's settings.json
+# in its older schema (settingsVersion 53 over 59) every time it saves, which
+# resets wallpaper.directory to a nonexistent ~/Pictures/Wallpapers and drops
+# whole config sections. Asking for noctalia-qs by name is what breaks the
+# deadlock; dms keeps working because quickshell-git comes in as a drop-in
+# replacement provider of quickshell.
+setup-noctalia-qs() {
+  if ! is-fedora; then
+    return
+  fi
+
+  # Nothing to repair on a fresh machine: a clean `dnf install noctalia-shell`
+  # resolves straight to 4.7.x + noctalia-qs with no quickshell in the picture.
+  if ! rpm -q noctalia-shell &> /dev/null || rpm -q noctalia-qs &> /dev/null; then
+    return
+  fi
+  if ! rpm -q quickshell &> /dev/null; then
+    return
+  fi
+
+  substep "Swapping the pinned quickshell for noctalia-qs..."
+  # --allowerasing is required to drop the conflicting quickshell. Verified
+  # transaction shape: erase quickshell, install noctalia-qs + quickshell-git,
+  # upgrade noctalia-shell 4.5.0 (x86_64) -> 4.7.7 (noarch).
+  sudo dnf install -y --allowerasing noctalia-qs \
+    || bootstrap_error "Failed to install noctalia-qs" \
+      "Inspect the transaction manually: dnf install --assumeno --allowerasing noctalia-qs"
+
+  # noctalia is spawned unsupervised by niri (spawn-at-startup "qs" -c
+  # noctalia-shell), so nothing restarts it into the new build on its own — and
+  # the old process still running will rewrite settings.json in the old schema
+  # when it next saves, so it has to go before the config is restored.
+  if pgrep -f "qs -c noctalia-shell" &> /dev/null; then
+    notice "noctalia upgraded, but the old build is still running and still writing the old settings schema."
+    substep "Restart it, then restore the config, in this order:"
+    substep "  pkill -f 'qs -c noctalia-shell'"
+    substep "  git -C \"$HOME/.config/Juliet\" restore symlinked/config/noctalia/settings.json"
+    substep "  setsid qs -c noctalia-shell &> /dev/null &"
   fi
 }
 
@@ -516,6 +716,32 @@ setup-flatpak() {
     || warn "Could not set Flatpak fontconfig override — Flatpak apps will use DejaVu for generic families."
 }
 
+# Files Juliet stows that other apps rewrite in place. An app that writes to a
+# stow symlink normally lands on the tracked file (visible as a git diff), but
+# some replace the symlink with a real file instead — Firefox's "make me your
+# default browser" does exactly that to mimeapps.list. That single real file
+# makes stow abort the *entire* config tree, so nothing new gets linked and the
+# failure looks unrelated to whatever config went missing. The repo copy is the
+# source of truth here, so take it back; the displaced file is kept alongside as
+# a .pre-stow.bak rather than deleted outright.
+STOW_RECLAIMABLE=(
+  "$HOME/.config/mimeapps.list"
+)
+
+reclaim-stow-casualties() {
+  local target
+  for target in "${STOW_RECLAIMABLE[@]}"; do
+    # Only a *real* file is a conflict; a symlink (ours) or a missing file is fine.
+    if [[ -f "$target" && ! -L "$target" ]]; then
+      substep "Reclaiming $(basename "$target") (an app replaced the Juliet symlink with a real file)..."
+      mv -f "$target" "$target.pre-stow.bak" \
+        || bootstrap_error "Could not move $target aside" \
+          "Remove it by hand, then re-run: juliet-bootstrap"
+      notice "Previous $(basename "$target") saved as $target.pre-stow.bak"
+    fi
+  done
+}
+
 symlink-dotfiles() {
   substep "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
@@ -526,6 +752,7 @@ symlink-dotfiles() {
   # stowed — opencode/dev-env both write config files, and a write through a
   # symlink would dirty this repo (see setup-opencode for the layering).
   mkdir -p ~/.config/opencode 2>/dev/null || true
+  reclaim-stow-casualties
   stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
     || bootstrap_error "stow home failed — conflicts with existing real files (see above)." \
       "Resolve the conflicts, then re-run: juliet-bootstrap"
@@ -1228,6 +1455,93 @@ setup-deplasma() {
   sudo sysctl --system &> /dev/null || true
 }
 
+# The niri config starts the shell with `qs -c noctalia-shell`, and quickshell
+# resolves -c only against ~/.config/quickshell — never against the packaged
+# copy in /usr/share/quickshell. Without this link the spawn fails silently at
+# login ("Could not find \"noctalia-shell\" config directory"), which on a
+# machine that still had dms installed just looked like dms winning. The
+# packaged noctalia-shell script creates the link; Juliet's own noctalia config
+# (settings, Bamboo scheme) is separate and lands in ~/.config/noctalia by stow.
+setup-noctalia() {
+  if ! is-fedora; then
+    return
+  fi
+
+  if ! command -v noctalia-shell &> /dev/null; then
+    return
+  fi
+
+  local link="$HOME/.config/quickshell/noctalia-shell"
+  # -e follows the link, so a dangling one (stale package path) also re-links.
+  if [[ -e "$link" ]]; then
+    return
+  fi
+
+  substep "Linking the noctalia-shell quickshell config..."
+  rm -f "$link"
+  noctalia-shell setup --symlink --force &> /dev/null \
+    || bootstrap_error "Failed to link the noctalia-shell quickshell config" \
+      "Run it manually: noctalia-shell setup --symlink --force"
+}
+
+# DankMaterialShell (dms) was the niri shell before noctalia, and it does not
+# step aside quietly: its user unit is enabled independently of niri's
+# spawn-at-startup, and it claims the org.freedesktop.Notifications bus name, so
+# leaving it installed means two bars and dms owning notifications no matter
+# what niri launches. Noctalia is the shell Juliet configures (DNFfile +
+# symlinked/config/noctalia + spawn-at-startup in the niri config), so retire
+# dms rather than leaving the two to race.
+setup-undms() {
+  if ! is-fedora; then
+    return
+  fi
+
+  # Never retire the old shell unless the replacement is actually installed —
+  # otherwise a half-bootstrapped machine logs in to a bare compositor.
+  if ! rpm -q noctalia-shell &> /dev/null; then
+    if rpm -q dms &> /dev/null; then
+      warn "Keeping dms: noctalia-shell is not installed yet (run the packages step first)."
+    fi
+    return
+  fi
+
+  # The unit was enabled by hand via `systemctl --user add-wants niri.service
+  # dms.service`, which drops a symlink into niri.service.wants — not the
+  # graphical-session.target.wants that [Install] declares. `disable` sweeps
+  # every symlink it finds, but clear the wants dir explicitly so the switch
+  # doesn't depend on that behaviour.
+  if systemctl --user list-unit-files dms.service &> /dev/null; then
+    if [[ "$(systemctl --user is-enabled dms.service 2> /dev/null)" != "disabled" ]]; then
+      substep "Disabling the dms user service (noctalia is the niri shell)..."
+      systemctl --user disable dms.service &> /dev/null \
+        || warn "Could not disable dms.service — check: systemctl --user status dms.service"
+    fi
+  fi
+  rm -f "$HOME"/.config/systemd/user/*.wants/dms.service
+  systemctl --user daemon-reload &> /dev/null || true
+
+  if rpm -q dms &> /dev/null; then
+    substep "Removing dms (DankMaterialShell)..."
+    sudo dnf remove -y dms \
+      || bootstrap_error "Failed to remove dms" \
+        "Inspect the transaction manually: sudo dnf remove --assumeno dms"
+  fi
+
+  # A dms already running in this session keeps going from its deleted binary
+  # until logout; killing it mid-session would leave the user barless if
+  # noctalia isn't up yet. Say so rather than doing it silently.
+  if pgrep -x dms &> /dev/null; then
+    notice "dms is still running in this session — it goes away at logout (or: systemctl --user stop dms.service)."
+  fi
+
+  # Its config is user data Juliet never managed, and telling a customised one
+  # from an untouched one isn't a call bootstrap should make. Same reasoning as
+  # the orphaned akonadi DB in setup-deplasma.
+  if [[ -d "$HOME/.config/DankMaterialShell" ]]; then
+    notice "Leftover dms config at ~/.config/DankMaterialShell — remove it by hand if you're done with dms."
+  fi
+}
+
 # Cap how much disk systemd-coredump may consume. The drkonqi crash loop wrote
 # 4.1GB of cores over ten days without anything noticing; the stock default
 # (10% of the filesystem) is far too generous to act as a warning signal.
@@ -1705,7 +2019,16 @@ run-packages() {
     setup-brew
   elif is-fedora; then
     setup-dnf
+    # After setup-dnf, so noctalia-shell is present to repair.
+    setup-noctalia-qs
     setup-flatpak
+    # Homebrew isn't the package manager on Fedora, but it is still installed
+    # here (setup-cargo leans on brew's rust), so its taps need the same
+    # reconciliation or every brew command keeps warning.
+    if command -v brew &> /dev/null; then
+      trust-brewfile-entries
+      prune-undeclared-taps
+    fi
   fi
 }
 
@@ -1742,10 +2065,12 @@ run-security() {
 }
 
 run-desktop() {
-  # Only show on Linux with relevant tools. Noctalia (the niri shell) needs no
-  # setup step here: it's installed via the DNFfile and started by
-  # spawn-at-startup in the niri config. Each setup-* step self-guards on the
-  # tool it configures, so only skip the whole category when none are present.
+  # Only show on Linux with relevant tools. Noctalia (the niri shell) is
+  # installed via the DNFfile and started by spawn-at-startup in the niri
+  # config; setup-noctalia only links the config path that spawn needs, and
+  # setup-undms clears the previous shell out of its way. Each setup-* step
+  # self-guards on the tool it configures, so only skip the whole category when
+  # none are present.
   if ! is-fedora; then return; fi
   # setup-deplasma has work to do even when neither greeter nor keyd is
   # installed yet, so leftover Plasma / KDE PIM cruft also keeps the category
@@ -1754,6 +2079,8 @@ run-desktop() {
     && ! command -v keyd &> /dev/null \
     && ! rpm -q plasma-drkonqi &> /dev/null \
     && ! rpm -q akonadi-calendar &> /dev/null \
+    && ! rpm -q dms &> /dev/null \
+    && ! command -v noctalia-shell &> /dev/null \
     && ! rpm -q akmod-nvidia &> /dev/null; then
     return
   fi
@@ -1764,6 +2091,10 @@ run-desktop() {
   # setup-deplasma removes plasma-login-manager, or there's no way to log in.
   setup-sddm
   setup-deplasma
+  # Order matters: link noctalia's config before retiring dms, so the machine is
+  # never left with no working shell.
+  setup-noctalia
+  setup-undms
   setup-coredump-limits
   setup-crash-purge
   setup-nvidia-secureboot

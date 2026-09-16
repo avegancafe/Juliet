@@ -6,7 +6,13 @@
 # COPR Repositories
 copr atim/starship
 copr scottames/ghostty
-copr solopasha/hyprland
+# hyprlock's source: Fedora packages neither hyprland nor hyprlock itself, and
+# solopasha/hyprland — the copr this used to point at — dropped every stable
+# chroot once Hyprland landed in Fedora proper, leaving rawhide only. Its
+# repomd then 404'd on every single dnf command. scottames/hypr builds the
+# whole hypr* stack for current Fedora (and is the same owner as the ghostty
+# copr above).
+copr scottames/hypr
 copr phracek/PyCharm
 copr zhangyi6324/noctalia-shell
 # neovide has no official Fedora package; agraven/neovide is abandoned (empty
@@ -107,6 +113,12 @@ xorg-x11-drv-nvidia-cuda
 mokutil
 wl-clipboard
 cliphist
+# cava: the backend behind noctalia's audio visualizer (audio.visualizerType /
+# audio.cavaFrameRate in noctalia/settings.json). It arrived on this machine as
+# a dependency of dms, so `dnf remove dms` in setup-undms would take it back out
+# as an unused dependency and silently kill the visualizer. Naming it here makes
+# it a package Juliet owns in its own right.
+cava
 playerctl
 brightnessctl
 pavucontrol
