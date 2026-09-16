@@ -1,18 +1,22 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "model": "fireworks-ai/accounts/fireworks/routers/deepseek-flash-latest",
+  "agents": {
+    "build": {
+      "model": "fireworks-ai/accounts/fireworks/routers/deepseek-flash-latest#max"
+    },
+    "kermit": {
+      "model": "fireworks-ai/accounts/fireworks/routers/deepseek-flash-latest#max"
+    },
+    "plan": {
+      "model": "fireworks-ai/accounts/fireworks/routers/deepseek-flash-latest#max"
+    }
+  },
   "enabled_providers": [
     "anthropic",
     "openai",
     "fireworks-ai"
   ],
-  "mcp": {
-    "launchdarkly": {
-      "enabled": false
-    },
-    "notion": {
-      "enabled": false
-    }
-  },
   "providers": {
     "anthropic": {
       "models": {
@@ -149,6 +153,9 @@
         "gpt-6-astra": {
           "disabled": true
         },
+        "gpt-6-astra-fast": {
+          "disabled": true
+        },
         "gpt-image-1-mini": {
           "disabled": true
         },
@@ -183,10 +190,31 @@
         "accounts/fireworks/models/deepseek-v4-flash-0731": {
           "disabled": true
         },
+        "accounts/fireworks/models/deepseek-v4-flash-0731-priority": {
+          "disabled": true
+        },
         "accounts/fireworks/models/deepseek-v4-flash-vision-exp": {
           "disabled": true
         },
+        "accounts/fireworks/models/deepseek-v4-pro": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/deepseek-v4-pro-0813": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/deepseek-v4-pro-0813-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/deepseek-v4-pro-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/deepseek-v4p1-flash-priority": {
+          "disabled": true
+        },
         "accounts/fireworks/models/glm-5p2": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/glm-5p2-priority": {
           "disabled": true
         },
         "accounts/fireworks/models/glm-5p3": {
@@ -195,7 +223,16 @@
         "accounts/fireworks/models/glm-5p3-flash": {
           "disabled": true
         },
+        "accounts/fireworks/models/glm-5p3-flash-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/glm-5p3-priority": {
+          "disabled": true
+        },
         "accounts/fireworks/models/gpt-oss-120b": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/gpt-oss-120b-priority": {
           "disabled": true
         },
         "accounts/fireworks/models/inkling": {
@@ -204,10 +241,25 @@
         "accounts/fireworks/models/kimi-k2p6": {
           "disabled": true
         },
+        "accounts/fireworks/models/kimi-k2p6-priority": {
+          "disabled": true
+        },
         "accounts/fireworks/models/kimi-k2p7-code": {
           "disabled": true
         },
+        "accounts/fireworks/models/kimi-k2p7-code-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/kimi-k3-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/minimax-m2p7": {
+          "disabled": true
+        },
         "accounts/fireworks/models/minimax-m3": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/minimax-m3-priority": {
           "disabled": true
         },
         "accounts/fireworks/models/mistral-large-3-fp8": {
@@ -231,13 +283,49 @@
         "accounts/fireworks/models/qwen3p8-max": {
           "disabled": true
         },
+        "accounts/fireworks/models/qwen3p8-max-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/deepseek-flash-latest-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/deepseek-pro-latest-priority": {
+          "disabled": true
+        },
         "accounts/fireworks/routers/glm-5p2-fast": {
           "disabled": true
         },
         "accounts/fireworks/routers/glm-5p3-fast": {
           "disabled": true
         },
+        "accounts/fireworks/routers/glm-fast-latest": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/glm-flash-latest-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/glm-latest-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/kimi-fast-latest": {
+          "disabled": true
+        },
         "accounts/fireworks/routers/kimi-k3-fast": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/kimi-latest-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/minimax-latest": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/minimax-latest-priority": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/qwen-max-latest": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/qwen-max-latest-priority": {
           "disabled": true
         }
       }
