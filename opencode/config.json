@@ -5,94 +5,242 @@
     "openai",
     "fireworks-ai"
   ],
-  "provider": {
-    "anthropic": {
-      "blacklist": [
-        "claude-fable-5",
-        "claude-haiku-4-5-20251001",
-        "claude-opus-4-5",
-        "claude-opus-4-5-20251101",
-        "claude-opus-4-6",
-        "claude-opus-4-7",
-        "claude-opus-4-8",
-        "claude-opus-4-8-fast",
-        "claude-opus-5-fast",
-        "claude-sonnet-4-5",
-        "claude-sonnet-4-5-20250929",
-        "claude-sonnet-4-6"
-      ]
+  "mcp": {
+    "launchdarkly": {
+      "enabled": false
     },
-    "openai": {
-      "blacklist": [
-        "chatgpt-image-latest",
-        "gpt-4.1",
-        "gpt-4.1-mini",
-        "gpt-4o",
-        "gpt-4o-2024-08-06",
-        "gpt-4o-2024-11-20",
-        "gpt-4o-mini",
-        "gpt-5",
-        "gpt-5-mini",
-        "gpt-5-nano",
-        "gpt-5-pro",
-        "gpt-5.1",
-        "gpt-5.2",
-        "gpt-5.2-pro",
-        "gpt-5.3-codex",
-        "gpt-5.3-codex-spark",
-        "gpt-5.4",
-        "gpt-5.4-fast",
-        "gpt-5.4-mini",
-        "gpt-5.4-mini-fast",
-        "gpt-5.4-nano",
-        "gpt-5.4-pro",
-        "gpt-5.5",
-        "gpt-5.5-fast",
-        "gpt-5.5-pro",
-        "gpt-5.6",
-        "gpt-5.6-luna-fast",
-        "gpt-5.6-sol-fast",
-        "gpt-5.6-terra",
-        "gpt-5.6-terra-fast",
-        "gpt-6-astra",
-        "gpt-image-1-mini",
-        "gpt-image-1.5",
-        "gpt-image-2",
-        "gpt-realtime-2.1",
-        "o3",
-        "o3-pro",
-        "text-embedding-3-large",
-        "text-embedding-3-small",
-        "text-embedding-ada-002"
-      ]
-    },
-    "fireworks-ai": {
-      "blacklist": [
-        "accounts/fireworks/models/deepseek-v4-flash-0731",
-        "accounts/fireworks/models/deepseek-v4-flash-vision-exp",
-        "accounts/fireworks/models/glm-5p2",
-        "accounts/fireworks/models/glm-5p3",
-        "accounts/fireworks/models/glm-5p3-flash",
-        "accounts/fireworks/models/gpt-oss-120b",
-        "accounts/fireworks/models/inkling",
-        "accounts/fireworks/models/kimi-k2p6",
-        "accounts/fireworks/models/kimi-k2p7-code",
-        "accounts/fireworks/models/minimax-m3",
-        "accounts/fireworks/models/mistral-large-3-fp8",
-        "accounts/fireworks/models/muse-glimmer-30b",
-        "accounts/fireworks/models/nemotron-3-ultra-nvfp4",
-        "accounts/fireworks/models/nemotron-lightning-3p5-30b-a3b",
-        "accounts/fireworks/models/qwen3p7-plus",
-        "accounts/fireworks/models/qwen3p8-2p4t-a95b",
-        "accounts/fireworks/models/qwen3p8-max",
-        "accounts/fireworks/routers/glm-5p2-fast",
-        "accounts/fireworks/routers/glm-5p3-fast",
-        "accounts/fireworks/routers/kimi-k3-fast"
-      ]
+    "notion": {
+      "enabled": false
     }
   },
-  "mcp": {
-    "launchdarkly": { "enabled": false },
-    "notion": { "enabled": false }
+  "providers": {
+    "anthropic": {
+      "models": {
+        "claude-fable-5": {
+          "disabled": true
+        },
+        "claude-haiku-4-5-20251001": {
+          "disabled": true
+        },
+        "claude-opus-4-5": {
+          "disabled": true
+        },
+        "claude-opus-4-5-20251101": {
+          "disabled": true
+        },
+        "claude-opus-4-6": {
+          "disabled": true
+        },
+        "claude-opus-4-7": {
+          "disabled": true
+        },
+        "claude-opus-4-8": {
+          "disabled": true
+        },
+        "claude-opus-4-8-fast": {
+          "disabled": true
+        },
+        "claude-opus-5-fast": {
+          "disabled": true
+        },
+        "claude-sonnet-4-5": {
+          "disabled": true
+        },
+        "claude-sonnet-4-5-20250929": {
+          "disabled": true
+        },
+        "claude-sonnet-4-6": {
+          "disabled": true
+        }
+      }
+    },
+    "openai": {
+      "models": {
+        "chatgpt-image-latest": {
+          "disabled": true
+        },
+        "gpt-4.1": {
+          "disabled": true
+        },
+        "gpt-4.1-mini": {
+          "disabled": true
+        },
+        "gpt-4o": {
+          "disabled": true
+        },
+        "gpt-4o-2024-08-06": {
+          "disabled": true
+        },
+        "gpt-4o-2024-11-20": {
+          "disabled": true
+        },
+        "gpt-4o-mini": {
+          "disabled": true
+        },
+        "gpt-5": {
+          "disabled": true
+        },
+        "gpt-5-mini": {
+          "disabled": true
+        },
+        "gpt-5-nano": {
+          "disabled": true
+        },
+        "gpt-5-pro": {
+          "disabled": true
+        },
+        "gpt-5.1": {
+          "disabled": true
+        },
+        "gpt-5.2": {
+          "disabled": true
+        },
+        "gpt-5.2-pro": {
+          "disabled": true
+        },
+        "gpt-5.3-codex": {
+          "disabled": true
+        },
+        "gpt-5.3-codex-spark": {
+          "disabled": true
+        },
+        "gpt-5.4": {
+          "disabled": true
+        },
+        "gpt-5.4-fast": {
+          "disabled": true
+        },
+        "gpt-5.4-mini": {
+          "disabled": true
+        },
+        "gpt-5.4-mini-fast": {
+          "disabled": true
+        },
+        "gpt-5.4-nano": {
+          "disabled": true
+        },
+        "gpt-5.4-pro": {
+          "disabled": true
+        },
+        "gpt-5.5": {
+          "disabled": true
+        },
+        "gpt-5.5-fast": {
+          "disabled": true
+        },
+        "gpt-5.5-pro": {
+          "disabled": true
+        },
+        "gpt-5.6": {
+          "disabled": true
+        },
+        "gpt-5.6-luna-fast": {
+          "disabled": true
+        },
+        "gpt-5.6-sol-fast": {
+          "disabled": true
+        },
+        "gpt-5.6-terra": {
+          "disabled": true
+        },
+        "gpt-5.6-terra-fast": {
+          "disabled": true
+        },
+        "gpt-6-astra": {
+          "disabled": true
+        },
+        "gpt-image-1-mini": {
+          "disabled": true
+        },
+        "gpt-image-1.5": {
+          "disabled": true
+        },
+        "gpt-image-2": {
+          "disabled": true
+        },
+        "gpt-realtime-2.1": {
+          "disabled": true
+        },
+        "o3": {
+          "disabled": true
+        },
+        "o3-pro": {
+          "disabled": true
+        },
+        "text-embedding-3-large": {
+          "disabled": true
+        },
+        "text-embedding-3-small": {
+          "disabled": true
+        },
+        "text-embedding-ada-002": {
+          "disabled": true
+        }
+      }
+    },
+    "fireworks-ai": {
+      "models": {
+        "accounts/fireworks/models/deepseek-v4-flash-0731": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/deepseek-v4-flash-vision-exp": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/glm-5p2": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/glm-5p3": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/glm-5p3-flash": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/gpt-oss-120b": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/inkling": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/kimi-k2p6": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/kimi-k2p7-code": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/minimax-m3": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/mistral-large-3-fp8": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/muse-glimmer-30b": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/nemotron-3-ultra-nvfp4": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/nemotron-lightning-3p5-30b-a3b": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/qwen3p7-plus": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/qwen3p8-2p4t-a95b": {
+          "disabled": true
+        },
+        "accounts/fireworks/models/qwen3p8-max": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/glm-5p2-fast": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/glm-5p3-fast": {
+          "disabled": true
+        },
+        "accounts/fireworks/routers/kimi-k3-fast": {
+          "disabled": true
+        }
+      }
+    }
   }
 }
