@@ -11,6 +11,8 @@ Portable development environment for Kyle's personal systems. The goal is that a
 
 **When in doubt, default to Juliet-managed; if it's genuinely unclear which it should be, ask the user.** Never silently `sudo`-install a tool or hand-edit a system file and move on — that is exactly the gap this repo exists to close.
 
+**Where the ad-hoc/secrets category lives:** `~/.config/local/` — never committed, loaded into every fish shell; per-machine fish overrides, `.env` secrets, and git values. See `.claude/rules/local-config.md`.
+
 **Where a managed change belongs:**
 
 | Change | Home in Juliet |
@@ -38,6 +40,7 @@ Portable development environment for Kyle's personal systems. The goal is that a
 | Neovim config | `symlinked/config/nvim/fnl/Juliet/` |
 | Terminal (Ghostty) | `symlinked/config/ghostty/config` |
 | App configs | `symlinked/config/<app-name>/` |
+| Machine-local config + secrets | `~/.config/local/` (outside the repo — see `.claude/rules/local-config.md`) |
 
 ## Package Management
 

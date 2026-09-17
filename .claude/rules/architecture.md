@@ -44,3 +44,4 @@ stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
 | Fish | `symlinked/config/fish/config.fish` | Aliases in `functions/aliases/` |
 | Ghostty | `symlinked/config/ghostty/config` | Primary terminal |
 | Niri | `symlinked/config/niri/config.kdl` | Wayland compositor |
+| Local overrides + secrets | `~/.config/local/` | Outside the repo, never committed — see `rules/local-config.md` |
