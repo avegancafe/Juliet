@@ -17,6 +17,18 @@
     "openai",
     "fireworks-ai"
   ],
+  "mcp": {
+    "servers": {
+      "sentry": {
+        "type": "remote",
+        "url": "https://mcp.sentry.dev/mcp",
+        "oauth": false,
+        "headers": {
+          "Authorization": "Sentry-Bearer {env:SENTRY_ACCESS_TOKEN}"
+        }
+      }
+    }
+  },
   "providers": {
     "anthropic": {
       "models": {
