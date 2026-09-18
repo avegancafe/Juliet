@@ -220,6 +220,9 @@
         "accounts/fireworks/models/deepseek-v4-pro-priority": {
           "disabled": true
         },
+        "accounts/fireworks/models/deepseek-v4p1-flash": {
+          "disabled": true
+        },
         "accounts/fireworks/models/deepseek-v4p1-flash-priority": {
           "disabled": true
         },
