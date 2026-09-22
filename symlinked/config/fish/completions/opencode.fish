@@ -21,6 +21,7 @@ complete -c opencode -n '__fish_use_subcommand' -f -a 'mini' -d 'Start the minim
 complete -c opencode -n '__fish_use_subcommand' -f -a 'run' -d 'Run OpenCode with a message'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'session' -d 'Manage sessions'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'service' -d 'Manage the background server'
+complete -c opencode -n '__fish_use_subcommand' -f -a 'reload' -d 'Reload configuration'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'pair' -d 'Show server pairing information'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'serve' -d 'Start the v2 API and web server'
 complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
@@ -42,7 +43,7 @@ complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" 
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue'
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt prompt' -f -a '--prompt' -d 'Prompt to use'
 complete -c opencode -n '__fish_seen_subcommand_from upgrade' -f
-complete -c opencode -n '__fish_seen_subcommand_from upgrade; and begin; not __fish_contains_opt -s m method; or contains -- (commandline -poc)[-1] --method -m; end' -l method -s m -d 'Installation method to use' -r -f -a 'curl npm pnpm bun yarn'
+complete -c opencode -n '__fish_seen_subcommand_from upgrade; and begin; not __fish_contains_opt -s m method; or contains -- (commandline -poc)[-1] --method -m; end' -l method -s m -d 'Installation method to use' -r -f -a 'curl npm pnpm bun yarn vp brew'
 complete -c opencode -n '__fish_seen_subcommand_from upgrade; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s m method' -f -a '--method' -d 'Installation method to use'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall' -f
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s c keep-config no-keep-config' -l keep-config -s c -d 'Keep configuration files'
@@ -102,10 +103,12 @@ complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subco
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and begin; not __fish_contains_opt server; or contains -- (commandline -poc)[-1] --server; end' -l server -d 'Connect to a server URL instead of the background service' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and begin; not __fish_contains_opt method; or contains -- (commandline -poc)[-1] --method; end' -l method -d 'Authentication method ID' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and begin; not __fish_contains_opt answer; or contains -- (commandline -poc)[-1] --answer; end' -l answer -d 'Provider form answer (key=value; repeat for multiple fields)' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--standalone' -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt method' -f -a '--method' -d 'Authentication method ID'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from login; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt answer' -f -a '--answer' -d 'Provider form answer (key=value; repeat for multiple fields)'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from logout' -f
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from logout; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from logout; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
@@ -322,6 +325,13 @@ complete -c opencode -n '__fish_seen_subcommand_from service; and __fish_seen_su
 complete -c opencode -n '__fish_seen_subcommand_from service; and __fish_seen_subcommand_from get' -f
 complete -c opencode -n '__fish_seen_subcommand_from service; and __fish_seen_subcommand_from set' -f
 complete -c opencode -n '__fish_seen_subcommand_from service; and __fish_seen_subcommand_from unset' -f
+complete -c opencode -n '__fish_seen_subcommand_from reload' -f
+complete -c opencode -n '__fish_seen_subcommand_from reload; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from reload; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
+complete -c opencode -n '__fish_seen_subcommand_from reload; and begin; not __fish_contains_opt server; or contains -- (commandline -poc)[-1] --server; end' -l server -d 'Connect to a server URL instead of the background service' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from reload; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--standalone' -d 'Run with a private server instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from reload; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
+complete -c opencode -n '__fish_seen_subcommand_from reload; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from pair' -f
 complete -c opencode -n '__fish_seen_subcommand_from pair; and begin; not __fish_contains_opt url; or contains -- (commandline -poc)[-1] --url; end' -l url -d 'Advertise an external HTTP(S) server URL in the pairing QR code' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from pair; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt url' -f -a '--url' -d 'Advertise an external HTTP(S) server URL in the pairing QR code'
