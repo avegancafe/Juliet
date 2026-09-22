@@ -126,7 +126,7 @@
       "~/.config/Juliet/"
     ]
   },
-  "model": "claude-fable-5-1",
+  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
