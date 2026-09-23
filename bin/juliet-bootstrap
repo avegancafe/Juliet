@@ -2008,6 +2008,61 @@ setup-opencode() {
   fi
 }
 
+# The HEY CLI ships an agent skill, and the skill is the reason this step
+# exists: `hey skill install` copies its SKILL.md to ~/.agents/skills/hey —
+# the shared root that opencode and Codex read directly — and links
+# ~/.claude/skills/hey for Claude Code, so one install covers all three
+# harnesses. The binary is a Brewfile cask on macOS (brew also links the shell
+# completions); Fedora has no repo for it, so the vendor installer drops a
+# checksum- and signature-verified binary into ~/.local/bin, the same shape as
+# setup-poetry. Neither half is stowed: hey owns its own files (the skill
+# carries a `managed by hey-cli` marker and is versioned, so re-running
+# refreshes it after a `hey upgrade`) and a stow link would fight that.
+setup-hey() {
+  # Resolve first: on Fedora the vendor installer drops the binary in
+  # ~/.local/bin, which fish puts on PATH (env.fish) but a bash bootstrap that
+  # predates that setup may not have yet.
+  local hey_bin
+  hey_bin=$(command -v hey 2> /dev/null || true)
+  [[ -z "$hey_bin" && -x "$HOME/.local/bin/hey" ]] && hey_bin="$HOME/.local/bin/hey"
+
+  # macOS installs hey from the Brewfile; Fedora has no repo for it, so the
+  # vendor installer supplies a checksum- and signature-verified binary (the
+  # same shape as setup-poetry).
+  if [[ -z "$hey_bin" ]] && is-fedora; then
+    spin "Installing hey CLI..." sh -c 'curl -fsSL https://hey.com/install-cli | bash' \
+      || bootstrap_error "Failed to install hey" \
+        "Retry manually: curl -fsSL https://hey.com/install-cli | bash"
+    hey_bin="$HOME/.local/bin/hey"
+  fi
+
+  # A selective run that skipped the packages step (macOS) gets a hint rather
+  # than a silently missing skill.
+  if [[ ! -x "$hey_bin" ]]; then
+    warn "hey CLI not found — skipping the HEY agent skill."
+    if is-macos; then
+      warn "Install it with: juliet-bootstrap --enable=packages"
+    else
+      warn "Install it with: juliet-bootstrap --enable=opencode"
+    fi
+    return
+  fi
+
+  # Homebrew's cask registers the completions system-wide on macOS; the Fedora
+  # installer registers them nowhere. Safe on every run: hey only rewrites
+  # files carrying its own `managed by hey-cli` marker, and a current file is
+  # a no-op.
+  if is-fedora; then
+    spin "Installing hey shell completions..." "$hey_bin" shell-completion install \
+      || bootstrap_error "Failed to install hey shell completions" \
+        "Run manually: hey shell-completion install"
+  fi
+
+  spin "Installing the HEY agent skill..." "$hey_bin" skill install \
+    || bootstrap_error "Failed to install the HEY agent skill" \
+      "Run manually: hey skill install"
+}
+
 # =============================================================================
 # Category Runner Functions
 # =============================================================================
@@ -2116,9 +2171,12 @@ run-claude() {
 }
 
 run-opencode() {
-  confirm-category "opencode" "Set up opencode? (CLI + cmux notification plugin)" || return
+  confirm-category "opencode" "Set up opencode? (CLI, cmux notification plugin, HEY agent skill)" || return
   rlog "🤖 Setting up opencode..."
   setup-opencode
+  # HEY's agent skill lands in the shared skills root opencode reads
+  # (~/.agents/skills), so it rides with the opencode category.
+  setup-hey
 }
 
 # =============================================================================
