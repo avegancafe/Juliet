@@ -312,8 +312,12 @@ prune-undeclared-taps() {
   local brewfile="$HOME/.config/Juliet/Brewfile"
   [[ -f "$brewfile" ]] || return 0
 
-  local declared installed
+  local declared installed installed_names
   declared=$(sed -nE 's/^[[:space:]]*tap[[:space:]]+"([^"]+)".*/\1/p' "$brewfile")
+  # `brew list --full-name` names casks with their tap too (basecamp/tap/hey,
+  # sanyam-g/switch/switch) — a cask from homebrew/cask is bare (cmux) — so
+  # ownership checks work the same for both package kinds.
+  installed_names=$(brew list --full-name 2> /dev/null)
 
   for installed in $(brew tap); do
     # Official taps are trusted implicitly and get tapped as a side effect of
@@ -321,10 +325,47 @@ prune-undeclared-taps() {
     [[ "$installed" == homebrew/* ]] && continue
     printf '%s\n' "$declared" | grep -qxF "$installed" && continue
 
-    # Untapping a tap that owns an installed formula orphans it, so leave
-    # those be and say so.
-    if brew list --full-name 2> /dev/null | grep -q "^$installed/"; then
+    # Untapping a tap that owns an installed formula or cask orphans it, so
+    # leave those be and say so.
+    if printf '%s\n' "$installed_names" | grep -q "^$installed/"; then
       warn "Tap $installed isn't in the Brewfile but still owns installed packages — left alone."
+      continue
+    fi
+
+    # A cask that MOVED taps is the one case `brew untap` can't classify: cmux
+    # migrated from manaflow-ai/cmux to homebrew/cask, so no installed full
+    # name matches the old tap's token anymore — but untap still matches the
+    # installed cask by bare token, loads the tap's stale copy to check whether
+    # it's installed (which the trust gate refuses; jq is in both the Brewfile
+    # and the DNFfile), and, even trusted, would refuse non-interactively or
+    # uninstall the installed cask with --force because it believes the tap
+    # owns it. Nothing of the tap's is actually installed, so delete the
+    # directory untap would have deleted instead. No keg links, manpages, or
+    # completions need cleaning up: the ownership check above already ruled out
+    # installed formulae, and no installed full name matches a tap token.
+    local token name phantom=""
+    if command -v jq &> /dev/null; then
+      while IFS= read -r token; do
+        [[ -n "$token" ]] || continue
+        name="${token##*/}"
+        printf '%s\n' "$installed_names" | grep -qE "(^|/)$name\$" || continue
+        printf '%s\n' "$installed_names" | grep -qxF "$token" && continue
+        phantom=1
+      done < <(brew tap-info --json=v1 "$installed" 2> /dev/null | jq -r '.[0].cask_tokens[]?')
+    fi
+
+    if [[ -n "$phantom" ]]; then
+      local tap_path
+      tap_path=$(brew --repository "$installed" 2> /dev/null || true)
+      spin "Removing the obsolete $installed tap (its casks live in another tap)..." \
+        rm -rf "$tap_path" \
+        || bootstrap_error "Failed to remove the obsolete $installed tap." \
+          "Remove its directory by hand: $tap_path"
+      rmdir "$(dirname "$tap_path")" 2> /dev/null || true
+      if brew tap | grep -qxF "$installed"; then
+        bootstrap_error "The obsolete $installed tap is still installed." \
+          "Remove its directory by hand: $tap_path"
+      fi
       continue
     fi
 
@@ -394,6 +435,67 @@ trust-brewfile-entries() {
   done < <(sed -nE 's#^[[:space:]]*(brew|cask)[[:space:]]+"([^"/]+/[^"/]+/[^"]+)".*#\1 \2#p' "$brewfile")
 }
 
+# Clear the module conflicts that make `brew bundle` report install failures on
+# an otherwise healthy machine — both are one-time leftovers of how a tool was
+# installed before the Brewfile asked for it, and a bundle that runs into one
+# marks the whole entry failed.
+clear-npm-codex-shadow() {
+  grep -qE '^[[:space:]]*cask[[:space:]]*"codex"' "$HOME/.config/Juliet/Brewfile" 2> /dev/null || return 0
+
+  # Machines that predate the codex cask carry the CLI as an npm-global
+  # @openai/codex, and the cask cannot link over a binary no formula owns ("It
+  # seems there is already a Binary at '/opt/homebrew/bin/codex'"). The cask is
+  # the source of truth now — it's what the Brewfile updates — so remove the
+  # npm copy. Homebrew's own npm has to do it: nodenv's would uninstall from
+  # its own prefix, not /opt/homebrew/lib where this copy actually lives.
+  local bin
+  bin=$(readlink "$(brew --prefix)/bin/codex" 2> /dev/null || true)
+  [[ "$bin" == *"/node_modules/@openai/codex/"* ]] || return 0
+
+  local npm
+  npm="$(brew --prefix node)/bin/npm"
+  if [[ ! -x "$npm" ]]; then
+    bootstrap_error "npm-global codex is blocking the Brewfile's codex cask." \
+      "Remove it, then re-run: npm uninstall -g @openai/codex"
+    return
+  fi
+
+  spin "Removing the npm-global codex (the cask owns the CLI now)..." \
+    "$npm" uninstall -g @openai/codex \
+    || bootstrap_error "Failed to remove the npm-global codex." \
+      "Run: npm uninstall -g @openai/codex"
+}
+
+# `thrift` (Apache Thrift, a library dependency of apache-arrow/gdal) and
+# `fbthrift` (declared in the Brewfile; watchman -> edencommon pulls it in) both
+# install a `bin/thrift`. Homebrew only links one, so installing fbthrift
+# aborts its link step on the symlink thrift already owns ("Could not symlink
+# bin/thrift ... belonging to thrift") and `brew bundle` reports the whole
+# entry as failed even though the keg itself is fine. The Brewfile is the
+# source of truth for what this machine runs, so fbthrift keeps the name:
+# unlink the dependency's copy — its libraries stay installed, which is all
+# apache-arrow/gdal link against — before bundle links fbthrift.
+resolve-thrift-link-conflict() {
+  brew list --formula thrift &> /dev/null || return 0
+  grep -qE '^[[:space:]]*brew[[:space:]]*"fbthrift"' "$HOME/.config/Juliet/Brewfile" 2> /dev/null || return 0
+
+  local target
+  target=$(readlink "$(brew --prefix)/bin/thrift" 2> /dev/null || true)
+  [[ "$target" == *"/Cellar/thrift/"* ]] || return 0
+
+  spin "Unlinking thrift so the Brewfile's fbthrift can own bin/thrift..." brew unlink thrift \
+    || bootstrap_error "Failed to unlink thrift." \
+      "Run: brew unlink thrift"
+
+  # fbthrift may not be installed yet; bundle installs and links it right
+  # after, which is exactly what the unlink above makes possible.
+  if brew list --formula fbthrift &> /dev/null; then
+    spin "Linking fbthrift..." brew link fbthrift \
+      || bootstrap_error "Failed to link fbthrift." \
+        "Run: brew link --overwrite fbthrift"
+  fi
+}
+
 setup-brew() {
   ensure-brew
 
@@ -403,6 +505,8 @@ setup-brew() {
 
   trust-brewfile-entries
   prune-undeclared-taps
+  clear-npm-codex-shadow
+  resolve-thrift-link-conflict
 
   rlog "Running brew bundle..."
   brew bundle --file ~/.config/Juliet/Brewfile \
@@ -1888,11 +1992,15 @@ setup-claude-code() {
     "claude-plugins-official:anthropics/claude-plugins-official"
   )
 
-  # Add marketplaces if not already registered
+  # Add marketplaces if not already registered. Match against --json output:
+  # the default text listing also names claude.ai-hosted marketplaces that are
+  # NOT configured ("... — not added"), so grepping the whole listing made
+  # superpowers-marketplace look registered — its add was skipped and every
+  # plugin install from it failed with "Plugin not found in marketplace".
   for marketplace_pair in "${marketplaces[@]}"; do
     marketplace_name="${marketplace_pair%%:*}"
     marketplace_id="${marketplace_pair#*:}"
-    if ! claude plugin marketplace list 2>/dev/null | grep -Fq "$marketplace_name"; then
+    if ! claude plugin marketplace list --json 2>/dev/null | grep -Fq "\"name\": \"$marketplace_name\""; then
       spin "Adding $marketplace_name marketplace..." claude plugin marketplace add "$marketplace_id" \
         || warn "Failed to add $marketplace_name marketplace (non-fatal)."
     fi
