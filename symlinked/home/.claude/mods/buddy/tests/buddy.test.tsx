@@ -133,16 +133,18 @@ test("the card row keeps the punk's leading spaces and blank lines", async ($, o
 
 test('the voice follows the stats, the personality and the face', async () => {
   const b = bones(newSeed())
-  const snarky = voice({ ...b, stats: { DEBUGGING: 40, PATIENCE: 10, CHAOS: 30, WISDOM: 50, SNARK: 95 }, name: 'Zyx', personality: 'hoards semicolons' })
+  const snarky = voice({ ...b, stats: { DEBUGGING: 40, PATIENCE: 10, CHAOS: 30, WISDOM: 50, SNARK: 95 }, name: 'Zyx', personality: 'hoards semicolons' }, { width: 12, lines: 6 })
   expect(snarky).toContain('SNARK 95/100: extremely')
   expect(snarky).toContain('sarcastic')
   expect(snarky).toContain('impatient')
   expect(snarky).toContain('Lean hardest into SNARK')
   expect(snarky).toContain('hoards semicolons')
+  expect(snarky).toContain('12 characters wide and 6 lines tall')
   for (const line of punk(b)) expect(snarky).toContain(line)
-  const sweet = voice({ ...b, stats: { DEBUGGING: 40, PATIENCE: 90, CHAOS: 30, WISDOM: 50, SNARK: 5 }, name: 'Zyx', personality: 'x' })
+  const sweet = voice({ ...b, stats: { DEBUGGING: 40, PATIENCE: 90, CHAOS: 30, WISDOM: 50, SNARK: 5 }, name: 'Zyx', personality: 'x' }, { width: 40, lines: 1 })
   expect(sweet).toContain('earnest')
   expect(sweet).not.toContain('sarcastic')
+  expect(sweet).toContain('40 characters wide and 1 line tall')
 })
 
 test("a finished turn puts the model's line, in its own voice, in the bubble", async ($, on) => {
@@ -187,4 +189,33 @@ test('a bubble wraps the whole quip to its width', async () => {
   const cut = wrap(quip, 12, 2)
   expect(cut.length).toBe(2)
   expect(cut[1]!.endsWith('…')).toBe(true)
+})
+
+test('a quip too long for the bubble goes back to the model once, with the measurements', async ($, on) => {
+  const clock = mock.clock(on)
+  mock.store(on, { pet: { seed: newSeed(), name: 'Zyx', personality: 'hoards semicolons' } })
+  on('command.register', (_, e) => ({ value: { command: e.name } }))
+  on('ui.render', ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box key="engine" />
+  })
+  on('ui.open', () => ({ value: { isPlaced: false, reason: 'narrow' } }) as never)
+  on('ui.panes', () => ({ value: [] }) as never)
+  const prompts: string[] = []
+  const LONG = 'this is a very long quip that rambles on and on and would never fit in a tiny speech bubble at all no way'
+  on('model.complete', (_, e) => {
+    prompts.push(e.prompt)
+    return { value: { isAnswered: true, text: prompts.length === 1 ? LONG : 'too long. fine.', usage: {} } } as never
+  })
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('turn.complete', (_, e) => ({ text: e.answer }))
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+
+  await $.turn.complete({ answer: 'done', durationMs: 1500, isAborted: false, turnId: 't1', reason: 'answer' } as never)
+  await clock.advance(1)
+  expect(prompts.length).toBe(2)
+  expect(prompts[1]).toContain('Say it again, shorter.')
+  expect(prompts[1]).toContain('characters')
+  const band = await $.ui.mount({ plugin: 'buddy', surface: 'terminal', ...BAND })
+  expect(await band.find({ type: 'Text', text: /too long\. fine\./ })).toBeDefined()
 })

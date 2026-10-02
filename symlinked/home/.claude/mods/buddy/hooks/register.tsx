@@ -4,6 +4,7 @@ import type { EngineInterface, Register } from 'claude-code'
 import type { Pet, Stored } from '../types'
 
 import { bones, bubbleLine, card, color, face, NAMES, newSeed, peakStat, pick, sprite, voice, wrap } from './companion'
+import type { Fit } from './companion'
 
 const pet = atom({ plugin: 'buddy', key: 'pet' } as const, null)
 const tick = atom({ plugin: 'buddy', key: 'tick' } as const, 0)
@@ -27,6 +28,9 @@ let bubbleUntil = 0
 let petUntil = 0
 let hatchUntil = 0
 let lastChirpAt = -Infinity
+// The bubble as last drawn on screen, which the model is told to fit (pane or one-row band).
+let fit: Fit = { width: 12, lines: 6 }
+const MAX_BUBBLE_LINES = 6
 let lastPrompt = ''
 
 async function say($: EngineInterface, text: string) {
@@ -43,14 +47,20 @@ async function chirp($: EngineInterface, situation: string, isForced = false) {
   lastChirpAt = now
   // Runs unawaited from hooks, so a failed call must not escape as an unhandled rejection.
   try {
-    const r = await $.model.complete({
-      model: 'haiku',
-      maxTokens: 60,
-      effort: 'low',
-      system: voice(mine),
-      prompt: situation,
-    })
-    const line = r.isAnswered ? bubbleLine(r.text) : null
+    const ask = (prompt: string) =>
+      $.model.complete({ model: 'haiku', maxTokens: 80, effort: 'low', system: voice(mine, fit), prompt })
+    const fits = (line: string) => wrap(line, fit.width).length <= fit.lines
+    const r = await ask(situation)
+    let line = r.isAnswered ? bubbleLine(r.text) : null
+    // Too long for the bubble: hand it back once with the measurements and ask again.
+    if (line && !fits(line)) {
+      const retry = await ask(
+        `${situation}\n\nYou said: ${line}\nThat needs ${wrap(line, fit.width).length} lines, but your bubble holds ` +
+          `${fit.lines} line${fit.lines === 1 ? '' : 's'} of ${fit.width} characters. Say it again, shorter.`,
+      )
+      const shorter = retry.isAnswered ? bubbleLine(retry.text) : null
+      if (shorter && (fits(shorter) || shorter.length < line.length)) line = shorter
+    }
     if (line) await say($, line)
   } catch {
     // no line this time; the bubble stays as it was
@@ -220,6 +230,7 @@ export const register: Register = on => {
     // The pane has the punk while it's on screen; otherwise the band carries a one-line face.
     const shown = (await $.ui.panes()).some(p => p.id === PANE && p.isPlaced && p.isShown)
     if (shown) return next(e)
+    fit = { width: Math.max(12, e.props.bodyColumns - [...face(mine)].length - mine.name.length - 6), lines: 1 }
     return (
       <Box flexDirection="row" justifyContent="flex-end">
         {bubble ? <Text wrap="truncate-end">“{bubble}” </Text> : null}
@@ -243,6 +254,7 @@ export const register: Register = on => {
     // the punk and its name leave, so the whole quip shows.
     const width = Math.max(8, e.props.bodyColumns - 4)
     const room = Math.max(1, e.props.scroll.bodyRows - lines.length - 1 - 2)
+    fit = { width, lines: Math.min(room, MAX_BUBBLE_LINES) }
 
     // Bottom-aligned, so the punk sits next to the prompt like the original sat beside the input.
     return (

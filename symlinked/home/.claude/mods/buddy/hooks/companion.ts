@@ -166,7 +166,9 @@ const TRAITS: Record<string, [low: string, high: string]> = {
 const degree = (v: number) => (v >= 80 ? 'extremely' : v >= 60 ? 'clearly' : v >= 35 ? 'a bit' : 'not at all')
 
 /** The system prompt that makes a buddy sound like its own stats, personality and face. */
-export function voice(pet: Pet): string {
+export type Fit = { width: number; lines: number }
+
+export function voice(pet: Pet, fit: Fit): string {
   const ranked = [...STATS].sort((a, b) => (pet.stats[b] ?? 0) - (pet.stats[a] ?? 0))
   const traits = STATS.map(s => {
     const v = pet.stats[s] ?? 0
@@ -184,8 +186,10 @@ export function voice(pet: Pet): string {
     traits,
     `Lean hardest into ${ranked[0]}; your ${ranked[4]} barely shows.`,
     '',
-    'You are not Claude and not an assistant; you are a pet with opinions. Reply with ONE speech-bubble line,',
-    'under 14 words, lowercase, no quotes, no emoji, no hashtags. React to what just happened in character.',
+    'You are not Claude and not an assistant; you are a pet with opinions. Reply with ONE speech-bubble line:',
+    'lowercase, no quotes, no emoji, no hashtags. React to what just happened in character.',
+    `Your speech bubble is ${fit.width} characters wide and ${fit.lines} line${fit.lines === 1 ? '' : 's'} tall, wrapped at word breaks,`,
+    `so keep the whole line under about ${Math.floor(fit.width * fit.lines * 0.8)} characters. Shorter is better; never trail off.`,
     'Be specific to the situation, never generic. Your look (eyes, hat, mouth) may color what you say.',
     'Words only: never draw, never repeat your picture, no code fences.',
   ].join('\n')
