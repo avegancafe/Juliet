@@ -1,0 +1,1 @@
+{ "name": "buddy", "version": "0.1.0", "author": { "name": "Kyle" }, "description": "Brings back the April Fools terminal buddy", "types": "./types/index.d.ts" }
