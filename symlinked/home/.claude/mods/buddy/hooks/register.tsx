@@ -1,9 +1,9 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Pet } from '../types'
+import type { Pet, Stored } from '../types'
 
-import { card, color, face, peakStat, pick, roll, sprite, STATS, wrap } from './companion'
+import { bones, card, color, face, NAMES, newSeed, peakStat, pick, seedFor, sprite, SPECIES, STATS, wrap } from './companion'
 
 const pet = atom({ plugin: 'buddy', key: 'pet' } as const, null)
 const tick = atom({ plugin: 'buddy', key: 'tick' } as const, 0)
@@ -55,33 +55,33 @@ async function chirp($: EngineInterface, situation: string, isForced = false) {
   if (r.isAnswered && r.text.trim()) await say($, r.text.trim().replace(/^["']|["']$/g, '').slice(0, 120))
 }
 
-async function hatch($: EngineInterface, keep: Partial<Pet> = {}): Promise<Pet> {
+async function hatch($: EngineInterface): Promise<Pet> {
   hatchUntil = (await $.clock.now()) + HATCH_MS
   await update($, isHidden, () => false)
   await $.store.set('isHidden', false)
-  let fresh = roll(Math.random, keep)
+  const body = await bones(newSeed())
+  let fresh: Pet = { ...body, name: pick(NAMES), personality: 'quietly judges your variable names' }
   await update($, pet, () => fresh)
-  if (!keep.name) {
-    const stats = Object.entries(fresh.stats).sort((a, b) => a[1] - b[1])
-    const r = await $.model.complete({
-      model: 'haiku',
-      maxTokens: 100,
-      effort: 'low',
-      system: 'You name tiny terminal pets. Reply with only a JSON object.',
-      prompt:
-        `A ${fresh.rarity} ${fresh.species} just hatched in a developer's terminal. Strongest stat ${peakStat(fresh)}, ` +
-        `weakest ${stats[0]![0]}. Reply {"name": "<short cute name>", "personality": "<one lowercase sentence under 12 words, specific and a little odd>"}`,
-    })
-    try {
-      const soul = r.isAnswered ? JSON.parse(r.text.match(/\{[\s\S]*\}/)?.[0] ?? '') : null
-      if (typeof soul?.name === 'string' && typeof soul?.personality === 'string') {
-        fresh = { ...fresh, name: soul.name.slice(0, 16), personality: soul.personality.slice(0, 100) }
-      }
-    } catch {
-      // keep the rolled fallback name and personality
+  const stats = Object.entries(body.stats).sort((a, b) => a[1] - b[1])
+  const r = await $.model.complete({
+    model: 'haiku',
+    maxTokens: 100,
+    effort: 'low',
+    system: 'You name tiny terminal pets. Reply with only a JSON object.',
+    prompt:
+      `A ${body.rarity} ${body.species} just hatched in a developer's terminal. Strongest stat ${peakStat(body)}, ` +
+      `weakest ${stats[0]![0]}. Reply {"name": "<short cute name>", "personality": "<one lowercase sentence under 12 words, specific and a little odd>"}`,
+  })
+  try {
+    const soul = r.isAnswered ? JSON.parse(r.text.match(/\{[\s\S]*\}/)?.[0] ?? '') : null
+    if (typeof soul?.name === 'string' && typeof soul?.personality === 'string') {
+      fresh = { ...fresh, name: soul.name.slice(0, 16), personality: soul.personality.slice(0, 100) }
     }
+  } catch {
+    // keep the fallback name and personality
   }
-  await $.store.set('pet', fresh)
+  const stored: Stored = { seed: fresh.seed, name: fresh.name, personality: fresh.personality }
+  await $.store.set('pet', stored)
   await update($, pet, () => fresh)
   await say($, `hi! i'm ${fresh.name}.`)
   return fresh
@@ -89,13 +89,16 @@ async function hatch($: EngineInterface, keep: Partial<Pet> = {}): Promise<Pet> 
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    let mine = (await $.store.get('pet')) as Pet | Partial<Pet> | undefined
-    // A buddy from the first version of this mod has no rarity: re-roll its bones, keep its name.
-    if (mine && !mine.rarity) {
-      mine = roll(Math.random, { species: mine.species, name: mine.name })
-      await $.store.set('pet', mine)
+    const saved = (await $.store.get('pet')) as (Partial<Stored> & { species?: string }) | undefined
+    if (saved?.name) {
+      // A buddy from before seeds keeps its name and species: find a seed that hatches the same kind.
+      const seed = saved.seed ?? (await seedFor(SPECIES.includes(saved.species ?? '') ? saved.species! : pick(SPECIES)))
+      const soul: Stored = { seed, name: saved.name, personality: saved.personality ?? 'quietly judges your variable names' }
+      if (!saved.seed) await $.store.set('pet', soul)
+      // Bones win over anything stored, as the original's `{ ...stored, ...bones }` did.
+      const mine: Pet = { ...soul, ...(await bones(seed)) }
+      await update($, pet, () => mine)
     }
-    await update($, pet, () => (mine as Pet | undefined) ?? null)
     const [hidden, muted] = await Promise.all([$.store.get('isHidden'), $.store.get('isMuted')])
     await update($, isHidden, () => hidden === true)
     await update($, isMuted, () => muted === true)

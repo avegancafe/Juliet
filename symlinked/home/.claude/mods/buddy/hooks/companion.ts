@@ -1,79 +1,109 @@
-import type { Pet } from '../types'
+import type { Bones, Pet } from '../types'
 
-import { EGG, EYES, HATS, HEARTS, IDLE, SPECIES } from './sprites'
+import { BODIES, EGG, HEARTS, IDLE, LEFT_EYES, RIGHT_EYES, TOPS } from './sprites'
 
+export const SPECIES = Object.keys(BODIES)
 export const RARITIES = ['common', 'uncommon', 'rare', 'epic', 'legendary'] as const
 const WEIGHTS = [60, 25, 10, 4, 1]
 const FLOORS = [5, 15, 25, 35, 50]
+// How far into TOPS a rarity reaches: common only the bare head, legendary all.
+const TOP_REACH = [6, 12, 18, 21, TOPS.length]
 export const STATS = ['DEBUGGING', 'PATIENCE', 'CHAOS', 'WISDOM', 'SNARK'] as const
-// Hats a rarity may roll, cumulative: uncommon gets the first three, legendary all.
-const HAT_POOL = ['crown', 'tophat', 'propeller', 'halo', 'wizard', 'beanie', 'tinyduck']
-const HATS_BY_RARITY = [0, 3, 5, 6, 7]
 export const RARITY_COLOR = ['gray', 'green', 'blue', 'magenta', 'yellow']
 const RAINBOW = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta']
 
-const NAMES = ['Pip', 'Mochi', 'Bean', 'Sprout', 'Nugget', 'Biscuit', 'Wren', 'Tofu', 'Pickle', 'Gizmo', 'Dumpling', 'Sprocket']
+export const NAMES = ['Pip', 'Mochi', 'Bean', 'Sprout', 'Nugget', 'Biscuit', 'Wren', 'Tofu', 'Pickle', 'Gizmo', 'Dumpling', 'Sprocket']
 
 export function pick<T>(xs: readonly T[], rand = Math.random): T {
   return xs[Math.floor(rand() * xs.length)]!
 }
 
-export function roll(rand = Math.random, keep: Partial<Pet> = {}): Pet {
-  let r = rand() * 100
+export function newSeed(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32))
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('')
+}
+
+/** keccak256(seed) in the contract; SHA-256 here, read as one big integer. */
+async function hash(seed: string): Promise<bigint> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(seed))
+  return BigInt(`0x${Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('')}`)
+}
+
+const slot = (rand: bigint, count: number) => Number(rand % BigInt(count))
+
+/** Everything about a buddy but its name and personality, from its seed alone. */
+export async function bones(seed: string): Promise<Bones> {
+  const rand = await hash(seed)
+  // Like the contract, the cosmetic slots share one `rand`; rarity and stats
+  // read higher bytes so they don't move in step with the species.
+  let roll = slot(rand >> 128n, 100)
   let tier = 0
-  while (tier < WEIGHTS.length - 1 && r >= WEIGHTS[tier]!) r -= WEIGHTS[tier++]!
+  while (tier < WEIGHTS.length - 1 && roll >= WEIGHTS[tier]!) roll -= WEIGHTS[tier++]!
+  const species = SPECIES[slot(rand, SPECIES.length)]!
+  const body = BODIES[species]!
+  const eye = slot(rand, LEFT_EYES.length)
   const floor = FLOORS[tier]!
-  const [peak, dump] = [...STATS].sort(() => rand() - 0.5)
+  const order = [...STATS].sort((a, b) => slot(rand >> BigInt(136 + STATS.indexOf(a) * 8), 256) - slot(rand >> BigInt(136 + STATS.indexOf(b) * 8), 256))
   const stats = Object.fromEntries(
-    STATS.map(s => [
-      s,
-      s === peak
-        ? tier === 4 ? 100 : Math.min(100, floor + 50 + Math.floor(rand() * 30))
-        : s === dump
-          ? floor + Math.floor(rand() * 10)
-          : floor + Math.floor(rand() * 40),
-    ]),
+    STATS.map((s, i) => {
+      const jitter = slot(rand >> BigInt(176 + i * 8), 256) / 256
+      const value =
+        s === order[0] ? (tier === 4 ? 100 : Math.min(100, floor + 50 + Math.floor(jitter * 30)))
+        : s === order[4] ? floor + Math.floor(jitter * 10)
+        : floor + Math.floor(jitter * 40)
+      return [s, value]
+    }),
   )
-  const hats = HAT_POOL.slice(0, HATS_BY_RARITY[tier])
-  const species = keep.species && SPECIES[keep.species] ? keep.species : pick(Object.keys(SPECIES), rand)
   return {
+    seed,
     species,
     rarity: RARITIES[tier]!,
-    eye: pick(EYES, rand),
-    hat: hats.length ? pick(hats, rand) : null,
-    isShiny: rand() < 0.01,
+    eyes: [LEFT_EYES[eye]!, RIGHT_EYES[eye]!],
+    mouth: body.mouths[slot(rand, body.mouths.length)]!,
+    top: TOPS[slot(rand, TOP_REACH[tier]!)]!,
+    isShiny: slot(rand >> 64n, 100) === 0,
     stats,
-    name: keep.name ?? pick(NAMES, rand),
-    personality: keep.personality ?? 'quietly judges your variable names',
   }
 }
 
-export function peakStat(pet: Pet): string {
+/** A seed whose bones are this species, found the way the buddy salt was: by trying. */
+export async function seedFor(species: string): Promise<string> {
+  for (;;) {
+    const seed = newSeed()
+    if ((await bones(seed)).species === species) return seed
+  }
+}
+
+export function peakStat(pet: Bones): string {
   return Object.entries(pet.stats).sort((a, b) => b[1] - a[1])[0]![0]
 }
 
 export type Moment = { tick: number; isPetting: boolean; isHatching: boolean; isWorking: boolean }
 
+function paint(line: string, pet: Bones, isBlinking: boolean): string {
+  const [l, r] = isBlinking ? ['─', '─'] : pet.eyes
+  return line.replaceAll('{L}', l).replaceAll('{R}', r).replaceAll('{M}', pet.mouth)
+}
+
 /** The sprite's five lines for this moment. */
-export function sprite(pet: Pet, m: Moment): string[] {
+export function sprite(pet: Bones, m: Moment): string[] {
+  if (m.isHatching) return EGG[m.tick % EGG.length]!.map(l => l.padEnd(12))
   const step = IDLE[m.tick % IDLE.length]!
-  // Working: fidget faster, no blinking.
-  const index = m.isWorking ? (m.tick % 3) : Math.max(0, step)
-  const frames = m.isHatching ? EGG : (SPECIES[pet.species] ?? SPECIES.blob!)
-  const eye = step === -1 && !m.isWorking ? '-' : pet.eye
-  const lines = frames[m.isHatching ? m.tick % 3 : index]!.map(l => l.replaceAll('{E}', eye))
-  if (m.isPetting) lines[0] = HEARTS[m.tick % HEARTS.length]!
-  else if (!m.isHatching && !lines[0] && pet.hat) lines[0] = HATS[pet.hat] ?? ''
+  const body = BODIES[pet.species] ?? BODIES.blob!
+  // Working: fidget every other tick, eyes open.
+  const isFidget = m.isWorking ? m.tick % 2 === 1 : step === 1
+  const lines = (isFidget ? body.fidget : body.base).map(l => paint(l, pet, step === -1 && !m.isWorking))
+  lines[0] = m.isPetting ? HEARTS[m.tick % HEARTS.length]! : lines[0] || pet.top
   return lines.map(l => l.padEnd(12))
 }
 
 /** One-line face for a short or narrow band. */
-export function face(pet: Pet): string {
-  const frames = SPECIES[pet.species] ?? SPECIES.blob!
-  return frames[0].find(l => l.includes('{E}'))!.trim().replaceAll('{E}', pet.eye)
+export function face(pet: Bones): string {
+  const body = BODIES[pet.species] ?? BODIES.blob!
+  return paint(body.base.find(l => l.includes('{L}'))!.trim(), pet, false)
 }
 
-export function color(pet: Pet, tick: number): string {
+export function color(pet: Bones, tick: number): string {
   return pet.isShiny ? RAINBOW[tick % RAINBOW.length]! : RARITY_COLOR[RARITIES.indexOf(pet.rarity)]!
 }
 
@@ -87,10 +117,12 @@ export function card(pet: Pet): string {
   return [
     `${'★'.repeat(tier + 1)} ${pet.rarity.toUpperCase()}${pet.isShiny ? '  ✨ SHINY' : ''}`,
     ...art,
-    `${pet.name} the ${pet.species}${pet.hat ? ` (${pet.hat})` : ''}`,
+    `${pet.name} the ${pet.species}`,
     `"${pet.personality}"`,
     '',
     ...bars,
+    '',
+    `seed ${pet.seed.slice(0, 16)}…`,
   ].join('\n')
 }
 

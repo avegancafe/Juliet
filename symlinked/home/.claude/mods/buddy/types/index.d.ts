@@ -1,13 +1,19 @@
-export type Pet = {
+/** What `$.store` keeps: the seed is the whole buddy's body, the rest its soul. */
+export type Stored = { seed: string; name: string; personality: string }
+
+/** Derived from the seed on every load, never stored. */
+export type Bones = {
+  seed: string
   species: string
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
-  eye: string
-  hat: string | null
+  eyes: [string, string]
+  mouth: string
+  top: string
   isShiny: boolean
   stats: Record<string, number>
-  name: string
-  personality: string
 }
+
+export type Pet = Bones & Stored
 
 declare module 'claude-code' {
   interface PluginState {

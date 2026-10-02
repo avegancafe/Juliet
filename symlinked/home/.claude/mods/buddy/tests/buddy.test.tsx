@@ -1,33 +1,55 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 
-import { card, roll, sprite } from '../hooks/companion'
-import { SPECIES } from '../hooks/sprites'
+import { bones, card, newSeed, seedFor, sprite, SPECIES } from '../hooks/companion'
+import { BODIES, LEFT_EYES, RIGHT_EYES, TOPS } from '../hooks/sprites'
 
 const BAND = {
   component: 'AbovePrompt',
   props: { hasSurvey: false, isWorking: false, maxRows: 20, bodyColumns: 100 } as never,
 } as const
 
+const AWAKE = { tick: 0, isPetting: false, isHatching: false, isWorking: false }
+
 describe('companion', () => {
-  test('every sprite frame is 5 lines, at most 12 columns, with eyes', async () => {
-    for (const [name, frames] of Object.entries(SPECIES)) {
-      for (const frame of frames) {
+  test('every body, with every eye pair and mouth, fits 5 lines by 12 columns', async () => {
+    expect(SPECIES.length).toBe(18)
+    expect(LEFT_EYES.length).toBe(RIGHT_EYES.length)
+    for (const [name, body] of Object.entries(BODIES)) {
+      for (const frame of [body.base, body.fidget]) {
         expect(frame.length).toBe(5)
-        for (const line of frame) expect(line.replaceAll('{E}', 'o').length <= 12 ? 'ok' : `${name}: ${line}`).toBe('ok')
-        expect(frame.some(l => l.includes('{E}'))).toBe(true)
+        expect(frame[0]).toBe('')
+        expect(frame.some(l => l.includes('{L}'))).toBe(true)
+        for (const mouth of body.mouths) {
+          for (let e = 0; e < LEFT_EYES.length; e++) {
+            for (const raw of frame) {
+              const line = raw.replaceAll('{L}', LEFT_EYES[e]!).replaceAll('{R}', RIGHT_EYES[e]!).replaceAll('{M}', mouth)
+              expect([...line].length <= 12 ? 'ok' : `${name}: "${line}"`).toBe('ok')
+            }
+          }
+        }
       }
     }
-    expect(Object.keys(SPECIES).length).toBe(18)
+    for (const top of TOPS) expect([...top].length <= 12 ? 'ok' : top).toBe('ok')
   })
 
-  test('a roll has five stats with a peak and a hat only above common', async () => {
-    for (let i = 0; i < 200; i++) {
-      const pet = roll()
-      expect(Object.keys(pet.stats).length).toBe(5)
-      if (pet.rarity === 'common') expect(pet.hat).toBe(null)
-      if (pet.rarity === 'legendary') expect(Math.max(...Object.values(pet.stats))).toBe(100)
-      expect(sprite(pet, { tick: 0, isPetting: false, isHatching: false, isWorking: false }).length).toBe(5)
+  test('a seed always draws the same buddy', async () => {
+    const seed = newSeed()
+    expect(await bones(seed)).toEqual(await bones(seed))
+  })
+
+  test('bones keep their slots in range and their rarity rules', async () => {
+    for (let i = 0; i < 300; i++) {
+      const b = await bones(newSeed())
+      expect(Object.keys(b.stats).length).toBe(5)
+      expect(BODIES[b.species]!.mouths).toContain(b.mouth)
+      if (b.rarity === 'common') expect(b.top).toBe('')
+      if (b.rarity === 'legendary') expect(Math.max(...Object.values(b.stats))).toBe(100)
+      expect(sprite(b, AWAKE).length).toBe(5)
     }
+  })
+
+  test('seedFor finds a seed that hatches the asked-for species', async () => {
+    expect((await bones(await seedFor('owl'))).species).toBe('owl')
   })
 })
 
@@ -46,7 +68,7 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
 
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'buddy', surface, ...BAND })
-    expect(await ui.find({ type: 'Text', text: /<\(. \)___/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /┤/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Pip/ })).toBeDefined()
     await ui.unmount()
   }
@@ -61,6 +83,6 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
 })
 
 test('card lists the name and every stat', async () => {
-  const text = card(roll(Math.random, { species: 'cat', name: 'Mochi' }))
-  for (const s of ['Mochi the cat', 'DEBUGGING', 'PATIENCE', 'CHAOS', 'WISDOM', 'SNARK']) expect(text).toContain(s)
+  const text = card({ ...(await bones(await seedFor('cat'))), name: 'Mochi', personality: 'naps on keyboards' })
+  for (const s of ['Mochi the cat', 'DEBUGGING', 'PATIENCE', 'CHAOS', 'WISDOM', 'SNARK', 'seed']) expect(text).toContain(s)
 })
