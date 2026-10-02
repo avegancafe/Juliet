@@ -178,6 +178,18 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // The card is art: drawn line by line, so the row keeps its leading spaces and blank lines.
+  on('ui.render', { component: 'CommandOutput', props: { command: 'buddy' } }, ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    return (
+      <Box flexDirection="column">
+        {e.props.text.split('\n').map((line, i) => (
+          <Text key={`c${i}`}>{line || ' '}</Text>
+        ))}
+      </Box>
+    )
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const mine = await read($, pet)
     if (e.props.hasSurvey || !mine || (await read($, isHidden))) return next(e)

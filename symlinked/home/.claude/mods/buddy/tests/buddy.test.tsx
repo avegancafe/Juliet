@@ -86,3 +86,24 @@ test('card shows the punk, its name, and every stat', async () => {
   const text = card({ ...b, name: 'Mochi', personality: 'naps on keyboards' })
   for (const s of ['Mochi', 'DEBUGGING', 'PATIENCE', 'CHAOS', 'WISDOM', 'SNARK', b.seed, ...punk(b)]) expect(text).toContain(s)
 })
+
+test("the card row keeps the punk's leading spaces and blank lines", async ($, on) => {
+  on('ui.render', ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box key="engine" />
+  })
+  const b = bones(newSeed())
+  const text = card({ ...b, name: 'Mochi', personality: 'naps on keyboards' })
+  for (const surface of ['terminal', 'desktop'] as const) {
+    const ui = await $.ui.mount({
+      plugin: 'buddy',
+      surface,
+      component: 'CommandOutput',
+      props: { command: 'buddy', args: 'card', text, isErrored: false } as never,
+    })
+    const lines = (await ui.findAll({ type: 'Text' })).map(t => t.text)
+    expect(lines.length).toBe(text.split('\n').length)
+    for (const line of punk(b)) expect(lines).toContain(line.trim() ? line : ' ')
+    await ui.unmount()
+  }
+})
