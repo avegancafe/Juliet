@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 
-import { bones, card, newSeed, punk, sprite } from '../hooks/companion'
+import { bones, bubbleLine, card, newSeed, punk, sprite, voice } from '../hooks/companion'
 import { hex, keccak256 } from '../hooks/keccak'
 import { PUNK_LEFT_EYES, PUNK_MOUTHS, PUNK_NOSES, PUNK_RIGHT_EYES, PUNK_TOPS } from '../hooks/punk-parts'
 
@@ -61,7 +61,7 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
     return <Box key="engine" />
   })
   on('command.run', () => ({ text: '' }))
-  on('model.complete', () => ({ isAnswered: false, reason: 'empty-reply' }) as never)
+  on('model.complete', () => ({ value: { isAnswered: false, reason: 'empty-reply' } }) as never)
   // The engine's pane dock, in memory: whether the buddy pane is seated and shown.
   let isSeated = false
   on('ui.open', () => ({ value: { isPlaced: isSeated } }) as never)
@@ -129,4 +129,51 @@ test("the card row keeps the punk's leading spaces and blank lines", async ($, o
     for (const line of punk(b)) expect(lines).toContain(line.trim() ? line : ' ')
     await ui.unmount()
   }
+})
+
+test('the voice follows the stats, the personality and the face', async () => {
+  const b = bones(newSeed())
+  const snarky = voice({ ...b, stats: { DEBUGGING: 40, PATIENCE: 10, CHAOS: 30, WISDOM: 50, SNARK: 95 }, name: 'Zyx', personality: 'hoards semicolons' })
+  expect(snarky).toContain('SNARK 95/100: extremely')
+  expect(snarky).toContain('sarcastic')
+  expect(snarky).toContain('impatient')
+  expect(snarky).toContain('Lean hardest into SNARK')
+  expect(snarky).toContain('hoards semicolons')
+  for (const line of punk(b)) expect(snarky).toContain(line)
+  const sweet = voice({ ...b, stats: { DEBUGGING: 40, PATIENCE: 90, CHAOS: 30, WISDOM: 50, SNARK: 5 }, name: 'Zyx', personality: 'x' })
+  expect(sweet).toContain('earnest')
+  expect(sweet).not.toContain('sarcastic')
+})
+
+test("a finished turn puts the model's line, in its own voice, in the bubble", async ($, on) => {
+  const clock = mock.clock(on)
+  mock.store(on, { pet: { seed: newSeed(), name: 'Zyx', personality: 'hoards semicolons' } })
+  on('command.register', (_, e) => ({ value: { command: e.name } }))
+  on('ui.render', ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box key="engine" />
+  })
+  on('ui.open', () => ({ value: { isPlaced: false, reason: 'narrow' } }) as never)
+  on('ui.panes', () => ({ value: [] }) as never)
+  const systems: string[] = []
+  on('model.complete', (_, e) => {
+    systems.push(e.system ?? '')
+    return { value: { isAnswered: true, text: 'another semicolon, another day', usage: {} } } as never
+  })
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('turn.complete', (_, e) => ({ text: e.answer }))
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+
+  await $.turn.complete({ answer: 'done', durationMs: 1500, isAborted: false, turnId: 't1', reason: 'answer' } as never)
+  await clock.advance(1)
+  expect(systems.length).toBe(1)
+  expect(systems[0]).toContain('You are Zyx')
+  const band = await $.ui.mount({ plugin: 'buddy', surface: 'terminal', ...BAND })
+  expect(await band.find({ type: 'Text', text: /another semicolon/ })).toBeDefined()
+})
+
+test('only a plain line of a reply reaches the bubble', async () => {
+  expect(bubbleLine('```\n ◙◙◙◙\n   ┌────┐\n```\nnice diff, i guess')).toBe('nice diff, i guess')
+  expect(bubbleLine('"yo, add a test script."')).toBe('yo, add a test script.')
+  expect(bubbleLine('```\n   ┌────┐\n```')).toBe(null)
 })

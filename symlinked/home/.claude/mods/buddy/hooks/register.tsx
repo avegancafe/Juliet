@@ -3,7 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { Pet, Stored } from '../types'
 
-import { bones, card, color, face, NAMES, newSeed, peakStat, pick, sprite, STATS, wrap } from './companion'
+import { bones, bubbleLine, card, color, face, NAMES, newSeed, peakStat, pick, sprite, voice, wrap } from './companion'
 
 const pet = atom({ plugin: 'buddy', key: 'pet' } as const, null)
 const tick = atom({ plugin: 'buddy', key: 'tick' } as const, 0)
@@ -20,15 +20,13 @@ const BUBBLE_MS = 10_000
 const PET_MS = 2_500
 const HATCH_MS = 3_000
 // ponytail: fixed model-call cooldown; make it an option if it's too chatty or too quiet
-const CHIRP_COOLDOWN_MS = 30_000
+const CHIRP_COOLDOWN_MS = 20_000
 
-const ERROR_QUIPS = ['uh oh', 'that one stung', '*hides behind input box*', 'we do not talk about that', 'have you tried reading the error']
-const PET_QUIPS = ['♥', '*happy wiggle*', 'hehe', 'again again', '*adjusts hat*']
 
 let bubbleUntil = 0
 let petUntil = 0
 let hatchUntil = 0
-let lastChirpAt = 0
+let lastChirpAt = -Infinity
 let lastPrompt = ''
 
 async function say($: EngineInterface, text: string) {
@@ -43,20 +41,20 @@ async function chirp($: EngineInterface, situation: string, isForced = false) {
   if (!mine || (await read($, isHidden)) || (await read($, isMuted))) return
   if (!isForced && now - lastChirpAt < CHIRP_COOLDOWN_MS) return
   lastChirpAt = now
-  const stats = STATS.map(s => `${s} ${mine.stats[s]}`).join(', ')
-  const r = await $.model.complete({
-    model: 'haiku',
-    maxTokens: 60,
-    effort: 'low',
-    system:
-      `You are ${mine.name}, a tiny ${mine.rarity} ASCII punk (a little box-drawn face) who lives beside the input box of a developer's terminal, ` +
-      `watching them work with Claude. Personality: ${mine.personality}. Stats (0-100): ${stats}. ` +
-      'You are not Claude and not an assistant. Reply with ONE speech-bubble line under 14 words, lowercase, ' +
-      'no quotes, no emoji, in character. Usually a dry little observation; sometimes a small genuinely useful ' +
-      'insight about what just happened. High SNARK is snarkier, high CHAOS weirder, high WISDOM wiser.',
-    prompt: situation,
-  })
-  if (r.isAnswered && r.text.trim()) await say($, r.text.trim().replace(/^["']|["']$/g, '').slice(0, 120))
+  // Runs unawaited from hooks, so a failed call must not escape as an unhandled rejection.
+  try {
+    const r = await $.model.complete({
+      model: 'haiku',
+      maxTokens: 60,
+      effort: 'low',
+      system: voice(mine),
+      prompt: situation,
+    })
+    const line = r.isAnswered ? bubbleLine(r.text) : null
+    if (line) await say($, line)
+  } catch {
+    // no line this time; the bubble stays as it was
+  }
 }
 
 async function hatch($: EngineInterface): Promise<Pet> {
@@ -88,6 +86,7 @@ async function hatch($: EngineInterface): Promise<Pet> {
   await $.store.set('pet', stored)
   await update($, pet, () => fresh)
   await say($, `hi! i'm ${fresh.name}.`)
+  void chirp($, 'You just hatched out of an egg in this terminal. Introduce yourself.', true)
   return fresh
 }
 
@@ -148,7 +147,8 @@ export const register: Register = on => {
     if (arg === 'pet') {
       petUntil = (await $.clock.now()) + PET_MS
       await update($, isHidden, () => false)
-      await say($, pick(PET_QUIPS))
+      await say($, '♥')
+      void chirp($, 'The developer just petted you.', true)
       return { text: `You pet ${mine.name}.` }
     }
     return { text: card(mine) }
@@ -177,12 +177,15 @@ export const register: Register = on => {
 
   on('tool.call', async ($, e, next) => {
     const ran = await next(e)
-    if (!e.agentId && 'isError' in ran && ran.isError) await say($, pick(ERROR_QUIPS))
+    if (!e.agentId && 'isError' in ran && ran.isError) {
+      const text = 'text' in ran && typeof ran.text === 'string' ? ran.text.slice(0, 300) : ''
+      void chirp($, `Claude's ${e.tool} call just failed${text ? `: ${text}` : ''}. React.`)
+    }
     return ran
   })
 
   on('turn.complete', async ($, e, next) => {
-    if (!e.agentId && !e.isAborted && e.durationMs > 4000) {
+    if (!e.agentId && !e.isAborted) {
       void chirp(
         $,
         `The developer asked Claude: "${lastPrompt.slice(0, 400)}"\n` +

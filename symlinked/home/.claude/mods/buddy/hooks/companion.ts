@@ -141,3 +141,49 @@ export function wrap(text: string, width: number): string[] {
   if (line) out.push(line)
   return out.slice(0, 3)
 }
+
+// What each stat means for how the buddy talks, from its lowest to its highest reading.
+const TRAITS: Record<string, [low: string, high: string]> = {
+  DEBUGGING: ['has no idea how code works and guesses wildly', 'spots the actual bug and names the concrete fix'],
+  PATIENCE: ['is openly impatient about slow turns and long waits', 'is serene, unhurried, and encouraging'],
+  CHAOS: ['is orderly and literal', 'goes on odd tangents and non sequiturs'],
+  WISDOM: ['says naive, obvious things', 'drops a real insight about the work'],
+  SNARK: ['is earnest and sweet', 'is dry, sarcastic, and teasing'],
+}
+
+const degree = (v: number) => (v >= 80 ? 'extremely' : v >= 60 ? 'clearly' : v >= 35 ? 'a bit' : 'not at all')
+
+/** The system prompt that makes a buddy sound like its own stats, personality and face. */
+export function voice(pet: Pet): string {
+  const ranked = [...STATS].sort((a, b) => (pet.stats[b] ?? 0) - (pet.stats[a] ?? 0))
+  const traits = STATS.map(s => {
+    const v = pet.stats[s] ?? 0
+    const [low, high] = TRAITS[s]!
+    return `- ${s} ${v}/100: ${v >= 50 ? `${degree(v)} — ${high}` : `${degree(100 - v)} the opposite — ${low}`}`
+  }).join('\n')
+  return [
+    `You are ${pet.name}, a ${pet.rarity}${pet.isShiny ? ', shiny' : ''} ASCII punk: a tiny box-drawn face that lives in a`,
+    "pane beside a developer's terminal, watching them work with Claude. This is you:",
+    '',
+    ...punk(pet),
+    '',
+    `Personality: ${pet.personality}`,
+    'How your stats shape your voice:',
+    traits,
+    `Lean hardest into ${ranked[0]}; your ${ranked[4]} barely shows.`,
+    '',
+    'You are not Claude and not an assistant; you are a pet with opinions. Reply with ONE speech-bubble line,',
+    'under 14 words, lowercase, no quotes, no emoji, no hashtags. React to what just happened in character.',
+    'Be specific to the situation, never generic. Your look (eyes, hat, mouth) may color what you say.',
+    'Words only: never draw, never repeat your picture, no code fences.',
+  ].join('\n')
+}
+
+/** The one plain line of a reply that may go in the bubble: no art, fences or quotes; null if none. */
+export function bubbleLine(reply: string): string | null {
+  const line = reply
+    .split('\n')
+    .map(l => l.trim())
+    .find(l => l && !l.startsWith('```') && !/[\u2500-\u259F\u25A0-\u25FF]/.test(l))
+  return line ? line.replace(/^["'“]|["'”]$/g, '').slice(0, 120) : null
+}
