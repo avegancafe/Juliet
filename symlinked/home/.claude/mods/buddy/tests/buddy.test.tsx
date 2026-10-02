@@ -11,7 +11,7 @@ test('buddy shows, reacts to /buddy, and hides', async ($, on) => {
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
 
-  for (const surface of ['terminal', 'desktop'] as const) {
+  for (const surface of ['terminal', 'desktop', 'vscode', 'mobile'] as const) {
     const ui = await $.ui.mount({ plugin: 'buddy', surface, ...BAND })
     expect(await ui.find({ type: 'Text', text: /<\(o \)___/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: 'Pip' })).toBeDefined()
