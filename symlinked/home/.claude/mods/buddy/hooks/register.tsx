@@ -239,14 +239,17 @@ export const register: Register = on => {
     const bubble = (await read($, isMuted)) ? null : await read($, says)
     const tint = color(mine, n)
     const lines = sprite(mine, { tick: n, isPetting: now < petUntil, isHatching: now < hatchUntil })
+    // The bubble gets the pane's width less its border and padding, and whatever rows
+    // the punk and its name leave, so the whole quip shows.
     const width = Math.max(8, e.props.bodyColumns - 4)
+    const room = Math.max(1, e.props.scroll.bodyRows - lines.length - 1 - 2)
 
     // Bottom-aligned, so the punk sits next to the prompt like the original sat beside the input.
     return (
       <Box flexDirection="column" justifyContent="flex-end" alignItems="center" height={e.props.scroll.bodyRows}>
         {bubble ? (
           <Box key="bubble" flexDirection="column" borderStyle="round" borderDimColor paddingX={1}>
-            {wrap(bubble, width).map((l, i) => (
+            {wrap(bubble, width, room).map((l, i) => (
               <Text key={`b${i}`}>{l}</Text>
             ))}
           </Box>

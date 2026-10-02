@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 
-import { bones, bubbleLine, card, newSeed, punk, sprite, voice } from '../hooks/companion'
+import { bones, bubbleLine, card, newSeed, punk, sprite, voice, wrap } from '../hooks/companion'
 import { hex, keccak256 } from '../hooks/keccak'
 import { PUNK_LEFT_EYES, PUNK_MOUTHS, PUNK_NOSES, PUNK_RIGHT_EYES, PUNK_TOPS } from '../hooks/punk-parts'
 
@@ -176,4 +176,15 @@ test('only a plain line of a reply reaches the bubble', async () => {
   expect(bubbleLine('```\n ◙◙◙◙\n   ┌────┐\n```\nnice diff, i guess')).toBe('nice diff, i guess')
   expect(bubbleLine('"yo, add a test script."')).toBe('yo, add a test script.')
   expect(bubbleLine('```\n   ┌────┐\n```')).toBe(null)
+})
+
+test('a bubble wraps the whole quip to its width', async () => {
+  const quip = 'oh the string isnt there? shocking. maybe read the file first next time.'
+  const lines = wrap(quip, 12)
+  for (const l of lines) expect([...l].length <= 12).toBe(true)
+  expect(lines.join(' ')).toBe(quip)
+  expect(wrap('supercalifragilistic', 8)).toEqual(['supercal', 'ifragili', 'stic'])
+  const cut = wrap(quip, 12, 2)
+  expect(cut.length).toBe(2)
+  expect(cut[1]!.endsWith('…')).toBe(true)
 })

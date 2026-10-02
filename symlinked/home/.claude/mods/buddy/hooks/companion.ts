@@ -128,18 +128,30 @@ export function card(pet: Pet): string {
   ].join('\n')
 }
 
-/** Wraps a bubble's text to at most `width` columns. */
-export function wrap(text: string, width: number): string[] {
+/**
+ * Wraps a bubble's text to `width` columns and at most `maxLines` lines: a word
+ * longer than a line is broken, and text past the last line ends it with `…`.
+ */
+export function wrap(text: string, width: number, maxLines = Infinity): string[] {
   const out: string[] = []
   let line = ''
-  for (const word of text.split(/\s+/)) {
-    if (line && line.length + word.length + 1 > width) {
+  for (let word of text.split(/\s+/).filter(Boolean)) {
+    while ([...word].length > width) {
+      if (line) out.push(line)
+      out.push([...word].slice(0, width).join(''))
+      word = [...word].slice(width).join('')
+      line = ''
+    }
+    if (line && [...line].length + [...word].length + 1 > width) {
       out.push(line)
       line = word
     } else line = line ? `${line} ${word}` : word
   }
   if (line) out.push(line)
-  return out.slice(0, 3)
+  if (out.length <= maxLines) return out
+  const kept = out.slice(0, Math.max(1, maxLines))
+  kept[kept.length - 1] = `${[...kept[kept.length - 1]!].slice(0, width - 1).join('')}…`
+  return kept
 }
 
 // What each stat means for how the buddy talks, from its lowest to its highest reading.
@@ -185,5 +197,5 @@ export function bubbleLine(reply: string): string | null {
     .split('\n')
     .map(l => l.trim())
     .find(l => l && !l.startsWith('```') && !/[\u2500-\u259F\u25A0-\u25FF]/.test(l))
-  return line ? line.replace(/^["'“]|["'”]$/g, '').slice(0, 120) : null
+  return line ? line.replace(/^["'“]|["'”]$/g, '') : null
 }
