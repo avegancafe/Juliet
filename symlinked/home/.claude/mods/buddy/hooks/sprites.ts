@@ -1,10 +1,7 @@
-// Sprites are composed the way ASCIIPunks draws its punks on-chain
-// (github.com/asciilabs/asciipunks--contract, MIT): one stored seed, hashed
-// once, and every slot picks its part as `rand % <slot count>`. A part that
-// appears twice in a list is twice as likely, which is how rarity falls out.
-//
-// A body is 5 lines of at most 12 columns. Line 0 is the top slot (hats,
-// hair, the punk "tops"); {L} {R} are the paired eyes, {M} the mouth.
+// Animal bodies for the slots ASCIIPunks fills (see punk-parts.ts): each
+// buddy wears one of the contract's three-line tops above a body like these.
+// A body is 5 lines of at most 12 columns; line 0 stays blank, where the top
+// sits. {L} {R} are the contract's paired eyes, {M} the species' own mouth.
 
 export type Body = { base: string[]; fidget: string[]; mouths: string[] }
 
@@ -102,21 +99,6 @@ export const BODIES: Record<string, Body> = {
     mouths: ['ω', '▾', '─', 'w', 'ω'],
   },
 }
-
-// ASCIIPunks' paired eye lists, verbatim; a pair keeps a punk's two eyes in
-// conversation (◄ ►, ╔ ╗, ♥ ♠).
-export const LEFT_EYES = ['◕', '*', '♥', 'X', '⊙', '˘', 'α', '◉', '☻', '¬', '^', '═', '┼', '┬', '■', '─', 'û', '╜', 'δ', '│', '┐', '┌', '┌', '╤', '/', '\\', '/', '\\', '╦', '♥', '♠', '♦', '╝', '◄', '►', '◄', '►', 'I', '╚', '╔', '╙', '╜', '╓', '╥', '$', '○', 'N', 'x']
-export const RIGHT_EYES = ['◕', '*', '♥', 'X', '⊙', '˘', 'α', '◉', '☻', '¬', '^', '═', '┼', '┬', '■', '─', 'û', '╜', 'δ', '│', '┐', '┐', '┌', '╤', '\\', '/', '/', '\\', '╦', '♠', '♣', '♦', '╝', '►', '◄', '◄', '◄', 'I', '╚', '╗', '╜', '╜', '╓', '╥', '$', '○', 'N', 'x']
-
-// One-line tops after ASCIIPunks' three-line ones; index 0 (bare) is listed
-// often so most buddies go hatless. Tops past a rarity's reach are rerolled
-// down by `rand % reach`.
-export const TOPS = [
-  '', '', '', '', '', '',
-  '   ┌┬┬┬┬┐   ', '   ╒╦╦╦╦╕   ', '    ││││    ', '    ║║║║    ', '   \\/////   ', '   ((((((   ',
-  '    ╓┬╥┐    ', '   ▐▐▐▌▌▌   ', '    ⌂⌂⌂⌂    ', '     ///    ', '   ± ±± ±   ', '    ◙◙◙◙    ',
-  '  ♫     ♪   ', '   ♣♥♦♠♣♥   ', '     [⌂]    ', '    ☼  ☼    ', '  /\\/\\/\\/\\  ', '    ↑↑↓↓    ',
-]
 
 export const EGG = [
   ['', '    ┌──┐    ', '   ┌┘  └┐   ', '   └┐  ┌┘   ', '    └──┘    '],

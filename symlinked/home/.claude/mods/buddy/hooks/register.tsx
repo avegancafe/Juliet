@@ -3,7 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { Pet, Stored } from '../types'
 
-import { bones, card, color, face, NAMES, newSeed, peakStat, pick, seedFor, sprite, SPECIES, STATS, wrap } from './companion'
+import { bones, card, color, face, legacySpecies, NAMES, newSeed, peakStat, pick, seedFor, sprite, SPECIES, STATS, wrap } from './companion'
 
 const pet = atom({ plugin: 'buddy', key: 'pet' } as const, null)
 const tick = atom({ plugin: 'buddy', key: 'tick' } as const, 0)
@@ -59,7 +59,7 @@ async function hatch($: EngineInterface): Promise<Pet> {
   hatchUntil = (await $.clock.now()) + HATCH_MS
   await update($, isHidden, () => false)
   await $.store.set('isHidden', false)
-  const body = await bones(newSeed())
+  const body = bones(newSeed())
   let fresh: Pet = { ...body, name: pick(NAMES), personality: 'quietly judges your variable names' }
   await update($, pet, () => fresh)
   const stats = Object.entries(body.stats).sort((a, b) => a[1] - b[1])
@@ -80,7 +80,7 @@ async function hatch($: EngineInterface): Promise<Pet> {
   } catch {
     // keep the fallback name and personality
   }
-  const stored: Stored = { seed: fresh.seed, name: fresh.name, personality: fresh.personality }
+  const stored: Stored = { seed: fresh.seed, name: fresh.name, personality: fresh.personality, v: 2 }
   await $.store.set('pet', stored)
   await update($, pet, () => fresh)
   await say($, `hi! i'm ${fresh.name}.`)
@@ -91,12 +91,17 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const saved = (await $.store.get('pet')) as (Partial<Stored> & { species?: string }) | undefined
     if (saved?.name) {
-      // A buddy from before seeds keeps its name and species: find a seed that hatches the same kind.
-      const seed = saved.seed ?? (await seedFor(SPECIES.includes(saved.species ?? '') ? saved.species! : pick(SPECIES)))
-      const soul: Stored = { seed, name: saved.name, personality: saved.personality ?? 'quietly judges your variable names' }
-      if (!saved.seed) await $.store.set('pet', soul)
+      // Older buddies keep their name and species: a pre-seed one names its species, a
+      // SHA-256 one is re-read the old way; either way find a keccak seed that hatches it.
+      let seed = saved.seed
+      if (!seed || saved.v !== 2) {
+        const species = seed ? await legacySpecies(seed) : saved.species ?? ''
+        seed = seedFor(SPECIES.includes(species) ? species : pick(SPECIES))
+      }
+      const soul: Stored = { seed, name: saved.name, personality: saved.personality ?? 'quietly judges your variable names', v: 2 }
+      if (seed !== saved.seed) await $.store.set('pet', soul)
       // Bones win over anything stored, as the original's `{ ...stored, ...bones }` did.
-      const mine: Pet = { ...soul, ...(await bones(seed)) }
+      const mine: Pet = { ...soul, ...bones(seed) }
       await update($, pet, () => mine)
     }
     const [hidden, muted] = await Promise.all([$.store.get('isHidden'), $.store.get('isMuted')])
@@ -188,7 +193,15 @@ export const register: Register = on => {
     const bubble = (await read($, isMuted)) ? null : await read($, says)
     const tint = color(mine, n)
 
-    if (e.props.maxRows < 7 || e.props.bodyColumns < 40) {
+    const lines = sprite(mine, {
+      tick: n,
+      isPetting: now < petUntil,
+      isHatching: now < hatchUntil,
+      isWorking: e.props.isWorking,
+    })
+
+    // The sprite, plus its name under it, or the one-line face when that won't fit.
+    if (e.props.maxRows < lines.length + 1 || e.props.bodyColumns < 40) {
       return (
         <Box>
           <Text color={tint}>{face(mine)} </Text>
@@ -198,12 +211,6 @@ export const register: Register = on => {
       )
     }
 
-    const lines = sprite(mine, {
-      tick: n,
-      isPetting: now < petUntil,
-      isHatching: now < hatchUntil,
-      isWorking: e.props.isWorking,
-    })
     const width = Math.max(12, Math.min(36, e.props.bodyColumns - 20))
 
     return (
