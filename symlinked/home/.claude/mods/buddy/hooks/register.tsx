@@ -11,6 +11,10 @@ const says = atom({ plugin: 'buddy', key: 'says' } as const, null)
 const isHidden = atom({ plugin: 'buddy', key: 'isHidden' } as const, false)
 const isMuted = atom({ plugin: 'buddy', key: 'isMuted' } as const, false)
 
+// The punk lives in a narrow pane docked beside the transcript, so it narrows the
+// conversation instead of pushing it up; the band above the prompt is its fallback.
+const PANE = 'buddy'
+const PANE_COLUMNS = 16
 const TICK_MS = 500
 const BUBBLE_MS = 10_000
 const PET_MS = 2_500
@@ -87,6 +91,11 @@ async function hatch($: EngineInterface): Promise<Pet> {
   return fresh
 }
 
+async function openPane($: EngineInterface) {
+  const mine = await read($, pet)
+  if (mine && !(await read($, isHidden))) await $.ui.open({ id: PANE, title: mine.name, columns: PANE_COLUMNS })
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const saved = (await $.store.get('pet')) as Partial<Stored> | undefined
@@ -103,6 +112,8 @@ export const register: Register = on => {
     await update($, isHidden, () => hidden === true)
     await update($, isMuted, () => muted === true)
     await $.command.register({ name: 'buddy', description: 'Your terminal buddy: pet, card, mute, unmute, off, on, hatch' })
+    // Unasked, so the engine seats it only on a terminal 144+ columns wide; the band covers the rest.
+    void openPane($)
     $.clock.every(TICK_MS, async () => {
       await update($, tick, n => n + 1)
       if (bubbleUntil && (await $.clock.now()) > bubbleUntil) {
@@ -118,11 +129,14 @@ export const register: Register = on => {
     const mine = await read($, pet)
     if (!mine || arg === 'hatch') {
       const fresh = await hatch($)
+      await openPane($)
       return { text: `A ${fresh.rarity} punk hatched: ${fresh.name}!\n\n${card(fresh)}` }
     }
     if (arg === 'off' || arg === 'on') {
       await update($, isHidden, () => arg === 'off')
       await $.store.set('isHidden', arg === 'off')
+      if (arg === 'off') await $.ui.close({ id: PANE })
+      else await openPane($)
       return { text: arg === 'off' ? `${mine.name} is napping. /buddy on to wake them.` : `${mine.name} is back!` }
     }
     if (arg === 'mute' || arg === 'unmute') {
@@ -200,45 +214,48 @@ export const register: Register = on => {
     const bubble = (await read($, isMuted)) ? null : await read($, says)
     const tint = color(mine, n)
 
-    const lines = sprite(mine, {
-      tick: n,
-      isPetting: now < petUntil,
-      isHatching: now < hatchUntil,
-    })
-
-    // One row in the flow: the name, the bubble, and on a short screen the one-line face.
-    // In fullscreen the punk and its bubble are absolute, painted over the transcript's
-    // bottom-right corner above that row, so they push nothing up. On the main screen an
-    // absolute box is clipped to the band, so the punk stays one line there.
-    const isOverlay = e.viewport?.isFullscreen === true && (e.viewport.rows ?? 0) >= lines.length + 8 && e.props.bodyColumns >= 40
-    if (!isOverlay) {
-      return (
-        <Box flexDirection="row" justifyContent="flex-end">
-          {bubble ? <Text wrap="truncate-end">“{bubble}” </Text> : null}
-          <Text color={tint}>{face(mine)} </Text>
-          <Text dimColor>{mine.name}</Text>
-        </Box>
-      )
-    }
-
-    const width = Math.max(12, Math.min(36, e.props.bodyColumns - 20))
+    // The pane has the punk while it's on screen; otherwise the band carries a one-line face.
+    const shown = (await $.ui.panes()).some(p => p.id === PANE && p.isPlaced && p.isShown)
+    if (shown) return next(e)
     return (
       <Box flexDirection="row" justifyContent="flex-end">
-        <Text dimColor>{mine.name.slice(0, 12).padStart(6 + Math.ceil(mine.name.length / 2)).padEnd(12)}</Text>
-        <Box key="pet" position="absolute" right={0} bottom={1} flexDirection="column" width={12}>
-          {lines.map((l, i) => (
-            <Text key={`s${i}`} color={tint}>
-              {l}
-            </Text>
-          ))}
-        </Box>
+        {bubble ? <Text wrap="truncate-end">“{bubble}” </Text> : null}
+        <Text color={tint}>{face(mine)} </Text>
+        <Text dimColor>{mine.name}</Text>
+      </Box>
+    )
+  })
+
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e, next) => {
+    const mine = await read($, pet)
+    if (!mine) return next(e)
+
+    const { Box, Text } = $.ui.resolve(e)
+    const n = await read($, tick)
+    const now = await $.clock.now()
+    const bubble = (await read($, isMuted)) ? null : await read($, says)
+    const tint = color(mine, n)
+    const lines = sprite(mine, { tick: n, isPetting: now < petUntil, isHatching: now < hatchUntil })
+    const width = Math.max(8, e.props.bodyColumns - 4)
+
+    // Bottom-aligned, so the punk sits next to the prompt like the original sat beside the input.
+    return (
+      <Box flexDirection="column" justifyContent="flex-end" alignItems="center" height={e.props.scroll.bodyRows}>
         {bubble ? (
-          <Box key="bubble" position="absolute" right={13} bottom={1} flexDirection="column" borderStyle="round" borderDimColor paddingX={1}>
+          <Box key="bubble" flexDirection="column" borderStyle="round" borderDimColor paddingX={1}>
             {wrap(bubble, width).map((l, i) => (
               <Text key={`b${i}`}>{l}</Text>
             ))}
           </Box>
         ) : null}
+        {lines.map((l, i) => (
+          <Text key={`s${i}`} color={tint}>
+            {l}
+          </Text>
+        ))}
+        <Text key="name" dimColor>
+          {mine.name}
+        </Text>
       </Box>
     )
   })

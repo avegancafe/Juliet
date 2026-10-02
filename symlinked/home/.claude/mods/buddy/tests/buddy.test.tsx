@@ -62,23 +62,38 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
   })
   on('command.run', () => ({ text: '' }))
   on('model.complete', () => ({ isAnswered: false, reason: 'empty-reply' }) as never)
+  // The engine's pane dock, in memory: whether the buddy pane is seated and shown.
+  let isSeated = false
+  on('ui.open', () => ({ value: { isPlaced: isSeated } }) as never)
+  on('ui.close', () => ({ value: undefined }) as never)
+  on('ui.panes', () =>
+    ({ value: isSeated ? [{ id: 'buddy', title: 'Pip', isShown: true, isFocused: false, isPlaced: true }] : [] }) as never)
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
 
-  const FULLSCREEN = { columns: 120, rows: 40, isFullscreen: true }
+  const PANE = {
+    component: 'Pane',
+    requestId: 'buddy',
+    props: { title: 'Pip', isFocused: false, bodyColumns: 16, placement: 'dock', scroll: { offset: 0, bodyRows: 30 } } as never,
+  } as const
   for (const surface of ['terminal', 'desktop'] as const) {
-    // Fullscreen: the whole punk, drawn absolute so it takes no rows of the band.
-    const ui = await $.ui.mount({ plugin: 'buddy', surface, ...BAND, viewport: FULLSCREEN })
-    expect(await ui.find({ type: 'Text', text: /├┐/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Pip/ })).toBeDefined()
-    expect(await ui.find({ type: 'Box', position: 'absolute' } as never)).toBeDefined()
-    await ui.unmount()
-    // Main screen: one row, the face and the name.
-    const flat = await $.ui.mount({ plugin: 'buddy', surface, ...BAND, viewport: { ...FULLSCREEN, isFullscreen: false } })
+    // No pane seated (a narrow terminal): the band carries the one-line face.
+    isSeated = false
+    const flat = await $.ui.mount({ plugin: 'buddy', surface, ...BAND })
     expect(await flat.find({ type: 'Text', text: /├┐/ })).toBeUndefined()
     expect(await flat.find({ type: 'Text', text: /Pip/ })).toBeDefined()
     await flat.unmount()
+    // Seated: the band steps aside and the pane draws the whole punk.
+    isSeated = true
+    const band = await $.ui.mount({ plugin: 'buddy', surface, ...BAND })
+    expect(await band.find({ type: 'Text', text: /Pip/ })).toBeUndefined()
+    await band.unmount()
+    const pane = await $.ui.mount({ plugin: 'buddy', surface, ...PANE })
+    expect(await pane.find({ type: 'Text', text: /├┐/ })).toBeDefined()
+    expect(await pane.find({ type: 'Text', text: /Pip/ })).toBeDefined()
+    await pane.unmount()
   }
+  isSeated = false
 
   const shown = await $.command.run({ command: 'buddy', args: 'card' } as never)
   expect(shown.text).toContain('Pip')
