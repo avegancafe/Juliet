@@ -1,21 +1,17 @@
 /**
  * What `$.store` keeps: the seed is the buddy's whole body, the rest its soul.
- * `v` 2 seeds hash with keccak256; older ones with SHA-256 (see companion.ts).
  */
-export type Stored = { seed: string; name: string; personality: string; v?: number }
+export type Stored = { seed: string; name: string; personality: string }
 
 /** Derived from the seed on every load, never stored. */
 export type Bones = {
   seed: string
-  species: string
   rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
   eyes: [string, string]
-  /** The species' own mouth; empty for the punk, which uses `punkMouth`. */
-  mouth: string
-  /** The contract's three-line top. */
+  /** The contract's parts: a three-line top, an eye pair, a nose, a two-line mouth. */
   top: string[]
   nose: string
-  punkMouth: string[]
+  mouth: string[]
   isShiny: boolean
   stats: Record<string, number>
 }

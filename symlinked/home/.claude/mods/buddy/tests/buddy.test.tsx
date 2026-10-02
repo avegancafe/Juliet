@@ -1,16 +1,15 @@
 import { describe, expect, mock, test } from 'claude-code/testing'
 
-import { bones, card, legacySpecies, newSeed, punk, seedFor, sprite, SPECIES } from '../hooks/companion'
+import { bones, card, newSeed, punk, sprite } from '../hooks/companion'
 import { hex, keccak256 } from '../hooks/keccak'
 import { PUNK_LEFT_EYES, PUNK_MOUTHS, PUNK_NOSES, PUNK_RIGHT_EYES, PUNK_TOPS } from '../hooks/punk-parts'
-import { BODIES } from '../hooks/sprites'
 
 const BAND = {
   component: 'AbovePrompt',
   props: { hasSurvey: false, isWorking: false, maxRows: 20, bodyColumns: 100 } as never,
 } as const
 
-const AWAKE = { tick: 0, isPetting: false, isHatching: false, isWorking: false }
+const AWAKE = { tick: 0, isPetting: false, isHatching: false }
 const width = (line: string) => [...line].length
 
 describe('companion', () => {
@@ -26,26 +25,7 @@ describe('companion', () => {
     for (const mouth of PUNK_MOUTHS) expect(mouth.map(width)).toEqual([12, 12])
   })
 
-  test('every animal, with every eye pair and mouth, fits 5 lines by 12 columns', async () => {
-    expect(SPECIES.length).toBe(19)
-    for (const [name, body] of Object.entries(BODIES)) {
-      for (const frame of [body.base, body.fidget]) {
-        expect(frame.length).toBe(5)
-        expect(frame[0]).toBe('')
-        expect(frame.some(l => l.includes('{L}'))).toBe(true)
-        for (const mouth of body.mouths) {
-          for (let e = 0; e < PUNK_LEFT_EYES.length; e++) {
-            for (const raw of frame) {
-              const line = raw.replaceAll('{L}', PUNK_LEFT_EYES[e]!).replaceAll('{R}', PUNK_RIGHT_EYES[e]!).replaceAll('{M}', mouth)
-              expect(width(line) <= 12 ? 'ok' : `${name}: "${line}"`).toBe('ok')
-            }
-          }
-        }
-      }
-    }
-  })
-
-  test("a buddy's punk twin is the contract's 12 by 12 draw", async () => {
+  test("a buddy is the contract's 12 by 12 draw", async () => {
     for (let i = 0; i < 50; i++) {
       const twin = punk(bones(newSeed()))
       expect(twin.length).toBe(12)
@@ -62,21 +42,14 @@ describe('companion', () => {
     for (let i = 0; i < 300; i++) {
       const b = bones(newSeed())
       expect(Object.keys(b.stats).length).toBe(5)
-      expect(b.top.length).toBe(3)
-      if (b.species !== 'punk') expect(BODIES[b.species]!.mouths).toContain(b.mouth)
+      expect(PUNK_TOPS).toContain(b.top)
+      expect(PUNK_MOUTHS).toContain(b.mouth)
       if (b.rarity === 'legendary') expect(Math.max(...Object.values(b.stats))).toBe(100)
-      expect(sprite(b, AWAKE).length).toBe(b.species === 'punk' ? 12 : 7)
+      expect(sprite(b, AWAKE)).toEqual(punk(b))
+      expect(sprite(b, { ...AWAKE, isHatching: true }).length).toBe(12)
     }
   })
 
-  test('seedFor finds a seed that hatches the asked-for species', async () => {
-    expect(bones(seedFor('owl')).species).toBe('owl')
-    expect(bones(seedFor('punk')).species).toBe('punk')
-  })
-
-  test('a SHA-256 era seed reads back as the species it hatched then', async () => {
-    expect(SPECIES).toContain(await legacySpecies(newSeed()))
-  })
 })
 
 test('an old buddy migrates, draws, shows its card, and hides', async ($, on) => {
@@ -94,13 +67,13 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
 
   for (const surface of ['terminal', 'desktop'] as const) {
     const ui = await $.ui.mount({ plugin: 'buddy', surface, ...BAND })
-    expect(await ui.find({ type: 'Text', text: /┤/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /├┐/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Pip/ })).toBeDefined()
     await ui.unmount()
   }
 
   const shown = await $.command.run({ command: 'buddy', args: 'card' } as never)
-  expect(shown.text).toContain('Pip the duck')
+  expect(shown.text).toContain('Pip')
   expect(shown.text).toContain('SNARK')
 
   await $.command.run({ command: 'buddy', args: 'off' } as never)
@@ -108,9 +81,8 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
   expect(await hidden.find({ type: 'Text', text: /Pip/ })).toBeUndefined()
 })
 
-test('card lists the name, every stat, and the punk twin', async () => {
-  const cat = bones(seedFor('cat'))
-  const text = card({ ...cat, name: 'Mochi', personality: 'naps on keyboards' })
-  for (const s of ['Mochi the cat', 'punk twin', 'DEBUGGING', 'PATIENCE', 'CHAOS', 'WISDOM', 'SNARK', cat.seed]) expect(text).toContain(s)
-  for (const line of punk(cat)) expect(text).toContain(line.trimEnd())
+test('card shows the punk, its name, and every stat', async () => {
+  const b = bones(newSeed())
+  const text = card({ ...b, name: 'Mochi', personality: 'naps on keyboards' })
+  for (const s of ['Mochi', 'DEBUGGING', 'PATIENCE', 'CHAOS', 'WISDOM', 'SNARK', b.seed, ...punk(b)]) expect(text).toContain(s)
 })

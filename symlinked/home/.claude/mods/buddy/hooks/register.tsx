@@ -3,7 +3,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { Pet, Stored } from '../types'
 
-import { bones, card, color, face, legacySpecies, NAMES, newSeed, peakStat, pick, seedFor, sprite, SPECIES, STATS, wrap } from './companion'
+import { bones, card, color, face, NAMES, newSeed, peakStat, pick, sprite, STATS, wrap } from './companion'
 
 const pet = atom({ plugin: 'buddy', key: 'pet' } as const, null)
 const tick = atom({ plugin: 'buddy', key: 'tick' } as const, 0)
@@ -19,7 +19,7 @@ const HATCH_MS = 3_000
 const CHIRP_COOLDOWN_MS = 30_000
 
 const ERROR_QUIPS = ['uh oh', 'that one stung', '*hides behind input box*', 'we do not talk about that', 'have you tried reading the error']
-const PET_QUIPS = ['♥', '*happy wiggle*', 'hehe', 'again again', '*purrs, regardless of species*']
+const PET_QUIPS = ['♥', '*happy wiggle*', 'hehe', 'again again', '*adjusts hat*']
 
 let bubbleUntil = 0
 let petUntil = 0
@@ -45,7 +45,7 @@ async function chirp($: EngineInterface, situation: string, isForced = false) {
     maxTokens: 60,
     effort: 'low',
     system:
-      `You are ${mine.name}, a tiny ${mine.rarity} ${mine.species} who lives beside the input box of a developer's terminal, ` +
+      `You are ${mine.name}, a tiny ${mine.rarity} ASCII punk (a little box-drawn face) who lives beside the input box of a developer's terminal, ` +
       `watching them work with Claude. Personality: ${mine.personality}. Stats (0-100): ${stats}. ` +
       'You are not Claude and not an assistant. Reply with ONE speech-bubble line under 14 words, lowercase, ' +
       'no quotes, no emoji, in character. Usually a dry little observation; sometimes a small genuinely useful ' +
@@ -69,7 +69,7 @@ async function hatch($: EngineInterface): Promise<Pet> {
     effort: 'low',
     system: 'You name tiny terminal pets. Reply with only a JSON object.',
     prompt:
-      `A ${body.rarity} ${body.species} just hatched in a developer's terminal. Strongest stat ${peakStat(body)}, ` +
+      `A ${body.rarity} ASCII punk (a little box-drawn face, after the ASCIIPunks NFTs) just hatched in a developer's terminal. Strongest stat ${peakStat(body)}, ` +
       `weakest ${stats[0]![0]}. Reply {"name": "<short cute name>", "personality": "<one lowercase sentence under 12 words, specific and a little odd>"}`,
   })
   try {
@@ -80,7 +80,7 @@ async function hatch($: EngineInterface): Promise<Pet> {
   } catch {
     // keep the fallback name and personality
   }
-  const stored: Stored = { seed: fresh.seed, name: fresh.name, personality: fresh.personality, v: 2 }
+  const stored: Stored = { seed: fresh.seed, name: fresh.name, personality: fresh.personality }
   await $.store.set('pet', stored)
   await update($, pet, () => fresh)
   await say($, `hi! i'm ${fresh.name}.`)
@@ -89,16 +89,11 @@ async function hatch($: EngineInterface): Promise<Pet> {
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    const saved = (await $.store.get('pet')) as (Partial<Stored> & { species?: string }) | undefined
+    const saved = (await $.store.get('pet')) as Partial<Stored> | undefined
     if (saved?.name) {
-      // Older buddies keep their name and species: a pre-seed one names its species, a
-      // SHA-256 one is re-read the old way; either way find a keccak seed that hatches it.
-      let seed = saved.seed
-      if (!seed || saved.v !== 2) {
-        const species = seed ? await legacySpecies(seed) : saved.species ?? ''
-        seed = seedFor(SPECIES.includes(species) ? species : pick(SPECIES))
-      }
-      const soul: Stored = { seed, name: saved.name, personality: saved.personality ?? 'quietly judges your variable names', v: 2 }
+      // A buddy from before seeds keeps its name and gets one.
+      const seed = saved.seed ?? newSeed()
+      const soul: Stored = { seed, name: saved.name, personality: saved.personality ?? 'quietly judges your variable names' }
       if (seed !== saved.seed) await $.store.set('pet', soul)
       // Bones win over anything stored, as the original's `{ ...stored, ...bones }` did.
       const mine: Pet = { ...soul, ...bones(seed) }
@@ -123,7 +118,7 @@ export const register: Register = on => {
     const mine = await read($, pet)
     if (!mine || arg === 'hatch') {
       const fresh = await hatch($)
-      return { text: `A ${fresh.rarity} ${fresh.species} hatched: ${fresh.name}!\n\n${card(fresh)}` }
+      return { text: `A ${fresh.rarity} punk hatched: ${fresh.name}!\n\n${card(fresh)}` }
     }
     if (arg === 'off' || arg === 'on') {
       await update($, isHidden, () => arg === 'off')
@@ -150,7 +145,7 @@ export const register: Register = on => {
     const mine = await read($, pet)
     if (!mine || (await read($, isHidden))) return result
     const text =
-      `A small ${mine.species} named ${mine.name} sits beside the user's input box and occasionally comments in a speech bubble. ` +
+      `A small ASCII punk named ${mine.name} sits beside the user's input box and occasionally comments in a speech bubble. ` +
       `You are not ${mine.name}; it is a separate watcher with its own voice. When the user addresses ${mine.name} directly, ` +
       `its bubble answers. Keep your own reply to one short line then, or answer only the part meant for you. ` +
       `Don't explain that you aren't ${mine.name}, and never speak for it.`
@@ -197,7 +192,6 @@ export const register: Register = on => {
       tick: n,
       isPetting: now < petUntil,
       isHatching: now < hatchUntil,
-      isWorking: e.props.isWorking,
     })
 
     // The sprite, plus its name under it, or the one-line face when that won't fit.
