@@ -206,38 +206,39 @@ export const register: Register = on => {
       isHatching: now < hatchUntil,
     })
 
-    // The sprite, plus its name under it, or the one-line face when that won't fit.
-    if (e.props.maxRows < lines.length + 1 || e.props.bodyColumns < 40) {
+    // One row in the flow: the name, the bubble, and on a short screen the one-line face.
+    // In fullscreen the punk and its bubble are absolute, painted over the transcript's
+    // bottom-right corner above that row, so they push nothing up. On the main screen an
+    // absolute box is clipped to the band, so the punk stays one line there.
+    const isOverlay = e.viewport?.isFullscreen === true && (e.viewport.rows ?? 0) >= lines.length + 8 && e.props.bodyColumns >= 40
+    if (!isOverlay) {
       return (
-        <Box>
+        <Box flexDirection="row" justifyContent="flex-end">
+          {bubble ? <Text wrap="truncate-end">“{bubble}” </Text> : null}
           <Text color={tint}>{face(mine)} </Text>
           <Text dimColor>{mine.name}</Text>
-          {bubble ? <Text> “{bubble}”</Text> : null}
         </Box>
       )
     }
 
     const width = Math.max(12, Math.min(36, e.props.bodyColumns - 20))
-
     return (
-      <Box flexDirection="row" justifyContent="flex-end" alignItems="flex-end">
-        {bubble ? (
-          <Box key="bubble" flexDirection="column" borderStyle="round" borderDimColor paddingX={1} marginRight={1}>
-            {wrap(bubble, width).map((l, i) => (
-              <Text key={`b${i}`}>{l}</Text>
-            ))}
-          </Box>
-        ) : null}
-        <Box key="pet" flexDirection="column" width={12}>
+      <Box flexDirection="row" justifyContent="flex-end">
+        <Text dimColor>{mine.name.slice(0, 12).padStart(6 + Math.ceil(mine.name.length / 2)).padEnd(12)}</Text>
+        <Box key="pet" position="absolute" right={0} bottom={1} flexDirection="column" width={12}>
           {lines.map((l, i) => (
             <Text key={`s${i}`} color={tint}>
               {l}
             </Text>
           ))}
-          <Text key="name" dimColor>
-            {mine.name.slice(0, 12).padStart(6 + Math.ceil(mine.name.length / 2))}
-          </Text>
         </Box>
+        {bubble ? (
+          <Box key="bubble" position="absolute" right={13} bottom={1} flexDirection="column" borderStyle="round" borderDimColor paddingX={1}>
+            {wrap(bubble, width).map((l, i) => (
+              <Text key={`b${i}`}>{l}</Text>
+            ))}
+          </Box>
+        ) : null}
       </Box>
     )
   })

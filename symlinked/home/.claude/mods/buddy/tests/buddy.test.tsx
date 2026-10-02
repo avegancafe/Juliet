@@ -65,11 +65,19 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
 
+  const FULLSCREEN = { columns: 120, rows: 40, isFullscreen: true }
   for (const surface of ['terminal', 'desktop'] as const) {
-    const ui = await $.ui.mount({ plugin: 'buddy', surface, ...BAND })
+    // Fullscreen: the whole punk, drawn absolute so it takes no rows of the band.
+    const ui = await $.ui.mount({ plugin: 'buddy', surface, ...BAND, viewport: FULLSCREEN })
     expect(await ui.find({ type: 'Text', text: /├┐/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Pip/ })).toBeDefined()
+    expect(await ui.find({ type: 'Box', position: 'absolute' } as never)).toBeDefined()
     await ui.unmount()
+    // Main screen: one row, the face and the name.
+    const flat = await $.ui.mount({ plugin: 'buddy', surface, ...BAND, viewport: { ...FULLSCREEN, isFullscreen: false } })
+    expect(await flat.find({ type: 'Text', text: /├┐/ })).toBeUndefined()
+    expect(await flat.find({ type: 'Text', text: /Pip/ })).toBeDefined()
+    await flat.unmount()
   }
 
   const shown = await $.command.run({ command: 'buddy', args: 'card' } as never)
