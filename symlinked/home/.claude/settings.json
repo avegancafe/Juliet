@@ -154,10 +154,8 @@
     "python-lsp@j2-claude-plugins": true,
     "typescript-lsp@j2-claude-plugins": true,
     "j2-eng@j2-claude-plugins": true,
-    "context7@claude-plugins-official": true,
     "beads@sttts-beads-skill": true,
     "kitchen-brigade@avegancafe-marketplace": true,
-    "avegancafe@avegancafe-marketplace": true,
     "superpowers@j2-claude-plugins": true,
     "codex@j2-claude-plugins": true,
     "dbt@j2-claude-plugins": true,
@@ -168,9 +166,10 @@
     "in-my-voice@j2-claude-plugins": true,
     "j2-sandbox@j2-claude-plugins": true,
     "typesafe@j2-claude-plugins": true,
-    "linear@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
-    "superpowers@superpowers-marketplace": true
+    "superpowers@superpowers-marketplace": true,
+    "diagram-design@j2-claude-plugins": true,
+    "beadwork@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
