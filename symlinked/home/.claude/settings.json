@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy"
+  },
   "permissions": {
     "allow": [
       "SendMessage",

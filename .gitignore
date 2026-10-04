@@ -8,6 +8,7 @@ fish_variables
 symlinked/config/crush/crush.json
 symlinked/home/.claude/*
 !symlinked/home/.claude/settings.json
+!symlinked/home/.claude/mods/
 
 .claude/*.local.json
 .claude/worktrees
