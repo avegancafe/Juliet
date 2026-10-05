@@ -244,7 +244,8 @@ export const register: Register = on => {
     const mine = await read($, pet)
     if (!mine) return next(e)
 
-    const { Box, Text } = $.ui.resolve(e)
+    const els = $.ui.resolve(e)
+    const { Box, Text } = els
     const n = await read($, tick)
     const now = await $.clock.now()
     const bubble = (await read($, isMuted)) ? null : await read($, says)
@@ -266,15 +267,34 @@ export const register: Register = on => {
             ))}
           </Box>
         ) : null}
-        {lines.map((l, i) => (
-          <Text key={`s${i}`} color={tint}>
-            {l}
-          </Text>
-        ))}
+        {e.surface !== 'terminal' && 'Svg' in els ? (
+          // Text draws in the app's proportional font off-terminal, which shears the punk's columns.
+          <els.Svg key="sprite" source={spriteSvg(lines, tint)} alt={`${mine.name}, a pixel punk`} />
+        ) : (
+          lines.map((l, i) => (
+            <Text key={`s${i}`} color={tint}>
+              {l}
+            </Text>
+          ))
+        )}
         <Text key="name" dimColor>
           {mine.name}
         </Text>
       </Box>
     )
   })
+}
+
+// The sprite as monospace SVG text, for surfaces whose Text is not drawn in a terminal cell grid.
+function spriteSvg(lines: string[], tint: string): string {
+  const size = 14
+  const lineHeight = Math.round(size * 1.2)
+  const cols = Math.max(1, ...lines.map(l => [...l].length))
+  const width = Math.ceil(cols * size * 0.6) + 2
+  const height = lines.length * lineHeight + 4
+  const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const rows = lines
+    .map((l, i) => `<text x="1" y="${(i + 1) * lineHeight}" xml:space="preserve">${esc(l)}</text>`)
+    .join('')
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="${size}" fill="${tint}" style="white-space:pre">${rows}</svg>`
 }

@@ -89,7 +89,9 @@ test('an old buddy migrates, draws, shows its card, and hides', async ($, on) =>
     expect(await band.find({ type: 'Text', text: /Pip/ })).toBeUndefined()
     await band.unmount()
     const pane = await $.ui.mount({ plugin: 'buddy', surface, ...PANE })
-    expect(await pane.find({ type: 'Text', text: /├┐/ })).toBeDefined()
+    // Off-terminal the punk is monospace SVG, since desktop Text is proportional.
+    if (surface === 'terminal') expect(await pane.find({ type: 'Text', text: /├┐/ })).toBeDefined()
+    else expect(String((await pane.find({ type: 'Svg' }))?.props.source)).toMatch(/├┐/)
     expect(await pane.find({ type: 'Text', text: /Pip/ })).toBeDefined()
     await pane.unmount()
   }
