@@ -221,3 +221,21 @@ test('a quip too long for the bubble goes back to the model once, with the measu
   const band = await $.ui.mount({ plugin: 'buddy', surface: 'terminal', ...BAND })
   expect(await band.find({ type: 'Text', text: /too long\. fine\./ })).toBeDefined()
 })
+
+test('the pane waits for /buddy instead of opening at session start', async ($, on) => {
+  mock.clock(on)
+  mock.store(on, { pet: { species: 'duck', name: 'Pip' } })
+  on('command.register', (_, e) => ({ value: { command: e.name } }))
+  on('model.complete', () => ({ value: { isAnswered: false, reason: 'empty-reply' } }) as never)
+  const opened: string[] = []
+  on('ui.open', (_, e) => {
+    opened.push(e.id)
+    return { value: { isPlaced: true } } as never
+  })
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+  expect(opened).toEqual([])
+
+  await $.command.run({ command: 'buddy', args: '' } as never)
+  expect(opened).toEqual(['buddy'])
+})

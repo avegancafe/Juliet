@@ -121,8 +121,7 @@ export const register: Register = on => {
     await update($, isHidden, () => hidden === true)
     await update($, isMuted, () => muted === true)
     await $.command.register({ name: 'buddy', description: 'Your terminal buddy: pet, card, mute, unmute, off, on, hatch' })
-    // Unasked, so the engine seats it only on a terminal 144+ columns wide; the band covers the rest.
-    void openPane($)
+    // No auto-open: the pane waits for `/buddy` or `/buddy on`; until then the band carries the face.
     $.clock.every(TICK_MS, async () => {
       await update($, tick, n => n + 1)
       if (bubbleUntil && (await $.clock.now()) > bubbleUntil) {
@@ -161,6 +160,7 @@ export const register: Register = on => {
       void chirp($, 'The developer just petted you.', true)
       return { text: `You pet ${mine.name}.` }
     }
+    await openPane($)
     return { text: card(mine) }
   })
 
