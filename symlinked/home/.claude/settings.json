@@ -225,6 +225,13 @@
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "askUserQuestionTimeout": "never",
+  "pluginConfigs": {
+    "j2-eng@j2-claude-plugins": {
+      "options": {
+        "openTicketsOnStart": true
+      }
+    }
+  },
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
