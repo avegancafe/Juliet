@@ -27,14 +27,16 @@ format = '$directory$git_branch$fill$context[  ](bg:#2f312c)$usage$model'
 # flush against the right edge, as the reference script's computed pad does.
 #
 # margin: Claude Code renders the status line inside its own chrome and truncates
-# content reaching the edge — the reference sets MARGIN=3 for the same reason.
+# content reaching the edge. The footer has a 2-column gutter on each side and
+# truncates with "…" past COLUMNS − 4 (measured on 2.1.293 at 77/100/140 columns),
+# so margin = 4 sits exactly flush right. The reference's MARGIN=3 clips a column.
 #
 # gap: the minimum columns $fill reserves when the line is MEASURED for fitting
 # (the reference's GAP=10). Emission expands the fill to absorb the slack, so
 # measuring it expanded would make every line exactly `usable` wide, the fit test
 # would always pass, and nothing would ever drop.
 [fit]
-margin = 3
+margin = 4
 gap = 10
 
 [directory]
