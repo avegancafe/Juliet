@@ -1,10 +1,6 @@
 {
-  "env": {
-    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy"
-  },
   "permissions": {
     "allow": [
-      "SendMessage",
       "Bash(git *)",
       "Bash(gh *)",
       "Bash(gcloud *)",
@@ -119,7 +115,8 @@
       "WebFetch(domain:stackoverflow.com)",
       "WebFetch(domain:npmjs.com)",
       "WebFetch(domain:pypi.org)",
-      "Skill(*)"
+      "Skill(*)",
+      "Task(*)"
     ],
     "deny": [],
     "ask": [],
@@ -129,7 +126,6 @@
       "/Users/jordanfrank/.config/Juliet/"
     ]
   },
-  "model": "default",
   "hooks": {
     "SessionStart": [
       {
@@ -146,38 +142,39 @@
   "worktree": {
     "baseRef": "fresh"
   },
-  "enableWorkflows": true,
   "statusLine": {
     "type": "command",
-    "command": "claude-statusline"
+    "command": "claude-statusline prompt"
   },
   "enabledPlugins": {
-    "avegancafe@avegancafe-marketplace": true,
-    "beads@sttts-beads-skill": true,
+    "avegancafe@avegancafe-marketplace": false,
+    "beads@sttts-beads-skill": false,
     "codex@j2-claude-plugins": true,
-    "context7@claude-plugins-official": true,
+    "context7@claude-plugins-official": false,
     "dbt@j2-claude-plugins": true,
-    "frontend-design@claude-plugins-official": true,
-    "in-my-voice@j2-claude-plugins": true,
-    "j2-eng@j2-claude-plugins": true,
+    "frontend-design@claude-plugins-official": false,
     "j2-presentations@j2-claude-plugins": true,
-    "j2-sandbox@j2-claude-plugins": true,
-    "kitchen-brigade@avegancafe-marketplace": true,
+    "kitchen-brigade@avegancafe-marketplace": false,
     "launchdarkly@j2-claude-plugins": true,
     "linear@claude-plugins-official": true,
     "mattpocock-skills@j2-claude-plugins": true,
-    "playwright@j2-claude-plugins": true,
     "python-lsp@j2-claude-plugins": true,
     "superpowers@j2-claude-plugins": true,
-    "typescript-lsp@j2-claude-plugins": true
+    "typescript-lsp@j2-claude-plugins": true,
+    "playwright@j2-claude-plugins": true,
+    "j2-sandbox@j2-claude-plugins": true,
+    "in-my-voice@j2-claude-plugins": false,
+    "j2-eng@j2-claude-plugins": true,
+    "typesafe@j2-claude-plugins": true,
+    "typesafe@typesafe-ai": true,
+    "diagram-design@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
       "source": {
         "source": "git",
         "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
-      },
-      "autoUpdate": true
+      }
     },
     "j2-claude-plugins": {
       "source": {
@@ -189,23 +186,25 @@
     "sttts-beads-skill": {
       "source": {
         "source": "github",
-        "repo": "obra/superpowers-marketplace"
+        "repo": "sttts/beads-skill"
+      }
+    },
+    "typesafe-ai": {
+      "source": {
+        "source": "github",
+        "repo": "typesafe-ai/skills"
       }
     }
   },
-  "outputStyle": "Concise",
   "alwaysThinkingEnabled": true,
   "effortLevel": "medium",
-  "promptSuggestionEnabled": false,
-  "awaySummaryEnabled": false,
-  "askUserQuestionTimeout": "never",
-  "pluginConfigs": {
-    "j2-eng@j2-claude-plugins": {
-      "options": {
-        "openTicketsOnStart": true
-      }
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "high"
     }
   },
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
@@ -213,11 +212,13 @@
   "verbose": true,
   "preferredNotifChannel": "auto",
   "autoCompactEnabled": true,
+  "teammateMode": "tmux",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": false,
   "skipAutoPermissionPrompt": true,
   "voiceEnabled": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
-  }
+  },
+  "model": "opus"
 }
