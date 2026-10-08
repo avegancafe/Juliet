@@ -158,7 +158,7 @@
     "context7@claude-plugins-official": true,
     "dbt@j2-claude-plugins": true,
     "frontend-design@claude-plugins-official": true,
-    "in-my-voice@j2-claude-plugins": true
+    "in-my-voice@j2-claude-plugins": true,
     "j2-eng@j2-claude-plugins": true,
     "j2-presentations@j2-claude-plugins": true,
     "j2-sandbox@j2-claude-plugins": true,
@@ -169,7 +169,7 @@
     "playwright@j2-claude-plugins": true,
     "python-lsp@j2-claude-plugins": true,
     "superpowers@j2-claude-plugins": true,
-    "typescript-lsp@j2-claude-plugins": true,
+    "typescript-lsp@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
