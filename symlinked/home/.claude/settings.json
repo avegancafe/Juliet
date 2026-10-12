@@ -102,9 +102,7 @@
       "mcp__notion__notion-get-comments",
       "mcp__notion__notion-get-teams",
       "mcp__notion__notion-get-users",
-      "mcp__context7__*",
       "mcp__claude_ai_Granola__*",
-      "mcp__plugin_context7_context7__*",
       "mcp__playwright__*",
       "Read(*)",
       "WebSearch",
@@ -169,8 +167,6 @@
     "in-my-voice@j2-claude-plugins": true,
     "j2-sandbox@j2-claude-plugins": true,
     "typesafe@j2-claude-plugins": true,
-    "playwright@claude-plugins-official": true,
-    "superpowers@superpowers-marketplace": true,
     "diagram-design@j2-claude-plugins": true,
     "beadwork@avegancafe-marketplace": true
   },
@@ -181,12 +177,6 @@
         "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
       },
       "autoUpdate": true
-    },
-    "Mixedbread-Grep": {
-      "source": {
-        "source": "github",
-        "repo": "mixedbread-ai/mgrep"
-      }
     },
     "j2-claude-plugins": {
       "source": {
@@ -199,12 +189,6 @@
       "source": {
         "source": "github",
         "repo": "sttts/beads-skill"
-      }
-    },
-    "superpowers-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "obra/superpowers-marketplace"
       }
     }
   },
