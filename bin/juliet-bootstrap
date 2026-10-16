@@ -846,6 +846,11 @@ reclaim-stow-casualties() {
   done
 }
 
+# OS litter that lands in symlinked/ when a folder is opened in Finder. It's
+# gitignored, but stow doesn't know that: a stray .DS_Store in symlinked/home
+# collides with the real ~/.DS_Store and aborts stowing the entire home tree.
+STOW_IGNORES=(--ignore='\.DS_Store')
+
 symlink-dotfiles() {
   substep "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
@@ -857,16 +862,16 @@ symlink-dotfiles() {
   # symlink would dirty this repo (see setup-opencode for the layering).
   mkdir -p ~/.config/opencode 2>/dev/null || true
   reclaim-stow-casualties
-  stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
+  stow "${STOW_IGNORES[@]}" --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
     || bootstrap_error "stow home failed — conflicts with existing real files (see above)." \
       "Resolve the conflicts, then re-run: juliet-bootstrap"
-  stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config \
+  stow "${STOW_IGNORES[@]}" --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config \
     || bootstrap_error "stow config failed — conflicts with existing real files (see above)." \
       "Resolve the conflicts, then re-run: juliet-bootstrap"
   # local-state only exists when something needs ~/.local/state files
   if [[ -d $HOME/.config/Juliet/symlinked/local-state ]]; then
     mkdir -p "$HOME/.local/state"
-    stow --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
+    stow "${STOW_IGNORES[@]}" --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
   fi
 }
 
