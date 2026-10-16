@@ -496,6 +496,21 @@ resolve-thrift-link-conflict() {
   fi
 }
 
+# The HEY desktop app used to be homebrew/cask's `hey`; Homebrew renamed it to
+# `hey-desktop`, but a machine that had it still answers to the bare token
+# `hey`. `brew bundle` matches the Brewfile's basecamp/tap/hey (the CLI) against
+# that record, prints "Using hey", and never installs the CLI — so setup-hey
+# later finds no `hey` binary. Drop the stale record so bundle installs the CLI.
+# Only when HEY.app is gone: a desktop app that's actually in use stays put.
+clear-stale-hey-desktop() {
+  brew list --cask hey-desktop &> /dev/null || return 0
+  command -v hey &> /dev/null && return 0 # CLI already present: nothing shadowed
+  [[ -d /Applications/HEY.app ]] && return 0
+  substep "Removing the stale hey-desktop cask record (it shadows the HEY CLI in brew bundle)..."
+  brew uninstall --cask hey-desktop \
+    || warn "Could not remove hey-desktop — the HEY CLI may not install. Run: brew uninstall --cask hey-desktop"
+}
+
 setup-brew() {
   ensure-brew
 
@@ -507,6 +522,7 @@ setup-brew() {
   prune-undeclared-taps
   clear-npm-codex-shadow
   resolve-thrift-link-conflict
+  clear-stale-hey-desktop
 
   rlog "Running brew bundle..."
   brew bundle --file ~/.config/Juliet/Brewfile \
@@ -2167,7 +2183,8 @@ setup-hey() {
   if [[ ! -x "$hey_bin" ]]; then
     warn "hey CLI not found — skipping the HEY agent skill."
     if is-macos; then
-      warn "Install it with: juliet-bootstrap --enable=packages"
+      warn "Install it with: brew install --cask basecamp/tap/hey"
+      warn "(If brew bundle printed \"Using hey\", a stale hey-desktop cask is shadowing it — brew uninstall --cask hey-desktop first.)"
     else
       warn "Install it with: juliet-bootstrap --enable=opencode"
     fi
