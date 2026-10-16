@@ -73,3 +73,6 @@
 
 sync:
     remote: "git+ssh://git@github.com/avegancafe/Juliet"
+export:
+    auto: true
+    interval: 5s
