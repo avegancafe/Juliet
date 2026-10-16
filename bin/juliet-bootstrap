@@ -12,6 +12,9 @@ ORIGINAL_ARGS=("$@")
 on-interrupt() {
   echo
   warn "Cancelled."
+  if [[ -n "${BREW_BUNDLE_LOG:-}" && -f "$BREW_BUNDLE_LOG" ]]; then
+    warn "brew bundle output so far: $BREW_BUNDLE_LOG"
+  fi
   exit 130
 }
 trap on-interrupt INT
@@ -524,10 +527,73 @@ setup-brew() {
   resolve-thrift-link-conflict
   clear-stale-hey-desktop
 
-  rlog "Running brew bundle..."
-  brew bundle --file ~/.config/Juliet/Brewfile \
-    || bootstrap_error "brew bundle reported failures — check the output above." \
+  run-brew-bundle
+}
+
+# Touch ID for sudo, via /etc/pam.d/sudo_local — the macOS-sanctioned hook that
+# survives OS updates (/etc/pam.d/sudo itself is reset by them). Lets the one
+# sudo prompt before brew bundle be a fingerprint instead of a password.
+setup-touchid-sudo() {
+  is-macos || return
+  local conf=/etc/pam.d/sudo_local
+  if grep -qE '^[[:space:]]*auth[[:space:]]+sufficient[[:space:]]+pam_tid\.so' "$conf" 2> /dev/null; then
+    skip "Touch ID for sudo already enabled"
+    return
+  fi
+  substep "Enabling Touch ID for sudo ($conf)..."
+  printf '%s\n' \
+    "# sudo_local: managed by juliet-bootstrap (setup-touchid-sudo)" \
+    "auth       sufficient     pam_tid.so" \
+    | sudo tee "$conf" > /dev/null \
+    || bootstrap_error "Failed to enable Touch ID for sudo" \
+      "Add 'auth sufficient pam_tid.so' to $conf manually"
+}
+
+# Set while brew bundle runs, so on-interrupt can point at the log.
+BREW_BUNDLE_LOG=""
+
+# brew bundle behind a spinner, its output captured to a temp log. sudo is
+# authenticated once up front (Touch ID) and kept alive in the background: the
+# pkg-installer casks (gpg-suite, karabiner-elements) sudo mid-run, and a
+# prompt hidden under the spinner would just hang.
+run-brew-bundle() {
+  local brewfile=~/.config/Juliet/Brewfile
+  if brew bundle check --file "$brewfile" &> /dev/null; then
+    skip "Brewfile already satisfied"
+    return
+  fi
+
+  setup-touchid-sudo
+  local keepalive=""
+  if sudo -v; then
+    # Refresh the sudo timestamp until brew bundle is done.
+    (while kill -0 $$ 2> /dev/null; do sudo -n true 2> /dev/null; sleep 30; done) &
+    keepalive=$!
+    disown "$keepalive" # no "Terminated" job notice when we kill it below
+  else
+    warn "sudo not authenticated — casks that need it may fail."
+  fi
+
+  BREW_BUNDLE_LOG="$(mktemp "${TMPDIR:-/tmp}/juliet-brew-bundle.XXXXXX")"
+  local rc=0
+  spin "Running brew bundle..." \
+    bash -c 'exec brew bundle --file "$1" > "$2" 2>&1 < /dev/null' _ "$brewfile" "$BREW_BUNDLE_LOG" \
+    || rc=$?
+  [[ -n "$keepalive" ]] && kill "$keepalive" 2> /dev/null
+
+  # gum spin swallows Ctrl-C itself (raw mode, so no SIGINT reaches our trap):
+  # it kills the command and exits 130. Treat that as cancelling bootstrap.
+  if [[ $rc -eq 130 ]]; then
+    on-interrupt
+  elif [[ $rc -eq 0 ]]; then
+    rm -f "$BREW_BUNDLE_LOG"
+  else
+    tail -n 20 "$BREW_BUNDLE_LOG" | sed 's/^/      /' >&2
+    bootstrap_error "brew bundle reported failures." \
+      "Full output: $BREW_BUNDLE_LOG" \
       "Then re-run: juliet-bootstrap --enable=packages"
+  fi
+  BREW_BUNDLE_LOG=""
 }
 
 setup-cargo() {
