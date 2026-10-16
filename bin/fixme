@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# fixme — hand this cmux pane's scrollback to a new Claude session (split right)
+# that looks for errors/issues and asks which ones to fix.
+#
+# Usage: fixme [--lines N] [note...]
+#   --lines N   capture the last N lines of scrollback (default 5000)
+#   note        free-text hint passed along to Claude, e.g. `fixme the brew step failed`
+set -euo pipefail
+
+lines=5000
+note=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --lines) lines="${2:?--lines needs a number}"; shift 2 ;;
+    --lines=*) lines="${1#*=}"; shift ;;
+    -h|--help) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    *) note+=("$1"); shift ;;
+  esac
+done
+
+if [[ -z "${CMUX_SURFACE_ID:-}" ]] || ! command -v cmux >/dev/null; then
+  echo "fixme: must be run inside a cmux terminal" >&2
+  exit 1
+fi
+
+dir="${TMPDIR:-/tmp}/fixme"
+mkdir -p "$dir"
+stamp="$(date +%Y%m%d-%H%M%S)"
+capture="$dir/$stamp-scrollback.txt"
+launcher="$dir/$stamp-launch.sh"
+
+cmux read-screen --surface "$CMUX_SURFACE_ID" --lines "$lines" >"$capture"
+
+prompt="Read the terminal session capture at $capture (the last $lines lines of scrollback from the pane I was just working in; my working directory was $PWD).
+
+Examine it for errors, warnings, failed steps, and inconsistencies (things that contradict each other or look silently wrong). Ignore the final \`fixme\` invocation itself. Investigate enough to explain each finding's likely cause.
+
+Then use the AskUserQuestion tool (multiSelect) to ask me which findings to fix - one option per finding, with a short description of the likely cause and fix.
+
+For the ones I pick:
+- If this directory has no .beads/ yet, ask me (AskUserQuestion) whether to run \`bd init\` or skip tracking.
+- File one bead per chosen issue (per my CLAUDE.md conventions), then fix them.
+You're in plan mode: present the beads-to-file and fixes as a plan for approval before doing either."
+
+if [[ ${#note[@]} -gt 0 ]]; then
+  prompt+="
+
+User note: ${note[*]}"
+fi
+
+printf -v q_pwd '%q' "$PWD"
+printf -v q_prompt '%q' "$prompt"
+cat >"$launcher" <<EOF
+#!/usr/bin/env bash
+cd $q_pwd
+exec claude --permission-mode plan $q_prompt
+EOF
+chmod +x "$launcher"
+
+cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "bash $launcher" >/dev/null
+echo "fixme: captured $(wc -l <"$capture" | tr -d ' ') lines → $capture"
