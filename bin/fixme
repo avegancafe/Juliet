@@ -27,7 +27,7 @@ dir="${TMPDIR:-/tmp}/fixme"
 mkdir -p "$dir"
 stamp="$(date +%Y%m%d-%H%M%S)"
 capture="$dir/$stamp-scrollback.txt"
-launcher="$dir/$stamp-launch.sh"
+prompt_file="$dir/$stamp-prompt.md"
 
 cmux read-screen --surface "$CMUX_SURFACE_ID" --lines "$lines" >"$capture"
 
@@ -48,14 +48,12 @@ if [[ ${#note[@]} -gt 0 ]]; then
 User note: ${note[*]}"
 fi
 
-printf -v q_pwd '%q' "$PWD"
-printf -v q_prompt '%q' "$prompt"
-cat >"$launcher" <<EOF
-#!/usr/bin/env bash
-cd $q_pwd
-exec claude --permission-mode plan $q_prompt
-EOF
-chmod +x "$launcher"
+printf '%s\n' "$prompt" >"$prompt_file"
 
-cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "bash $launcher" >/dev/null
+# --command is typed into the new pane's interactive shell (fish), so keep it
+# one line of plain single-quoted words that fish and POSIX shells parse alike.
+sq() { local esc="'\\''"; printf "'%s'" "${1//\'/$esc}"; }
+cmd="cd $(sq "$PWD") && claude --permission-mode plan $(sq "Read $prompt_file and follow the instructions in it.")"
+
+cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "$cmd" >/dev/null
 echo "fixme: captured $(wc -l <"$capture" | tr -d ' ') lines → $capture"
