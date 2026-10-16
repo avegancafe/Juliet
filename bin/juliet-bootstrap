@@ -238,7 +238,7 @@ update-juliet() {
     cd "$WORKDIR"
 
     if ! git diff --quiet; then
-      warn "Warning: There are unstaged changes in ~/.config/Juliet. Skipping updating Juliet."
+      skip "unstaged changes in ~/.config/Juliet"
       cd - > /dev/null
       return
     fi
@@ -252,7 +252,17 @@ update-juliet() {
       local old_hash=""
       [[ -f "$self" ]] && old_hash=$(sha256sum "$self" | cut -d' ' -f1)
 
-      git pull
+      local before pull_out
+      before=$(git rev-parse HEAD)
+      if ! pull_out=$(git pull 2>&1); then
+        _step_close
+        printf '%s\n' "$pull_out" | sed 's/^/      /' >&2
+        bootstrap_error "git pull failed in $WORKDIR"
+      elif [[ "$(git rev-parse HEAD)" == "$before" ]]; then
+        step_result "already up to date"
+      else
+        step_result "pulled $(git rev-list --count "$before..HEAD") commit(s)"
+      fi
 
       # If the pull changed this very script, the rest of this run would
       # execute against the stale, already-loaded copy in memory. Re-exec the
@@ -265,6 +275,7 @@ update-juliet() {
         new_hash=$(sha256sum "$self" | cut -d' ' -f1)
         if [[ "$new_hash" != "$old_hash" ]]; then
           substep "juliet-bootstrap was updated by the pull — re-executing the new version..."
+          _step_close
           cd - > /dev/null
           JULIET_BOOTSTRAP_REEXEC=1 exec "$self" "${ORIGINAL_ARGS[@]}"
         fi
@@ -1158,6 +1169,7 @@ setup-fish() {
 
   if [[ "$SHELL" != "$FISH_PATH" ]]; then
     substep "Setting fish to default shell..."
+    _step_close # chsh prompts for a password; keep it off the step line
     chsh -s "$FISH_PATH" "$(whoami)"
   else
     skip "fish is already the default shell — skipping"
