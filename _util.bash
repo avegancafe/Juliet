@@ -58,6 +58,7 @@ fatal() {
 # next thing printed through these helpers finishes it:
 #   - step_result "<text>"      appends that result ("... up to date")
 #   - skip "<why>"              appends "skipped (<why>)"
+#   - unchanged "<why>"         same, but silent if the line already finished
 #   - anything else             appends " done" if the function that opened
 #                               the step has returned (it finished silently),
 #                               or just a newline if that function is still
@@ -125,11 +126,26 @@ skip() {
   # Only finish the open line if it belongs to the function calling skip.
   if [[ -n "$_STEP_OPEN" && "${FUNCNAME[1]:-main}" == "$_STEP_FN" \
         && $(( ${#FUNCNAME[@]} - 1 )) -eq $_STEP_DEPTH ]]; then
-    printf ' %sskipped (%s)%s\n' "$(_tput dim)" "$why" "$RESET_CODE"
-    _STEP_OPEN=""
+    _step_skipped "$why"
   else
     _step_close
     printf "    %s%s%s\n" "$(_tput dim)" "$why" "$RESET_CODE"
+  fi
+}
+
+_step_skipped() {
+  printf ' %sskipped (%s)%s\n' "$(_tput dim)" "$1" "$RESET_CODE"
+  _STEP_OPEN=""
+}
+
+# Nothing needed doing: finish the caller's own open step as "skipped (<why>)".
+# A no-op when the line was already finished (child steps printed under it),
+# so it's safe at the end of a check-style function. Keep <why> to a few words.
+#   "done" means something changed; "skipped (why)" means nothing did.
+unchanged() {
+  if [[ -n "$_STEP_OPEN" && "${FUNCNAME[1]:-main}" == "$_STEP_FN" \
+        && $(( ${#FUNCNAME[@]} - 1 )) -eq $_STEP_DEPTH ]]; then
+    _step_skipped "$1"
   fi
 }
 

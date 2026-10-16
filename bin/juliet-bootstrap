@@ -228,7 +228,11 @@ is-macos() {
 setup-git() {
   substep "Setting up git..."
   mkdir -p ~/.config/local
-  [[ ! -f ~/.config/local/gitconfig ]] && cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
+  if [[ -f ~/.config/local/gitconfig ]]; then
+    unchanged "already configured"
+  else
+    cp ~/.config/Juliet/.gitconfig__local ~/.config/local/gitconfig
+  fi
 }
 
 update-juliet() {
@@ -409,6 +413,7 @@ ensure-bootstrap-deps() {
       sudo dnf install -y "$tool"
     done
   fi
+  unchanged "already installed"
 }
 
 # Homebrew 6.0 refuses to load formulae and casks from third-party taps until
@@ -625,6 +630,7 @@ setup-cargo() {
     spin "Upgrading rust (Homebrew)..." brew upgrade rust -y \
       || bootstrap_error "Failed to upgrade rust — run 'brew upgrade rust' manually."
   fi
+  unchanged "up to date"
 }
 
 # Every enabled COPR is consulted on every dnf transaction, so a copr that
@@ -955,17 +961,32 @@ symlink-dotfiles() {
   # symlink would dirty this repo (see setup-opencode for the layering).
   mkdir -p ~/.config/opencode 2>/dev/null || true
   reclaim-stow-casualties
-  stow "${STOW_IGNORES[@]}" --target=$HOME --dir=$HOME/.config/Juliet/symlinked home \
+  local links=0
+  stow-package home "$HOME" \
     || bootstrap_error "stow home failed — conflicts with existing real files (see above)." \
       "Resolve the conflicts, then re-run: juliet-bootstrap"
-  stow "${STOW_IGNORES[@]}" --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config \
+  stow-package config "$HOME/.config" \
     || bootstrap_error "stow config failed — conflicts with existing real files (see above)." \
       "Resolve the conflicts, then re-run: juliet-bootstrap"
   # local-state only exists when something needs ~/.local/state files
   if [[ -d $HOME/.config/Juliet/symlinked/local-state ]]; then
     mkdir -p "$HOME/.local/state"
-    stow "${STOW_IGNORES[@]}" --target=$HOME/.local/state --dir=$HOME/.config/Juliet/symlinked local-state
+    stow-package local-state "$HOME/.local/state"
   fi
+  (( links > 0 )) || unchanged "already linked"
+}
+
+# stow one package verbosely, adding the links it made to the caller's
+# `links` count. Output stays hidden unless stow fails (conflict details).
+stow-package() {
+  local out rc=0
+  out=$(stow -v "${STOW_IGNORES[@]}" --target="$2" --dir="$HOME/.config/Juliet/symlinked" "$1" 2>&1) || rc=$?
+  links=$(( links + $(grep -c '^LINK:' <<< "$out") ))
+  if (( rc != 0 )); then
+    _step_close
+    printf '%s\n' "$out" | sed 's/^/      /' >&2
+  fi
+  return $rc
 }
 
 # The key git is actually configured to sign with, rather than whichever
@@ -1045,7 +1066,7 @@ setup-ssh() {
     ssh_status=$(github-ssh-status)
     case "$ssh_status" in
       ok)
-        substep "GitHub SSH auth works and $(basename "$existing_signing_key") signs commits — leaving keys as they are."
+        unchanged "keys already work"
         sync-allowed-signers "$existing_signing_key.pub"
         return
         ;;
@@ -1067,6 +1088,7 @@ setup-ssh() {
   done
 
   local email="${SSH_EMAIL:-}"
+  [[ ${#missing[@]} -gt 0 ]] && _step_close # gum input / ssh-keygen prompt
   if [[ ${#missing[@]} -gt 0 && -z "$email" ]]; then
     email=$(gum input --prompt "What is your email for your ssh keys? " --placeholder "your_email@example.com")
     [[ $? -ne 0 || -z "$email" ]] && on-interrupt
@@ -1131,6 +1153,7 @@ setup-ssh() {
         "gh ssh-key add ~/.ssh/github_signing.pub --type signing"
     fi
   fi
+  unchanged "already set up"
 }
 
 setup-fzf() {
@@ -1139,6 +1162,7 @@ setup-fzf() {
     rlog "Installing fzf..."
     /opt/homebrew/opt/fzf/install
   fi
+  unchanged "already installed"
 }
 
 setup-tmux-plugins() {
@@ -1150,6 +1174,7 @@ setup-tmux-plugins() {
       || bootstrap_error "Failed to clone tpm" \
         "Retry manually: git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm"
   fi
+  unchanged "already installed"
 }
 
 setup-fish() {
@@ -1198,6 +1223,10 @@ setup-cyberduck() {
   fi
 
   substep "Configuring Cyberduck (ignore SSH agent, use per-bookmark key)..."
+  if [[ "$(defaults read ch.sudo.cyberduck ssh.authentication.agent.enable 2> /dev/null)" == "0" ]]; then
+    unchanged "already configured"
+    return
+  fi
   defaults write ch.sudo.cyberduck ssh.authentication.agent.enable -bool false
 }
 
@@ -1218,6 +1247,7 @@ setup-rust() {
     spin "Installing tabiew (cargo)..." cargo install tabiew \
       || bootstrap_error "Failed to install tabiew — run 'cargo install tabiew' manually."
   fi
+  unchanged "already installed"
 }
 
 setup-python() {
@@ -1241,6 +1271,7 @@ setup-python() {
     spin "Installing pipenv (pip)..." pip install --user pipenv \
       || bootstrap_error "Failed to install pipenv — run 'pip install --user pipenv' manually."
   fi
+  unchanged "already installed"
 }
 
 setup-node-tools() {
@@ -1256,6 +1287,7 @@ setup-node-tools() {
       fi
     done
   fi
+  unchanged "already installed"
 }
 
 setup-nodenv() {
@@ -1263,6 +1295,7 @@ setup-nodenv() {
   # official installer (clones nodenv + node-build into ~/.nodenv).
   substep "Checking nodenv..."
   if command -v nodenv &> /dev/null || [[ -d "$HOME/.nodenv/bin" ]]; then
+    unchanged "already installed"
     return
   fi
   spin "Installing nodenv..." sh -c 'curl -fsSL https://github.com/nodenv/nodenv-installer/raw/HEAD/bin/nodenv-installer | bash' \
@@ -1275,6 +1308,7 @@ setup-flyctl() {
   # env.fish puts on PATH). Run non-interactively it leaves shell rc files alone.
   substep "Checking flyctl..."
   if command -v flyctl &> /dev/null || [[ -x "$HOME/.fly/bin/flyctl" ]]; then
+    unchanged "already installed"
     return
   fi
   spin "Installing flyctl..." sh -c 'curl -fsSL https://fly.io/install.sh | sh -s -- --non-interactive' \
@@ -1326,6 +1360,7 @@ setup-sddm() {
   THEME_DEST="/usr/share/sddm/themes/juliet"
 
   if [[ ! -d "$THEME_SRC" ]]; then
+    unchanged "no theme in repo"
     return
   fi
 
@@ -1965,21 +2000,23 @@ setup-crash-purge() {
 
 setup-fonts() {
   substep "Installing fonts..."
-  local result="done"
+  local changed=0
   local dest="$(font-dir)/Juliet"
   mkdir -p "$dest"
 
   # 1. Vendored fonts (flattened into dest; fontconfig/CoreText recurse anyway)
   local vendored="$HOME/.config/Juliet/etc/fonts"
   if [[ -d "$vendored" ]]; then
-    find "$vendored" -type f \( -iname '*.ttf' -o -iname '*.otf' \) \
-      -exec cp -f {} "$dest/" \;
+    local font
+    while IFS= read -r -d '' font; do
+      cmp -s "$font" "$dest/$(basename "$font")" && continue
+      cp -f "$font" "$dest/" && changed=1
+    done < <(find "$vendored" -type f \( -iname '*.ttf' -o -iname '*.otf' \) -print0)
   fi
 
   # 2. Iosevka Nerd Font Mono (download + extract the four core Mono weights)
-  if [[ -f "$dest/IosevkaNerdFontMono-Regular.ttf" ]]; then
-    result="done (Iosevka Nerd Font Mono already present)"
-  else
+  if [[ ! -f "$dest/IosevkaNerdFontMono-Regular.ttf" ]]; then
+    changed=1
     local url="https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONTS_VERSION}/Iosevka.zip"
     local tmp
     tmp="$(mktemp -d)"
@@ -2001,10 +2038,10 @@ setup-fonts() {
 
   # 3. Refresh the font cache (macOS picks fonts up automatically and may not
   # ship fc-cache, so only run it when present).
-  if command -v fc-cache &> /dev/null; then
+  if (( changed )) && command -v fc-cache &> /dev/null; then
     fc-cache -f "$(font-dir)" > /dev/null 2>&1 || true
   fi
-  [[ -n "$_STEP_OPEN" ]] && step_result "$result"
+  (( changed )) || unchanged "already installed"
   return 0
 }
 
