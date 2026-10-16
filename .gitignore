@@ -5,6 +5,7 @@ symlinked/config/fish/config__local.fish
 Brewfile.lock.json
 fish_variables
 .crush
+.playwright-mcp/
 symlinked/config/crush/crush.json
 symlinked/home/.claude/*
 !symlinked/home/.claude/settings.json
