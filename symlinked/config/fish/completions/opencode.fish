@@ -8,11 +8,11 @@
 
 complete -c opencode -n '__fish_use_subcommand' -f
 complete -c opencode -n '__fish_use_subcommand' -f -a 'upgrade' -d 'Upgrade OpenCode to the latest or a specific version'
-complete -c opencode -n '__fish_use_subcommand' -f -a 'uninstall' -d 'Uninstall OpenCode and remove all related files'
+complete -c opencode -n '__fish_use_subcommand' -f -a 'uninstall' -d 'Uninstall OpenCode, keeping session data, configuration, and state'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'acp' -d 'Start an Agent Client Protocol server'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'api' -d 'Make a request to the running server'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'debug' -d 'Debugging and troubleshooting tools'
-complete -c opencode -n '__fish_use_subcommand' -f -a 'auth' -d 'manage AI providers and credentials'
+complete -c opencode -n '__fish_use_subcommand' -f -a 'auth' -d 'manage integrations and credentials'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'mcp' -d 'Manage MCP (Model Context Protocol) servers'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'plugin' -d 'Manage plugins'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'models' -d 'List all available models'
@@ -22,7 +22,7 @@ complete -c opencode -n '__fish_use_subcommand' -f -a 'run' -d 'Run OpenCode wit
 complete -c opencode -n '__fish_use_subcommand' -f -a 'session' -d 'Manage sessions'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'service' -d 'Manage the background server'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'reload' -d 'Reload configuration'
-complete -c opencode -n '__fish_use_subcommand' -f -a 'pair' -d 'Show server pairing information'
+complete -c opencode -n '__fish_use_subcommand' -f -a 'pair' -d 'Print one-time links to connect a browser or app'
 complete -c opencode -n '__fish_use_subcommand' -f -a 'serve' -d 'Start the v2 API and web server'
 complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
@@ -31,7 +31,7 @@ complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt auto
 complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt auto no-auto' -l no-auto -d 'Disable auto'
 complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt -s c continue no-continue' -l continue -s c -d 'Continue the last session'
 complete -c opencode -n '__fish_use_subcommand; and not __fish_contains_opt -s c continue no-continue' -l no-continue -d 'Disable continue'
-complete -c opencode -n '__fish_use_subcommand; and begin; not __fish_contains_opt -s s session; or contains -- (commandline -poc)[-1] --session -s; end' -l session -s s -d 'Session ID to continue' -r -f
+complete -c opencode -n '__fish_use_subcommand; and begin; not __fish_contains_opt -s s session; or contains -- (commandline -poc)[-1] --session -s; end' -l session -s s -d 'Session ID to continue, or to create if it does not exist' -r -f
 complete -c opencode -n '__fish_use_subcommand; and begin; not __fish_contains_opt prompt; or contains -- (commandline -poc)[-1] --prompt; end' -l prompt -d 'Prompt to use' -r -f
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--standalone' -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
@@ -40,29 +40,25 @@ complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" 
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt auto no-auto' -f -a '--no-auto' -d 'Disable auto'
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c continue no-continue' -f -a '--continue' -d 'Continue the last session'
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c continue no-continue' -f -a '--no-continue' -d 'Disable continue'
-complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue'
+complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue, or to create if it does not exist'
 complete -c opencode -n '__fish_use_subcommand; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt prompt' -f -a '--prompt' -d 'Prompt to use'
 complete -c opencode -n '__fish_seen_subcommand_from upgrade' -f
 complete -c opencode -n '__fish_seen_subcommand_from upgrade; and begin; not __fish_contains_opt -s m method; or contains -- (commandline -poc)[-1] --method -m; end' -l method -s m -d 'Installation method to use' -r -f -a 'curl npm pnpm bun yarn vp brew'
 complete -c opencode -n '__fish_seen_subcommand_from upgrade; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s m method' -f -a '--method' -d 'Installation method to use'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall' -f
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s c keep-config no-keep-config' -l keep-config -s c -d 'Keep configuration files'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s c keep-config no-keep-config' -l no-keep-config -d 'Disable keep-config'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s d keep-data no-keep-data' -l keep-data -s d -d 'Keep session data and snapshots'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s d keep-data no-keep-data' -l no-keep-data -d 'Disable keep-data'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt dry-run no-dry-run' -l dry-run -d 'Show what would be removed without removing'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt dry-run no-dry-run' -l no-dry-run -d 'Disable dry-run'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s f force no-force' -l force -s f -d 'Skip confirmation prompts'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not __fish_contains_opt -s f force no-force' -l no-force -d 'Disable force'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c keep-config no-keep-config' -f -a '--keep-config' -d 'Keep configuration files'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c keep-config no-keep-config' -f -a '--no-keep-config' -d 'Disable keep-config'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s d keep-data no-keep-data' -f -a '--keep-data' -d 'Keep session data and snapshots'
-complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s d keep-data no-keep-data' -f -a '--no-keep-data' -d 'Disable keep-data'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt dry-run no-dry-run' -f -a '--dry-run' -d 'Show what would be removed without removing'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt dry-run no-dry-run' -f -a '--no-dry-run' -d 'Disable dry-run'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s f force no-force' -f -a '--force' -d 'Skip confirmation prompts'
 complete -c opencode -n '__fish_seen_subcommand_from uninstall; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s f force no-force' -f -a '--no-force' -d 'Disable force'
 complete -c opencode -n '__fish_seen_subcommand_from acp' -f
+complete -c opencode -n '__fish_seen_subcommand_from acp; and not __fish_contains_opt login no-login' -l login -d 'Run auth login instead of starting the server'
+complete -c opencode -n '__fish_seen_subcommand_from acp; and not __fish_contains_opt login no-login' -l no-login -d 'Disable login'
+complete -c opencode -n '__fish_seen_subcommand_from acp; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt login no-login' -f -a '--login' -d 'Run auth login instead of starting the server'
+complete -c opencode -n '__fish_seen_subcommand_from acp; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt login no-login' -f -a '--no-login' -d 'Disable login'
 complete -c opencode -n '__fish_seen_subcommand_from api' -f
 complete -c opencode -n '__fish_seen_subcommand_from api; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from api; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
@@ -84,11 +80,13 @@ complete -c opencode -n '__fish_seen_subcommand_from debug; and __fish_seen_subc
 complete -c opencode -n '__fish_seen_subcommand_from debug; and __fish_seen_subcommand_from config' -f
 complete -c opencode -n '__fish_seen_subcommand_from debug; and __fish_seen_subcommand_from paths' -f
 complete -c opencode -n '__fish_seen_subcommand_from debug; and __fish_seen_subcommand_from paths' -r -f -a 'db home data config cache state tmp bin log repos' -d 'Print only one path: db, home, data, config, cache, state, tmp, bin, log, repos'
-complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout switch' -f
-complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout switch' -f -a 'list' -d 'list providers and credentials'
-complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout switch' -f -a 'login' -d 'log in to a provider'
-complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout switch' -f -a 'logout' -d 'log out of a saved account'
-complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout switch' -f -a 'switch' -d 'switch the active account for an integration'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f -a 'list' -d 'list integrations and credentials'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f -a 'login' -d 'connect an integration'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f -a 'logout' -d 'log out of a saved account'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f -a 'export' -d 'print stored credentials, including secrets, as JSON'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f -a 'import' -d 'import credentials exported by auth export'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and not __fish_seen_subcommand_from list login logout export import switch' -f -a 'switch' -d 'switch the active account for an integration'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from list' -f
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from list; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from list; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
@@ -116,6 +114,20 @@ complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subco
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from logout; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--standalone' -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from logout; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from logout; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export' -f
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export; and begin; not __fish_contains_opt server; or contains -- (commandline -poc)[-1] --server; end' -l server -d 'Connect to a server URL instead of the background service' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--standalone' -d 'Run with a private server instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from export; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import' -f
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import; and begin; not __fish_contains_opt server; or contains -- (commandline -poc)[-1] --server; end' -l server -d 'Connect to a server URL instead of the background service' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--standalone' -d 'Run with a private server instead of the background service'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
+complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from import; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from switch' -f
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from switch; and not __fish_contains_opt standalone no-standalone' -l standalone -d 'Run with a private server instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from auth; and __fish_seen_subcommand_from switch; and not __fish_contains_opt standalone no-standalone' -l no-standalone -d 'Disable standalone'
@@ -209,7 +221,7 @@ complete -c opencode -n '__fish_seen_subcommand_from mini; and not __fish_contai
 complete -c opencode -n '__fish_seen_subcommand_from mini; and begin; not __fish_contains_opt server; or contains -- (commandline -poc)[-1] --server; end' -l server -d 'Connect to a server URL instead of the background service' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not __fish_contains_opt -s c continue no-continue' -l continue -s c -d 'Continue the last session'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not __fish_contains_opt -s c continue no-continue' -l no-continue -d 'Disable continue'
-complete -c opencode -n '__fish_seen_subcommand_from mini; and begin; not __fish_contains_opt -s s session; or contains -- (commandline -poc)[-1] --session -s; end' -l session -s s -d 'Session ID to continue' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from mini; and begin; not __fish_contains_opt -s s session; or contains -- (commandline -poc)[-1] --session -s; end' -l session -s s -d 'Session ID to continue, or to create if it does not exist' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not __fish_contains_opt fork no-fork' -l fork -d 'Fork the session when continuing'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not __fish_contains_opt fork no-fork' -l no-fork -d 'Disable fork'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not __fish_contains_opt replay no-replay' -l replay -d 'Restore session history on resume and resize (disable with --no-replay)'
@@ -223,7 +235,7 @@ complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match 
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c continue no-continue' -f -a '--continue' -d 'Continue the last session'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c continue no-continue' -f -a '--no-continue' -d 'Disable continue'
-complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue'
+complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue, or to create if it does not exist'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt fork no-fork' -f -a '--fork' -d 'Fork the session when continuing'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt fork no-fork' -f -a '--no-fork' -d 'Disable fork'
 complete -c opencode -n '__fish_seen_subcommand_from mini; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt replay no-replay' -f -a '--replay' -d 'Restore session history on resume and resize (disable with --no-replay)'
@@ -238,7 +250,7 @@ complete -c opencode -n '__fish_seen_subcommand_from run; and not __fish_contain
 complete -c opencode -n '__fish_seen_subcommand_from run; and begin; not __fish_contains_opt server; or contains -- (commandline -poc)[-1] --server; end' -l server -d 'Connect to a server URL instead of the background service' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from run; and not __fish_contains_opt -s c continue no-continue' -l continue -s c -d 'Continue the last session'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not __fish_contains_opt -s c continue no-continue' -l no-continue -d 'Disable continue'
-complete -c opencode -n '__fish_seen_subcommand_from run; and begin; not __fish_contains_opt -s s session; or contains -- (commandline -poc)[-1] --session -s; end' -l session -s s -d 'Session ID to continue' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from run; and begin; not __fish_contains_opt -s s session; or contains -- (commandline -poc)[-1] --session -s; end' -l session -s s -d 'Session ID to continue, or to create if it does not exist' -r -f
 complete -c opencode -n '__fish_seen_subcommand_from run; and not __fish_contains_opt fork no-fork' -l fork -d 'Fork the session before continuing'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not __fish_contains_opt fork no-fork' -l no-fork -d 'Disable fork'
 complete -c opencode -n '__fish_seen_subcommand_from run; and begin; not __fish_contains_opt -s m model; or contains -- (commandline -poc)[-1] --model -m; end' -l model -s m -d 'Model to use in the format provider/model#variant' -r -f
@@ -255,7 +267,7 @@ complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -
 complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c continue no-continue' -f -a '--continue' -d 'Continue the last session'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s c continue no-continue' -f -a '--no-continue' -d 'Disable continue'
-complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue'
+complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s s session' -f -a '--session' -d 'Session ID to continue, or to create if it does not exist'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt fork no-fork' -f -a '--fork' -d 'Fork the session before continuing'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt fork no-fork' -f -a '--no-fork' -d 'Disable fork'
 complete -c opencode -n '__fish_seen_subcommand_from run; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt -s m model' -f -a '--model' -d 'Model to use in the format provider/model#variant'
@@ -333,8 +345,12 @@ complete -c opencode -n '__fish_seen_subcommand_from reload; and not string matc
 complete -c opencode -n '__fish_seen_subcommand_from reload; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt standalone no-standalone' -f -a '--no-standalone' -d 'Disable standalone'
 complete -c opencode -n '__fish_seen_subcommand_from reload; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt server' -f -a '--server' -d 'Connect to a server URL instead of the background service'
 complete -c opencode -n '__fish_seen_subcommand_from pair' -f
-complete -c opencode -n '__fish_seen_subcommand_from pair; and begin; not __fish_contains_opt url; or contains -- (commandline -poc)[-1] --url; end' -l url -d 'Advertise an external HTTP(S) server URL in the pairing QR code' -r -f
-complete -c opencode -n '__fish_seen_subcommand_from pair; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt url' -f -a '--url' -d 'Advertise an external HTTP(S) server URL in the pairing QR code'
+complete -c opencode -n '__fish_seen_subcommand_from pair; and begin; not __fish_contains_opt url; or contains -- (commandline -poc)[-1] --url; end' -l url -d 'Use an external HTTP(S) server URL in pairing links' -r -f
+complete -c opencode -n '__fish_seen_subcommand_from pair; and not __fish_contains_opt remote no-remote' -l remote -d 'Pair through the OpenTunnel remote address, enabling remote access if needed'
+complete -c opencode -n '__fish_seen_subcommand_from pair; and not __fish_contains_opt remote no-remote' -l no-remote -d 'Disable remote'
+complete -c opencode -n '__fish_seen_subcommand_from pair; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt url' -f -a '--url' -d 'Use an external HTTP(S) server URL in pairing links'
+complete -c opencode -n '__fish_seen_subcommand_from pair; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt remote no-remote' -f -a '--remote' -d 'Pair through the OpenTunnel remote address, enabling remote access if needed'
+complete -c opencode -n '__fish_seen_subcommand_from pair; and not string match -q -- "-*" (commandline -ct); and not __fish_contains_opt remote no-remote' -f -a '--no-remote' -d 'Disable remote'
 complete -c opencode -n '__fish_seen_subcommand_from serve' -f
 complete -c opencode -n '__fish_seen_subcommand_from serve; and begin; not __fish_contains_opt hostname; or contains -- (commandline -poc)[-1] --hostname; end' -l hostname -r -f
 complete -c opencode -n '__fish_seen_subcommand_from serve; and begin; not __fish_contains_opt port; or contains -- (commandline -poc)[-1] --port; end' -l port -r -f
