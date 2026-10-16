@@ -1170,6 +1170,19 @@ setup-nodenv() {
     || bootstrap_error "Failed to install nodenv — see https://github.com/nodenv/nodenv-installer."
 }
 
+setup-flyctl() {
+  # macOS gets flyctl from the Brewfile; Fedora has no dnf package, so use
+  # Fly's official installer (binary + `fly` symlink in ~/.fly/bin, which
+  # env.fish puts on PATH). Run non-interactively it leaves shell rc files alone.
+  substep "Checking flyctl..."
+  if command -v flyctl &> /dev/null || [[ -x "$HOME/.fly/bin/flyctl" ]]; then
+    return
+  fi
+  spin "Installing flyctl..." sh -c 'curl -fsSL https://fly.io/install.sh | sh -s -- --non-interactive' \
+    || bootstrap_error "Failed to install flyctl" \
+      "Retry manually: curl -fsSL https://fly.io/install.sh | sh"
+}
+
 setup-sddm() {
   if ! is-fedora; then
     return
@@ -2202,13 +2215,14 @@ run-fonts() {
 }
 
 run-dev() {
-  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint)" || return
+  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint, flyctl)" || return
   rlog "🛠️ Installing dev tools..."
   setup-cargo
   setup-rust
   setup-python
   setup-nodenv
   setup-node-tools
+  setup-flyctl
 }
 
 run-shell() {
