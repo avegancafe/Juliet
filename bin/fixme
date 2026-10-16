@@ -57,28 +57,5 @@ exec claude --permission-mode plan $q_prompt
 EOF
 chmod +x "$launcher"
 
-# Don't use `new-split --command`: cmux types it into the new pane before fish
-# has started, and fish drops that typeahead, so it never runs. Instead open a
-# plain split, wait for its shell prompt to settle, then send the command.
-split_out="$(cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true)"
-new_surface="$(grep -oE 'surface:[0-9]+' <<<"$split_out" | head -1)"
-if [[ -z "$new_surface" ]]; then
-  echo "fixme: couldn't get the new split's surface from: $split_out" >&2
-  exit 1
-fi
-
-# Ready = screen non-empty and unchanged for ~0.6s (timeout ~10s).
-prev="" stable=0
-for _ in $(seq 1 50); do
-  sleep 0.2
-  cur="$(cmux read-screen --surface "$new_surface" --lines 5 2>/dev/null || true)"
-  if [[ -n "${cur//[[:space:]]/}" && "$cur" == "$prev" ]]; then
-    (( ++stable >= 3 )) && break
-  else
-    stable=0
-  fi
-  prev="$cur"
-done
-
-cmux send --surface "$new_surface" "bash $launcher\n" >/dev/null
+cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "bash $launcher" >/dev/null
 echo "fixme: captured $(wc -l <"$capture" | tr -d ' ') lines → $capture"
