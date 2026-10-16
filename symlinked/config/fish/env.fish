@@ -11,6 +11,7 @@ set -gx PATH "$HOME/.local/bin" $PATH
 set -gx PATH "$GOPATH/bin" $PATH
 set -gx PATH "$HOME/.cargo/bin" $PATH
 set -gx PATH $PATH "$HOME/.foundry/bin"
+set -gx PATH $PATH "$HOME/.fly/bin"
 set -gx PATH "/opt/homebrew/opt/go@1.20/bin" $PATH
 set -gx PATH (npm config get prefix)/bin $PATH
 set -gx PATH "$HOME/.config/Juliet/bin" $PATH
