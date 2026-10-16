@@ -1172,7 +1172,7 @@ setup-fish() {
     _step_close # chsh prompts for a password; keep it off the step line
     chsh -s "$FISH_PATH" "$(whoami)"
   else
-    skip "fish is already the default shell — skipping"
+    skip "already the default shell"
   fi
 }
 
@@ -1965,6 +1965,7 @@ setup-crash-purge() {
 
 setup-fonts() {
   substep "Installing fonts..."
+  local result="done"
   local dest="$(font-dir)/Juliet"
   mkdir -p "$dest"
 
@@ -1977,7 +1978,7 @@ setup-fonts() {
 
   # 2. Iosevka Nerd Font Mono (download + extract the four core Mono weights)
   if [[ -f "$dest/IosevkaNerdFontMono-Regular.ttf" ]]; then
-    skip "Iosevka Nerd Font Mono already installed — skipping download"
+    result="done (Iosevka Nerd Font Mono already present)"
   else
     local url="https://github.com/ryanoasis/nerd-fonts/releases/download/${NERD_FONTS_VERSION}/Iosevka.zip"
     local tmp
@@ -2003,6 +2004,8 @@ setup-fonts() {
   if command -v fc-cache &> /dev/null; then
     fc-cache -f "$(font-dir)" > /dev/null 2>&1 || true
   fi
+  [[ -n "$_STEP_OPEN" ]] && step_result "$result"
+  return 0
 }
 
 # claude-statusline renders the Claude Code status line (the `statusLine` block
@@ -2072,7 +2075,7 @@ setup-claude-code() {
     rlog "Installing Claude CLI..."
     curl -fsSL https://claude.ai/install.sh | bash
   else
-    skip "Claude CLI already installed — skipping"
+    skip "Claude CLI already installed"
   fi
 
   # Configure git to authenticate GitHub over HTTPS via the gh CLI. Claude Code
@@ -2168,7 +2171,7 @@ setup-opencode() {
     rlog "Installing opencode CLI..."
     curl -fsSL https://opencode.ai/install | bash
   else
-    skip "opencode already installed — skipping"
+    skip "opencode already installed"
   fi
 
   # Config layering (Juliet does NOT stow opencode.json or tui.json):

@@ -57,7 +57,7 @@ fatal() {
 # A substep ending in "..." is printed WITHOUT a newline and left open. The
 # next thing printed through these helpers finishes it:
 #   - step_result "<text>"      appends that result ("... up to date")
-#   - skip "<why>"              appends "skipped — <why>"
+#   - skip "<why>"              appends "skipped (<why>)"
 #   - anything else             appends " done" if the function that opened
 #                               the step has returned (it finished silently),
 #                               or just a newline if that function is still
@@ -118,15 +118,14 @@ substep() {
 }
 
 # A step skipped because it was already satisfied. Under an open step it
-# finishes that line ("Setting up fish... skipped — fish is already the
-# default shell"); on its own it's a dim indented line.
+# finishes that line ("Setting up fish... skipped (already the default
+# shell)"); on its own it's a dim indented line.
 skip() {
   local why="$1"
-  why="${why% — skipping}"; why="${why% - skipping}"
   # Only finish the open line if it belongs to the function calling skip.
   if [[ -n "$_STEP_OPEN" && "${FUNCNAME[1]:-main}" == "$_STEP_FN" \
         && $(( ${#FUNCNAME[@]} - 1 )) -eq $_STEP_DEPTH ]]; then
-    printf ' %sskipped — %s%s\n' "$(_tput dim)" "$why" "$RESET_CODE"
+    printf ' %sskipped (%s)%s\n' "$(_tput dim)" "$why" "$RESET_CODE"
     _STEP_OPEN=""
   else
     _step_close
