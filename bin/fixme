@@ -40,6 +40,7 @@ Then use the AskUserQuestion tool (multiSelect) to ask me which findings to fix 
 For the ones I pick:
 - If this directory has no .beads/ yet, ask me (AskUserQuestion) whether to run \`bd init\` or skip tracking.
 - File one bead per chosen issue (per my CLAUDE.md conventions), then fix them.
+- When the selected fixes are done, commit them (focused messages referencing the beads) and push.
 You're in plan mode: present the beads-to-file and fixes as a plan for approval before doing either."
 
 if [[ ${#note[@]} -gt 0 ]]; then
