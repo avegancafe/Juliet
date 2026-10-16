@@ -53,7 +53,7 @@ bootstrap_error() {
 
 print-bootstrap-summary() {
   if [[ ${#BOOTSTRAP_ERRORS[@]} -eq 0 ]]; then
-    log "✅ Done!"
+    log "🎉 Done!"
     return 0
   fi
   echo
@@ -263,9 +263,9 @@ update-juliet() {
         printf '%s\n' "$pull_out" | sed 's/^/      /' >&2
         bootstrap_error "git pull failed in $WORKDIR"
       elif [[ "$(git rev-parse HEAD)" == "$before" ]]; then
-        step_result "already up to date"
+        unchanged "already up to date"
       else
-        step_result "pulled $(git rev-list --count "$before..HEAD") commit(s)"
+        step_done "pulled $(git rev-list --count "$before..HEAD") commit(s)"
       fi
 
       # If the pull changed this very script, the rest of this run would
@@ -398,7 +398,7 @@ prune-undeclared-taps() {
 # The full package steps run later and are idempotent, so this early install is
 # just to satisfy the ordering dependency.
 ensure-bootstrap-deps() {
-  substep "Checking bootstrap prerequisites (stow, gum)..."
+  substep "Checking stow and gum..."
   if is-macos; then
     ensure-brew
     for tool in stow gum; do
@@ -552,11 +552,11 @@ setup-brew() {
 setup-touchid-sudo() {
   is-macos || return
   local conf=/etc/pam.d/sudo_local
+  substep "Enabling Touch ID for sudo..."
   if grep -qE '^[[:space:]]*auth[[:space:]]+sufficient[[:space:]]+pam_tid\.so' "$conf" 2> /dev/null; then
-    skip "Touch ID for sudo already enabled"
+    unchanged "already enabled"
     return
   fi
-  substep "Enabling Touch ID for sudo ($conf)..."
   printf '%s\n' \
     "# sudo_local: managed by juliet-bootstrap (setup-touchid-sudo)" \
     "auth       sufficient     pam_tid.so" \
@@ -597,8 +597,8 @@ run-brew-bundle() {
     || rc=$?
   [[ -n "$keepalive" ]] && kill "$keepalive" 2> /dev/null
 
-  # gum spin swallows Ctrl-C itself (raw mode, so no SIGINT reaches our trap):
-  # it kills the command and exits 130. Treat that as cancelling bootstrap.
+  # Ctrl-C normally reaches on-interrupt (which prints the log path) via the
+  # INT trap; 130 here covers the command exiting from SIGINT on its own.
   if [[ $rc -eq 130 ]]; then
     on-interrupt
   elif [[ $rc -eq 0 ]]; then
@@ -1168,7 +1168,7 @@ setup-fzf() {
 setup-tmux-plugins() {
   # tpm (tmux plugin manager) bootstraps the plugins declared in the tracked
   # .tmux.conf; nothing installs it besides this clone.
-  substep "Checking tpm (tmux plugin manager)..."
+  substep "Checking tpm..."
   if [[ ! -d "$HOME/.tmux/plugins/tpm" ]]; then
     spin "Installing tpm..." git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm" \
       || bootstrap_error "Failed to clone tpm" \
@@ -1222,7 +1222,7 @@ setup-cyberduck() {
     return
   fi
 
-  substep "Configuring Cyberduck (ignore SSH agent, use per-bookmark key)..."
+  substep "Configuring Cyberduck SSH keys..."
   if [[ "$(defaults read ch.sudo.cyberduck ssh.authentication.agent.enable 2> /dev/null)" == "0" ]]; then
     unchanged "already configured"
     return
@@ -1231,7 +1231,7 @@ setup-cyberduck() {
 }
 
 setup-rust() {
-  substep "Checking Rust tools (stylua, silicon, tabiew)..."
+  substep "Checking Rust tools..."
   if ! command -v stylua &> /dev/null; then
     spin "Installing stylua (cargo)..." cargo install stylua \
       || bootstrap_error "Failed to install stylua — run 'cargo install stylua' manually."
@@ -1251,7 +1251,7 @@ setup-rust() {
 }
 
 setup-python() {
-  substep "Checking Python tools (poetry, sqlfluff, pipenv)..."
+  substep "Checking Python tools..."
   if ! command -v poetry &> /dev/null; then
     spin "Installing poetry..." sh -c 'curl -sSL https://install.python-poetry.org | python3 -' \
       || bootstrap_error "Failed to install poetry" \
@@ -1275,7 +1275,7 @@ setup-python() {
 }
 
 setup-node-tools() {
-  substep "Checking Node tools (prettier, eslint)..."
+  substep "Checking Node tools..."
   # prettier/eslint (neoformat/nvim-lint) have no Fedora dnf packages; macOS
   # gets them from the Brewfile
   if is-fedora; then

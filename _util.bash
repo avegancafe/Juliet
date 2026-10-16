@@ -50,26 +50,76 @@ fatal() {
 }
 
 # ---------------------------------------------------------------------------
-# Step lines that finish in place
+# Step lines
 #
-#   substep "Checking cargo..."   →   "    Checking cargo... done"
+#   substep "Checking cargo..."   →   "  ⣷ Checking cargo..."  (animated)
+#                                 →   "  ✓ Checking cargo"             done
+#                                 →   "  → Checking cargo (up to date)" skipped
+#                                 →   "  ✗ Checking cargo"             failed
 #
-# A substep ending in "..." is printed WITHOUT a newline and left open. The
-# next thing printed through these helpers finishes it:
-#   - step_result "<text>"      appends that result ("... up to date")
-#   - skip "<why>"              appends "skipped (<why>)"
-#   - unchanged "<why>"         same, but silent if the line already finished
-#   - anything else             appends " done" if the function that opened
-#                               the step has returned (it finished silently),
-#                               or just a newline if that function is still
-#                               running (its child steps follow underneath).
-# No cursor movement is involved, so this is safe when output isn't a TTY.
-# Raw output from a command run under an open step lands on the same line —
-# capture it, or call step_result/_step_close first.
+# "done" means something changed; "skipped (why)" means nothing did.
+#
+# A substep ending in "..." opens a step: a spinner runs on its line (TTY only)
+# while the calling function works. The next thing printed through these
+# helpers finishes it:
+#   - unchanged "<why>"   skipped (no-op if the line was already finished,
+#                         e.g. child steps printed under it)
+#   - skip "<why>"        skipped, or a standalone "→ <why>" line otherwise
+#   - step_done [note]    done, with an optional note
+#   - anything else       done if the opening function has returned, or a
+#                         "•" parent line if it's still running (its child
+#                         steps follow underneath)
+# Raw output from a command run under an open step would fight the spinner —
+# capture it, or call _step_close first (sudo does this itself before a
+# password prompt).
+#
+# This is a small bash spinner rather than `gum spin` because gum spin can only
+# wrap one external command, while a step is arbitrary bash in the calling
+# function. It uses gum's "dot" frames so both look the same.
 # ---------------------------------------------------------------------------
-_STEP_OPEN=""      # text of the open step line, if any
+_STEP_OPEN=""      # title of the open step, if any
 _STEP_FN=""        # function that opened it
 _STEP_DEPTH=0      # its call-stack depth when opened
+_SPIN_PID=""
+_SPIN_FRAMES=(⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷)
+_C_GREEN=$(_tput setaf 2)
+_C_RED=$(_tput setaf 1)
+_C_SPIN=$(_tput setaf 5)
+_C_DIM=$(_tput dim)
+
+_spinner_start() {
+  [ -t 1 ] || return 0
+  _tput civis
+  (
+    trap 'exit 0' TERM
+    i=0
+    while :; do
+      printf '\r  %s%s%s %s' "$_C_SPIN" "${_SPIN_FRAMES[i % 8]}" "$RESET_CODE" "$1"
+      i=$((i + 1))
+      sleep 0.08
+    done
+  ) &
+  _SPIN_PID=$!
+  disown "$_SPIN_PID" 2> /dev/null
+}
+
+_spinner_stop() {
+  [[ -n "$_SPIN_PID" ]] || return 0
+  kill "$_SPIN_PID" 2> /dev/null
+  while kill -0 "$_SPIN_PID" 2> /dev/null; do sleep 0.01; done
+  _SPIN_PID=""
+  printf '\r%s' "$(_tput el)"
+  _tput cnorm
+}
+# Never leave a spinner running or the cursor hidden (Ctrl-C, exit, errors).
+trap '_spinner_stop' EXIT
+
+# "  <glyph> <text>" — glyph in column 2, text in column 4 (under "==> " text).
+_mark() { printf '  %s%s%s %s\n' "$1" "$2" "$RESET_CODE" "$3"; }
+_mark_done()   { _mark "$_C_GREEN" "✓" "$1${2:+ ($2)}"; }
+_mark_skip()   { _mark "$_C_DIM" "→" "${_C_DIM}$1${2:+ ($2)}${RESET_CODE}"; }
+_mark_fail()   { _mark "$_C_RED" "✗" "$1${2:+ ($2)}"; }
+_mark_parent() { _mark "$_C_DIM" "•" "$1"; }
 
 # Is the function that opened the step still running (on the call stack)?
 _step_owner_running() {
@@ -79,78 +129,71 @@ _step_owner_running() {
   (( idx >= 1 )) && [[ "${FUNCNAME[$idx]}" == "$_STEP_FN" ]]
 }
 
-# Finish the open step line. $1 = explicit result text; default = auto.
+# Does the open step belong to the function calling the helper that calls this?
+_step_owned_by_caller() {
+  [[ -n "$_STEP_OPEN" && "${FUNCNAME[2]:-main}" == "$_STEP_FN" ]] \
+    && (( ${#FUNCNAME[@]} - 2 == _STEP_DEPTH ))
+}
+
+# Finish the open step. $1 = done|skip|fail (default: auto), $2 = note.
 _step_close() {
   [[ -n "$_STEP_OPEN" ]] || return 0
-  local result="${1-}"
-  if [[ -z "$result" ]] && ! _step_owner_running; then
-    result="done"
-  fi
-  if [[ -n "$result" ]]; then
-    printf ' %s%s%s\n' "$(_tput setaf 2)" "$result" "$RESET_CODE"
-  else
-    printf '\n'
+  local kind="${1-}" note="${2-}" title="${_STEP_OPEN%...}"
+  _spinner_stop
+  if [[ -z "$kind" ]]; then
+    if _step_owner_running; then kind=parent; else kind=done; fi
   fi
   _STEP_OPEN=""
+  case "$kind" in
+    done) _mark_done "$title" "$note" ;;
+    skip) _mark_skip "$title" "$note" ;;
+    fail) _mark_fail "$title" "$note" ;;
+    *)    _mark_parent "$title" ;;
+  esac
 }
 
-# Explicitly finish the open step with a result, e.g. step_result "up to date".
-step_result() {
-  if [[ -n "$_STEP_OPEN" ]]; then
-    _step_close "$1"
-  else
-    substep "$1"
-  fi
-}
-
-# Quiet sub-step line for an individual operation under a log/rlog section
-# header — indented with no "==>" banner, so the bold section headers stand out
-# (Homebrew-style). "Doing x..." lines stay open and finish in place (above).
+# Section sub-step. "Doing x..." opens a step (above); anything else is a
+# plain indented line.
 substep() {
   _step_close
   if [[ "$1" == *... ]]; then
-    printf "    %s" "$1"
     _STEP_OPEN="$1"
     _STEP_FN="${FUNCNAME[1]:-main}"
     _STEP_DEPTH=$(( ${#FUNCNAME[@]} - 1 ))
+    _spinner_start "$1"
   else
-    printf "    %s\n" "$1"
+    printf '    %s\n' "$1"
   fi
 }
 
-# A step skipped because it was already satisfied. Under an open step it
-# finishes that line ("Setting up fish... skipped (already the default
-# shell)"); on its own it's a dim indented line.
+# Nothing needed doing: finish the caller's open step as skipped. Silent if the
+# line already finished. Keep <why> to a few words.
+unchanged() {
+  _step_owned_by_caller && _step_close skip "$1"
+  return 0
+}
+
+# Skipped: finishes the caller's open step, or prints a standalone "→" line.
 skip() {
-  local why="$1"
-  # Only finish the open line if it belongs to the function calling skip.
-  if [[ -n "$_STEP_OPEN" && "${FUNCNAME[1]:-main}" == "$_STEP_FN" \
-        && $(( ${#FUNCNAME[@]} - 1 )) -eq $_STEP_DEPTH ]]; then
-    _step_skipped "$why"
+  if _step_owned_by_caller; then
+    _step_close skip "$1"
   else
     _step_close
-    printf "    %s%s%s\n" "$(_tput dim)" "$why" "$RESET_CODE"
+    _mark_skip "$1"
   fi
 }
 
-_step_skipped() {
-  printf ' %sskipped (%s)%s\n' "$(_tput dim)" "$1" "$RESET_CODE"
-  _STEP_OPEN=""
-}
-
-# Nothing needed doing: finish the caller's own open step as "skipped (<why>)".
-# A no-op when the line was already finished (child steps printed under it),
-# so it's safe at the end of a check-style function. Keep <why> to a few words.
-#   "done" means something changed; "skipped (why)" means nothing did.
-unchanged() {
-  if [[ -n "$_STEP_OPEN" && "${FUNCNAME[1]:-main}" == "$_STEP_FN" \
-        && $(( ${#FUNCNAME[@]} - 1 )) -eq $_STEP_DEPTH ]]; then
-    _step_skipped "$1"
+# Finish the open step as done, with an optional note ("pulled 3 commits").
+step_done() {
+  if [[ -n "$_STEP_OPEN" ]]; then
+    _step_close done "${1-}"
+  elif [[ -n "${1-}" ]]; then
+    _mark_done "$1"
   fi
 }
 
-# sudo that moves a password prompt onto its own line instead of the end of
-# an open step line. Only closes the step when sudo would actually prompt.
+# sudo that moves a password prompt off the spinner line. Only finishes the
+# step when sudo would actually prompt.
 sudo() {
   if [[ -n "$_STEP_OPEN" ]] && ! command sudo -n true 2> /dev/null; then
     _step_close
@@ -158,36 +201,24 @@ sudo() {
   command sudo "$@"
 }
 
-# Run a (verbose, non-interactive) command behind a gum spinner so its output is
-# hidden on success and shown only if it fails (--show-error). On success the
-# spinner (gum erases its own line on exit) is replaced by
-# "    <title> done". Falls back to a captured run (no spinner) when gum
-# is unavailable or stdout is not a TTY (CI, piped); output is shown only on
-# failure there too. The command's exit code is always propagated, so callers
-# can keep using `spin ... || warn ...` and `if ! spin ...; then`. 130 means
-# Ctrl-C inside gum spin (it swallows the signal), so no result is printed.
-#
-# `--padding "0 0 0 2"` left-pads the WHOLE spinner line (glyph included) so
-# the spinner text sits in the substep column (gum can't indent just the
-# glyph; it always starts at column 0).
+# Run a (verbose, non-interactive) command behind the spinner: output hidden,
+# shown only if it fails. Leaves "✓ <title>" or "✗ <title>". The exit code is
+# propagated, so callers can keep using `spin ... || warn ...`.
 #
 # Do NOT wrap interactive commands (anything that prompts, incl. sudo) — the
 # spinner hides stdin prompts and the step will appear to hang.
 spin() {
   local title="$1"; shift
-  local rc=0
+  local rc=0 out
   _step_close
-  if [ -t 1 ] && command -v gum &>/dev/null; then
-    gum spin --spinner dot --show-error --padding "0 0 0 2" --title "$title" -- "$@" || rc=$?
-  else
-    local out
-    out="$("$@" 2>&1)" || rc=$?
-    (( rc != 0 )) && [[ -n "$out" ]] && printf '%s\n' "$out"
-  fi
+  _spinner_start "$title"
+  out="$("$@" 2>&1)" || rc=$?
+  _spinner_stop
   if (( rc == 0 )); then
-    printf "    %s %sdone%s\n" "$title" "$(_tput setaf 2)" "$RESET_CODE"
-  elif (( rc != 130 )); then
-    printf "    %s %sfailed%s\n" "$title" "$(_tput setaf 1)" "$RESET_CODE"
+    _mark_done "${title%...}"
+  else
+    _mark_fail "${title%...}"
+    [[ -n "$out" ]] && printf '%s\n' "$out" | sed 's/^/      /' >&2
   fi
   return $rc
 }
