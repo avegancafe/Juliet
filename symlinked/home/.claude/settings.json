@@ -168,7 +168,10 @@
     "j2-sandbox@j2-claude-plugins": true,
     "typesafe@j2-claude-plugins": true,
     "diagram-design@j2-claude-plugins": true,
-    "beadwork@avegancafe-marketplace": true
+    "beadwork@avegancafe-marketplace": true,
+    "superpowers@superpowers-marketplace": true,
+    "playwright@claude-plugins-official": true,
+    "cc-plugin-you-should-know@builtin": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
@@ -189,6 +192,12 @@
       "source": {
         "source": "github",
         "repo": "sttts/beads-skill"
+      }
+    },
+    "superpowers-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers-marketplace"
       }
     }
   },
