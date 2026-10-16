@@ -21,3 +21,10 @@ symlinked/home/.pi/agent/auth.json
 symlinked/home/.pi/agent/sessions/
 .pi/artifacts/
 plans/
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+.beads/proxieddb/
+*.gate.lock*
