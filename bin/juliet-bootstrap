@@ -537,11 +537,14 @@ setup-brew() {
     brew install gum
   fi
 
+  # ~3s of brew queries that usually find nothing to fix — keep a spinner up.
+  substep "Checking Homebrew taps and links..."
   trust-brewfile-entries
   prune-undeclared-taps
   clear-npm-codex-shadow
   resolve-thrift-link-conflict
   clear-stale-hey-desktop
+  unchanged "nothing to fix"
 
   run-brew-bundle
 }
@@ -574,13 +577,18 @@ BREW_BUNDLE_LOG=""
 # prompt hidden under the spinner would just hang.
 run-brew-bundle() {
   local brewfile=~/.config/Juliet/Brewfile
+  substep "Checking Brewfile..."
   if brew bundle check --file "$brewfile" &> /dev/null; then
-    skip "Brewfile already satisfied"
+    unchanged "everything installed"
     return
   fi
 
   setup-touchid-sudo
   local keepalive=""
+  # Touch ID asks through a macOS dialog, not the terminal — say so, or this
+  # looks like a hang.
+  command sudo -n true 2> /dev/null \
+    || substep "Waiting for sudo (Touch ID or password) so casks can install"
   if sudo -v; then
     # Refresh the sudo timestamp until brew bundle is done.
     (while kill -0 $$ 2> /dev/null; do sudo -n true 2> /dev/null; sleep 30; done) &
