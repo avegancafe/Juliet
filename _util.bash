@@ -52,10 +52,10 @@ fatal() {
 # ---------------------------------------------------------------------------
 # Step lines
 #
-#   substep "Checking cargo..."   =>  " ⣷  Checking cargo..."  (animated)
-#                                 =>  " ✓  Checking cargo"             done
-#                                 =>  " ⁃  Checking cargo (up to date)" skipped
-#                                 =>  " ✗  Checking cargo"             failed
+#   substep "Checking cargo..."   =>  " ∙  Checking cargo..."  (bullet blinks)
+#                                 =>  " ∙  Checking cargo... done"      done
+#                                 =>  " ◦  Checking cargo (up to date)" skipped
+#                                 =>  " ✗  Checking cargo"              failed
 #
 # "done" means something changed; "skipped (why)" means nothing did.
 #
@@ -64,24 +64,25 @@ fatal() {
 # helpers finishes it:
 #   - unchanged "<why>"   skipped (no-op if the line was already finished,
 #                         e.g. child steps printed under it)
-#   - skip "<why>"        skipped, or a standalone "⁃ <why>" line otherwise
+#   - skip "<why>"        skipped, or a standalone "◦ <why>" line otherwise
 #   - step_done [note]    done, with an optional note
 #   - anything else       done if the opening function has returned, or a
-#                         "•" parent line if it's still running (its child
-#                         steps follow underneath)
+#                         plain dim "∙" parent line if it's still running
+#                         (its child steps follow underneath)
 # Raw output from a command run under an open step would fight the spinner —
 # capture it, or call _step_close first (sudo does this itself before a
 # password prompt).
 #
 # This is a small bash spinner rather than `gum spin` because gum spin can only
 # wrap one external command, while a step is arbitrary bash in the calling
-# function. It uses gum's "dot" frames so both look the same.
+# function.
 # ---------------------------------------------------------------------------
 _STEP_OPEN=""      # title of the open step, if any
 _STEP_FN=""        # function that opened it
 _STEP_DEPTH=0      # its call-stack depth when opened
 _SPIN_PID=""
-_SPIN_FRAMES=(⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷)
+_SPIN_FRAMES=(∙ " ")   # a blinking bullet
+_SPIN_DELAY=0.4
 _C_GREEN=$(_tput setaf 2)
 _C_RED=$(_tput setaf 1)
 _C_SPIN=$(_tput setaf 5)
@@ -94,9 +95,9 @@ _spinner_start() {
     trap 'exit 0' TERM
     i=0
     while :; do
-      printf '\r %s%s%s  %s' "$_C_SPIN" "${_SPIN_FRAMES[i % 8]}" "$RESET_CODE" "$1"
+      printf '\r %s%s%s  %s' "$_C_SPIN" "${_SPIN_FRAMES[i % ${#_SPIN_FRAMES[@]}]}" "$RESET_CODE" "$1"
       i=$((i + 1))
-      sleep 0.08
+      sleep "$_SPIN_DELAY"
     done
   ) &
   _SPIN_PID=$!
@@ -117,10 +118,11 @@ trap '_spinner_stop' EXIT
 # " <glyph>  <text>" — glyph in column 1 (same as the spinner), text in
 # column 4 (under the "==> " header text).
 _mark() { printf ' %s%s%s  %s\n' "$1" "$2" "$RESET_CODE" "$3"; }
-_mark_done()   { _mark "$_C_GREEN" "✓" "$1${2:+ ($2)}"; }
-_mark_skip()   { _mark "$_C_DIM" "⁃" "${_C_DIM}$1${2:+ ($2)}${RESET_CODE}"; }
+# done: the blinking bullet settles, "... done" appended
+_mark_done()   { _mark "$_C_GREEN" "∙" "$1... ${_C_GREEN}done${2:+ ($2)}${RESET_CODE}"; }
+_mark_skip()   { _mark "$_C_DIM" "◦" "${_C_DIM}$1${2:+ ($2)}${RESET_CODE}"; }
 _mark_fail()   { _mark "$_C_RED" "✗" "$1${2:+ ($2)}"; }
-_mark_parent() { _mark "$_C_DIM" "•" "$1"; }
+_mark_parent() { _mark "$_C_DIM" "∙" "$1"; }
 
 # Is the function that opened the step still running (on the call stack)?
 _step_owner_running() {
@@ -174,7 +176,7 @@ unchanged() {
   return 0
 }
 
-# Skipped: finishes the caller's open step, or prints a standalone "⁃" line.
+# Skipped: finishes the caller's open step, or prints a standalone "◦" line.
 skip() {
   if _step_owned_by_caller; then
     _step_close skip "$1"
@@ -203,7 +205,7 @@ sudo() {
 }
 
 # Run a (verbose, non-interactive) command behind the spinner: output hidden,
-# shown only if it fails. Leaves "✓ <title>" or "✗ <title>". The exit code is
+# shown only if it fails. Leaves "∙ <title>... done" or "✗ <title>". The exit code is
 # propagated, so callers can keep using `spin ... || warn ...`.
 #
 # Do NOT wrap interactive commands (anything that prompts, incl. sudo) — the
