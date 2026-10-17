@@ -52,10 +52,10 @@ fatal() {
 # ---------------------------------------------------------------------------
 # Step lines
 #
-#   substep "Checking cargo..."   →   " ⣷  Checking cargo..."  (animated)
-#                                 →   " ✓  Checking cargo"             done
-#                                 →   " →  Checking cargo (up to date)" skipped
-#                                 →   " ✗  Checking cargo"             failed
+#   substep "Checking cargo..."   ›   " ⣷  Checking cargo..."  (animated)
+#                                 ›   " ✓  Checking cargo"             done
+#                                 ›   " ›  Checking cargo (up to date)" skipped
+#                                 ›   " ✗  Checking cargo"             failed
 #
 # "done" means something changed; "skipped (why)" means nothing did.
 #
@@ -64,7 +64,7 @@ fatal() {
 # helpers finishes it:
 #   - unchanged "<why>"   skipped (no-op if the line was already finished,
 #                         e.g. child steps printed under it)
-#   - skip "<why>"        skipped, or a standalone "→ <why>" line otherwise
+#   - skip "<why>"        skipped, or a standalone "› <why>" line otherwise
 #   - step_done [note]    done, with an optional note
 #   - anything else       done if the opening function has returned, or a
 #                         "•" parent line if it's still running (its child
@@ -118,7 +118,7 @@ trap '_spinner_stop' EXIT
 # column 4 (under the "==> " header text).
 _mark() { printf ' %s%s%s  %s\n' "$1" "$2" "$RESET_CODE" "$3"; }
 _mark_done()   { _mark "$_C_GREEN" "✓" "$1${2:+ ($2)}"; }
-_mark_skip()   { _mark "$_C_DIM" "→" "${_C_DIM}$1${2:+ ($2)}${RESET_CODE}"; }
+_mark_skip()   { _mark "$_C_DIM" "›" "${_C_DIM}$1${2:+ ($2)}${RESET_CODE}"; }
 _mark_fail()   { _mark "$_C_RED" "✗" "$1${2:+ ($2)}"; }
 _mark_parent() { _mark "$_C_DIM" "•" "$1"; }
 
@@ -174,7 +174,7 @@ unchanged() {
   return 0
 }
 
-# Skipped: finishes the caller's open step, or prints a standalone "→" line.
+# Skipped: finishes the caller's open step, or prints a standalone "›" line.
 skip() {
   if _step_owned_by_caller; then
     _step_close skip "$1"
