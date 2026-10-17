@@ -52,10 +52,10 @@ fatal() {
 # ---------------------------------------------------------------------------
 # Step lines
 #
-#   substep "Checking cargo..."   ›   " ⣷  Checking cargo..."  (animated)
-#                                 ›   " ✓  Checking cargo"             done
-#                                 ›   " ›  Checking cargo (up to date)" skipped
-#                                 ›   " ✗  Checking cargo"             failed
+#   substep "Checking cargo..."   =>  " ⣷  Checking cargo..."  (animated)
+#                                 =>  " ✓  Checking cargo"             done
+#                                 =>  " ›  Checking cargo (up to date)" skipped
+#                                 =>  " ✗  Checking cargo"             failed
 #
 # "done" means something changed; "skipped (why)" means nothing did.
 #
