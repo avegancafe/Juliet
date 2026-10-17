@@ -52,10 +52,10 @@ fatal() {
 # ---------------------------------------------------------------------------
 # Step lines
 #
-#   substep "Checking cargo..."   →   "  ⣷ Checking cargo..."  (animated)
-#                                 →   "  ✓ Checking cargo"             done
-#                                 →   "  → Checking cargo (up to date)" skipped
-#                                 →   "  ✗ Checking cargo"             failed
+#   substep "Checking cargo..."   →   " ⣷  Checking cargo..."  (animated)
+#                                 →   " ✓  Checking cargo"             done
+#                                 →   " →  Checking cargo (up to date)" skipped
+#                                 →   " ✗  Checking cargo"             failed
 #
 # "done" means something changed; "skipped (why)" means nothing did.
 #
@@ -94,7 +94,7 @@ _spinner_start() {
     trap 'exit 0' TERM
     i=0
     while :; do
-      printf '\r  %s%s%s %s' "$_C_SPIN" "${_SPIN_FRAMES[i % 8]}" "$RESET_CODE" "$1"
+      printf '\r %s%s%s  %s' "$_C_SPIN" "${_SPIN_FRAMES[i % 8]}" "$RESET_CODE" "$1"
       i=$((i + 1))
       sleep 0.08
     done
@@ -114,8 +114,9 @@ _spinner_stop() {
 # Never leave a spinner running or the cursor hidden (Ctrl-C, exit, errors).
 trap '_spinner_stop' EXIT
 
-# "  <glyph> <text>" — glyph in column 2, text in column 4 (under "==> " text).
-_mark() { printf '  %s%s%s %s\n' "$1" "$2" "$RESET_CODE" "$3"; }
+# " <glyph>  <text>" — glyph in column 1 (same as the spinner), text in
+# column 4 (under the "==> " header text).
+_mark() { printf ' %s%s%s  %s\n' "$1" "$2" "$RESET_CODE" "$3"; }
 _mark_done()   { _mark "$_C_GREEN" "✓" "$1${2:+ ($2)}"; }
 _mark_skip()   { _mark "$_C_DIM" "→" "${_C_DIM}$1${2:+ ($2)}${RESET_CODE}"; }
 _mark_fail()   { _mark "$_C_RED" "✗" "$1${2:+ ($2)}"; }
