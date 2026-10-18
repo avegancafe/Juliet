@@ -38,6 +38,7 @@ background_opacity = 0.93
 start = ["launcher", "cpu", "ram", "active_window"]
 center = ["workspaces"]
 end = [
+  "claude",
   "audio_visualizer",
   "tray",
   "power_profile",
@@ -46,3 +47,7 @@ end = [
   "clock",
   "notifications",
 ]
+
+# Claude Code background agents (plugin: symlinked/home/.local/share/noctalia/plugins/claude_agents)
+[widget.claude]
+type = "kyle/claude_agents:status"
