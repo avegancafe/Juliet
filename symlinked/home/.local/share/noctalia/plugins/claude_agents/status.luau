@@ -26,7 +26,7 @@ local DONE_FRESH_S = 30 * 60
 local INT_FRESH_S = 5 * 60 -- every interactive turn ends "done": let it go quickly
 local USAGE_STALE_S = 15 * 60
 local FEED_DIR = "~/.cache/claude-agents"
-local USAGE_PATHS = { FEED_DIR .. "/_usage.json", "~/.cache/claude-usage.json" } -- feed first, statusline tee fallback
+local USAGE_PATHS = { FEED_DIR .. "/_usage.json" }
 
 -- Vertical hop of the die inside a fixed-height cell (gravity-ish: dwell low, pop up).
 local CELL_H = 28
@@ -148,21 +148,14 @@ local function seconds(t)
   return if t > 1e12 then t / 1000 else t
 end
 
--- Normalise either snapshot to { at = seconds, five = pct?, seven = pct? }:
---   feed _usage.json  {at(ms), rateLimits = [{kind, percentUsed}]}
---   tee claude-usage.json  {at(s), rate_limits = {five_hour = {used_percentage}}}
+-- The feed's _usage.json {at(ms), rateLimits = [{kind, percentUsed}]} as
+-- { at = seconds, five = pct?, seven = pct? }.
 local function readUsage(snap)
-  if type(snap) ~= "table" then return nil end
+  if type(snap) ~= "table" or type(snap.rateLimits) ~= "table" then return nil end
   local out = { at = seconds(snap.at) }
-  if type(snap.rateLimits) == "table" then
-    for _, r in ipairs(snap.rateLimits) do
-      if r.kind == "five_hour" then out.five = r.percentUsed end
-      if r.kind == "seven_day" then out.seven = r.percentUsed end
-    end
-  elseif type(snap.rate_limits) == "table" then
-    local f, s = snap.rate_limits.five_hour, snap.rate_limits.seven_day
-    out.five = type(f) == "table" and f.used_percentage or nil
-    out.seven = type(s) == "table" and s.used_percentage or nil
+  for _, r in ipairs(snap.rateLimits) do
+    if r.kind == "five_hour" then out.five = r.percentUsed end
+    if r.kind == "seven_day" then out.seven = r.percentUsed end
   end
   if out.five == nil and out.seven == nil then return nil end
   return out
