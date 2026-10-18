@@ -707,7 +707,7 @@ sync-copr-repos() {
       done
       missing=""
       for pkg in $owned; do
-        dnf repoquery "${disable[@]}" --available \
+        dnf repoquery --assumeyes "${disable[@]}" --available \
           --qf '%{name}\n' "$pkg" 2> /dev/null | grep -qx "$pkg" || missing="$missing $pkg"
       done
 
@@ -750,7 +750,7 @@ rehome-orphaned-copr-packages() {
   rehome=""
   stranded=""
   for pkg in $orphans; do
-    if dnf repoquery --available --qf '%{name}\n' "$pkg" 2> /dev/null | grep -qx "$pkg"; then
+    if dnf repoquery --assumeyes --available --qf '%{name}\n' "$pkg" 2> /dev/null | grep -qx "$pkg"; then
       rehome="$rehome $pkg"
     else
       stranded="$stranded $pkg"
