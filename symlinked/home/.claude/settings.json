@@ -127,7 +127,7 @@
       "~/.config/Juliet/"
     ]
   },
-  "model": "sonnet",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -163,7 +163,6 @@
     "playwright@j2-claude-plugins": true,
     "mattpocock-skills@j2-claude-plugins": true,
     "launchdarkly@j2-claude-plugins": true,
-    "session-ids@avegancafe-marketplace": true,
     "in-my-voice@j2-claude-plugins": true,
     "j2-sandbox@j2-claude-plugins": true,
     "typesafe@j2-claude-plugins": true,
@@ -171,7 +170,8 @@
     "beadwork@avegancafe-marketplace": true,
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
-    "cc-plugin-you-should-know@builtin": true
+    "cc-plugin-you-should-know@builtin": true,
+    "avegancafe@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
@@ -215,6 +215,7 @@
       "effortLevel": "medium"
     }
   },
+  "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "askUserQuestionTimeout": "never",
@@ -277,6 +278,5 @@
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
-  },
-  "advisorModel": "opus"
+  }
 }
