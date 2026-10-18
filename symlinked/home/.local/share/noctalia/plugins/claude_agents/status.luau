@@ -7,7 +7,7 @@
 --   5-6  done    - it succeeded, ready for your response       (primary)
 -- (a `done` session only counts while its state.json is < DONE_FRESH_S old.)
 -- Nothing needs you but something is working: the die shuffles faces nonstop.
--- Nothing running at all: napping robot.
+-- Nothing running at all: sleeping robot with neon-sign z's (see NEON).
 -- A failed/blocked die bounces (failed faster). Next to it: Claude Code 5h / 7d usage
 -- meters (snapshot written by bin/claude-statusline-tee; dimmed when stale). Agent names
 -- and the 3-word summaries live in the tooltip / panel.
@@ -29,10 +29,24 @@ local BOUNCE = { "end", "end", "center", "start", "center", "end" }
 local BOUNCE_FAST = { "end", "start", "end", "start" }
 
 local DICE = { "⚀", "⚁", "⚂", "⚃", "⚄", "⚅" }
-local ROBOT = {
-  working = { "[o_o]>.  ", "[o_O]>.. ", "[O_o]>...", "[o_o]>   " },
-  idle = { "[-_-] zZ ", "[-_-] Zz " },
+-- Sleeping robot: the z's light up like a neon sign - switch on one tube at a time,
+-- hold, buzz with a flicker, power down, repeat. {text, lit, ticks} (150ms per tick);
+-- text is always 3 wide so the bar never reflows. Unlit = dimmed tube.
+local NEON = {
+  { "   ", false, 5 },
+  { "z  ", true, 3 },
+  { "zz ", true, 3 },
+  { "zzz", true, 4 },
+  -- flicker
+  { "zzz", false, 1 }, { "zzz", true, 1 }, { "zz ", true, 1 }, { "zzz", true, 1 },
+  { "zzz", false, 1 }, { "zzz", true, 6 },
+  -- power down
+  { "zz ", true, 2 }, { "z  ", true, 2 }, { "z  ", false, 1 }, { "   ", false, 4 },
 }
+local NEON_TIMELINE = {}
+for _, step in ipairs(NEON) do
+  for _ = 1, step[3] do table.insert(NEON_TIMELINE, step) end
+end
 
 local FILLER = { a = true, an = true, the = true, ["and"] = true, of = true, to = true, ["for"] = true, with = true, ["in"] = true, on = true, that = true, this = true, it = true, is = true, as = true }
 
@@ -154,8 +168,11 @@ local function render()
       ui.label({ text = DICE[shown], color = role, fontSize = 12 }),
     })
   else
-    local frames = ROBOT[mode]
-    lead = ui.label({ text = frames[(math.floor(tick / 2) % #frames) + 1], color = role })
+    local step = NEON_TIMELINE[(tick % #NEON_TIMELINE) + 1]
+    lead = ui.row({ gap = 6, align = "center" }, {
+      ui.label({ text = "[-_-]", color = "on_surface_variant" }),
+      ui.label({ text = step[1], color = step[2] and "secondary" or "on_surface_variant", opacity = step[2] and 1 or 0.45 }),
+    })
   end
 
   local nodes = { lead }
