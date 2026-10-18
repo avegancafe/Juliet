@@ -1300,6 +1300,22 @@ setup-flyctl() {
       "Retry manually: curl -fsSL https://fly.io/install.sh | sh"
 }
 
+# bd (beads) is this repo's issue tracker. macOS gets it from the Brewfile;
+# Fedora has no dnf or copr package, so use the upstream installer, which
+# downloads a checksum-verified release binary into /usr/local/bin when that's
+# user-writable, else ~/.local/bin — no sudo either way, like setup-hey.
+setup-beads() {
+  is-fedora || return 0
+  substep "Checking bd (beads)..."
+  if command -v bd &> /dev/null || [[ -x "$HOME/.local/bin/bd" ]]; then
+    unchanged "already installed"
+    return
+  fi
+  spin "Installing bd (beads)..." sh -c 'curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash' \
+    || bootstrap_error "Failed to install bd" \
+      "Retry manually: curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash"
+}
+
 setup-sddm() {
   if ! is-fedora; then
     return
@@ -2372,7 +2388,7 @@ run-fonts() {
 }
 
 run-dev() {
-  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint, flyctl)" || return
+  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint, flyctl, bd)" || return
   rlog "🛠️ Installing dev tools..."
   setup-cargo
   setup-rust
@@ -2380,6 +2396,7 @@ run-dev() {
   setup-nodenv
   setup-node-tools
   setup-flyctl
+  setup-beads
 }
 
 run-shell() {
