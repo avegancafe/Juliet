@@ -121,7 +121,7 @@
     ],
     "deny": [],
     "ask": [],
-    "defaultMode": "auto",
+    "defaultMode": "plan",
     "additionalDirectories": [
       "~/workspace/dev-env/",
       "~/.config/Juliet/"
