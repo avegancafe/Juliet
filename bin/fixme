@@ -54,8 +54,8 @@ end tell
 APPLESCRIPT
   else
     # GTK Ghostty only exposes app-level actions over D-Bus, so press the hidden
-    # ctrl+alt+shift+f9 keybind (ghostty/config) that chains the same actions.
-    wtype -M ctrl -M alt -M shift -k F9 -m shift -m alt -m ctrl
+    # super+ctrl+shift+f keybind (ghostty/config) that chains the same actions.
+    wtype -M logo -M ctrl -M shift -k f -m shift -m ctrl -m logo
   fi
 
   while IFS= read -r -t 3 line </dev/tty; do
@@ -70,7 +70,7 @@ APPLESCRIPT
   stty "$tty_state" </dev/tty
 
   if [[ -z "$file" ]]; then
-    echo "fixme: Ghostty didn't hand over the scrollback (is ctrl+alt+shift+f9 bound in ghostty/config, and was this pane focused?)" >&2
+    echo "fixme: Ghostty didn't hand over the scrollback (is super+ctrl+shift+f bound in ghostty/config, and was this pane focused?)" >&2
     exit 1
   fi
   scrollback+=("$file")
