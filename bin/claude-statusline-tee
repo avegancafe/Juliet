@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# statusLine shim: snapshot Claude Code's rate-limit usage for the Noctalia
+# claude_agents widget, then hand the *unchanged* input to claude-statusline.
+#
+# Claude Code only passes `rate_limits` (5h / 7d usage) to the statusLine command, so
+# this is the one place to capture it. Output, exit code and stdin seen by
+# claude-statusline are identical to running it directly; every capture step is
+# best-effort and silent, so a failure here can never break the status line.
+#
+# Writes ${XDG_CACHE_HOME:-~/.cache}/claude-usage.json:
+#   {"at": <unix seconds>, "rate_limits": { ...as received... }}
+
+input=$(cat)
+
+out="${XDG_CACHE_HOME:-$HOME/.cache}/claude-usage.json"
+{
+  rl=$(printf '%s' "$input" | jq -c '.rate_limits // empty')
+  if [ -n "$rl" ]; then
+    mkdir -p "$(dirname "$out")"
+    tmp=$(mktemp "$out.XXXXXX")
+    printf '{"at":%s,"rate_limits":%s}\n' "$(date +%s)" "$rl" >"$tmp" && mv -f "$tmp" "$out"
+  fi
+} >/dev/null 2>&1
+
+printf '%s' "$input" | claude-statusline "$@"
