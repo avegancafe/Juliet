@@ -147,7 +147,7 @@
   "enableWorkflows": true,
   "statusLine": {
     "type": "command",
-    "command": "claude-statusline"
+    "command": "claude-statusline-tee"
   },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
