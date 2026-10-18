@@ -6,7 +6,8 @@
 --   3-4  blocked - it's asking you a question                  (secondary)
 --   5-6  done    - it succeeded, ready for your response       (primary)
 -- (a `done` session only counts while its state.json is < DONE_FRESH_S old.)
--- Nothing needs you but something is working: typing robot. Otherwise: napping robot.
+-- Nothing needs you but something is working: the die shuffles faces nonstop.
+-- Nothing running at all: napping robot.
 -- A failed/blocked die bounces (failed faster). Next to it: Claude Code 5h / 7d usage
 -- meters (snapshot written by bin/claude-statusline-tee; dimmed when stale). Agent names
 -- and the 3-word summaries live in the tooltip / panel.
@@ -138,11 +139,13 @@ end
 
 local function render()
   local lead
-  if mode == "dice" then
+  if mode == "dice" or mode == "working" then
+    -- Working: the die never settles, it shuffles every tick. Dice: it tumbles
+    -- once when the headline changes, then holds its face.
     local shown = face
-    if roll > 0 then shown = math.random(1, 6) end
+    if mode == "working" or roll > 0 then shown = math.random(1, 6) end
     local align = "center"
-    if roll == 0 and (settled == "failed" or settled == "blocked") then
+    if mode == "dice" and roll == 0 and (settled == "failed" or settled == "blocked") then
       local seq = settled == "failed" and BOUNCE_FAST or BOUNCE
       align = seq[(tick % #seq) + 1]
     end
