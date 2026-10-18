@@ -7,16 +7,25 @@
 --   5-6  done    - it succeeded, ready for your response       (primary)
 -- (a `done` session only counts while its state.json is < DONE_FRESH_S old.)
 -- Nothing needs you but something is working: typing robot. Otherwise: napping robot.
--- Next to it, a <=3-word summary of the headline session (+N if more need you).
+-- A failed/blocked die bounces (failed faster). Next to it: Claude Code 5h / 7d usage
+-- meters (snapshot written by bin/claude-statusline-tee; dimmed when stale). Agent names
+-- and the 3-word summaries live in the tooltip / panel.
 --
 -- Data: `claude agents --json` (roster) + ~/.claude/jobs/<id>/state.json (`detail`,
 -- file mtime). The roster is published to shared state ("agents") for panel.luau.
 -- Left click: wide panel.  Right click: `claude agents` in a terminal.
 
-local TICK_MS = 250
-local POLL_TICKS = 20 -- roster refresh every 5s
-local ROLL_TICKS = 6 -- ~1.5s of tumbling before the die settles
+local TICK_MS = 150
+local POLL_TICKS = 33 -- roster + usage refresh every ~5s
+local ROLL_TICKS = 10 -- ~1.5s of tumbling before the die settles
 local DONE_FRESH_S = 30 * 60
+local USAGE_STALE_S = 15 * 60 -- usage is only refreshed while an interactive session redraws its status line
+local USAGE_PATH = "~/.cache/claude-usage.json" -- written by bin/claude-statusline-tee
+
+-- Vertical hop of the die inside a fixed-height cell (gravity-ish: dwell low, pop up).
+local CELL_H = 28
+local BOUNCE = { "end", "end", "center", "start", "center", "end" }
+local BOUNCE_FAST = { "end", "start", "end", "start" }
 
 local DICE = { "⚀", "⚁", "⚂", "⚃", "⚄", "⚅" }
 local ROBOT = {
@@ -57,6 +66,8 @@ local agents = {}
 local mode = "idle" -- "dice" | "working" | "idle"
 local face, role = 1, "on_surface_variant"
 local summary = ""
+local settled = "" -- state of the die's session: failed | blocked | done
+local usage = nil
 local lastKey = ""
 local roll = 0
 local tick = 0
@@ -76,6 +87,7 @@ local function setMode(list)
   end
   if best then
     mode = "dice"
+    settled = best.state
     face, role = outcome(best)
     summary = best.haiku
     if needs > 1 then summary = `{summary} +{needs - 1}` end
@@ -95,22 +107,67 @@ local function setMode(list)
   end
 end
 
+-- "▰▰▱▱▱" for a 0-100 percentage
+local function meter(pct)
+  local filled = math.floor(pct / 20 + 0.5)
+  return string.rep("▰", filled) .. string.rep("▱", 5 - filled)
+end
+
+local function usageColor(pct, stale)
+  if stale then return "on_surface_variant" end
+  if pct >= 90 then return "error" end
+  if pct >= 70 then return "secondary" end
+  return "on_surface"
+end
+
+local function window(w)
+  if type(w) == "table" and type(w.used_percentage) == "number" then return w.used_percentage end
+  return nil
+end
+
+-- {label, pct, stale} per available window, from the statusline tee's snapshot.
+local function usageParts()
+  local parts = {}
+  if not usage or type(usage.rate_limits) ~= "table" then return parts end
+  local stale = (os.time() - (usage.at or 0)) > USAGE_STALE_S
+  local five, seven = window(usage.rate_limits.five_hour), window(usage.rate_limits.seven_day)
+  if five then table.insert(parts, { "5h", five, stale }) end
+  if seven then table.insert(parts, { "7d", seven, stale }) end
+  return parts
+end
+
 local function render()
-  local text
+  local lead
   if mode == "dice" then
     local shown = face
     if roll > 0 then shown = math.random(1, 6) end
-    text = `{DICE[shown]} {summary}`
+    local align = "center"
+    if roll == 0 and (settled == "failed" or settled == "blocked") then
+      local seq = settled == "failed" and BOUNCE_FAST or BOUNCE
+      align = seq[(tick % #seq) + 1]
+    end
+    -- Fixed-height cell: moving the die between start/center/end is the hop.
+    lead = ui.column({ height = CELL_H, width = 18, justify = align, align = "center" }, {
+      ui.label({ text = DICE[shown], color = role, fontSize = 12 }),
+    })
   else
     local frames = ROBOT[mode]
-    text = frames[(tick % #frames) + 1] .. summary
+    lead = ui.label({ text = frames[(math.floor(tick / 2) % #frames) + 1], color = role })
   end
-  barWidget.setGlyphColor(role)
-  barWidget.setColor(role)
-  barWidget.setText(text)
+
+  local nodes = { lead }
+  for _, p in ipairs(usageParts()) do
+    table.insert(nodes, ui.label({ text = p[1], color = "on_surface_variant" }))
+    table.insert(nodes, ui.label({ text = `{meter(p[2])} {math.floor(p[2] + 0.5)}%`, color = usageColor(p[2], p[3]) }))
+  end
+  barWidget.render(ui.row({ gap = 6, align = "center" }, nodes))
+
   local rows = {}
   for _, a in ipairs(agents) do
     table.insert(rows, { key = a.state, value = a.name })
+  end
+  for _, p in ipairs(usageParts()) do
+    table.insert(rows, { key = p[1] .. " usage", value = `{math.floor(p[2] + 0.5)}%{p[3] and " (stale)" or ""}` })
   end
   barWidget.setTooltip(#rows > 0 and rows or "No Claude agents")
 end
@@ -128,7 +185,15 @@ local function finish(list)
   render()
 end
 
+local function refreshUsage()
+  noctalia.readFileAsync(noctalia.expandPath(USAGE_PATH), function(contents)
+    local snap = contents and noctalia.json.decode(contents) or nil
+    if type(snap) == "table" then usage = snap end
+  end)
+end
+
 local function refresh()
+  refreshUsage()
   if polling then return end
   polling = true
   noctalia.runAsync({ "claude", "agents", "--json" }, function(result)
