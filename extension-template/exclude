@@ -1,0 +1,4 @@
+# Juliet packages to leave out, one name per line. Matches Brewfile, DNFfile
+# and Flatpakfile entries by name ("cursor", or a tap-qualified
+# "someone/tap/thing"). It only stops installing them; it doesn't uninstall.
+# cursor

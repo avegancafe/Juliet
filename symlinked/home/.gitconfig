@@ -44,8 +44,6 @@
 	autocrlf = false
 	editor = nvim
 	pager = delta
-[github]
-	user = avegancafe
 [format]
 	# the %x08's are delete characters
 	pretty = format:%C(yellow)%h%Creset —  %C(cyan)%ai%x08%x08%x08%x08%x08%x08%x08%x08%x08%Creset —  %C(red)%<(20,trunc)%an %Creset%<(75,trunc)%s
@@ -66,6 +64,10 @@
 	prune = true
 [user]
 	signingkey = ~/.ssh/id_ed25519
+# Extension first (per-person settings such as [github] user — see
+# EXTENSIONS.md), then machine-local, so local wins. Missing files are ignored.
+[include]
+	path = ~/.config/juliet-extension/gitconfig
 [include]
 	path = ~/.config/local/gitconfig
 [difftool "sourcetree"]

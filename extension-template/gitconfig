@@ -1,0 +1,4 @@
+# Included by Juliet's ~/.gitconfig (before ~/.config/local/gitconfig, which
+# still wins). Good for settings that are yours on every machine.
+# [github]
+# 	user = your-github-login

@@ -1,0 +1,6 @@
+# Never commit secrets. juliet-bootstrap refuses an extension that tracks any
+# .env file other than .env.template.
+.env
+.env.*
+!.env.template
+.DS_Store

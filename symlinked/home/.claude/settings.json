@@ -119,7 +119,15 @@
       "WebFetch(domain:pypi.org)",
       "Skill(*)"
     ],
-    "deny": [],
+    "deny": [
+      "Read(~/.config/local/.env)",
+      "Read(//**/.env)",
+      "Read(//**/.env.local)",
+      "Read(//**/.env.development)",
+      "Read(//**/.env.production)",
+      "Read(//**/.env.staging)",
+      "Read(//**/.env.test)"
+    ],
     "ask": [],
     "defaultMode": "plan",
     "additionalDirectories": [

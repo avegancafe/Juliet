@@ -26,3 +26,11 @@ plans/
 .beads-credential-key
 .beads/proxieddb/
 *.gate.lock*
+
+# Written by `hey shell-completion install` (the juliet-kyle extension); hey-cli owns it
+symlinked/config/fish/completions/hey.fish
+
+# Secrets never get committed; only templates do
+.env
+.env.*
+!.env.template

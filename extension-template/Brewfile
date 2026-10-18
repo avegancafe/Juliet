@@ -1,0 +1,6 @@
+# Appended to Juliet's Brewfile on macOS. Same syntax as Juliet's Brewfile:
+# declare a tap here before using its packages, or bootstrap prunes it.
+# tap "someone/tap"
+# brew "helix"
+# cask "slack"
+# vscode "vscodevim.vim"
