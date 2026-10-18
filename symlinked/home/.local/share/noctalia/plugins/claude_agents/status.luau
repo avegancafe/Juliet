@@ -1,27 +1,32 @@
 --!nonstrict
--- Claude Code background agents in the bar.
+-- Claude Code sessions (background jobs and interactive) in the bar.
 --
 -- A session that needs you rolls a die and lands on a face:
 --   1-2  failed  - it hit a wall and doesn't know what to do   (red)
 --   3-4  blocked - it's asking you a question                  (secondary)
 --   5-6  done    - it succeeded, ready for your response       (primary)
--- (a `done` session only counts while its state.json is < DONE_FRESH_S old.)
+-- (a `done` session only counts while fresh: DONE_FRESH_S background, INT_FRESH_S interactive.)
 -- Nothing needs you but something is working: the die shuffles faces nonstop.
 -- Nothing running at all: sleeping robot with neon-sign z's (see NEON).
 -- A failed/blocked die bounces (failed faster). Next to it: Claude Code 5h / 7d usage
--- meters (snapshot written by bin/claude-statusline-tee; dimmed when stale). Agent names
--- and the 3-word summaries live in the tooltip / panel.
+-- meters (dimmed when stale). Names, reasons and context fill live in the tooltip / panel.
 --
--- Data: `claude agents --json` (roster) + ~/.claude/jobs/<id>/state.json (`detail`,
--- file mtime). The roster is published to shared state ("agents") for panel.luau.
+-- Data: `claude agents --json` is the roster (who is alive, names). Each session's
+-- agents-feed mod (symlinked/home/.claude/mods/agents-feed) writes
+-- ~/.cache/claude-agents/<sessionId>.json (state, reason, context) and _usage.json
+-- (rate limits), and pings `onIpc("refresh")` on every change. Background jobs also
+-- have ~/.claude/jobs/<id>/state.json, whose state matches the agents view.
+-- The joined list is published to shared state ("agents") for panel.luau.
 -- Left click: wide panel.  Right click: `claude agents` in a terminal.
 
 local TICK_MS = 150
-local POLL_TICKS = 33 -- roster + usage refresh every ~5s
+local POLL_TICKS = 33 -- roster + usage refresh every ~5s (the feed's ping makes it sooner)
 local ROLL_TICKS = 10 -- ~1.5s of tumbling before the die settles
 local DONE_FRESH_S = 30 * 60
-local USAGE_STALE_S = 15 * 60 -- usage is only refreshed while an interactive session redraws its status line
-local USAGE_PATH = "~/.cache/claude-usage.json" -- written by bin/claude-statusline-tee
+local INT_FRESH_S = 5 * 60 -- every interactive turn ends "done": let it go quickly
+local USAGE_STALE_S = 15 * 60
+local FEED_DIR = "~/.cache/claude-agents"
+local USAGE_PATHS = { FEED_DIR .. "/_usage.json" }
 
 -- Vertical hop of the die inside a fixed-height cell (gravity-ish: dwell low, pop up).
 local CELL_H = 28
@@ -138,19 +143,31 @@ local function usageColor(pct, stale)
   return "on_surface"
 end
 
-local function window(w)
-  if type(w) == "table" and type(w.used_percentage) == "number" then return w.used_percentage end
-  return nil
+local function seconds(t)
+  if type(t) ~= "number" then return 0 end
+  return if t > 1e12 then t / 1000 else t
 end
 
--- {label, pct, stale} per available window, from the statusline tee's snapshot.
+-- The feed's _usage.json {at(ms), rateLimits = [{kind, percentUsed}]} as
+-- { at = seconds, five = pct?, seven = pct? }.
+local function readUsage(snap)
+  if type(snap) ~= "table" or type(snap.rateLimits) ~= "table" then return nil end
+  local out = { at = seconds(snap.at) }
+  for _, r in ipairs(snap.rateLimits) do
+    if r.kind == "five_hour" then out.five = r.percentUsed end
+    if r.kind == "seven_day" then out.seven = r.percentUsed end
+  end
+  if out.five == nil and out.seven == nil then return nil end
+  return out
+end
+
+-- {label, pct, stale} per available window.
 local function usageParts()
   local parts = {}
-  if not usage or type(usage.rate_limits) ~= "table" then return parts end
-  local stale = (os.time() - (usage.at or 0)) > USAGE_STALE_S
-  local five, seven = window(usage.rate_limits.five_hour), window(usage.rate_limits.seven_day)
-  if five then table.insert(parts, { "5h", five, stale }) end
-  if seven then table.insert(parts, { "7d", seven, stale }) end
+  if not usage then return parts end
+  local stale = (os.time() - usage.at) > USAGE_STALE_S
+  if type(usage.five) == "number" then table.insert(parts, { "5h", usage.five, stale }) end
+  if type(usage.seven) == "number" then table.insert(parts, { "7d", usage.seven, stale }) end
   return parts
 end
 
@@ -187,7 +204,7 @@ local function render()
 
   local rows = {}
   for _, a in ipairs(agents) do
-    table.insert(rows, { key = a.state, value = a.name })
+    table.insert(rows, { key = a.state, value = if a.kind == "interactive" then `{a.name} (int)` else a.name })
   end
   for _, p in ipairs(usageParts()) do
     table.insert(rows, { key = p[1] .. " usage", value = `{math.floor(p[2] + 0.5)}%{p[3] and " (stale)" or ""}` })
@@ -208,11 +225,50 @@ local function finish(list)
   render()
 end
 
-local function refreshUsage()
-  noctalia.readFileAsync(noctalia.expandPath(USAGE_PATH), function(contents)
-    local snap = contents and noctalia.json.decode(contents) or nil
-    if type(snap) == "table" then usage = snap end
+-- First usable snapshot in USAGE_PATHS order.
+local function refreshUsage(i)
+  i = i or 1
+  local path = USAGE_PATHS[i]
+  if not path then return end
+  noctalia.readFileAsync(noctalia.expandPath(path), function(contents)
+    local snap = readUsage(contents and noctalia.json.decode(contents) or nil)
+    if snap then usage = snap else refreshUsage(i + 1) end
   end)
+end
+
+local function readJson(path, cb)
+  noctalia.readFileAsync(noctalia.expandPath(path), function(contents)
+    local value = contents and noctalia.json.decode(contents) or nil
+    cb(if type(value) == "table" then value else nil)
+  end)
+end
+
+-- Feed states -> the widget's: idle/ended sessions are just idle.
+local FEED_STATE = { working = "working", blocked = "blocked", failed = "failed", done = "done", idle = "idle", ended = "idle" }
+
+-- Fill entry from its feed file and, for a background job, its job file.
+-- The job file's state is the agents view's own, so it wins for background jobs;
+-- the feed adds the real reason text and the context fill.
+local function join(entry, feed, job)
+  local updated = 0
+  if feed then
+    entry.state = FEED_STATE[feed.state] or entry.state
+    entry.reason = type(feed.reason) == "string" and feed.reason or ""
+    entry.haiku = type(feed.summary) == "string" and feed.summary or ""
+    if type(feed.context) == "table" and type(feed.context.percent) == "number" then entry.ctx = feed.context.percent end
+    updated = seconds(feed.updatedAt)
+  end
+  if job then
+    if type(job.state) == "string" then entry.state = job.state end
+    if entry.reason == "" and type(job.detail) == "string" then
+      entry.reason = job.detail
+      entry.haiku = haiku(job.detail)
+    end
+    local info = noctalia.fileInfo(noctalia.expandPath(`~/.claude/jobs/{entry.id}/state.json`))
+    if info and type(info.mtime) == "number" then updated = math.max(updated, seconds(info.mtime)) end
+  end
+  local window = if entry.kind == "background" then DONE_FRESH_S else INT_FRESH_S
+  entry.fresh = updated > 0 and (os.time() - updated) < window
 end
 
 local function refresh()
@@ -225,32 +281,35 @@ local function refresh()
       polling = false
       return
     end
-    -- The roster also lists interactive sessions (no id/state); only background ones are jobs.
-    local jobs = {}
+    local list = {}
     for _, a in ipairs(roster) do
-      if a.kind == "background" and a.id then table.insert(jobs, a) end
-    end
-    roster = jobs
-    local list, pending = {}, #roster
-    if pending == 0 then return finish(list) end
-    for i, a in ipairs(roster) do
-      local entry = { id = tostring(a.id), name = tostring(a.name or a.id), state = tostring(a.state or ""), startedAt = a.startedAt, haiku = "", fresh = false }
-      list[i] = entry
-      local path = noctalia.expandPath(`~/.claude/jobs/{a.id}/state.json`)
-      local info = noctalia.fileInfo(path)
-      if info and type(info.mtime) == "number" then
-        local mtime = if info.mtime > 1e12 then info.mtime / 1000 else info.mtime
-        entry.fresh = (os.time() - mtime) < DONE_FRESH_S
+      if type(a.sessionId) == "string" then
+        local kind = if a.kind == "background" then "background" else "interactive"
+        -- Interactive sessions have no job id or state in the roster: busy/idle only.
+        local state = if kind == "background" then tostring(a.state or "") elseif a.status == "busy" then "working" else "idle"
+        table.insert(list, {
+          id = tostring(a.id or string.sub(a.sessionId, 1, 8)),
+          sessionId = a.sessionId,
+          kind = kind,
+          name = tostring(a.name or a.id or string.sub(a.sessionId, 1, 8)),
+          state = state,
+          startedAt = a.startedAt,
+          reason = "",
+          haiku = "",
+          fresh = false,
+        })
       end
-      noctalia.readFileAsync(path, function(contents)
-        local job = contents and noctalia.json.decode(contents) or nil
-        if type(job) == "table" then
-          entry.haiku = haiku(job.detail)
-          -- The job file's state (working/done/blocked/failed) is fresher than the roster's.
-          if type(job.state) == "string" then entry.state = job.state end
+    end
+    local pending = #list
+    if pending == 0 then return finish(list) end
+    for _, entry in ipairs(list) do
+      readJson(`{FEED_DIR}/{entry.sessionId}.json`, function(feed)
+        local function done(job)
+          join(entry, feed, job)
+          pending -= 1
+          if pending == 0 then finish(list) end
         end
-        pending -= 1
-        if pending == 0 then finish(list) end
+        if entry.kind == "background" then readJson(`~/.claude/jobs/{entry.id}/state.json`, done) else done(nil) end
       end)
     end
   end)
@@ -268,6 +327,11 @@ function update()
     refresh()
   end
   render()
+end
+
+-- The agents-feed mod pings this on every change: refresh on the next tick.
+function onIpc(event)
+  if event == "refresh" then pollIn = 0 end
 end
 
 function onClick()
