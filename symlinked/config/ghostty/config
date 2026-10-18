@@ -18,7 +18,7 @@ keybind = shift+enter=text:\n
 # the pane's scrollback. It dumps the scrollback + screen to a file and types
 # the tagged path into fixme's own input. Keep in sync with ghostty_capture in
 # bin/fixme.
-keybind = ctrl+alt+shift+f9=text:__fixme_screen__:
+keybind = super+ctrl+shift+f=text:__fixme_screen__:
 keybind = chain=write_screen_file:paste
 keybind = chain=text:\n
 
