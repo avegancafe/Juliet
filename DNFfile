@@ -112,6 +112,9 @@ xorg-x11-drv-nvidia-cuda
 mokutil
 wl-clipboard
 cliphist
+# wtype: bin/fixme presses a hidden Ghostty keybind with it to dump the pane's
+# scrollback (Ghostty's GTK build has no other way for a shell to ask for it).
+wtype
 # cava: the backend behind noctalia's audio visualizer (audio.visualizerType /
 # audio.cavaFrameRate in noctalia/settings.json). It arrived on this machine as
 # a dependency of dms, so `dnf remove dms` in setup-undms would take it back out

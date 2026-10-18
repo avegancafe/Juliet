@@ -14,4 +14,12 @@ quick-terminal-size = 100%
 macos-titlebar-style = tabs
 keybind = shift+enter=text:\n
 
+# Not for pressing by hand: bin/fixme presses this with wtype (Linux) to read
+# the pane's scrollback. It dumps the scrollback + screen to a file and types
+# the tagged path into fixme's own input. Keep in sync with ghostty_capture in
+# bin/fixme.
+keybind = ctrl+alt+shift+f9=text:__fixme_screen__:
+keybind = chain=write_screen_file:paste
+keybind = chain=text:\n
+
 config-file = ?../local/ghostty/config
