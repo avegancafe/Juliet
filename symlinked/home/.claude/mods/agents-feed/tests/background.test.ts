@@ -15,9 +15,17 @@ describe('background session', () => {
     on('clock.now', () => ({ value: 1000 }))
     on('turn.complete', ($, e) => ({ text: e.answer }))
     on('session.measure', ($, e) => ({ changed: e.changed }))
+    on('classic.Notification', () => ({}))
 
     await $.turn.complete({ answer: 'Looked around.\nneeds input: which color should the die be?', durationMs: 5, isAborted: false, turnId: 't1', reason: 'answer' })
     expect(JSON.parse(writes.at(-1)!.text)).toMatchObject({ kind: 'background', jobId: 'abc123', state: 'blocked', reason: 'which color should the die be?' })
+
+    // The idle notice that follows must not overwrite the real reason...
+    await $.classic.Notification({ message: 'Claude is waiting for your input', notification_type: 'idle_prompt' })
+    expect(JSON.parse(writes.at(-1)!.text).reason).toBe('which color should the die be?')
+    // ...but a permission prompt does block.
+    await $.classic.Notification({ message: 'Claude needs your permission to use Bash', notification_type: 'permission_prompt' })
+    expect(JSON.parse(writes.at(-1)!.text)).toMatchObject({ state: 'blocked', reason: 'Claude needs your permission to use Bash' })
 
     await $.session.measure({
       context: { tokens: 50_000, window: 200_000, percent: 25 },

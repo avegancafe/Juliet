@@ -12,14 +12,23 @@ local function age(startedAt)
   return `{math.floor(mins / 60)}h{mins % 60}m`
 end
 
+-- One line, at most n characters (labels wrap otherwise and squeeze their neighbours).
+local function clip(s, n)
+  s = string.match(tostring(s or ""), "^[^\n]*") or ""
+  if utf8.len(s) and utf8.len(s) > n then
+    return string.sub(s, 1, utf8.offset(s, n) - 1) .. "…"
+  end
+  return s
+end
+
 local function row(a)
   local color = a.role or STATE_COLOR[a.state] or "error"
   return ui.row({ gap = 16, align = "center", paddingV = 4 }, {
     ui.label({ text = (a.die and a.die ~= "") and a.die or "●", color = color, width = 14 }),
     ui.label({ text = a.state, color = color, width = 70 }),
     ui.label({ text = if a.kind == "interactive" then "int" else "bg", color = "on_surface_variant", width = 28 }),
-    ui.label({ text = a.name, color = "on_surface", flexGrow = 1 }),
-    ui.label({ text = a.reason or "", color = "on_surface_variant", width = 420 }),
+    ui.label({ text = clip(a.name, 34), color = "on_surface", width = 290 }),
+    ui.label({ text = clip(a.reason, 64), color = "on_surface_variant", flexGrow = 1 }),
     ui.label({ text = if type(a.ctx) == "number" then `ctx {math.floor(a.ctx + 0.5)}%` else "", color = "on_surface_variant", width = 64 }),
     ui.label({ text = age(a.startedAt), color = "on_surface_variant", width = 56 }),
   })

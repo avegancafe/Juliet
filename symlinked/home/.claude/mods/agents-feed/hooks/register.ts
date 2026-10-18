@@ -14,6 +14,8 @@ let dir = ''
 // the call itself starting means you answered it.
 let isAwaitingPermission = false
 
+const IGNORED_NOTIFICATIONS = new Set(['idle_prompt', 'auth_success'])
+
 async function ensure($: EngineInterface): Promise<Feed> {
   if (feed) return feed
   const home = (await $.env.get('HOME')) ?? ''
@@ -109,10 +111,12 @@ export const register: Register = (on) => {
     return next(e)
   }).catch(($, e, next) => next(e))
 
-  // Permission prompts and "waiting for input" notices, where classic hooks reach
-  // installed plugins (an organization's managed settings can withhold them).
+  // Permission prompts and the like, where classic hooks reach installed plugins (an
+  // organization's managed settings can withhold them). The idle "waiting for your
+  // input" notice is skipped: turn.complete already said why the turn ended, and
+  // that reason is the useful one.
   on('classic.Notification', async ($, e, next) => {
-    await setState($, 'blocked', e.message)
+    if (!IGNORED_NOTIFICATIONS.has(e.notification_type)) await setState($, 'blocked', e.message)
     return next(e)
   }).catch(($, e, next) => next(e))
 
