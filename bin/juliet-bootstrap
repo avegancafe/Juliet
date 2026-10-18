@@ -2043,10 +2043,10 @@ setup-fonts() {
 #      feat/module-priorities is unusable here. The feature branch was
 #      fast-forwarded into the fork's main to give a slash-free ref.
 #
-# No `command -v` guard: main moves, so re-running picks up new commits. Go's
-# module cache keeps that cheap when nothing changed. (First install of a new
-# module path can be slow while proxy.golang.org fetches it; subsequent ones are
-# fast, and it's already warmed.)
+# No `command -v` guard: main moves, so re-running picks up new commits. The
+# installed binary's pseudo-version ends in the commit it was built from, so
+# compare that to main's tip and only reinstall when they differ. (First install
+# of a new module path can be slow while proxy.golang.org fetches it.)
 CLAUDE_STATUSLINE_PKG="github.com/avegancafe/claude-statusline"
 CLAUDE_STATUSLINE_REF="main"
 
@@ -2077,6 +2077,18 @@ setup-claude-statusline() {
   # lags behind the real tip — observed installing a commit old enough to predate
   # a field the tracked config.toml references, producing "(statusline error)" with
   # a green exit. A personal fork wants the direct fetch.
+  local gobin installed_sha remote_sha
+  gobin="$(go env GOBIN)"
+  [[ -n "$gobin" ]] || gobin="$(go env GOPATH)/bin"
+  installed_sha=$(go version -m "$gobin/claude-statusline" 2> /dev/null \
+    | awk '$1 == "mod" { n = split($3, v, "-"); print v[n] }')
+  remote_sha=$(git ls-remote "https://${CLAUDE_STATUSLINE_PKG}" "refs/heads/${CLAUDE_STATUSLINE_REF}" 2> /dev/null \
+    | cut -c1-12)
+  if [[ -n "$installed_sha" && "$installed_sha" == "$remote_sha" ]]; then
+    skip "claude-statusline (up to date at ${installed_sha:0:7})"
+    return
+  fi
+
   spin "Installing claude-statusline (${CLAUDE_STATUSLINE_REF})..." \
     env GOPRIVATE='github.com/avegancafe/*' go install "${CLAUDE_STATUSLINE_PKG}@${CLAUDE_STATUSLINE_REF}" \
     || bootstrap_error "Failed to install claude-statusline — the Claude Code status line will render nothing." \
@@ -2299,15 +2311,33 @@ setup-hey() {
   fi
 
   # Homebrew's cask registers the completions system-wide on macOS; the Fedora
-  # installer registers them nowhere. Safe on every run: hey only rewrites
-  # files carrying its own `managed by hey-cli` marker, and a current file is
-  # a no-op.
-  if is-fedora; then
+  # installer registers them nowhere. hey only rewrites files carrying its own
+  # `managed by hey-cli` marker, but compare first anyway (minus that marker
+  # line, which install adds) so a current file reads as skipped, not "done". For fish the target is the stowed
+  # completions dir, so a hey upgrade shows up as a diff to commit.
+  local completion_file=""
+  case "$(basename "${SHELL:-}")" in
+    fish) completion_file="$HOME/.config/fish/completions/hey.fish" ;;
+    bash) completion_file="$HOME/.local/share/bash-completion/completions/hey" ;;
+  esac
+  if is-fedora && [[ -n "$completion_file" ]] \
+    && [[ -f "$completion_file" ]] \
+    && cmp -s <("$hey_bin" shell-completion generate "$(basename "$SHELL")" 2> /dev/null) \
+      <(grep -v '^# managed by hey-cli' "$completion_file"); then
+    skip "hey shell completions (up to date)"
+  elif is-fedora; then
     spin "Installing hey shell completions..." "$hey_bin" shell-completion install \
       || bootstrap_error "Failed to install hey shell completions" \
         "Run manually: hey shell-completion install"
   fi
 
+  # `hey skill` prints the SKILL.md embedded in this binary; install copies it to
+  # ~/.agents/skills/hey and links ~/.claude/skills/hey to it.
+  if "$hey_bin" skill 2> /dev/null | cmp -s - "$HOME/.agents/skills/hey/SKILL.md" \
+    && [[ -L "$HOME/.claude/skills/hey" ]]; then
+    skip "HEY agent skill (up to date)"
+    return
+  fi
   spin "Installing the HEY agent skill..." "$hey_bin" skill install \
     || bootstrap_error "Failed to install the HEY agent skill" \
       "Run manually: hey skill install"
