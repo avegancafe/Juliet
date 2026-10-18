@@ -2117,6 +2117,13 @@ setup-claude-code() {
     warn "Private plugin marketplaces won't clone over HTTPS until gh is installed and authenticated."
   fi
 
+  # Each `claude plugin ... list` costs ~0.5s, so list once and grep the
+  # captured output, under a step so the wait isn't a frozen screen.
+  substep "Checking Claude plugins..."
+  local marketplace_list plugin_list
+  marketplace_list=$(claude plugin marketplace list --json 2>/dev/null)
+  plugin_list=$(claude plugin list 2>/dev/null)
+
   # Define marketplaces to add
   # Format: "name:id" pairs (bash 3.2 compatible)
   marketplaces=(
@@ -2132,7 +2139,7 @@ setup-claude-code() {
   for marketplace_pair in "${marketplaces[@]}"; do
     marketplace_name="${marketplace_pair%%:*}"
     marketplace_id="${marketplace_pair#*:}"
-    if ! claude plugin marketplace list --json 2>/dev/null | grep -Fq "\"name\": \"$marketplace_name\""; then
+    if ! printf '%s\n' "$marketplace_list" | grep -Fq "\"name\": \"$marketplace_name\""; then
       spin "Adding $marketplace_name marketplace..." claude plugin marketplace add "$marketplace_id" \
         || warn "Failed to add $marketplace_name marketplace (non-fatal)."
     fi
@@ -2150,11 +2157,12 @@ setup-claude-code() {
 
   # Install plugins if not already installed
   for plugin in "${plugins[@]}"; do
-    if ! claude plugin list 2>/dev/null | grep -Fq "$plugin"; then
+    if ! printf '%s\n' "$plugin_list" | grep -Fq "$plugin"; then
       spin "Installing $plugin..." claude plugin install "$plugin" \
         || bootstrap_error "Failed to install $plugin — run 'claude plugin install $plugin' manually."
     fi
   done
+  unchanged "all installed"
 }
 
 # Anthropic doesn't ship an official Fedora/RPM build of Claude Desktop — only
