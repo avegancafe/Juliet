@@ -2216,7 +2216,8 @@ setup-opencode() {
   # cmux workspace tab when the agent goes idle or errors. It's a no-op
   # outside a cmux session, but warn if the cmux CLI is missing so the user
   # knows notifications won't fire.
-  if ! command -v cmux &> /dev/null; then
+  # cmux is macOS-only (a Brewfile cask), so there's nothing to install on Linux.
+  if is-macos && ! command -v cmux &> /dev/null; then
     warn "cmux CLI not found — opencode→cmux notifications stay inactive until cmux is installed."
   fi
 }
