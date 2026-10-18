@@ -92,12 +92,15 @@ local polling = false
 local function setMode(list)
   local best, bestRank, needs, working = nil, 99, 0, 0
   for _, a in ipairs(list) do
+    if a.state == "working" then working += 1 end
+  end
+  for _, a in ipairs(list) do
     local f, r, rank = outcome(a)
-    if f then
+    -- A finished session only claims the die once nothing is still running; while
+    -- work is in flight the die keeps tumbling. Failed/blocked always win.
+    if f and not (rank == 3 and working > 0) then
       needs += 1
       if rank < bestRank then best, bestRank = a, rank end
-    elseif a.state == "working" then
-      working += 1
     end
   end
   if best then
