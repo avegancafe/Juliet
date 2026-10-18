@@ -1,0 +1,16 @@
+# Bar widget showing Claude Code background-agent status (`claude agents --json`).
+id = "kyle/claude_agents"
+name = "Claude Agents"
+version = "0.1.0"
+plugin_api = 26
+author = "kyle"
+license = "MIT"
+dependencies = []
+tags = ["claude"]
+icon = "robot"
+description = "Counts of working / needs-input / done Claude Code background agents."
+
+[[widget]]
+id = "status"
+entry = "status.luau"
+
