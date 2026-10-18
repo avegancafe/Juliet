@@ -12,9 +12,9 @@ local function age(startedAt)
 end
 
 local function row(a)
-  local color = STATE_COLOR[a.state] or "error"
+  local color = a.role or STATE_COLOR[a.state] or "error"
   return ui.row({ gap = 16, align = "center", paddingV = 4 }, {
-    ui.label({ text = "●", color = color, width = 14 }),
+    ui.label({ text = (a.die and a.die ~= "") and a.die or "●", color = color, width = 14 }),
     ui.label({ text = a.state, color = color, width = 80 }),
     ui.label({ text = a.name, color = "on_surface", flexGrow = 1 }),
     ui.label({ text = a.haiku or "", color = "on_surface_variant", width = 220 }),
