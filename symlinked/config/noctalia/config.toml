@@ -51,3 +51,7 @@ end = [
 # Claude Code background agents (plugin: symlinked/home/.local/share/noctalia/plugins/claude_agents)
 [widget.claude]
 type = "kyle/claude_agents:status"
+
+# Local plugins stowed from symlinked/home/.local/share/noctalia/plugins
+[plugins]
+enabled = ["kyle/claude_agents"]
