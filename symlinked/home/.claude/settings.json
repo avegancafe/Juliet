@@ -127,7 +127,7 @@
       "~/.config/Juliet/"
     ]
   },
-  "model": "opus[1m]",
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -277,5 +277,6 @@
   },
   "feedbackSurveyState": {
     "lastShownTime": 1754002642696
-  }
+  },
+  "advisorModel": "opus"
 }
