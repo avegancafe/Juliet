@@ -14,3 +14,11 @@ description = "Counts of working / needs-input / done Claude Code background age
 id = "status"
 entry = "status.luau"
 
+[[panel]]
+id = "panel"
+entry = "panel.luau"
+width = 760
+height = "fill"
+placement = "floating"
+position = "center_right"
+
