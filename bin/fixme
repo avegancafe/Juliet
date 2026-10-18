@@ -1,27 +1,95 @@
 #!/usr/bin/env bash
-# fixme — hand this cmux pane's scrollback to a new Claude session (split right)
-# that looks for errors/issues and asks which ones to fix.
+# fixme — hand this terminal's scrollback to a new Claude session that looks
+# for errors/issues and asks which ones to fix.
 #
-# Usage: fixme [--lines N] [note...]
-#   --lines N   capture the last N lines of scrollback (default 5000)
-#   note        free-text hint passed along to Claude, e.g. `fixme the brew step failed`
+# Usage: fixme [--lines N] [--scrollback FILE]... [note...]
+#   --lines N           capture the last N lines of scrollback (default 5000)
+#   --scrollback FILE   use FILE as the scrollback instead of capturing it;
+#                       repeat to join files in order (empty values are skipped)
+#   note                free-text hint passed along to Claude, e.g. `fixme the brew step failed`
+#
+# Works in cmux and Ghostty. Claude opens in a split to the right, except in
+# Ghostty on Linux, where it opens in a new window (niri puts it in the next
+# column) since Ghostty's GTK build can't split from a script.
 set -euo pipefail
 
 lines=5000
+scrollback=()
 note=()
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --lines) lines="${2:?--lines needs a number}"; shift 2 ;;
     --lines=*) lines="${1#*=}"; shift ;;
-    -h|--help) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    --scrollback) scrollback+=("${2:?--scrollback needs a file}"); shift 2 ;;
+    --scrollback=) shift ;;
+    --scrollback=*) scrollback+=("${1#*=}"); shift ;;
+    -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) note+=("$1"); shift ;;
   esac
 done
 
-if [[ -z "${CMUX_SURFACE_ID:-}" ]] || ! command -v cmux >/dev/null; then
-  echo "fixme: must be run inside a cmux terminal" >&2
-  exit 1
+in_cmux() { [[ -n "${CMUX_SURFACE_ID:-}" ]] && command -v cmux >/dev/null; }
+in_ghostty() { [[ "${TERM_PROGRAM:-}" == ghostty ]]; }
+
+# Ghostty has no command a shell can run to read a pane's scrollback, but its
+# write_screen_file action (scrollback + screen) can paste the dump file's path
+# into the pane, and while we run, that input is ours. So: turn off echo, have
+# Ghostty run the action on this pane with a tag before the path, and read the
+# tagged line back from the tty.
+ghostty_capture() {
+  local tty_state line file=""
+  local paste_start=$'\e[200~' paste_end=$'\e[201~'
+  tty_state="$(stty -g </dev/tty)"
+  stty -echo </dev/tty
+
+  if [[ "$(uname -s)" == Darwin ]]; then
+    # Ghostty 1.3+ AppleScript runs the actions on the focused terminal (this one).
+    osascript >/dev/null <<'APPLESCRIPT'
+tell application "Ghostty"
+  set t to focused terminal of selected tab of front window
+  perform action "text:__fixme_screen__:" on t
+  perform action "write_screen_file:paste" on t
+  perform action "text:\\n" on t
+end tell
+APPLESCRIPT
+  else
+    # GTK Ghostty only exposes app-level actions over D-Bus, so press the hidden
+    # ctrl+alt+shift+f9 keybind (ghostty/config) that chains the same actions.
+    wtype -M ctrl -M alt -M shift -k F9 -m shift -m alt -m ctrl
+  fi
+
+  while IFS= read -r -t 3 line </dev/tty; do
+    # Drop bracketed-paste markers in case the shell left that mode on.
+    line="${line//"$paste_start"/}"
+    line="${line//"$paste_end"/}"
+    if [[ "$line" == *__fixme_screen__:* ]]; then
+      file="${line#*__fixme_screen__:}"
+      break
+    fi
+  done
+  stty "$tty_state" </dev/tty
+
+  if [[ -z "$file" ]]; then
+    echo "fixme: Ghostty didn't hand over the scrollback (is ctrl+alt+shift+f9 bound in ghostty/config, and was this pane focused?)" >&2
+    exit 1
+  fi
+  scrollback+=("$file")
+}
+
+if [[ ${#scrollback[@]} -eq 0 ]] && ! in_cmux; then
+  if in_ghostty && [[ -t 0 ]]; then
+    ghostty_capture
+  else
+    echo "fixme: must be run inside cmux or Ghostty" >&2
+    exit 1
+  fi
 fi
+for f in ${scrollback[@]+"${scrollback[@]}"}; do
+  if [[ ! -r "$f" ]]; then
+    echo "fixme: can't read scrollback file: $f" >&2
+    exit 1
+  fi
+done
 
 dir="${TMPDIR:-/tmp}/fixme"
 mkdir -p "$dir"
@@ -29,7 +97,11 @@ stamp="$(date +%Y%m%d-%H%M%S)"
 capture="$dir/$stamp-scrollback.txt"
 prompt_file="$dir/$stamp-prompt.md"
 
-cmux read-screen --surface "$CMUX_SURFACE_ID" --lines "$lines" >"$capture"
+if [[ ${#scrollback[@]} -gt 0 ]]; then
+  cat "${scrollback[@]}" | tail -n "$lines" >"$capture"
+else
+  cmux read-screen --surface "$CMUX_SURFACE_ID" --lines "$lines" >"$capture"
+fi
 
 prompt="Read the terminal session capture at $capture (the last $lines lines of scrollback from the pane I was just working in; my working directory was $PWD).
 
@@ -51,10 +123,30 @@ fi
 
 printf '%s\n' "$prompt" >"$prompt_file"
 
-# --command is typed into the new pane's interactive shell (fish), so keep it
-# one line of plain single-quoted words that fish and POSIX shells parse alike.
+# $cmd is run by the new pane's interactive shell (fish), so keep it one line
+# of plain single-quoted words that fish and POSIX shells parse alike.
 sq() { local esc="'\\''"; printf "'%s'" "${1//\'/$esc}"; }
 cmd="cd $(sq "$PWD") && claude --permission-mode plan $(sq "Read $prompt_file and follow the instructions in it.")"
 
-cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "$cmd" >/dev/null
+if in_cmux; then
+  cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "$cmd" >/dev/null
+elif [[ "$(uname -s)" == Darwin ]]; then
+  # Ghostty 1.3+ AppleScript: split the focused terminal (the one the keybind
+  # fired in) and type $cmd into the new split's shell, like cmux --command.
+  osascript - "$PWD" "$cmd" >/dev/null <<'APPLESCRIPT'
+on run argv
+  tell application "Ghostty"
+    set cfg to {initial working directory:(item 1 of argv), initial input:((item 2 of argv) & linefeed)}
+    set t to focused terminal of selected tab of front window
+    focus (split t direction right with configuration cfg)
+  end tell
+end run
+APPLESCRIPT
+else
+  # Ghostty GTK has no scriptable splits, so open a new window via D-Bus. Run
+  # $cmd in a login+interactive shell so PATH and secrets match a normal tab,
+  # then drop to a shell when Claude exits.
+  shell="${SHELL:-/bin/bash}"
+  ghostty +new-window --working-directory="$PWD" -e "$shell" -lic "$cmd; exec $(sq "$shell") -l" >/dev/null
+fi
 echo "fixme: captured $(wc -l <"$capture" | tr -d ' ') lines → $capture"
