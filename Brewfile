@@ -161,7 +161,7 @@ cask "gcloud-cli"
 cask "ghostty"
 cask "gpg-suite"
 cask "hammerspoon"
-cask "basecamp/tap/hey"
+cask "basecamp/tap/hey" if ENV["JULIET_HEY"] == "1" # opt-in: see setup-hey
 cask "kaleidoscope"
 cask "karabiner-elements"
 cask "keycastr"

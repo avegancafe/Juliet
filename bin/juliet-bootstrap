@@ -80,6 +80,17 @@ ENABLED_STEPS=()
 SKIPPED_STEPS=()
 SSH_EMAIL=""
 
+# HEY is Kyle's mail provider, not something every user of this repo has, so
+# its setup (the CLI cask, the agent skill, completions) is opt-in per machine:
+# JULIET_HEY=1 in the environment or in ~/.config/local/.env. Read the file
+# directly because bootstrap is bash and a fresh machine may not have a fish
+# shell that loaded it yet. Exported so brew bundle's Brewfile sees it too.
+if [[ -z "${JULIET_HEY:-}" && -f "$HOME/.config/local/.env" ]]; then
+  JULIET_HEY=$(sed -nE 's/^JULIET_HEY=(.*)$/\1/p' "$HOME/.config/local/.env" | tail -n 1)
+fi
+export JULIET_HEY="${JULIET_HEY:-}"
+hey-enabled() { [[ "$JULIET_HEY" == "1" ]]; }
+
 show-help() {
   cat << 'EOF'
 Usage: juliet-bootstrap [OPTIONS]
@@ -103,6 +114,8 @@ Examples:
 Environment Variables:
   JULIET_BOOTSTRAP_ARGS  Default arguments when no CLI args provided
                          Any CLI argument disables the env var
+  JULIET_HEY=1           Opt this machine into HEY setup (CLI, agent skill)
+                         Also read from ~/.config/local/.env
 
 Environment variable example:
   export JULIET_BOOTSTRAP_ARGS="-y --skip=packages"
@@ -522,6 +535,7 @@ resolve-thrift-link-conflict() {
 # later finds no `hey` binary. Drop the stale record so bundle installs the CLI.
 # Only when HEY.app is gone: a desktop app that's actually in use stays put.
 clear-stale-hey-desktop() {
+  hey-enabled || return 0
   brew list --cask hey-desktop &> /dev/null || return 0
   command -v hey &> /dev/null && return 0 # CLI already present: nothing shadowed
   [[ -d /Applications/HEY.app ]] && return 0
@@ -2209,6 +2223,11 @@ setup-opencode() {
 # carries a `managed by hey-cli` marker and is versioned, so re-running
 # refreshes it after a `hey upgrade`) and a stow link would fight that.
 setup-hey() {
+  if ! hey-enabled; then
+    skip "Skipping HEY setup (opt in with JULIET_HEY=1 in ~/.config/local/.env)"
+    return
+  fi
+
   # Resolve first: on Fedora the vendor installer drops the binary in
   # ~/.local/bin, which fish puts on PATH (env.fish) but a bash bootstrap that
   # predates that setup may not have yet.
@@ -2357,7 +2376,7 @@ run-claude() {
 }
 
 run-opencode() {
-  confirm-category "opencode" "Set up opencode? (CLI, cmux notification plugin, HEY agent skill)" || return
+  confirm-category "opencode" "Set up opencode? (CLI, cmux notification plugin, HEY agent skill if JULIET_HEY=1)" || return
   rlog "🤖 Setting up opencode..."
   setup-opencode
   # HEY's agent skill lands in the shared skills root opencode reads

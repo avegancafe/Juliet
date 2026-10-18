@@ -26,3 +26,6 @@ plans/
 .beads-credential-key
 .beads/proxieddb/
 *.gate.lock*
+
+# Written by `hey shell-completion install` (setup-hey); hey-cli owns it
+symlinked/config/fish/completions/hey.fish
