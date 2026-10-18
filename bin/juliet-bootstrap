@@ -841,55 +841,6 @@ setup-dnf() {
   fi
 }
 
-# noctalia-shell 4.7 moved off the generic `quickshell` package onto its own
-# `noctalia-qs` build, and the two conflict. On a machine that ever ran
-# DankMaterialShell, the danklinux copr's pinned quickshell
-# (0.2.1.1+pin713) is already installed and still satisfies noctalia-shell
-# 4.5.0, so dnf sees no way forward: `dnf upgrade noctalia-shell` reports
-# "nothing to do" (even with --allowerasing) and the machine sits on 4.5.0
-# indefinitely.
-#
-# That pin is not cosmetic. noctalia 4.5.0 rewrites this repo's settings.json
-# in its older schema (settingsVersion 53 over 59) every time it saves, which
-# resets wallpaper.directory to a nonexistent ~/Pictures/Wallpapers and drops
-# whole config sections. Asking for noctalia-qs by name is what breaks the
-# deadlock; dms keeps working because quickshell-git comes in as a drop-in
-# replacement provider of quickshell.
-setup-noctalia-qs() {
-  if ! is-fedora; then
-    return
-  fi
-
-  # Nothing to repair on a fresh machine: a clean `dnf install noctalia-shell`
-  # resolves straight to 4.7.x + noctalia-qs with no quickshell in the picture.
-  if ! rpm -q noctalia-shell &> /dev/null || rpm -q noctalia-qs &> /dev/null; then
-    return
-  fi
-  if ! rpm -q quickshell &> /dev/null; then
-    return
-  fi
-
-  substep "Swapping the pinned quickshell for noctalia-qs..."
-  # --allowerasing is required to drop the conflicting quickshell. Verified
-  # transaction shape: erase quickshell, install noctalia-qs + quickshell-git,
-  # upgrade noctalia-shell 4.5.0 (x86_64) -> 4.7.7 (noarch).
-  sudo dnf install -y --allowerasing noctalia-qs \
-    || bootstrap_error "Failed to install noctalia-qs" \
-      "Inspect the transaction manually: dnf install --assumeno --allowerasing noctalia-qs"
-
-  # noctalia is spawned unsupervised by niri (spawn-at-startup "qs" -c
-  # noctalia-shell), so nothing restarts it into the new build on its own — and
-  # the old process still running will rewrite settings.json in the old schema
-  # when it next saves, so it has to go before the config is restored.
-  if pgrep -f "qs -c noctalia-shell" &> /dev/null; then
-    notice "noctalia upgraded, but the old build is still running and still writing the old settings schema."
-    substep "Restart it, then restore the config, in this order:"
-    substep "  pkill -f 'qs -c noctalia-shell'"
-    substep "  git -C \"$HOME/.config/Juliet\" restore symlinked/config/noctalia/settings.json"
-    substep "  setsid qs -c noctalia-shell &> /dev/null &"
-  fi
-}
-
 setup-flatpak() {
   substep "Setting up Flatpak packages..."
 
@@ -1714,35 +1665,6 @@ setup-deplasma() {
   sudo sysctl --system &> /dev/null || true
 }
 
-# The niri config starts the shell with `qs -c noctalia-shell`, and quickshell
-# resolves -c only against ~/.config/quickshell — never against the packaged
-# copy in /usr/share/quickshell. Without this link the spawn fails silently at
-# login ("Could not find \"noctalia-shell\" config directory"), which on a
-# machine that still had dms installed just looked like dms winning. The
-# packaged noctalia-shell script creates the link; Juliet's own noctalia config
-# (settings, Bamboo scheme) is separate and lands in ~/.config/noctalia by stow.
-setup-noctalia() {
-  if ! is-fedora; then
-    return
-  fi
-
-  if ! command -v noctalia-shell &> /dev/null; then
-    return
-  fi
-
-  local link="$HOME/.config/quickshell/noctalia-shell"
-  # -e follows the link, so a dangling one (stale package path) also re-links.
-  if [[ -e "$link" ]]; then
-    return
-  fi
-
-  substep "Linking the noctalia-shell quickshell config..."
-  rm -f "$link"
-  noctalia-shell setup --symlink --force &> /dev/null \
-    || bootstrap_error "Failed to link the noctalia-shell quickshell config" \
-      "Run it manually: noctalia-shell setup --symlink --force"
-}
-
 # DankMaterialShell (dms) was the niri shell before noctalia, and it does not
 # step aside quietly: its user unit is enabled independently of niri's
 # spawn-at-startup, and it claims the org.freedesktop.Notifications bus name, so
@@ -1757,9 +1679,9 @@ setup-undms() {
 
   # Never retire the old shell unless the replacement is actually installed —
   # otherwise a half-bootstrapped machine logs in to a bare compositor.
-  if ! rpm -q noctalia-shell &> /dev/null; then
+  if ! rpm -q noctalia &> /dev/null; then
     if rpm -q dms &> /dev/null; then
-      warn "Keeping dms: noctalia-shell is not installed yet (run the packages step first)."
+      warn "Keeping dms: noctalia is not installed yet (run the packages step first)."
     fi
     return
   fi
@@ -2343,8 +2265,6 @@ run-packages() {
     setup-brew
   elif is-fedora; then
     setup-dnf
-    # After setup-dnf, so noctalia-shell is present to repair.
-    setup-noctalia-qs
     setup-flatpak
     # Homebrew isn't the package manager on Fedora, but it is still installed
     # here (setup-cargo leans on brew's rust), so its taps need the same
@@ -2392,8 +2312,7 @@ run-security() {
 run-desktop() {
   # Only show on Linux with relevant tools. Noctalia (the niri shell) is
   # installed via the DNFfile and started by spawn-at-startup in the niri
-  # config; setup-noctalia only links the config path that spawn needs, and
-  # setup-undms clears the previous shell out of its way. Each setup-* step
+  # config; setup-undms clears the previous shell out of its way. Each setup-* step
   # self-guards on the tool it configures, so only skip the whole category when
   # none are present.
   if ! is-fedora; then return; fi
@@ -2405,7 +2324,7 @@ run-desktop() {
     && ! rpm -q plasma-drkonqi &> /dev/null \
     && ! rpm -q akonadi-calendar &> /dev/null \
     && ! rpm -q dms &> /dev/null \
-    && ! command -v noctalia-shell &> /dev/null \
+    && ! command -v noctalia &> /dev/null \
     && ! rpm -q akmod-nvidia &> /dev/null; then
     return
   fi
@@ -2416,9 +2335,6 @@ run-desktop() {
   # setup-deplasma removes plasma-login-manager, or there's no way to log in.
   setup-sddm
   setup-deplasma
-  # Order matters: link noctalia's config before retiring dms, so the machine is
-  # never left with no working shell.
-  setup-noctalia
   setup-undms
   setup-coredump-limits
   setup-crash-purge

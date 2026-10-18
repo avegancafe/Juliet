@@ -292,7 +292,7 @@ layout {
 // a Plasma session; polkit-gnome was retired from Fedora, so lxqt-policykit
 // is the maintained, DE-agnostic Qt agent.
 spawn-at-startup "/usr/libexec/lxqt-policykit-agent"
-spawn-at-startup "qs" "-c" "noctalia-shell"
+spawn-at-startup "noctalia"
 spawn-at-startup "ghostty"
 // Delay steam so noctalia can come up and paint the wallpaper first,
 // without competing for CPU/GPU/IO during login.
@@ -444,7 +444,7 @@ binds {
     // menu). keyd gives leftmeta a dual role: hold = the Mod modifier (so every
     // Mod+... bind below still works), tap = F13, which niri binds here.
     // Requires the keyd setup — see etc/keyd/default.conf.
-    F13 hotkey-overlay-title="Noctalia Control Center: tap Super" { spawn "qs" "-c" "noctalia-shell" "ipc" "call" "controlCenter" "toggle"; }
+    F13 hotkey-overlay-title="Noctalia Control Center: tap Super" { spawn "noctalia" "msg" "panel-toggle" "control-center"; }
     Mod+Shift+Period hotkey-overlay-title="Emoji/Unicode Picker: rofimoji" { spawn "rofimoji"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: hyprlock" { spawn "hyprlock"; }
 
@@ -720,6 +720,6 @@ debug {
 
 // Noctalia: show the wallpaper blurred behind the overview backdrop.
 layer-rule {
-    match namespace="^noctalia-overview*"
+    match namespace="^noctalia-backdrop"
     place-within-backdrop true
 }

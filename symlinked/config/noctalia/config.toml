@@ -1,0 +1,48 @@
+# Noctalia 5 config. Hand-written layer; GUI changes land in
+# ~/.local/state/noctalia/settings.toml and override this file.
+
+[theme]
+mode = "dark"
+source = "custom"
+custom_palette = "Bamboo"  # palettes/Bamboo.json
+
+[shell]
+font_family = "Iosevka Nerd Font Mono"
+
+[shell.animation]
+enabled = false
+
+[wallpaper]
+directory = "~/.config/Juliet/etc/wallpaper"
+fill_mode = "crop"
+
+[wallpaper.default]
+path = "~/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png"
+
+# Wallpaper blurred behind niri's overview (pairs with the
+# ^noctalia-backdrop layer-rule in niri/config.kdl).
+[backdrop]
+enabled = true
+blur_intensity = 0.4
+tint_intensity = 0.6
+
+[location]
+address = "Brooklyn"
+
+[nightlight]
+enabled = true
+temperature_night = 5535
+
+[bar.default]
+background_opacity = 0.93
+start = ["launcher", "cpu", "ram", "active_window"]
+center = ["workspaces"]
+end = [
+  "audio_visualizer",
+  "tray",
+  "power_profile",
+  "network",
+  "battery",
+  "clock",
+  "notifications",
+]

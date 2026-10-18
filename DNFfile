@@ -14,7 +14,6 @@ copr scottames/ghostty
 # copr above).
 copr scottames/hypr
 copr phracek/PyCharm
-copr zhangyi6324/noctalia-shell
 # neovide has no official Fedora package; agraven/neovide is abandoned (empty
 # f44 repo) — bijumon/neovide-release tracks upstream releases with f44 builds
 copr bijumon/neovide-release
@@ -57,7 +56,7 @@ golang-x-tools-goimports
 # Window Manager / Desktop
 niri
 hyprlock
-noctalia-shell
+noctalia
 # sddm: the display manager. Fedora 44's KDE spin ships plasma-login-manager
 # instead, but this machine runs niri, not Plasma — and the whole Plasma stack
 # is removed by the setup-deplasma step. sddm is the greeter Juliet themes
