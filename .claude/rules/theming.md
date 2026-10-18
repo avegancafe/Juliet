@@ -16,7 +16,7 @@ Bamboo theme is applied consistently across all applications.
 | Ghostty | `symlinked/config/ghostty/config` | Bamboo theme |
 | Helix | `symlinked/config/helix/config.toml` | Bamboo theme |
 | Btop | `symlinked/config/btop/btop.conf` | Bamboo theme |
-| Noctalia | `symlinked/config/noctalia/colorschemes/Bamboo/Bamboo.json` | Custom scheme; selected via `predefinedScheme: "Bamboo"` in `settings.json` (edit only while noctalia is stopped) |
+| Noctalia | `symlinked/config/noctalia/palettes/Bamboo.json` | Custom palette; selected via `[theme] source = "custom"`, `custom_palette = "Bamboo"` in `config.toml` (GUI changes land in `~/.local/state/noctalia/settings.toml` and override it) |
 
 ## Theme Assets
 

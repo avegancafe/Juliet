@@ -78,7 +78,7 @@ stow --target=$HOME/.config --dir=$HOME/.config/Juliet/symlinked config
 # 4. Restart the app and verify it reads/writes through the symlink
 ```
 
-**Runtime-rewritten files** (e.g. noctalia's `settings.json`): only edit these while the app is stopped, or through the app's own UI — external edits made while it runs get overwritten when it next saves.
+**Runtime-rewritten files** (e.g. a JSON settings file the app saves itself): only edit these while the app is stopped, or through the app's own UI — external edits made while it runs get overwritten when it next saves.
 
 ## Example: Adding Fuzzel Config
 
