@@ -29,14 +29,16 @@ local USAGE_STALE_S = 15 * 60
 local FEED_DIR = "~/.cache/claude-agents"
 local USAGE_PATHS = { FEED_DIR .. "/_usage.json" }
 
--- Dock-style bounce: the die sits on the floor of a fixed-height cell and hops
--- under constant gravity (height is a parabola in time: fast off the floor, slow
--- at the top, fast back down), then a small damped rebound, then rests on the
--- floor before the next hop. Height comes from wall-clock time, so it stays a true
--- parabola however the 73ms ticks sample it.
-local CELL_H = 28
+-- Dock-style bounce: the "floor" is the die's normal resting spot, centred in the
+-- bar like every other icon; it hops up from there under constant gravity (height
+-- is a parabola in time: fast off the floor, slow at the top, fast back down),
+-- makes a small damped rebound, and settles back exactly where it sits. Height
+-- comes from wall-clock time, so it stays a true parabola however the 73ms ticks
+-- sample it. The cell is centred in the 34px bar, so its top half is the headroom.
+local CELL_H = 32
 local DIE_PX = 18
-local HOP_PX = CELL_H - DIE_PX
+local REST_PX = (CELL_H - DIE_PX) / 2 -- die centred in the cell
+local HOP_PX = CELL_H - DIE_PX - REST_PX -- headroom above the resting spot
 -- Per state: one cycle's length, and its hops as {share of the cycle, share of HOP_PX};
 -- what's left of the cycle is rest on the floor.
 local BOUNCE = {
@@ -44,7 +46,7 @@ local BOUNCE = {
   failed = { period = 700, hops = { { 0.6, 1 }, { 0.2, 0.18 } } },
 }
 
--- Pixels above the floor at time nowMs for the given BOUNCE entry.
+-- Pixels above the resting spot at time nowMs for the given BOUNCE entry.
 local function lift(spec, nowMs)
   local t = (nowMs % spec.period) / spec.period
   for _, hop in ipairs(spec.hops) do
@@ -202,12 +204,12 @@ local function render()
     -- once when the headline changes, then holds its face.
     local shown = face
     if mode == "working" or roll > 0 then shown = math.random(1, 6) end
-    -- A die that isn't bouncing floats mid-cell; a bouncing one starts from the floor.
-    local up = HOP_PX / 2
+    -- Every die rests at the same centred spot; a bouncing one hops up from it.
+    local up = REST_PX
     local spec = mode == "dice" and roll == 0 and BOUNCE[settled]
-    if spec then up = lift(spec, noctalia.nowMs()) end
-    -- An invisible fixed-height box under the die is its height above the floor
-    -- (ui.spacer flexes, so it can't hold a height).
+    if spec then up += lift(spec, noctalia.nowMs()) end
+    -- An invisible fixed-height box under the die is its height above the cell's
+    -- bottom (ui.spacer flexes, so it can't hold a height).
     lead = ui.column({ height = CELL_H, width = DIE_PX, justify = "end", align = "center" }, {
       ui.glyph({ name = `dice-{shown}-filled`, size = DIE_PX, color = role }),
       ui.box({ width = 1, height = math.floor(up + 0.5), opacity = 0 }),
