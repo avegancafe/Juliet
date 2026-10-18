@@ -14,12 +14,13 @@ quick-terminal-size = 100%
 macos-titlebar-style = tabs
 keybind = shift+enter=text:\n
 
-# Not for pressing by hand: bin/fixme presses this with wtype (Linux) to read
-# the pane's scrollback. It dumps the scrollback + screen to a file and types
-# the tagged path into fixme's own input. Keep in sync with ghostty_capture in
-# bin/fixme.
-keybind = super+ctrl+shift+f=text:__fixme_screen__:
+# fixme (Juliet bin/fixme): dump this pane's scrollback + screen to a file and
+# type `fixme --scrollback=<file> ` at the start of the line (\x01), then run it.
+# Press it at a shell prompt (after typing an optional note), or just type
+# `fixme`, which presses this key itself (wtype) and reads the line back.
+# Keep in sync with ghostty_capture in bin/fixme.
+keybind = super+ctrl+shift+f=text:\x01fixme --scrollback=
 keybind = chain=write_screen_file:paste
-keybind = chain=text:\n
+keybind = chain=text:\x20\r
 
 config-file = ?../local/ghostty/config

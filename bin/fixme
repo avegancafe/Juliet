@@ -8,7 +8,8 @@
 #                       repeat to join files in order (empty values are skipped)
 #   note                free-text hint passed along to Claude, e.g. `fixme the brew step failed`
 #
-# Works in cmux and Ghostty. Claude opens in a split to the right, except in
+# Works in cmux and Ghostty; in Ghostty, pressing super+ctrl+shift+f at a
+# prompt does the same. Claude opens in a split to the right, except in
 # Ghostty on Linux, where it opens in a new window (niri puts it in the next
 # column) since Ghostty's GTK build can't split from a script.
 set -euo pipefail
@@ -23,7 +24,7 @@ while [[ $# -gt 0 ]]; do
     --scrollback) scrollback+=("${2:?--scrollback needs a file}"); shift 2 ;;
     --scrollback=) shift ;;
     --scrollback=*) scrollback+=("${1#*=}"); shift ;;
-    -h|--help) sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) note+=("$1"); shift ;;
   esac
 done
@@ -31,11 +32,18 @@ done
 in_cmux() { [[ -n "${CMUX_SURFACE_ID:-}" ]] && command -v cmux >/dev/null; }
 in_ghostty() { [[ "${TERM_PROGRAM:-}" == ghostty ]]; }
 
+# Pressing super+ctrl+shift+f at a prompt types `fixme --scrollback=<file> `
+# before whatever note was on the line, so a typed `fixme the brew step failed`
+# arrives with a note starting with "fixme".
+if [[ "${note[0]:-}" == fixme ]]; then
+  note=(${note[@]+"${note[@]:1}"})
+fi
+
 # Ghostty has no command a shell can run to read a pane's scrollback, but its
 # write_screen_file action (scrollback + screen) can paste the dump file's path
 # into the pane, and while we run, that input is ours. So: turn off echo, have
-# Ghostty run the action on this pane with a tag before the path, and read the
-# tagged line back from the tty.
+# Ghostty run the same actions as the super+ctrl+shift+f keybind on this pane,
+# and read the `fixme --scrollback=<file>` line it types back from the tty.
 ghostty_capture() {
   local tty_state line file=""
   local paste_start=$'\e[200~' paste_end=$'\e[201~'
@@ -47,9 +55,9 @@ ghostty_capture() {
     osascript >/dev/null <<'APPLESCRIPT'
 tell application "Ghostty"
   set t to focused terminal of selected tab of front window
-  perform action "text:__fixme_screen__:" on t
+  perform action "text:\\x01fixme --scrollback=" on t
   perform action "write_screen_file:paste" on t
-  perform action "text:\\n" on t
+  perform action "text:\\x20\\r" on t
 end tell
 APPLESCRIPT
   else
@@ -62,8 +70,9 @@ APPLESCRIPT
     # Drop bracketed-paste markers in case the shell left that mode on.
     line="${line//"$paste_start"/}"
     line="${line//"$paste_end"/}"
-    if [[ "$line" == *__fixme_screen__:* ]]; then
-      file="${line#*__fixme_screen__:}"
+    if [[ "$line" == *"fixme --scrollback="* ]]; then
+      file="${line#*fixme --scrollback=}"
+      file="${file%%[[:space:]]*}"
       break
     fi
   done
