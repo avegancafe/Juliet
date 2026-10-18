@@ -8,8 +8,9 @@
 #                       repeat to join files in order (empty values are skipped)
 #   note                free-text hint passed along to Claude, e.g. `fixme the brew step failed`
 #
-# Works in cmux and Ghostty; in Ghostty, pressing super+ctrl+shift+f at a
-# prompt does the same. Claude opens in a split to the right, except in
+# Works in cmux and in Ghostty on macOS. In Ghostty on Linux, press
+# super+ctrl+shift+f at a prompt instead (it runs fixme with this pane's
+# scrollback; that also works on macOS). Claude opens in a split to the right, except in
 # Ghostty on Linux, where it opens in a new window (niri puts it in the next
 # column) since Ghostty's GTK build can't split from a script.
 set -euo pipefail
@@ -24,7 +25,7 @@ while [[ $# -gt 0 ]]; do
     --scrollback) scrollback+=("${2:?--scrollback needs a file}"); shift 2 ;;
     --scrollback=) shift ;;
     --scrollback=*) scrollback+=("${1#*=}"); shift ;;
-    -h|--help) sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) note+=("$1"); shift ;;
   esac
 done
@@ -41,10 +42,12 @@ fi
 
 # Ghostty has no command a shell can run to read a pane's scrollback, but its
 # write_screen_file action (scrollback + screen) can paste the dump file's path
-# into the pane, and while we run, that input is ours. So: turn off echo, have
-# Ghostty run the same actions as the super+ctrl+shift+f keybind on this pane,
-# and read the `fixme --scrollback=<file>` line it types back from the tty.
-# Prints the dump path once Ghostty types the `fixme --scrollback=<file>` line.
+# into the pane, and while we run, that input is ours. On macOS, AppleScript
+# runs the same actions as the super+ctrl+shift+f keybind on this exact pane;
+# we turn off echo and read back the `fixme --scrollback=<file>` line it types.
+# Linux Ghostty has no such API (its D-Bus/CLI IPC can only open windows), and
+# faking the keypress could land in whatever window gets focus, so there you
+# press super+ctrl+shift+f yourself.
 read_dump_path() {
   local line paste_start=$'\e[200~' paste_end=$'\e[201~'
   while IFS= read -r -t 2 line </dev/tty; do
@@ -60,18 +63,12 @@ read_dump_path() {
   return 1
 }
 
-# GTK Ghostty only exposes app-level actions over D-Bus, so press the
-# super+ctrl+shift+f keybind (ghostty/config) that chains the same actions.
-press_fixme_key() { wtype -M logo -M ctrl -M shift -k f -m shift -m ctrl -m logo; }
-
-ghostty_capture() {
+ghostty_capture_macos() {
   local tty_state file=""
   tty_state="$(stty -g </dev/tty)"
   stty -echo </dev/tty
-
-  if [[ "$(uname -s)" == Darwin ]]; then
-    # Ghostty 1.3+ AppleScript runs the actions on the focused terminal (this one).
-    osascript >/dev/null <<'APPLESCRIPT'
+  # Ghostty 1.3+ AppleScript runs the actions on the focused terminal (this one).
+  osascript >/dev/null <<'APPLESCRIPT'
 tell application "Ghostty"
   set t to focused terminal of selected tab of front window
   perform action "text:\\x01fixme --scrollback=" on t
@@ -79,35 +76,23 @@ tell application "Ghostty"
   perform action "text:\\x20\\r" on t
 end tell
 APPLESCRIPT
-    file="$(read_dump_path)" || true
-  else
-    press_fixme_key
-    file="$(read_dump_path)" || true
-    if [[ -z "$file" ]]; then
-      # Usually a Ghostty that hasn't reloaded its config since the keybind was
-      # added: Ghostty sent the unbound key to us as an escape sequence. Discard
-      # that, reload Ghostty's config over D-Bus, and try once more.
-      while read -r -s -t 0.2 -n 4096 _ </dev/tty; do :; done
-      gdbus call --session --dest com.mitchellh.ghostty \
-        --object-path /com/mitchellh/ghostty \
-        --method org.gtk.Actions.Activate reload-config '[]' '{}' >/dev/null 2>&1 || true
-      sleep 0.5
-      press_fixme_key
-      file="$(read_dump_path)" || true
-    fi
-  fi
+  file="$(read_dump_path)" || true
   stty "$tty_state" </dev/tty
 
   if [[ -z "$file" ]]; then
-    echo "fixme: Ghostty didn't hand over the scrollback (is super+ctrl+shift+f bound in ghostty/config, and was this pane focused?)" >&2
+    echo "fixme: Ghostty didn't hand over the scrollback (is AppleScript allowed for Ghostty in System Settings → Privacy & Security → Automation?)" >&2
     exit 1
   fi
   scrollback+=("$file")
 }
 
 if [[ ${#scrollback[@]} -eq 0 ]] && ! in_cmux; then
-  if in_ghostty && [[ -t 0 ]]; then
-    ghostty_capture
+  if in_ghostty && [[ "$(uname -s)" != Darwin ]]; then
+    echo "fixme: in Ghostty on Linux, press super+ctrl+shift+f at a shell prompt instead (type an optional note first)." >&2
+    echo "       (If nothing happens, reload Ghostty's config: ctrl+shift+,)" >&2
+    exit 1
+  elif in_ghostty && [[ -t 0 ]]; then
+    ghostty_capture_macos
   else
     echo "fixme: must be run inside cmux or Ghostty" >&2
     exit 1

@@ -16,9 +16,9 @@ keybind = shift+enter=text:\n
 
 # fixme (Juliet bin/fixme): dump this pane's scrollback + screen to a file and
 # type `fixme --scrollback=<file> ` at the start of the line (\x01), then run it.
-# Press it at a shell prompt (after typing an optional note), or just type
-# `fixme`, which presses this key itself (wtype) and reads the line back.
-# Keep in sync with ghostty_capture in bin/fixme.
+# Press it at a shell prompt, after typing an optional note. (On macOS, typing
+# `fixme` also works: it runs these same actions via AppleScript. Keep in sync
+# with ghostty_capture_macos in bin/fixme.)
 keybind = super+ctrl+shift+f=text:\x01fixme --scrollback=
 keybind = chain=write_screen_file:paste
 keybind = chain=text:\x20\r
