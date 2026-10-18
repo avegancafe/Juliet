@@ -21,7 +21,7 @@ Loaded line-by-line by `envsource` (`symlinked/config/fish/functions/aliases/env
 - `NAME=value`, split on the **first** `=` — keep it simple
 - **Don't quote values** — quotes are not stripped, so `NAME="x"` sets `"x"` (with quotes)
 - Comments must have `#` in **column 1**; an indented `#` line is not skipped and will be misparsed
-- Blank / whitespace-only lines are skipped
+- Blank / whitespace-only lines are skipped, and so are keys with an empty value (`KEY=`, the `.env.template` placeholder): they leave the variable untouched rather than exporting it empty
 - Each entry is exported globally (`set -gx`), so every new fish shell — and everything launched from one — inherits it
 
 ## Propagation and restarts
