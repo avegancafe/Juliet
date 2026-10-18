@@ -683,6 +683,10 @@ sync-copr-repos() {
   for enabled in $(dnf copr list 2> /dev/null | awk '{print $1}' \
     | sed 's|^copr.fedorainfracloud.org/||'); do
     printf '%s\n' "$declared" | grep -qxF "$enabled" && continue
+    # Hardware-gated coprs that setup-fingerprint owns.
+    if has-goodix-533c && printf '%s\n' "${FINGERPRINT_COPRS[@]}" | grep -qxF "$enabled"; then
+      continue
+    fi
 
     # One copr can own several repo ids: its own
     # copr:copr.fedorainfracloud.org:<owner>:<project>, plus a
@@ -1419,22 +1423,30 @@ setup-keyd() {
 #   sudo dnf swap libfprint-tod libfprint
 #   sudo dnf copr disable antiderivative/libfprint-tod-goodix-0.0.9
 #   sudo dnf copr disable manciukic/libfprint-tod-goodix
+# The fingerprint COPRs are enabled here rather than in the DNFfile because
+# they only belong on machines with the sensor. sync-copr-repos counts them as
+# declared on such machines so it doesn't flag them as strays.
+FINGERPRINT_COPRS=(antiderivative/libfprint-tod-goodix-0.0.9 manciukic/libfprint-tod-goodix)
+
+# Read from sysfs rather than lsusb so this doesn't depend on usbutils.
+has-goodix-533c() {
+  local dev
+  for dev in /sys/bus/usb/devices/*/; do
+    if [[ "$(cat "$dev/idVendor" 2>/dev/null)" == "27c6" \
+      && "$(cat "$dev/idProduct" 2>/dev/null)" == "533c" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 setup-fingerprint() {
   if ! is-fedora; then
     return
   fi
 
-  # Only meaningful on hardware carrying this exact sensor. Read from sysfs
-  # rather than lsusb so the step doesn't depend on usbutils being installed.
-  local dev found=""
-  for dev in /sys/bus/usb/devices/*/; do
-    if [[ "$(cat "$dev/idVendor" 2>/dev/null)" == "27c6" \
-      && "$(cat "$dev/idProduct" 2>/dev/null)" == "533c" ]]; then
-      found=1
-      break
-    fi
-  done
-  if [[ -z "$found" ]]; then
+  # Only meaningful on hardware carrying this exact sensor.
+  if ! has-goodix-533c; then
     return
   fi
 
@@ -1442,7 +1454,7 @@ setup-fingerprint() {
     substep "Installing the Goodix TOD fingerprint driver..."
 
     local repo
-    for repo in antiderivative/libfprint-tod-goodix-0.0.9 manciukic/libfprint-tod-goodix; do
+    for repo in "${FINGERPRINT_COPRS[@]}"; do
       if ! dnf copr list 2>/dev/null | grep -q "$repo"; then
         sudo dnf copr enable -y "$repo" \
           || bootstrap_error "Failed to enable COPR $repo" \
