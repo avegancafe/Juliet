@@ -44,9 +44,28 @@ fi
 # into the pane, and while we run, that input is ours. So: turn off echo, have
 # Ghostty run the same actions as the super+ctrl+shift+f keybind on this pane,
 # and read the `fixme --scrollback=<file>` line it types back from the tty.
+# Prints the dump path once Ghostty types the `fixme --scrollback=<file>` line.
+read_dump_path() {
+  local line paste_start=$'\e[200~' paste_end=$'\e[201~'
+  while IFS= read -r -t 2 line </dev/tty; do
+    # Drop bracketed-paste markers in case the shell left that mode on.
+    line="${line//"$paste_start"/}"
+    line="${line//"$paste_end"/}"
+    if [[ "$line" == *"fixme --scrollback="* ]]; then
+      line="${line#*fixme --scrollback=}"
+      printf '%s\n' "${line%%[[:space:]]*}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# GTK Ghostty only exposes app-level actions over D-Bus, so press the
+# super+ctrl+shift+f keybind (ghostty/config) that chains the same actions.
+press_fixme_key() { wtype -M logo -M ctrl -M shift -k f -m shift -m ctrl -m logo; }
+
 ghostty_capture() {
-  local tty_state line file=""
-  local paste_start=$'\e[200~' paste_end=$'\e[201~'
+  local tty_state file=""
   tty_state="$(stty -g </dev/tty)"
   stty -echo </dev/tty
 
@@ -60,22 +79,23 @@ tell application "Ghostty"
   perform action "text:\\x20\\r" on t
 end tell
 APPLESCRIPT
+    file="$(read_dump_path)" || true
   else
-    # GTK Ghostty only exposes app-level actions over D-Bus, so press the hidden
-    # super+ctrl+shift+f keybind (ghostty/config) that chains the same actions.
-    wtype -M logo -M ctrl -M shift -k f -m shift -m ctrl -m logo
-  fi
-
-  while IFS= read -r -t 3 line </dev/tty; do
-    # Drop bracketed-paste markers in case the shell left that mode on.
-    line="${line//"$paste_start"/}"
-    line="${line//"$paste_end"/}"
-    if [[ "$line" == *"fixme --scrollback="* ]]; then
-      file="${line#*fixme --scrollback=}"
-      file="${file%%[[:space:]]*}"
-      break
+    press_fixme_key
+    file="$(read_dump_path)" || true
+    if [[ -z "$file" ]]; then
+      # Usually a Ghostty that hasn't reloaded its config since the keybind was
+      # added: Ghostty sent the unbound key to us as an escape sequence. Discard
+      # that, reload Ghostty's config over D-Bus, and try once more.
+      while read -r -s -t 0.2 -n 4096 _ </dev/tty; do :; done
+      gdbus call --session --dest com.mitchellh.ghostty \
+        --object-path /com/mitchellh/ghostty \
+        --method org.gtk.Actions.Activate reload-config '[]' '{}' >/dev/null 2>&1 || true
+      sleep 0.5
+      press_fixme_key
+      file="$(read_dump_path)" || true
     fi
-  done
+  fi
   stty "$tty_state" </dev/tty
 
   if [[ -z "$file" ]]; then
