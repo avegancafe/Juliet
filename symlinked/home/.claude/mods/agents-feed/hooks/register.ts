@@ -16,24 +16,37 @@ let isAwaitingPermission = false
 
 const IGNORED_NOTIFICATIONS = new Set(['idle_prompt', 'auth_success'])
 
+// The session's file as last written, so a reload of this module (which runs
+// session.start again with fresh variables) picks up where it left off.
+async function previous($: EngineInterface, path: string, sessionId: string): Promise<Partial<Feed>> {
+  try {
+    const old = JSON.parse(await $.fs.read(path)) as Partial<Feed>
+    return old.sessionId === sessionId && old.state !== 'ended' ? old : {}
+  } catch {
+    return {}
+  }
+}
+
 async function ensure($: EngineInterface): Promise<Feed> {
   if (feed) return feed
   const home = (await $.env.get('HOME')) ?? ''
   const jobDir = await $.env.get('CLAUDE_JOB_DIR')
+  const sessionId = await $.session.id()
   dir = feedDir(home)
+  const old = await previous($, `${dir}/${sessionId}.json`, sessionId)
   feed = {
     v: 1,
-    sessionId: await $.session.id(),
+    state: old.state ?? 'idle',
+    reason: old.reason ?? '',
+    summary: old.summary ?? '',
+    context: old.context ?? {},
+    rateLimits: old.rateLimits ?? [],
+    updatedAt: old.updatedAt ?? 0,
+    sessionId,
     jobId: jobDir ? (jobDir.replace(/\/+$/, '').split('/').pop() ?? null) : null,
     kind: jobDir ? 'background' : 'interactive',
     cwd: await $.session.cwd(),
     model: await $.session.model(),
-    state: 'idle',
-    reason: '',
-    summary: '',
-    context: {},
-    rateLimits: [],
-    updatedAt: 0,
   }
   return feed
 }

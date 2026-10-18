@@ -13,6 +13,7 @@ describe('background session', () => {
     on('session.cwd', () => ({ value: '/work' }))
     on('session.model', () => ({ value: 'opus' }))
     on('clock.now', () => ({ value: 1000 }))
+    on('fs.read', () => ({ deny: 'no such file' }))
     on('turn.complete', ($, e) => ({ text: e.answer }))
     on('session.measure', ($, e) => ({ changed: e.changed }))
     on('classic.Notification', () => ({}))

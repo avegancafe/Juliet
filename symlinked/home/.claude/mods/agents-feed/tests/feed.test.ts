@@ -35,6 +35,7 @@ describe('interactive session', () => {
     on('session.cwd', () => ({ value: '/work' }))
     on('session.model', () => ({ value: 'opus' }))
     on('clock.now', () => ({ value: 1000 }))
+    on('fs.read', () => ({ deny: 'no such file' }))
     on('turn.start', ($, e) => ({ turnId: e.turnId }))
     on('turn.complete', ($, e) => ({ text: e.answer }))
 
