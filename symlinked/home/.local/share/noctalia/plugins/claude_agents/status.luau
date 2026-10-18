@@ -19,9 +19,10 @@
 -- The joined list is published to shared state ("agents") for panel.luau.
 -- Left click: wide panel.  Right click: `claude agents` in a terminal.
 
-local TICK_MS = 150
-local POLL_TICKS = 33 -- roster + usage refresh every ~5s (the feed's ping makes it sooner)
-local ROLL_TICKS = 10 -- ~1.5s of tumbling before the die settles
+local TICK_MS = 50 -- a tumbling die shows a new face every tick (~20/s)
+local SLOW = 3 -- the bounce and the neon z's step every SLOW ticks (150ms)
+local POLL_TICKS = 100 -- roster + usage refresh every ~5s (the feed's ping makes it sooner)
+local ROLL_TICKS = 30 -- ~1.5s of tumbling before the die settles
 local DONE_FRESH_S = 30 * 60
 local INT_FRESH_S = 5 * 60 -- every interactive turn ends "done": let it go quickly
 local USAGE_STALE_S = 15 * 60
@@ -33,9 +34,8 @@ local CELL_H = 28
 local BOUNCE = { "end", "end", "center", "start", "center", "end" }
 local BOUNCE_FAST = { "end", "start", "end", "start" }
 
-local DICE = { "⚀", "⚁", "⚂", "⚃", "⚄", "⚅" }
 -- Sleeping robot: the z's light up like a neon sign - switch on one tube at a time,
--- hold, buzz with a flicker, power down, repeat. {text, lit, ticks} (150ms per tick);
+-- hold, buzz with a flicker, power down, repeat. {text, lit, steps} (a step is SLOW ticks, 150ms);
 -- text is always 3 wide so the bar never reflows. Unlit = dimmed tube.
 local NEON = {
   { "   ", false, 5 },
@@ -181,14 +181,14 @@ local function render()
     local align = "center"
     if mode == "dice" and roll == 0 and (settled == "failed" or settled == "blocked") then
       local seq = settled == "failed" and BOUNCE_FAST or BOUNCE
-      align = seq[(tick % #seq) + 1]
+      align = seq[(math.floor(tick / SLOW) % #seq) + 1]
     end
     -- Fixed-height cell: moving the die between start/center/end is the hop.
     lead = ui.column({ height = CELL_H, width = 18, justify = align, align = "center" }, {
-      ui.label({ text = DICE[shown], color = role, fontSize = 12 }),
+      ui.glyph({ name = `dice-{shown}-filled`, size = 18, color = role }),
     })
   else
-    local step = NEON_TIMELINE[(tick % #NEON_TIMELINE) + 1]
+    local step = NEON_TIMELINE[(math.floor(tick / SLOW) % #NEON_TIMELINE) + 1]
     lead = ui.row({ gap = 6, align = "center" }, {
       ui.label({ text = "[-_-]", color = "on_surface_variant" }),
       ui.label({ text = step[1], color = step[2] and "secondary" or "on_surface_variant", opacity = step[2] and 1 or 0.45 }),
@@ -215,7 +215,7 @@ end
 local function finish(list)
   for _, a in ipairs(list) do
     local f, r = outcome(a)
-    a.die = f and DICE[f] or ""
+    a.face = f -- Tabler `dice-<face>-filled` in the panel; nil when it doesn't need you
     a.role = r or (a.state == "working" and "primary" or "on_surface_variant")
   end
   agents = list

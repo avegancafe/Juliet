@@ -24,7 +24,7 @@ end
 local function row(a)
   local color = a.role or STATE_COLOR[a.state] or "error"
   return ui.row({ gap = 16, align = "center", paddingV = 4 }, {
-    ui.label({ text = (a.die and a.die ~= "") and a.die or "●", color = color, width = 14 }),
+    if a.face then ui.glyph({ name = `dice-{a.face}-filled`, size = 16, color = color, width = 16 }) else ui.label({ text = "●", color = color, width = 16 }),
     ui.label({ text = a.state, color = color, width = 70 }),
     ui.label({ text = if a.kind == "interactive" then "int" else "bg", color = "on_surface_variant", width = 28 }),
     ui.label({ text = clip(a.name, 34), color = "on_surface", width = 290 }),
