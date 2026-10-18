@@ -784,8 +784,8 @@ dnf-satisfied() {
   rpm -q "$1" &> /dev/null && return 0
   rpm -q --whatprovides "$1" &> /dev/null && return 0
   # Binary/file provides need dnf's resolver; --assumeno exits 0 only when
-  # the spec is already satisfied. The cache is fresh from the transaction
-  # that just ran, so --cacheonly keeps this fast and offline.
+  # the spec is already satisfied. --cacheonly keeps this fast and offline; with
+  # no cache yet it fails, which just means the spec gets handed to dnf.
   dnf --cacheonly install --assumeno "$1" &> /dev/null
 }
 
@@ -823,17 +823,28 @@ setup-dnf() {
     packages+=("$line")
   done < "$DNFFILE"
 
+  # Only hand dnf what's missing, so a machine that's already converged doesn't
+  # prompt for sudo just to hear "Nothing to do".
+  missing=()
+  for pkg in ${packages[@]+"${packages[@]}"}; do
+    dnf-satisfied "$pkg" || missing+=("$pkg")
+  done
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    unchanged "all ${#packages[@]} installed"
+    return
+  fi
+
   # Install packages
-  if [[ ${#packages[@]} -gt 0 ]]; then
-    rlog "Installing ${#packages[@]} DNF packages..."
+  if [[ ${#missing[@]} -gt 0 ]]; then
+    rlog "Installing ${#missing[@]} DNF packages..."
     # --skip-unavailable/--skip-broken keep one bad package (e.g. steam
     # without RPM Fusion) from aborting the whole transaction.
-    sudo dnf install -y --skip-unavailable --skip-broken "${packages[@]}"
+    sudo dnf install -y --skip-unavailable --skip-broken "${missing[@]}"
 
     # Retry anything still missing individually so each failure surfaces its
     # own error instead of being silently skipped.
     failed=()
-    for pkg in "${packages[@]}"; do
+    for pkg in "${missing[@]}"; do
       dnf-satisfied "$pkg" && continue
       substep "Retrying $pkg individually..."
       sudo dnf install -y "$pkg" || failed+=("$pkg")
