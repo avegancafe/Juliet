@@ -82,7 +82,7 @@ _STEP_FN=""        # function that opened it
 _STEP_DEPTH=0      # its call-stack depth when opened
 _SPIN_PID=""
 _SPIN_FRAMES=(∙ " ")   # a blinking bullet
-_SPIN_DELAY=0.4
+_SPIN_DELAY=0.8
 _C_GREEN=$(_tput setaf 2)
 _C_RED=$(_tput setaf 1)
 _C_SPIN=$(_tput setaf 5)
@@ -97,7 +97,7 @@ _spinner_start() {
     while :; do
       printf '\r %s%s%s  %s' "$_C_SPIN" "${_SPIN_FRAMES[i % ${#_SPIN_FRAMES[@]}]}" "$RESET_CODE" "$1"
       i=$((i + 1))
-      sleep "$_SPIN_DELAY"
+      sleep "$_SPIN_DELAY" & wait $!   # wait, so a TERM from _spinner_stop lands now, not after the sleep
     done
   ) &
   _SPIN_PID=$!
