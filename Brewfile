@@ -161,7 +161,6 @@ cask "gcloud-cli"
 cask "ghostty"
 cask "gpg-suite"
 cask "hammerspoon"
-cask "basecamp/tap/hey" if ENV["JULIET_HEY"] == "1" # opt-in: see setup-hey
 cask "kaleidoscope"
 cask "karabiner-elements"
 cask "keycastr"
@@ -178,3 +177,9 @@ cask "visual-studio-code"
 cask "vlc", args: { appdir: "/Applications" }
 cask "vorssaint/tap/vorssaint"
 cask "zen"
+
+# Personal: Kyle's machines only (JULIET_PERSONAL=1 — see bin/juliet-bootstrap).
+# Taps stay declared above unconditionally; only the packages are gated.
+if ENV["JULIET_PERSONAL"] == "1"
+  cask "basecamp/tap/hey"
+end
