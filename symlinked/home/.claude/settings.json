@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy"
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy:~/.claude/mods/agents-feed"
   },
   "permissions": {
     "allow": [

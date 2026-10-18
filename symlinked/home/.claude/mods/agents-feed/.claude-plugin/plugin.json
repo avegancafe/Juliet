@@ -1,0 +1,1 @@
+{ "name": "agents-feed", "version": "0.1.0", "author": { "name": "Kyle" }, "description": "Writes each session's state, context fill and rate limits to ~/.cache/claude-agents for the Noctalia agents widget" }

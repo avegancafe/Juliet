@@ -1,4 +1,5 @@
-# Bar widget showing Claude Code background-agent status (`claude agents --json`).
+# Bar widget showing Claude Code session status: `claude agents --json` roster joined
+# with the agents-feed mod's snapshots (~/.cache/claude-agents/).
 id = "kyle/claude_agents"
 name = "Claude Agents"
 version = "0.1.0"
@@ -8,7 +9,7 @@ license = "MIT"
 dependencies = []
 tags = ["claude"]
 icon = "robot"
-description = "Counts of working / needs-input / done Claude Code background agents."
+description = "A die for what your Claude Code sessions need from you, plus 5h / 7d usage meters."
 
 [[widget]]
 id = "status"
@@ -17,7 +18,7 @@ entry = "status.luau"
 [[panel]]
 id = "panel"
 entry = "panel.luau"
-width = 760
+width = 1000
 height = "fill"
 placement = "floating"
 position = "center_right"
