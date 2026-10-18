@@ -2077,7 +2077,7 @@ setup-claude-code() {
   # `!gh ...` form resolves gh from PATH, so it stays portable across macOS/Fedora.
   if command -v gh &> /dev/null; then
     if gh auth status &> /dev/null; then
-      substep "Configuring gh as the git credential helper for GitHub (HTTPS access to private repos)..."
+      substep "Configuring gh as the GitHub git credential helper..."
       mkdir -p "$HOME/.config/local"
       git config --file "$HOME/.config/local/gitconfig" credential."https://github.com".helper "!gh auth git-credential"
       git config --file "$HOME/.config/local/gitconfig" credential."https://gist.github.com".helper "!gh auth git-credential"

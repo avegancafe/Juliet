@@ -90,12 +90,17 @@ _C_DIM=$(_tput dim)
 
 _spinner_start() {
   [ -t 1 ] || return 0
+  # A title wider than the terminal wraps, and \r only rewinds the last
+  # wrapped row, so every frame would reprint the head of the title. Clip it.
+  local title="$1" cols
+  cols=$(tput cols 2> /dev/null || echo 80)
+  (( ${#title} > cols - 5 )) && title="${title:0:cols-6}…"
   _tput civis
   (
     trap 'exit 0' TERM
     i=0
     while :; do
-      printf '\r %s%s%s  %s' "$_C_SPIN" "${_SPIN_FRAMES[i % ${#_SPIN_FRAMES[@]}]}" "$RESET_CODE" "$1"
+      printf '\r %s%s%s  %s' "$_C_SPIN" "${_SPIN_FRAMES[i % ${#_SPIN_FRAMES[@]}]}" "$RESET_CODE" "$title"
       i=$((i + 1))
       sleep "$_SPIN_DELAY" & wait $!   # wait, so a TERM from _spinner_stop lands now, not after the sleep
     done
