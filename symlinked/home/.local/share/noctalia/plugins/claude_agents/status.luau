@@ -8,7 +8,7 @@
 -- (a `done` session only counts while fresh: DONE_FRESH_S background, INT_FRESH_S interactive.)
 -- Nothing needs you but something is working: the die shuffles faces nonstop.
 -- Nothing running at all: sleeping robot with neon-sign z's (see NEON).
--- A failed/blocked die bounces (failed faster). Next to it: Claude Code 5h / 7d usage
+-- A failed/blocked die bounces like a Dock icon asking for attention (failed faster). Next to it: Claude Code 5h / 7d usage
 -- meters (dimmed when stale). Names, reasons and context fill live in the tooltip / panel.
 --
 -- Data: `claude agents --json` is the roster (who is alive, names). Each session's
@@ -19,20 +19,44 @@
 -- The joined list is published to shared state ("agents") for panel.luau.
 -- Left click: wide panel.  Right click: `claude agents` in a terminal.
 
-local TICK_MS = 50 -- a tumbling die shows a new face every tick (~20/s)
-local SLOW = 3 -- the bounce and the neon z's step every SLOW ticks (150ms)
-local POLL_TICKS = 100 -- roster + usage refresh every ~5s (the feed's ping makes it sooner)
-local ROLL_TICKS = 30 -- ~1.5s of tumbling before the die settles
+local TICK_MS = 73 -- a tumbling die shows a new face every tick (~14/s)
+local SLOW = 2 -- the neon z's step every SLOW ticks (~146ms)
+local POLL_TICKS = 68 -- roster + usage refresh every ~5s (the feed's ping makes it sooner)
+local ROLL_TICKS = 20 -- ~1.5s of tumbling before the die settles
 local DONE_FRESH_S = 30 * 60
 local INT_FRESH_S = 5 * 60 -- every interactive turn ends "done": let it go quickly
 local USAGE_STALE_S = 15 * 60
 local FEED_DIR = "~/.cache/claude-agents"
 local USAGE_PATHS = { FEED_DIR .. "/_usage.json" }
 
--- Vertical hop of the die inside a fixed-height cell (gravity-ish: dwell low, pop up).
+-- Dock-style bounce: the die sits on the floor of a fixed-height cell and hops
+-- under constant gravity (height is a parabola in time: fast off the floor, slow
+-- at the top, fast back down), then a small damped rebound, then rests on the
+-- floor before the next hop. Height comes from wall-clock time, so it stays a true
+-- parabola however the 73ms ticks sample it.
 local CELL_H = 28
-local BOUNCE = { "end", "end", "center", "start", "center", "end" }
-local BOUNCE_FAST = { "end", "start", "end", "start" }
+local DIE_PX = 18
+local HOP_PX = CELL_H - DIE_PX
+-- Per state: one cycle's length, and its hops as {share of the cycle, share of HOP_PX};
+-- what's left of the cycle is rest on the floor.
+local BOUNCE = {
+  blocked = { period = 1200, hops = { { 0.42, 1 }, { 0.16, 0.22 } } },
+  failed = { period = 700, hops = { { 0.6, 1 }, { 0.2, 0.18 } } },
+}
+
+-- Pixels above the floor at time nowMs for the given BOUNCE entry.
+local function lift(spec, nowMs)
+  local t = (nowMs % spec.period) / spec.period
+  for _, hop in ipairs(spec.hops) do
+    local share, height = hop[1], hop[2]
+    if t < share then
+      local x = t / share
+      return HOP_PX * height * 4 * x * (1 - x)
+    end
+    t -= share
+  end
+  return 0
+end
 
 -- Sleeping robot: the z's light up like a neon sign - switch on one tube at a time,
 -- hold, buzz with a flicker, power down, repeat. {text, lit, steps} (a step is SLOW ticks, 150ms);
@@ -178,14 +202,15 @@ local function render()
     -- once when the headline changes, then holds its face.
     local shown = face
     if mode == "working" or roll > 0 then shown = math.random(1, 6) end
-    local align = "center"
-    if mode == "dice" and roll == 0 and (settled == "failed" or settled == "blocked") then
-      local seq = settled == "failed" and BOUNCE_FAST or BOUNCE
-      align = seq[(math.floor(tick / SLOW) % #seq) + 1]
-    end
-    -- Fixed-height cell: moving the die between start/center/end is the hop.
-    lead = ui.column({ height = CELL_H, width = 18, justify = align, align = "center" }, {
-      ui.glyph({ name = `dice-{shown}-filled`, size = 18, color = role }),
+    -- A die that isn't bouncing floats mid-cell; a bouncing one starts from the floor.
+    local up = HOP_PX / 2
+    local spec = mode == "dice" and roll == 0 and BOUNCE[settled]
+    if spec then up = lift(spec, noctalia.nowMs()) end
+    -- An invisible fixed-height box under the die is its height above the floor
+    -- (ui.spacer flexes, so it can't hold a height).
+    lead = ui.column({ height = CELL_H, width = DIE_PX, justify = "end", align = "center" }, {
+      ui.glyph({ name = `dice-{shown}-filled`, size = DIE_PX, color = role }),
+      ui.box({ width = 1, height = math.floor(up + 0.5), opacity = 0 }),
     })
   else
     local step = NEON_TIMELINE[(math.floor(tick / SLOW) % #NEON_TIMELINE) + 1]
