@@ -870,14 +870,20 @@ setup-flatpak() {
     [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
     if [[ "$line" =~ ^remote[[:space:]]+ ]]; then
       read -r _ name url <<< "$line"
+      flatpak remotes --columns=name 2> /dev/null | grep -qxF "$name" && continue
       substep "Adding Flatpak remote: $name"
       flatpak remote-add --if-not-exists "$name" "$url"
     fi
   done < "$FLATPAKFILE"
 
-  # Install apps
+  # Install apps. Close the step first so per-app lines nest under it.
+  _step_close
   while IFS= read -r line || [[ -n "$line" ]]; do
     [[ -z "$line" || "$line" =~ ^[[:space:]]*# || "$line" =~ ^remote[[:space:]]+ ]] && continue
+    if flatpak info "$line" &> /dev/null; then
+      skip "Flatpak $line (already installed)"
+      continue
+    fi
     spin "Installing Flatpak: $line..." flatpak install -y flathub "$line" \
       || bootstrap_error "Failed to install Flatpak $line" \
         "Retry manually: flatpak install flathub $line"
@@ -888,6 +894,10 @@ setup-flatpak() {
   # is invisible inside the sandbox and generic families (sans-serif, monospace)
   # fall back to the runtime's DejaVu instead of Iosevka Nerd Font Mono. Applies
   # globally so future Flatpaks inherit it. User-level; no root needed.
+  if flatpak override --user --show 2> /dev/null | grep -qF 'xdg-config/fontconfig:ro'; then
+    skip "Flatpak fontconfig access (already granted)"
+    return
+  fi
   substep "Granting Flatpaks read access to user fontconfig..."
   flatpak override --user --filesystem=xdg-config/fontconfig:ro \
     || warn "Could not set Flatpak fontconfig override — Flatpak apps will use DejaVu for generic families."
@@ -1338,17 +1348,24 @@ setup-sddm() {
     return
   fi
 
-  # Always copy/update theme to system directory
-  substep "Installing Juliet SDDM theme..."
-  sudo rm -rf "$THEME_DEST"
-  sudo cp -r "$THEME_SRC" "$THEME_DEST"
   # The theme renders solid black by default, matching the hyprlock lock
   # screen, so this wallpaper is unused until theme.conf sets
   # `background=background.png`. Copied anyway so making that switch is a
   # one-word edit rather than a hunt for the file.
-  sudo cp "$HOME/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png" "$THEME_DEST/background.png"
-  sudo chmod -R 755 "$THEME_DEST"
-  sudo find "$THEME_DEST" -type f -exec chmod 644 {} \;
+  local wallpaper="$HOME/.config/Juliet/etc/wallpaper/my-neighbor-totoro-sunflowers.png"
+
+  # Recopy only when the installed theme differs from the repo's.
+  if diff -rq --exclude=background.png "$THEME_SRC" "$THEME_DEST" &> /dev/null \
+    && cmp -s "$wallpaper" "$THEME_DEST/background.png"; then
+    unchanged "theme up to date"
+  else
+    substep "Installing Juliet SDDM theme..."
+    sudo rm -rf "$THEME_DEST"
+    sudo cp -r "$THEME_SRC" "$THEME_DEST"
+    sudo cp "$wallpaper" "$THEME_DEST/background.png"
+    sudo chmod -R 755 "$THEME_DEST"
+    sudo find "$THEME_DEST" -type f -exec chmod 644 {} \;
+  fi
 
   # Select the theme. Written whenever the content differs rather than only when
   # the file is absent: a create-once guard can't converge if the file drifts
@@ -1397,6 +1414,12 @@ setup-keyd() {
 
   local src="$HOME/.config/Juliet/etc/keyd/default.conf"
   if [[ ! -f "$src" ]]; then
+    return
+  fi
+
+  if cmp -s "$src" /etc/keyd/default.conf \
+    && systemctl is-enabled --quiet keyd && systemctl is-active --quiet keyd; then
+    unchanged "config current, service running"
     return
   fi
 
@@ -2076,7 +2099,11 @@ setup-claude-code() {
   # would bake a machine-specific absolute gh path into the tracked dotfile. The
   # `!gh ...` form resolves gh from PATH, so it stays portable across macOS/Fedora.
   if command -v gh &> /dev/null; then
-    if gh auth status &> /dev/null; then
+    local local_gitconfig="$HOME/.config/local/gitconfig" helper="!gh auth git-credential"
+    if [[ "$(git config --file "$local_gitconfig" --get credential."https://github.com".helper)" == "$helper" \
+      && "$(git config --file "$local_gitconfig" --get credential."https://gist.github.com".helper)" == "$helper" ]]; then
+      skip "gh git credential helper (already configured)"
+    elif gh auth status &> /dev/null; then
       substep "Configuring gh as the GitHub git credential helper..."
       mkdir -p "$HOME/.config/local"
       git config --file "$HOME/.config/local/gitconfig" credential."https://github.com".helper "!gh auth git-credential"
