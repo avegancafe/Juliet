@@ -68,11 +68,11 @@ local NEON = {
   { "z  ", true, 3 },
   { "zz ", true, 3 },
   { "zzz", true, 4 },
-  -- flicker
-  { "zzz", false, 1 }, { "zzz", true, 1 }, { "zz ", true, 1 }, { "zzz", true, 1 },
+  -- flicker (lit/dim only: the count only ever goes up or resets)
+  { "zzz", false, 1 }, { "zzz", true, 1 }, { "zzz", false, 1 }, { "zzz", true, 1 },
   { "zzz", false, 1 }, { "zzz", true, 6 },
-  -- power down
-  { "zz ", true, 2 }, { "z  ", true, 2 }, { "z  ", false, 1 }, { "   ", false, 4 },
+  -- power down: all three dim together, then reset
+  { "zzz", false, 2 }, { "   ", false, 5 },
 }
 local NEON_TIMELINE = {}
 for _, step in ipairs(NEON) do
