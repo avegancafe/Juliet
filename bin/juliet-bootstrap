@@ -241,6 +241,16 @@ is-macos() {
   [[ "$OSTYPE" == "darwin"* ]]
 }
 
+# The account's login shell (what chsh changes), not $SHELL — $SHELL is
+# inherited from whatever launched bootstrap and can differ.
+account-login-shell() {
+  if is-macos; then
+    dscl . -read "$HOME" UserShell 2>/dev/null | awk '{print $2}'
+  else
+    getent passwd "$(id -un)" | cut -d: -f7
+  fi
+}
+
 setup-git() {
   substep "Setting up git..."
   mkdir -p ~/.config/local
@@ -1178,7 +1188,9 @@ setup-fish() {
     sudo bash -c "echo '$FISH_PATH' >> /etc/shells"
   fi
 
-  if [[ "$SHELL" != "$FISH_PATH" ]]; then
+  local login_shell
+  login_shell="$(account-login-shell)"
+  if [[ "${login_shell:-$SHELL}" != "$FISH_PATH" ]]; then
     substep "Setting fish to default shell..."
     _step_close # chsh prompts for a password; keep it off the step line
     chsh -s "$FISH_PATH" "$(whoami)"
