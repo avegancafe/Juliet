@@ -1,8 +1,9 @@
 #! /bin/bash
 # shellcheck disable=SC2034  # globals set here are read by the bootstrap.d modules
 
-# Everything bootstrap loads is resolved next to this script, so a checkout
-# anywhere (a worktree, a fresh clone) runs its own code.
+# Bootstrap's own code (_util.bash, bootstrap.d/) loads from next to this
+# script. Its data — etc/, the package files, symlinked/, and the repo it
+# pulls — still comes from $JULIET_DIR (~/.config/Juliet) below.
 JULIET_BIN="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$JULIET_BIN/../_util.bash"
 
@@ -113,8 +114,10 @@ done
 unset _module
 
 show-help() {
-  local text
-  text=$(cat << 'EOF'
+  local categories="${CATEGORIES[*]}"
+  # Plain heredocs (not inside $(...)): bash 3.2 misparses an apostrophe in a
+  # heredoc within command substitution.
+  cat << 'EOF'
 Usage: juliet-bootstrap [OPTIONS]
 
 Options:
@@ -126,7 +129,9 @@ Options:
   --list                 Show every category and step, and which apply here
   -h, --help             Show this help message
 
-Categories: @CATEGORIES@
+EOF
+  printf 'Categories: %s\n' "${categories// /, }"
+  cat << 'EOF'
 Each category's steps can also be named on their own (e.g. --enable=keyd);
 run --list to see them.
 
@@ -149,9 +154,6 @@ Environment variable example:
   juliet-bootstrap              # Uses env var
   juliet-bootstrap --no         # Ignores env var, uses only CLI args
 EOF
-)
-  local categories="${CATEGORIES[*]}"
-  printf '%s\n' "${text/@CATEGORIES@/${categories// /, }}"
 }
 
 # Parse environment variable arguments only if no CLI args provided
