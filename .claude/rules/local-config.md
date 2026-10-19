@@ -6,7 +6,7 @@ Machine-local config and secrets live in `~/.config/local/`. It is **outside thi
 
 | File | Purpose | Loaded by |
 |------|---------|-----------|
-| `.env` | Local secrets and per-machine values (`JULIET_EXTENSION`, `SENTRY_ACCESS_TOKEN`, `LINEAR_API_KEY`, `GITHUB_PAT`, …). Seeded and topped up from Juliet's and the extension's `.env.template` by bootstrap (missing keys only) | `~/.config/fish/config.fish` → `envsource ~/.config/local/.env` (the `# Local environment variables` block) |
+| `.env` | Local secrets and per-machine values (`JULIET_EXTENSION`, `SENTRY_ACCESS_TOKEN`, `LINEAR_API_KEY`, …). Seeded and topped up from Juliet's and the extension's `.env.template` by bootstrap (missing keys only) | `~/.config/fish/config.fish` → `envsource ~/.config/local/.env` (the `# Local environment variables` block) |
 | `fish/config.fish` | Fish settings that only make sense on this machine | `~/.config/fish/initializers/local.fish` sources it when present |
 | `gitconfig` | Per-machine git identity and credential helpers | `~/.gitconfig` → `[include] path = ~/.config/local/gitconfig` |
 | other files | Machine-local artifacts that would be noise (or a secret) in git — e.g. `slack-mcp-app-manifest.yaml` | whatever tool owns them |
