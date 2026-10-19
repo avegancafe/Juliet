@@ -119,6 +119,8 @@ local roll = 0
 local tick = 0
 local pollIn = 0
 local polling = false
+local pollStartedAt = 0
+local STALL_TICKS = 2 * POLL_TICKS
 
 local function setMode(list)
   local best, bestRank, needs, working = nil, 99, 0, 0
@@ -245,10 +247,11 @@ local function finish(list)
     a.face = f -- Tabler `dice-<face>-filled` in the panel; nil when it doesn't need you
     a.role = r or (a.state == "working" and "primary" or "on_surface_variant")
   end
+  polling = false
   agents = list
   setMode(list)
-  noctalia.state.set("agents", list)
-  polling = false
+  local ok, err = pcall(noctalia.state.set, "agents", list)
+  if not ok then logErr(`state.set: {err}`) end
   render()
 end
 
@@ -263,10 +266,19 @@ local function refreshUsage(i)
   end)
 end
 
+-- Errors inside async callbacks vanish silently and would leave the poll stuck,
+-- so they are caught and appended here instead.
+local LOG_PATH = noctalia.expandPath(FEED_DIR .. "/_widget.log")
+local function logErr(msg)
+  noctalia.runAsync({ "sh", "-c", 'printf "%s %s\\n" "$(date "+%F %T")" "$2" >> "$1"', "sh", LOG_PATH, tostring(msg) }, function() end)
+end
+
+-- A file that is missing, half-written or not JSON reads as nil.
 local function readJson(path, cb)
   noctalia.readFileAsync(noctalia.expandPath(path), function(contents)
-    local value = contents and noctalia.json.decode(contents) or nil
-    cb(if type(value) == "table" then value else nil)
+    local ok, value = pcall(function() return contents and noctalia.json.decode(contents) or nil end)
+    if not ok then logErr(`decode {path}: {value}`) end
+    cb(if ok and type(value) == "table" then value else nil)
   end)
 end
 
@@ -303,10 +315,16 @@ end
 
 local function refresh()
   refreshUsage()
-  if polling then return end
+  if polling then
+    -- A poll whose callbacks never all came back would block every later one.
+    if tick - pollStartedAt < STALL_TICKS then return end
+    logErr("poll stalled; starting a new one")
+  end
   polling = true
+  pollStartedAt = tick
   noctalia.runAsync({ "claude", "agents", "--json" }, function(result)
-    local roster = result.exitCode == 0 and noctalia.json.decode(result.stdout) or nil
+    local ok, roster = pcall(function() return result.exitCode == 0 and noctalia.json.decode(result.stdout) or nil end)
+    if not ok then logErr(`roster decode: {roster}`) end
     if type(roster) ~= "table" then
       polling = false
       return
@@ -335,7 +353,8 @@ local function refresh()
     for _, entry in ipairs(list) do
       readJson(`{FEED_DIR}/{entry.sessionId}.json`, function(feed)
         local function done(job)
-          join(entry, feed, job)
+          local ok, err = pcall(join, entry, feed, job)
+          if not ok then logErr(`join {entry.id}: {err}`) end
           pending -= 1
           if pending == 0 then finish(list) end
         end
