@@ -275,7 +275,9 @@ local FEED_STATE = { working = "working", blocked = "blocked", failed = "failed"
 
 -- Fill entry from its feed file and, for a background job, its job file.
 -- The job file's state is the agents view's own, so it wins for background jobs;
--- the feed adds the real reason text and the context fill.
+-- the feed adds the real reason text and the context fill. One exception: a job
+-- waiting on its own scheduled wakeup (cron/ScheduleWakeup) still says "working"
+-- but with tempo "idle". Nothing is running, so it counts as idle.
 local function join(entry, feed, job)
   local updated = 0
   if feed then
@@ -287,6 +289,7 @@ local function join(entry, feed, job)
   end
   if job then
     if type(job.state) == "string" then entry.state = job.state end
+    if entry.state == "working" and job.tempo == "idle" then entry.state = "idle" end
     if entry.reason == "" and type(job.detail) == "string" then
       entry.reason = job.detail
       entry.haiku = haiku(job.detail)
