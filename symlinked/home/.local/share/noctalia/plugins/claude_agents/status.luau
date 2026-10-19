@@ -120,6 +120,7 @@ local tick = 0
 local pollIn = 0
 local polling = false
 local pollStartedAt = 0
+local pollAt = "" -- what the running poll last waited on, for the stall log
 local STALL_TICKS = 2 * POLL_TICKS
 
 local function setMode(list)
@@ -278,7 +279,9 @@ end
 local function readJson(path, cb)
   local full = noctalia.expandPath(path)
   if not noctalia.fileInfo(full) then return cb(nil) end
+  pollAt = path
   noctalia.readFileAsync(full, function(contents)
+    pollAt = `{path} (callback)`
     local ok, value = pcall(function() return contents and noctalia.json.decode(contents) or nil end)
     if not ok then logErr(`decode {path}: {value}`) end
     cb(if ok and type(value) == "table" then value else nil)
@@ -321,10 +324,11 @@ local function refresh()
   if polling then
     -- A poll whose callbacks never all came back would block every later one.
     if tick - pollStartedAt < STALL_TICKS then return end
-    logErr("poll stalled; starting a new one")
+    logErr(`poll stalled at {pollAt}; starting a new one`)
   end
   polling = true
   pollStartedAt = tick
+  pollAt = "claude agents --json"
   noctalia.runAsync({ "claude", "agents", "--json" }, function(result)
     local ok, roster = pcall(function() return result.exitCode == 0 and noctalia.json.decode(result.stdout) or nil end)
     if not ok then logErr(`roster decode: {roster}`) end
