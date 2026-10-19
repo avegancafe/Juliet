@@ -273,9 +273,12 @@ local function logErr(msg)
   noctalia.runAsync({ "sh", "-c", 'printf "%s %s\\n" "$(date "+%F %T")" "$2" >> "$1"', "sh", LOG_PATH, tostring(msg) }, function() end)
 end
 
--- A file that is missing, half-written or not JSON reads as nil.
+-- A file that is missing, half-written or not JSON reads as nil. readFileAsync
+-- never calls back for a missing file, so check first or the poll hangs.
 local function readJson(path, cb)
-  noctalia.readFileAsync(noctalia.expandPath(path), function(contents)
+  local full = noctalia.expandPath(path)
+  if not noctalia.fileInfo(full) then return cb(nil) end
+  noctalia.readFileAsync(full, function(contents)
     local ok, value = pcall(function() return contents and noctalia.json.decode(contents) or nil end)
     if not ok then logErr(`decode {path}: {value}`) end
     cb(if ok and type(value) == "table" then value else nil)
@@ -351,15 +354,21 @@ local function refresh()
     local pending = #list
     if pending == 0 then return finish(list) end
     for _, entry in ipairs(list) do
-      readJson(`{FEED_DIR}/{entry.sessionId}.json`, function(feed)
-        local function done(job)
+      local function withFeed(job)
+        -- A resumed job runs under a new session id, but its feed file keeps the
+        -- job's original one: fall back to that.
+        local path = `{FEED_DIR}/{entry.sessionId}.json`
+        if job and type(job.sessionId) == "string" and not noctalia.fileInfo(noctalia.expandPath(path)) then
+          path = `{FEED_DIR}/{job.sessionId}.json`
+        end
+        readJson(path, function(feed)
           local ok, err = pcall(join, entry, feed, job)
           if not ok then logErr(`join {entry.id}: {err}`) end
           pending -= 1
           if pending == 0 then finish(list) end
-        end
-        if entry.kind == "background" then readJson(`~/.claude/jobs/{entry.id}/state.json`, done) else done(nil) end
-      end)
+        end)
+      end
+      if entry.kind == "background" then readJson(`~/.claude/jobs/{entry.id}/state.json`, withFeed) else withFeed(nil) end
     end
   end)
 end
