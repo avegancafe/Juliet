@@ -1330,6 +1330,27 @@ setup-beads() {
       "Retry manually: curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash"
 }
 
+# Install a tracked file (under etc/) to a root-owned path, writing only when
+# the content differs. This converges: edit the repo copy and the next run
+# updates the machine, which a create-once `[[ -f "$dest" ]]` guard never does.
+# Returns 0 when it wrote the file, 1 when it was already current, and 2 on
+# failure (already reported through bootstrap_error).
+install-system-file() {
+  local src="$1" dest="$2" mode="${3:-644}"
+  if [[ ! -f "$src" ]]; then
+    bootstrap_error "Missing tracked file $src" \
+      "Restore it: git -C $JULIET_DIR checkout -- ${src#"$JULIET_DIR"/}"
+    return 2
+  fi
+  cmp -s "$src" "$dest" && return 1
+  if ! sudo install -D -m "$mode" "$src" "$dest"; then
+    bootstrap_error "Failed to install $dest" \
+      "Copy it manually: sudo install -D -m $mode $src $dest"
+    return 2
+  fi
+  return 0
+}
+
 setup-sddm() {
   if ! is-fedora; then
     return
@@ -1408,17 +1429,10 @@ setup-sddm() {
   # fallback — so a greeter that can't load a cursor theme renders nothing while
   # the mouse still works. The KDE spin's kde_settings.conf used to supply this;
   # setup-deplasma takes that file with it, so Juliet has to own it now.
-  SDDM_CONF="/etc/sddm.conf.d/juliet.conf"
-  local want_conf
-  want_conf=$'[Theme]\nCurrent=juliet\nCursorTheme=Adwaita'
-  if [[ "$(cat "$SDDM_CONF" 2>/dev/null)" != "$want_conf" ]]; then
-    substep "Configuring SDDM to use the Juliet theme..."
-    sudo install -d -m 755 /etc/sddm.conf.d \
-      || bootstrap_error "Failed to create /etc/sddm.conf.d"
-    printf '%s\n' "$want_conf" | sudo tee "$SDDM_CONF" > /dev/null \
-      || bootstrap_error "Failed to write $SDDM_CONF" \
-        "Set it manually: printf '[Theme]\\nCurrent=juliet\\nCursorTheme=Adwaita\\n' | sudo tee $SDDM_CONF"
-  fi
+  # The selection itself lives in etc/sddm/juliet.conf.
+  substep "Configuring SDDM to use the Juliet theme..."
+  install-system-file "$JULIET_DIR/etc/sddm/juliet.conf" /etc/sddm.conf.d/juliet.conf
+  [[ $? -eq 1 ]] && unchanged "already selected"
 
   # The cursor theme named above has to actually exist for the greeter, which
   # runs as the sddm user and only searches system icon dirs.
@@ -1442,21 +1456,16 @@ setup-keyd() {
   fi
   substep "Setting up keyd (dual-role Super: hold=Mod, tap=noctalia menu)..."
 
-  local src="$HOME/.config/Juliet/etc/keyd/default.conf"
-  if [[ ! -f "$src" ]]; then
-    return
-  fi
+  install-system-file "$JULIET_DIR/etc/keyd/default.conf" /etc/keyd/default.conf
+  local rc=$?
+  (( rc == 2 )) && return
 
-  if cmp -s "$src" /etc/keyd/default.conf \
+  if (( rc == 1 )) \
     && systemctl is-enabled --quiet keyd && systemctl is-active --quiet keyd; then
     unchanged "config current, service running"
     return
   fi
 
-  # install -D creates /etc/keyd if missing and sets 0644 in one step.
-  sudo install -Dm644 "$src" /etc/keyd/default.conf \
-    || bootstrap_error "Failed to install /etc/keyd/default.conf" \
-      "Copy it manually: sudo install -Dm644 $src /etc/keyd/default.conf"
   sudo systemctl enable --now keyd \
     || bootstrap_error "Failed to enable the keyd service" \
       "Enable it manually: sudo systemctl enable --now keyd"
@@ -1808,24 +1817,11 @@ setup-coredump-limits() {
     return
   fi
 
-  local conf="/etc/systemd/coredump.conf.d/juliet.conf"
-  if [[ -f "$conf" ]]; then
-    return
-  fi
-
+  # The caps themselves live in etc/coredump/juliet.conf.
   substep "Capping systemd-coredump disk usage..."
-  sudo install -d -m 755 /etc/systemd/coredump.conf.d \
-    || bootstrap_error "Failed to create /etc/systemd/coredump.conf.d" \
-      "Create it manually: sudo install -d -m 755 /etc/systemd/coredump.conf.d"
-  sudo tee "$conf" > /dev/null << 'EOF'
-# Managed by Juliet (bin/juliet-bootstrap :: setup-coredump-limits).
-# A runaway crash loop once wrote 4.1GB of cores here unnoticed; these caps
-# keep any repeat bounded.
-[Coredump]
-MaxUse=512M
-KeepFree=2G
-ProcessSizeMax=256M
-EOF
+  install-system-file "$JULIET_DIR/etc/coredump/juliet.conf" \
+    /etc/systemd/coredump.conf.d/juliet.conf
+  [[ $? -eq 1 ]] && unchanged "caps current"
 }
 
 # Pinned Nerd Fonts release used for fonts too large to vendor (Iosevka).
@@ -1936,27 +1932,14 @@ setup-nvidia-powermgmt() {
     return
   fi
 
-  local conf="/etc/modprobe.d/juliet-nvidia-pm.conf"
-  if [[ -f "$conf" ]]; then
-    return
-  fi
-
+  # The modprobe option lives in etc/modprobe/juliet-nvidia-pm.conf.
   substep "Enabling nvidia Runtime D3 so the dGPU powers down when idle..."
-  sudo tee "$conf" > /dev/null << 'EOF'
-# Managed by Juliet (bin/juliet-bootstrap :: setup-nvidia-powermgmt).
-# The driver leaves Runtime D3 off by default, which keeps the dGPU powered for
-# the whole session on a laptop. 0x02 powers it down (video memory included)
-# once idle. Verify after a reboot with:
-#   cat /proc/driver/nvidia/gpus/*/power
-#   cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status
-options nvidia NVreg_DynamicPowerManagement=0x02
-EOF
-  if [[ ! -f "$conf" ]]; then
-    bootstrap_error "Failed to write $conf" \
-      "Create it manually with: options nvidia NVreg_DynamicPowerManagement=0x02"
-    return
-  fi
-  notice "nvidia Runtime D3 takes effect on the next reboot."
+  install-system-file "$JULIET_DIR/etc/modprobe/juliet-nvidia-pm.conf" \
+    /etc/modprobe.d/juliet-nvidia-pm.conf
+  case $? in
+    0) notice "nvidia Runtime D3 change takes effect on the next reboot." ;;
+    1) unchanged "already enabled" ;;
+  esac
 }
 
 # How long crash evidence is worth keeping. Long enough to debug something that
