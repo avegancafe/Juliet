@@ -56,6 +56,8 @@ golang-x-tools-goimports
 # Window Manager / Desktop
 niri
 hyprlock
+# hypridle: runs hyprlock before suspend / lid close (hypr/hypridle.conf)
+hypridle
 noctalia
 # sddm: the display manager. Fedora 44's KDE spin ships plasma-login-manager
 # instead, but this machine runs niri, not Plasma — and the whole Plasma stack

@@ -6,6 +6,13 @@ mode = "dark"
 source = "custom"
 custom_palette = "Bamboo"  # palettes/Bamboo.json
 
+# Noctalia locks with its own lock screen on logind PrepareForSleep (lid close,
+# systemctl suspend) unless this is off. hypridle runs hyprlock before sleep
+# instead (symlinked/config/hypr/hypridle.conf), so the lock screen is the same
+# minimal black one whether you lock by hand or by closing the lid.
+[lockscreen]
+lock_before_suspend = false
+
 [shell]
 font_family = "Iosevka Nerd Font Mono"
 

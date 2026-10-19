@@ -293,6 +293,8 @@ layout {
 // is the maintained, DE-agnostic Qt agent.
 spawn-at-startup "/usr/libexec/lxqt-policykit-agent"
 spawn-at-startup "noctalia"
+// Locks with hyprlock before sleep (hypr/hypridle.conf)
+spawn-at-startup "hypridle"
 spawn-at-startup "ghostty"
 // Delay steam so noctalia can come up and paint the wallpaper first,
 // without competing for CPU/GPU/IO during login.
