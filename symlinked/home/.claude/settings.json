@@ -179,7 +179,8 @@
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
     "cc-plugin-you-should-know@builtin": true,
-    "avegancafe@avegancafe-marketplace": true
+    "avegancafe@avegancafe-marketplace": true,
+    "session-management@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
@@ -230,7 +231,13 @@
   "pluginConfigs": {
     "j2-eng@j2-claude-plugins": {
       "options": {
-        "openTicketsOnStart": true
+        "openTicketsOnStart": false,
+        "openPrsOnStart": true
+      }
+    },
+    "beadwork@avegancafe-marketplace": {
+      "options": {
+        "openOnStart": true
       }
     }
   },
