@@ -79,6 +79,7 @@ NO_ALL="false"
 ENABLED_STEPS=()
 SKIPPED_STEPS=()
 SSH_EMAIL=""
+LIST_ONLY="false"
 
 JULIET_DIR="$HOME/.config/Juliet"
 # Machine-local secrets and settings (never committed). Bootstrap reads single
@@ -94,8 +95,75 @@ JULIET_BREWFILE="$JULIET_DIR/Brewfile"
 JULIET_DNFFILE="$JULIET_DIR/DNFfile"
 JULIET_FLATPAKFILE="$JULIET_DIR/Flatpakfile"
 
+# =============================================================================
+# Category Registry
+# =============================================================================
+# The one list of what bootstrap can do. Each category declares its header,
+# its prompt and its steps, in run order. --help, --list, the prompts,
+# --enable/--skip and the runner all read from here, so adding a step is one
+# edit. A step is a function; its CLI name drops the setup- prefix
+# (setup-keyd → keyd), so `--enable=keyd` runs just that step.
+#
+# A step may also define <function>-applicable: a cheap, read-only check
+# (OS, installed tool, hardware). When it fails, the step is left out of the
+# prompt and not run; a category with no applicable steps skips itself without
+# asking. It may set NA_REASON to explain why, for --list and the skip line.
+#
+#   category <name> <log|rlog> <header> <question> <step-function>...
+#   (rlog headers mark a category that uses the network)
+CATEGORIES=()
+category() {
+  local name="$1"
+  CATEGORIES+=("$name")
+  printf -v "CATEGORY_LOG_$name" '%s' "$2"
+  printf -v "CATEGORY_HEADER_$name" '%s' "$3"
+  printf -v "CATEGORY_QUESTION_$name" '%s' "$4"
+  shift 4
+  printf -v "CATEGORY_STEPS_$name" '%s' "$*"
+}
+
+# category-field <category> <LOG|HEADER|QUESTION|STEPS>
+category-field() {
+  local var="CATEGORY_${2}_$1"
+  printf '%s' "${!var}"
+}
+
+# CLI name of a step function: setup-keyd → keyd.
+step-name() { printf '%s' "${1#setup-}"; }
+
+category packages rlog "📦 Installing system packages..." \
+  "Install system packages from the Brewfile / DNFfile / Flatpakfile?" \
+  setup-brew setup-dnf setup-flatpak setup-brew-taps
+category fonts rlog "🔤 Installing fonts..." \
+  "Install fonts (Iosevka Nerd Font Mono + the vendored ones in etc/fonts)?" \
+  setup-fonts
+category dev rlog "🛠️ Installing dev tools..." "Install dev tools?" \
+  setup-cargo setup-rust setup-python setup-nodenv setup-node-tools \
+  setup-flyctl setup-beads
+category shell log "🐚 Configuring shell..." "Configure shell?" \
+  setup-fish setup-fzf setup-tmux-plugins
+category security log "🔐 Setting up security..." "Set up security?" \
+  setup-ssh setup-gpg setup-cyberduck
+# Order matters here: sddm must become the display manager before deplasma
+# removes plasma-login-manager (or there's no way to log in), and fingerprint
+# edits /etc/pam.d/sddm, which is only worth doing once sddm is the DM.
+category desktop log "🖥️ Configuring desktop..." "Configure desktop?" \
+  setup-sddm setup-deplasma setup-undms setup-coredump-limits \
+  setup-crash-purge setup-nvidia-secureboot setup-nvidia-powermgmt \
+  setup-keyd setup-fingerprint
+category claude rlog "🤖 Setting up Claude..." "Set up Claude?" \
+  setup-claude-code setup-claude-statusline setup-claude-desktop
+category opencode rlog "🤖 Setting up opencode..." "Set up opencode?" \
+  setup-opencode
+# The extension's own steps (its bootstrap.bash defines extension-setup). Runs
+# last, after packages and symlinks have been layered.
+category extension rlog "🧩 Running extension setup..." \
+  "Run your extension's setup steps?" \
+  setup-extension-steps
+
 show-help() {
-  cat << 'EOF'
+  local text
+  text=$(cat << 'EOF'
 Usage: juliet-bootstrap [OPTIONS]
 
 Options:
@@ -104,14 +172,19 @@ Options:
   --enable=STEPS         Only run these steps (comma-separated)
   --skip=STEPS           Skip these steps (comma-separated)
   --ssh-email=EMAIL      Email for SSH key generation
+  --list                 Show every category and step, and which apply here
   -h, --help             Show this help message
 
-Steps: packages (includes flatpak), fonts, dev, shell, security, desktop, claude, opencode, extension
+Categories: @CATEGORIES@
+Each category's steps can also be named on their own (e.g. --enable=keyd);
+run --list to see them.
 
 Examples:
   juliet-bootstrap -y                        # Accept all prompts
   juliet-bootstrap -y --skip=packages        # All except packages
   juliet-bootstrap --enable=shell,security   # Only shell and security
+  juliet-bootstrap --enable=keyd             # Only the keyd step
+  juliet-bootstrap --skip=fingerprint        # Everything but one step
   juliet-bootstrap --enable=security --ssh-email=test@example.com
 
 Environment Variables:
@@ -125,6 +198,9 @@ Environment variable example:
   juliet-bootstrap              # Uses env var
   juliet-bootstrap --no         # Ignores env var, uses only CLI args
 EOF
+)
+  local categories="${CATEGORIES[*]}"
+  printf '%s\n' "${text/@CATEGORIES@/${categories// /, }}"
 }
 
 # Parse environment variable arguments only if no CLI args provided
@@ -155,6 +231,10 @@ while [[ $# -gt 0 ]]; do
       SSH_EMAIL="${1#*=}"
       shift
       ;;
+    --list)
+      LIST_ONLY="true"
+      shift
+      ;;
     -h|--help)
       show-help
       exit 0
@@ -167,69 +247,70 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Check if a step should run based on --enable and --skip flags
+# Is <word> one of the remaining arguments?
+in-list() {
+  local needle="$1"
+  shift
+  [[ " $* " == *" $needle "* ]]
+}
+
+# Did --enable name this category, or any of its steps?
+category-enabled() {
+  local cat="$1" fn
+  in-list "$cat" "${ENABLED_STEPS[@]}" && return 0
+  for fn in $(category-field "$cat" STEPS); do
+    in-list "$(step-name "$fn")" "${ENABLED_STEPS[@]}" && return 0
+  done
+  return 1
+}
+
+# Should this category run at all under --enable/--skip?
 should-run-step() {
-  local step="$1"
-
-  # If --enable was used, only run if step is in the list
-  if [[ ${#ENABLED_STEPS[@]} -gt 0 ]]; then
-    [[ " ${ENABLED_STEPS[*]} " =~ " $step " ]] && return 0 || return 1
-  fi
-
-  # If --skip was used, skip if step is in the list
-  if [[ " ${SKIPPED_STEPS[*]} " =~ " $step " ]]; then
-    return 1
-  fi
-
-  return 0
+  local cat="$1"
+  in-list "$cat" "${SKIPPED_STEPS[@]}" && return 1
+  [[ ${#ENABLED_STEPS[@]} -eq 0 ]] && return 0
+  category-enabled "$cat"
 }
 
-# Determine whether to prompt or auto-answer based on flags
-should-confirm() {
-  local step="$1"
-  local prompt="$2"
-
-  # Step was explicitly enabled via --enable
-  if [[ ${#ENABLED_STEPS[@]} -gt 0 ]] && [[ " ${ENABLED_STEPS[*]} " =~ " $step " ]]; then
-    return 0
-  fi
-
-  # Global yes/no flags
-  [[ "$YES_ALL" == "true" ]] && return 0
-  [[ "$NO_ALL" == "true" ]] && return 1
-
-  # Interactive prompt
-  gum-confirm "$prompt"
+# Should <step-function> of <category> run under --enable/--skip? Naming the
+# category enables all its steps; naming a step enables just that one.
+step-selected() {
+  local cat="$1" name
+  name=$(step-name "$2")
+  in-list "$name" "${SKIPPED_STEPS[@]}" && return 1
+  [[ ${#ENABLED_STEPS[@]} -eq 0 ]] && return 0
+  in-list "$cat" "${ENABLED_STEPS[@]}" || in-list "$name" "${ENABLED_STEPS[@]}"
 }
 
-# Category-level confirmation (combines should-run-step + should-confirm)
+# Prompt for a category unless the flags already answered. Naming it (or one
+# of its steps) with --enable runs it without asking.
 confirm-category() {
-  local category="$1"
-  local description="$2"
-
-  if ! should-run-step "$category"; then
-    skip "Skipping $category step(s) (filtered)"
-    return 1
-  fi
-
-  # Explicitly enabled via --enable: run without prompting (matches should-confirm)
-  if [[ ${#ENABLED_STEPS[@]} -gt 0 ]] && [[ " ${ENABLED_STEPS[*]} " =~ " $category " ]]; then
-    return 0
-  fi
-
+  local cat="$1" question="$2"
+  category-enabled "$cat" && return 0
   [[ "$YES_ALL" == "true" ]] && return 0
-
-  if [[ "$NO_ALL" == "true" ]]; then
-    skip "Skipping $category step(s)"
+  if [[ "$NO_ALL" == "true" ]] || ! gum-confirm "$question"; then
+    skip "Skipping $cat step(s)"
     return 1
   fi
-
-  if ! gum-confirm "$description"; then
-    skip "Skipping $category step(s)"
-    return 1
-  fi
-
   return 0
+}
+
+# Refuse typos in --enable/--skip instead of silently running nothing.
+validate-step-names() {
+  local known=" ${CATEGORIES[*]} " cat fn name bad=()
+  for cat in "${CATEGORIES[@]}"; do
+    for fn in $(category-field "$cat" STEPS); do
+      known+="$(step-name "$fn") "
+    done
+  done
+  for name in "${ENABLED_STEPS[@]}" "${SKIPPED_STEPS[@]}"; do
+    [[ -z "$name" || "$known" == *" $name "* ]] || bad+=("$name")
+  done
+  if [[ ${#bad[@]} -gt 0 ]]; then
+    error "Unknown step(s): ${bad[*]}"
+    printf '      %s\n' "Run juliet-bootstrap --list to see the categories and steps." >&2
+    exit 1
+  fi
 }
 
 # OS Detection
@@ -2564,133 +2645,126 @@ link-extension-overrides() {
 }
 
 # =============================================================================
-# Category Runner Functions
+# Category Runner
 # =============================================================================
 
-run-packages() {
-  confirm-category "packages" "Install system packages? (neovim, bat, ripgrep, fzf, gh, starship, ghostty...)" || return
-  rlog "📦 Installing system packages..."
-  if is-macos; then
-    setup-brew
-  elif is-fedora; then
-    setup-dnf
-    setup-flatpak
-    # Homebrew isn't the package manager on Fedora, but it is still installed
-    # here (setup-cargo leans on brew's rust), so its taps need the same
-    # reconciliation or every brew command keeps warning.
-    if command -v brew &> /dev/null; then
-      trust-brewfile-entries
-      prune-undeclared-taps
-    fi
+# Does <step-function> apply on this machine? Steps without an -applicable
+# check always do.
+step-applicable() {
+  declare -F "$1-applicable" > /dev/null || return 0
+  "$1-applicable"
+}
+
+setup-brew-applicable() { is-macos; }
+setup-dnf-applicable() { is-fedora; }
+setup-flatpak-applicable() { is-fedora; }
+
+# Homebrew isn't the package manager on Fedora, but it is still installed
+# there (setup-cargo leans on brew's rust), so its taps need the same
+# reconciliation or every brew command keeps warning.
+setup-brew-taps-applicable() { is-fedora && command -v brew &> /dev/null; }
+setup-brew-taps() {
+  trust-brewfile-entries
+  prune-undeclared-taps
+}
+
+setup-beads-applicable() { is-fedora; }
+setup-cyberduck-applicable() { is-macos; }
+
+setup-sddm-applicable() { is-fedora && command -v sddm &> /dev/null; }
+setup-deplasma-applicable() { is-fedora; }
+setup-undms-applicable() { is-fedora; }
+setup-coredump-limits-applicable() { is-fedora; }
+setup-crash-purge-applicable() { is-fedora; }
+setup-nvidia-secureboot-applicable() { is-fedora && rpm -q akmod-nvidia &> /dev/null; }
+setup-nvidia-powermgmt-applicable() { is-fedora && rpm -q akmod-nvidia &> /dev/null; }
+setup-keyd-applicable() { is-fedora && command -v keyd &> /dev/null; }
+setup-fingerprint-applicable() { is-fedora && has-goodix-533c; }
+
+setup-claude-desktop-applicable() { is-fedora; }
+
+setup-extension-steps-applicable() {
+  # --list runs before setup-extension loads the extension, so only the
+  # configured URL/path is known; whether it defines steps is decided at run time.
+  if [[ "$LIST_ONLY" == "true" ]]; then
+    # A blank `JULIET_EXTENSION=` (the .env.template placeholder) means none.
+    [[ -f "$LOCAL_ENV" ]] && grep -qE '^JULIET_EXTENSION=.' "$LOCAL_ENV" && return 0
+    NA_REASON="no extension — set JULIET_EXTENSION in ~/.config/local/.env"
+    return 1
   fi
-}
-
-run-fonts() {
-  confirm-category "fonts" "Install fonts? (Iosevka Nerd Font Mono + vendored 3270/Berkeley/JetBrains/MonoLisa)" || return
-  rlog "🔤 Installing fonts..."
-  setup-fonts
-}
-
-run-dev() {
-  confirm-category "dev" "Install dev tools? (rust/cargo, stylua, poetry, nodenv, prettier/eslint, flyctl, bd)" || return
-  rlog "🛠️ Installing dev tools..."
-  setup-cargo
-  setup-rust
-  setup-python
-  setup-nodenv
-  setup-node-tools
-  setup-flyctl
-  setup-beads
-}
-
-run-shell() {
-  confirm-category "shell" "Configure shell? (fish as default, fzf keybindings, tmux plugins)" || return
-  log "🐚 Configuring shell..."
-  setup-fish
-  setup-fzf
-  setup-tmux-plugins
-}
-
-run-security() {
-  confirm-category "security" "Set up security? (SSH key, GPG agent)" || return
-  log "🔐 Setting up security..."
-  setup-ssh
-  setup-gpg
-  setup-cyberduck
-}
-
-run-desktop() {
-  # Only show on Linux with relevant tools. Noctalia (the niri shell) is
-  # installed via the DNFfile and started by spawn-at-startup in the niri
-  # config; setup-undms clears the previous shell out of its way. Each setup-* step
-  # self-guards on the tool it configures, so only skip the whole category when
-  # none are present.
-  if ! is-fedora; then return; fi
-  # setup-deplasma has work to do even when neither greeter nor keyd is
-  # installed yet, so leftover Plasma / KDE PIM cruft also keeps the category
-  # alive — as does an nvidia driver still waiting on MOK enrollment.
-  if ! command -v sddm &> /dev/null \
-    && ! command -v keyd &> /dev/null \
-    && ! rpm -q plasma-drkonqi &> /dev/null \
-    && ! rpm -q akonadi-calendar &> /dev/null \
-    && ! rpm -q dms &> /dev/null \
-    && ! command -v noctalia &> /dev/null \
-    && ! rpm -q akmod-nvidia &> /dev/null; then
-    return
-  fi
-
-  confirm-category "desktop" "Configure desktop? (sddm greeter + theme, keyd Super-tap remap, Plasma/PIM cleanup, nvidia Secure Boot, Goodix fingerprint driver)" || return
-  log "🖥️ Configuring desktop..."
-  # Order matters: setup-sddm must enable sddm as the display manager before
-  # setup-deplasma removes plasma-login-manager, or there's no way to log in.
-  setup-sddm
-  setup-deplasma
-  setup-undms
-  setup-coredump-limits
-  setup-crash-purge
-  setup-nvidia-secureboot
-  setup-nvidia-powermgmt
-  setup-keyd
-  # After setup-sddm: this edits /etc/pam.d/sddm, which is only worth doing once
-  # sddm is actually the display manager.
-  setup-fingerprint
-}
-
-run-claude() {
-  confirm-category "claude" "Set up Claude? (Code CLI, statusline, superpowers, context7, LSP plugins, Claude Desktop)" || return
-  rlog "🤖 Setting up Claude..."
-  setup-claude-code
-  setup-claude-statusline
-  # Claude tooling, not desktop-environment config — and it self-guards on
-  # Fedora, so it's a no-op on macOS.
-  setup-claude-desktop
-}
-
-run-opencode() {
-  confirm-category "opencode" "Set up opencode? (CLI, cmux notification plugin)" || return
-  rlog "🤖 Setting up opencode..."
-  setup-opencode
-}
-
-# The extension's own setup steps (its bootstrap.bash defines extension-setup).
-# Runs last, after packages and symlinks have been layered.
-run-extension() {
   if [[ "$EXTENSION_ACTIVE" != "true" ]]; then
-    skip "Skipping extension step (no extension — set JULIET_EXTENSION in ~/.config/local/.env)"
-    return
+    NA_REASON="no extension — set JULIET_EXTENSION in ~/.config/local/.env"
+    return 1
   fi
   if ! declare -F extension-setup > /dev/null; then
-    skip "Skipping extension step (the extension defines no extension-setup)"
+    NA_REASON="the extension defines no extension-setup"
+    return 1
+  fi
+}
+setup-extension-steps() { extension-setup; }
+
+# Run one category: filter its steps by flags and applicability, ask once
+# (listing exactly the steps that will run), then run them in order.
+run-category() {
+  local cat="$1" fn names="" steps=()
+  if ! should-run-step "$cat"; then
+    skip "Skipping $cat step(s) (filtered)"
     return
   fi
-  confirm-category "extension" "Run your extension's setup steps?" || return
-  rlog "🧩 Running extension setup..."
-  extension-setup
+  NA_REASON=""
+  for fn in $(category-field "$cat" STEPS); do
+    step-selected "$cat" "$fn" || continue
+    step-applicable "$fn" || continue
+    steps+=("$fn")
+    names+="${names:+, }$(step-name "$fn")"
+  done
+  if [[ ${#steps[@]} -eq 0 ]]; then
+    [[ -n "$NA_REASON" ]] && skip "Skipping $cat step(s) ($NA_REASON)"
+    return
+  fi
+  confirm-category "$cat" "$(category-field "$cat" QUESTION) ($names)" || return
+  "$(category-field "$cat" LOG)" "$(category-field "$cat" HEADER)"
+  for fn in "${steps[@]}"; do
+    "$fn"
+  done
+}
+
+run-categories() {
+  local cat
+  for cat in "${CATEGORIES[@]}"; do
+    run-category "$cat"
+  done
+}
+
+# --list: every category and step, and whether it applies on this machine.
+list-steps() {
+  local cat fn
+  for cat in "${CATEGORIES[@]}"; do
+    printf '%s%s%s  %s\n' "$BOLD_CODE" "$cat" "$RESET_CODE" "$(category-field "$cat" QUESTION)"
+    for fn in $(category-field "$cat" STEPS); do
+      NA_REASON=""
+      if step-applicable "$fn"; then
+        printf '  ∙ %s\n' "$(step-name "$fn")"
+      else
+        printf '  ◦ %s (not applicable here%s)\n' "$(step-name "$fn")" "${NA_REASON:+: $NA_REASON}"
+      fi
+    done
+  done
 }
 
 # =============================================================================
 # Main Execution
 # =============================================================================
+
+# Sourced (by tests) instead of executed: stop here with every function and the
+# category registry defined, but nothing run.
+[[ "${BASH_SOURCE[0]}" != "$0" ]] && return 0
+
+validate-step-names
+if [[ "$LIST_ONLY" == "true" ]]; then
+  list-steps
+  exit 0
+fi
 
 # Core setup (always runs).
 #
@@ -2717,15 +2791,7 @@ log "🔗 Linking dotfiles..."
 setup-git
 symlink-dotfiles
 
-# Category-based setup
-run-packages
-run-fonts
-run-dev
-run-shell
-run-security
-run-desktop
-run-claude
-run-opencode
-run-extension
+# Category-based setup (see the Category Registry near the top)
+run-categories
 
 print-bootstrap-summary
