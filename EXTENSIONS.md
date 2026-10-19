@@ -50,7 +50,7 @@ These are kept stable for extensions: `spin "Doing x..." cmd args`,
 `substep "Doing x..."`, `skip "why"`, `notice`, `warn`,
 `bootstrap_error "summary" "hint..."` (records a failure, doesn't exit),
 `is-macos`, `is-fedora`, `gum-confirm "question?"` (respects `-y`/`-n`), and
-`$EXTENSION_DIR`. Anything else in `bin/juliet-bootstrap` may change.
+`$EXTENSION_DIR`. Anything else in `bin/juliet-bootstrap` or `bin/bootstrap.d/` may change.
 
 ## Secrets and `.env`
 

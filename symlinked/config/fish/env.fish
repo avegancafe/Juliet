@@ -66,7 +66,7 @@ set -gx NEOVIDE_FRAME buttonless
 #   2. NEVER add the deprecated theme/tui/keybinds keys — opencode rewrites
 #      any config file containing them in place (verified on 1.18.0), which
 #      would dirty this repo. Theme lives in the seeded tui.json instead
-#      (see setup-opencode in bin/juliet-bootstrap).
+#      (see setup-opencode in bin/bootstrap.d/80-opencode.bash).
 # Fallback semantics: opencode has ONE OPENCODE_CONFIG slot, so a machine may
 # claim it earlier (e.g. conf.d/00-*.fish pointing at a personal local.json
 # with `model`/`shell`); Juliet's layer applies where unclaimed.

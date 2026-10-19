@@ -8,6 +8,7 @@ Juliet/
 │   ├── config/      # Files → ~/.config/
 │   └── home/        # Files → ~/
 ├── bin/             # Utility scripts
+│   └── bootstrap.d/ # juliet-bootstrap's steps: one module per category
 ├── etc/             # Assets (fonts, themes, wallpapers)
 ├── Brewfile         # Homebrew packages (macOS)
 ├── DNFfile          # DNF packages (Fedora)
