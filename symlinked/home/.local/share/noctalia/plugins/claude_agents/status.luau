@@ -292,22 +292,20 @@ end
 local FEED_STATE = { working = "working", blocked = "blocked", failed = "failed", done = "done", idle = "idle", ended = "idle" }
 
 -- Fill entry from its feed file and, for a background job, its job file.
--- The job file's state is the agents view's own, so it wins for background jobs;
--- the feed adds the real reason text and the context fill. One exception: a job
--- waiting on its own scheduled wakeup (cron/ScheduleWakeup) still says "working"
--- but with tempo "idle". Nothing is running, so it counts as idle.
+-- A background job's state comes from the roster (set in refresh), never from
+-- these files: the feed can say "blocked" for a busy job, and the job file is
+-- rewritten so often that a read can come back empty. The feed adds the reason
+-- text and context fill; for interactive sessions it also gives the state.
 local function join(entry, feed, job)
   local updated = 0
   if feed then
-    entry.state = FEED_STATE[feed.state] or entry.state
+    if entry.kind ~= "background" then entry.state = FEED_STATE[feed.state] or entry.state end
     entry.reason = type(feed.reason) == "string" and feed.reason or ""
     entry.haiku = type(feed.summary) == "string" and feed.summary or ""
     if type(feed.context) == "table" and type(feed.context.percent) == "number" then entry.ctx = feed.context.percent end
     updated = seconds(feed.updatedAt)
   end
   if job then
-    if type(job.state) == "string" then entry.state = job.state end
-    if entry.state == "working" and job.tempo == "idle" then entry.state = "idle" end
     if entry.reason == "" and type(job.detail) == "string" then
       entry.reason = job.detail
       entry.haiku = haiku(job.detail)
@@ -342,6 +340,9 @@ local function refresh()
         local kind = if a.kind == "background" then "background" else "interactive"
         -- Interactive sessions have no job id or state in the roster: busy/idle only.
         local state = if kind == "background" then tostring(a.state or "") elseif a.status == "busy" then "working" else "idle"
+        -- A job waiting on its own scheduled wakeup (cron/ScheduleWakeup) stays
+        -- "working" but its process is idle: nothing is running, so it's idle.
+        if kind == "background" and state == "working" and a.status == "idle" then state = "idle" end
         table.insert(list, {
           id = tostring(a.id or string.sub(a.sessionId, 1, 8)),
           sessionId = a.sessionId,
