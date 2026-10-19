@@ -3,7 +3,7 @@
 # dev: language toolchains and CLI dev tools.
 
 category dev rlog "🛠️ Installing dev tools..." "Install dev tools?" \
-  setup-cargo setup-rust setup-python setup-nodenv setup-node-tools \
+  setup-cargo setup-rust setup-go-tools setup-python setup-nodenv setup-node-tools \
   setup-flyctl setup-beads
 
 setup-cargo() {
@@ -25,6 +25,17 @@ setup-cargo() {
       || bootstrap_error "Failed to upgrade rust — run 'brew upgrade rust' manually."
   fi
   unchanged "up to date"
+}
+
+# lazysql via go install; macOS gets it from the Brewfile instead.
+setup-go-tools-applicable() { is-fedora; }
+setup-go-tools() {
+  substep "Checking Go tools..."
+  if ! command -v lazysql &> /dev/null; then
+    spin "Installing lazysql (go)..." go install github.com/jorgerojas26/lazysql@latest \
+      || bootstrap_error "Failed to install lazysql — run 'go install github.com/jorgerojas26/lazysql@latest' manually."
+  fi
+  unchanged "already installed"
 }
 
 setup-rust() {
