@@ -61,18 +61,16 @@ local function lift(spec, nowMs)
 end
 
 -- Sleeping robot: the z's light up like a neon sign - switch on one tube at a time,
--- hold, buzz with a flicker, power down, repeat. {text, lit, steps} (a step is SLOW ticks, 150ms);
--- text is always 3 wide so the bar never reflows. Unlit = dimmed tube.
+-- hold, buzz with a flicker, then start over at one z (it only ever counts up: 1, 2, 3, 1, 2, 3...).
+-- {text, lit, steps} (a step is SLOW ticks, 150ms); text is always 3 wide so the bar never reflows.
+-- Unlit = dimmed tube.
 local NEON = {
-  { "   ", false, 5 },
   { "z  ", true, 3 },
   { "zz ", true, 3 },
   { "zzz", true, 4 },
-  -- flicker
-  { "zzz", false, 1 }, { "zzz", true, 1 }, { "zz ", true, 1 }, { "zzz", true, 1 },
+  -- flicker: all three z's blink, never dropping back to two
+  { "zzz", false, 1 }, { "zzz", true, 1 }, { "zzz", false, 1 }, { "zzz", true, 1 },
   { "zzz", false, 1 }, { "zzz", true, 6 },
-  -- power down
-  { "zz ", true, 2 }, { "z  ", true, 2 }, { "z  ", false, 1 }, { "   ", false, 4 },
 }
 local NEON_TIMELINE = {}
 for _, step in ipairs(NEON) do
