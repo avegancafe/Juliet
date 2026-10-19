@@ -351,9 +351,11 @@ local function refresh()
         })
       end
     end
-    local pending = #list
-    if pending == 0 then return finish(list) end
-    for _, entry in ipairs(list) do
+    -- One entry at a time: with 5+ agents some of the parallel readFileAsync calls
+    -- never called back, which hung the poll.
+    local function step(i)
+      local entry = list[i]
+      if not entry then return finish(list) end
       local function withFeed(job)
         -- A resumed job runs under a new session id, but its feed file keeps the
         -- job's original one: fall back to that.
@@ -364,12 +366,12 @@ local function refresh()
         readJson(path, function(feed)
           local ok, err = pcall(join, entry, feed, job)
           if not ok then logErr(`join {entry.id}: {err}`) end
-          pending -= 1
-          if pending == 0 then finish(list) end
+          step(i + 1)
         end)
       end
       if entry.kind == "background" then readJson(`~/.claude/jobs/{entry.id}/state.json`, withFeed) else withFeed(nil) end
     end
+    step(1)
   end)
 end
 
