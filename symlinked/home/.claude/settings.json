@@ -128,7 +128,7 @@
       "~/.config/Juliet/"
     ]
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -164,12 +164,13 @@
     "playwright@j2-claude-plugins": true,
     "mattpocock-skills@j2-claude-plugins": true,
     "launchdarkly@j2-claude-plugins": true,
-    "session-ids@avegancafe-marketplace": true,
     "in-my-voice@j2-claude-plugins": true,
     "j2-sandbox@j2-claude-plugins": true,
     "typesafe@j2-claude-plugins": true,
     "diagram-design@j2-claude-plugins": true,
-    "beadwork@avegancafe-marketplace": true
+    "beadwork@avegancafe-marketplace": true,
+    "avegancafe@avegancafe-marketplace": true,
+    "session-management@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
@@ -205,6 +206,9 @@
     },
     "claude-fable-5-1": {
       "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
     }
   },
   "promptSuggestionEnabled": false,
@@ -213,7 +217,8 @@
   "pluginConfigs": {
     "j2-eng@j2-claude-plugins": {
       "options": {
-        "openTicketsOnStart": true
+        "openTicketsOnStart": false,
+        "openPrsOnStart": true
       }
     }
   },
