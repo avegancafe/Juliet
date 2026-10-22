@@ -52,3 +52,5 @@ fish_add_path "$HOME/.opencode/bin"
 
 # Claude Code Subagent Model
 set -gx CLAUDE_CODE_SUBAGENT_MODEL opus
+
+eval (/opt/homebrew/bin/brew shellenv fish)
