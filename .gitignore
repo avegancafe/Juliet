@@ -34,3 +34,6 @@ symlinked/config/fish/completions/hey.fish
 .env
 .env.*
 !.env.template
+
+# Karabiner-Elements writes its own timestamped backups here
+symlinked/config/karabiner/automatic_backups/
