@@ -25,6 +25,7 @@ plans/
 *.db
 .beads-credential-key
 .beads/proxieddb/
+.beads/.auto-import-issues.jsonl
 *.gate.lock*
 
 # Written by `hey shell-completion install` (the juliet-kyle extension); hey-cli owns it
