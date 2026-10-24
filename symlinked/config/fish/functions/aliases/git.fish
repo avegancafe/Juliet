@@ -92,10 +92,14 @@ function commit
     end
 
     if test -n "$_flag_s"
-        set -l initials $(test -n $GIT_INITIALS && echo $GIT_INITIALS || echo 'KH')
+        if test -z "$GIT_INITIALS"
+            error "GIT_INITIALS is not set— exiting..."
+            printf '\nAdd your initials to ~/.config/local/.env, e.g.:\n  GIT_INITIALS=KH\nthen open a new shell.\n\n'
+            return 1
+        end
 
-        git commit --message "[$initials] $message"
-        log "Committing with message '[$initials] $message'..."
+        git commit --message "[$GIT_INITIALS] $message"
+        log "Committing with message '[$GIT_INITIALS] $message'..."
         return 0
     end
 
