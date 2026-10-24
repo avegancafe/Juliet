@@ -10,7 +10,7 @@ Kyle's setup has two layers:
 | Layer | Repo | Holds |
 |-------|------|-------|
 | **Juliet** | `~/.config/Juliet` (`avegancafe/Juliet`) | Shared setup that anyone can run from `main`: packages, dotfiles and bootstrap steps that make sense for any Juliet user |
-| **juliet-kyle** | `~/workspace/juliet-kyle` (`avegancafe/juliet-kyle`) | Kyle's personal layer: his own apps and accounts (HEY, Zola, Obsidian, Zen, …), `[github] user`, and setup steps for those |
+| **juliet-kyle** | `~/workspace/juliet-kyle` (`avegancafe/juliet-kyle`) | Kyle's personal layer: his own apps and accounts (HEY, Obsidian, Zen, …), `[github] user`, and setup steps for those |
 
 `~/.config/Juliet/EXTENSIONS.md` is the source of truth for the extension format. Read it before changing the extension.
 
@@ -20,6 +20,7 @@ Ask: **"Would someone else running Juliet want this?"**
 - **Yes** → Juliet. Use the other Juliet skills as normal.
 - **No, it's Kyle's taste or account** → juliet-kyle.
 - **This machine only, or a secret** → `~/.config/local/` (ad-hoc), in neither repo.
+- **A Claude connector (MCP server) that should work in claude.ai, on mobile or in Projects** → its own repo, deployed as a remote connector (like `avegancafe/hey-mcp` and `avegancafe/zola-mcp-remote` on Fly). Don't also register it locally in Claude Desktop or Claude Code: claude.ai connectors already reach both, and a local copy loads every tool twice.
 
 Say which layer you picked and why. If a Juliet change is really personal (it names Kyle's accounts, or apps only he uses), move it to the extension rather than adding it to Juliet.
 
