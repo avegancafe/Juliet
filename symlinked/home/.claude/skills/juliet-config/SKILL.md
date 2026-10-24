@@ -27,7 +27,7 @@ Work in `~/.config/Juliet` using absolute paths, whatever directory the session 
   - Never silently implement only the OS you happen to be on.
 - **No sudo.** Your Bash tool can't answer a password prompt. Script anything system-level as a bootstrap step (`juliet-bootstrap-step` skill), then give the user the exact command to run, e.g. `juliet-bootstrap --enable=keyd`. Don't hand out one-off `sudo` commands for something bootstrap should own.
 - **Dotfiles:** edit only under `~/.config/Juliet/symlinked/`, never the symlink targets in `~` or `~/.config`, and never delete or recreate links by hand. New app configs: `add-app-config` skill. Fish functions: `add-fish-alias` skill.
-- **Personal preferences** (Kyle's own apps and accounts, e.g. HEY) go in the extension repo `~/workspace/juliet-kyle`, not in Juliet.
+- **Shared or personal? Decide every time.** Kyle's own apps, accounts and taste (e.g. HEY, Zola, his GitHub user) go in the extension repo `~/workspace/juliet-kyle`, not in Juliet. The `juliet-extension` skill covers the split, where each kind of change lives there, and why an extension edit only applies after a push and `juliet-bootstrap --enable=extension`.
 - **Package sources are declarative:** Brewfile `tap` lines and DNFfile `copr` lines are the full list, and bootstrap removes any that aren't declared. Never tap or enable a repo by hand.
 - **Git and tasks:** don't commit or push unless asked. Use `bd` (beads) for task tracking in this repo, not markdown TODOs.
 

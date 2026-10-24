@@ -47,4 +47,4 @@ Canonical example — `setup-keyd` in `bin/bootstrap.d/60-desktop.bash`: OS guar
 - Run just this step: `~/.config/Juliet/bin/juliet-bootstrap --enable=<name>`. Naming a category runs all of its steps; `--skip=<name>` excludes one.
 - For a command the user runs through `!` in Claude Code: keep it one line (fish). Note that sudo prompts still fail without a TTY, so tell them to run it in a real terminal.
 
-If the step only applies to Kyle personally, put it in the extension repo (`~/workspace/juliet-kyle`, `extension-setup`) instead. See `EXTENSIONS.md`.
+If the step only applies to Kyle personally, put it in the extension repo (`~/workspace/juliet-kyle`, `extension-setup`) instead. See `EXTENSIONS.md` and the `juliet-extension` skill (extension steps may use only the stable helpers, and they apply only after a push).

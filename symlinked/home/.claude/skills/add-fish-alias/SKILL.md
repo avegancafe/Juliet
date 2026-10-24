@@ -5,6 +5,8 @@ description: Use when creating a new fish shell alias, function, or command shor
 
 # Add Fish Alias
 
+> **Personal, not shared?** If this is Kyle's own taste rather than something any Juliet user would want, it goes in `~/workspace/juliet-kyle` instead. See the `juliet-extension` skill for the equivalent file there.
+
 Create a new fish shell function/alias in Juliet dotfiles.
 
 ## Process

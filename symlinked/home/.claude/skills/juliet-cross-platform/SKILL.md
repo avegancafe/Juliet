@@ -5,6 +5,8 @@ description: Use when changing Kyle's Juliet setup (~/.config/Juliet) in a way t
 
 # Juliet: macOS ↔ Fedora
 
+> **Personal, not shared?** If this is Kyle's own taste rather than something any Juliet user would want, it goes in `~/workspace/juliet-kyle` instead. See the `juliet-extension` skill for the equivalent file there.
+
 Juliet targets two OSes. Every change answers **"what happens on the other one?"** All paths below are under `~/.config/Juliet/`.
 
 ## Which package file?

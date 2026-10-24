@@ -5,6 +5,8 @@ description: Use when adding configuration for a new application to Kyle's Julie
 
 # Add App Configuration
 
+> **Personal, not shared?** If this is Kyle's own taste rather than something any Juliet user would want, it goes in `~/workspace/juliet-kyle` instead. See the `juliet-extension` skill for the equivalent file there.
+
 Add a new application's configuration to Juliet dotfiles with proper stow symlinks.
 
 ## How the Stow Symlink Farm Works
