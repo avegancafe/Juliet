@@ -1,6 +1,6 @@
 ---
 name: add-fish-alias
-description: Use when creating a new fish shell alias, function, or command shortcut, or when user asks to "add an alias for X"
+description: Use when creating a new fish shell alias, function, or command shortcut in Kyle's Juliet dotfiles (~/.config/Juliet), or when user asks to "add an alias for X"
 ---
 
 # Add Fish Alias

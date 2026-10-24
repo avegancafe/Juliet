@@ -1,6 +1,6 @@
 ---
 name: add-app-config
-description: Use when adding configuration for a new application to the dotfiles, setting up a new tool's config, adopting a config directory an app already created, or when user says "add config for X"
+description: Use when adding configuration for a new application to Kyle's Juliet dotfiles (~/.config/Juliet), setting up a new tool's config, adopting a config directory an app already created, or when user says "add config for X"
 ---
 
 # Add App Configuration
