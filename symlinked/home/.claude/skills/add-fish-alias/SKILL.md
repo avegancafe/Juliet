@@ -11,7 +11,7 @@ Create a new fish shell function/alias in Juliet dotfiles.
 
 1. **Create function file**
    ```
-   symlinked/config/fish/functions/aliases/<name>.fish
+   ~/.config/Juliet/symlinked/config/fish/functions/aliases/<name>.fish
    ```
 
 2. **Write the function**
@@ -84,4 +84,4 @@ Group related functions (e.g., `git.fish` contains `ga`, `gl`, `gm`, `commit`, e
 
 - Forgetting `--wraps` (loses tab completion)
 - Using `$@` instead of `$argv` (bash syntax, not fish)
-- Creating in wrong directory (must be in `symlinked/config/fish/functions/aliases/`)
+- Creating in wrong directory (must be in `~/.config/Juliet/symlinked/config/fish/functions/aliases/`)

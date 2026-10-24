@@ -48,7 +48,14 @@ Portable development environment for Kyle's personal systems. The goal is that a
 - **macOS**: `brew bundle --file ~/.config/Juliet/Brewfile`
 - **Fedora**: Packages listed in `DNFfile`
 
-## Skills
+## Skills and the `juliet` agent
 
-- `add-app-config` - Add configuration for a new application
-- `add-fish-alias` - Create a new fish shell alias/function
+These are **global**: they live in `symlinked/home/.claude/` and are stowed into `~/.claude/`, so they work from any directory, not just this repo.
+
+- `juliet` agent (`symlinked/home/.claude/agents/juliet.md`): handles any question about or change to the computer config as "in Juliet, X", keeping macOS and Fedora in step. It preloads the skills below.
+- `juliet-cross-platform`: macOS ↔ Fedora mapping (Brewfile ↔ DNFfile/Flatpakfile, OS-gating, equivalent tools)
+- `juliet-bootstrap-step`: add or change a `setup-*` step in `bin/bootstrap.d/`
+- `add-app-config`: add configuration for a new application
+- `add-fish-alias`: create a new fish shell alias/function
+
+When you add a skill here, use absolute `~/.config/Juliet/...` paths, because it runs from any directory. Add it to the agent's `skills:` list if the agent should preload it.

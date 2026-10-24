@@ -9,15 +9,15 @@ Add a new application's configuration to Juliet dotfiles with proper stow symlin
 
 ## How the Stow Symlink Farm Works
 
-Juliet manages dotfiles as three stow "packages" under `symlinked/`, each with its own target:
+Juliet (`~/.config/Juliet`) manages dotfiles as three stow "packages" under `symlinked/`, each with its own target:
 
 | Package | Stow command target | Files land in |
 |---------|--------------------|---------------|
-| `symlinked/home/` | `~` | `~/.gitconfig`, etc. |
-| `symlinked/config/` | `~/.config` | `~/.config/<app>/` |
-| `symlinked/local-state/` | `~/.local/state` | `~/.local/state/<app>/` |
+| `~/.config/Juliet/symlinked/home/` | `~` | `~/.gitconfig`, etc. |
+| `~/.config/Juliet/symlinked/config/` | `~/.config` | `~/.config/<app>/` |
+| `~/.config/Juliet/symlinked/local-state/` | `~/.local/state` | `~/.local/state/<app>/` |
 
-`juliet-bootstrap` runs all three stow invocations in `symlink-dotfiles` on every run — so a new app config added under `symlinked/config/` is picked up automatically on other machines; **no bootstrap changes are needed**.
+`juliet-bootstrap` runs all three stow invocations in `symlink-dotfiles` on every run — so a new app config added under `~/.config/Juliet/symlinked/config/` is picked up automatically on other machines; **no bootstrap changes are needed**.
 
 **Folding:** stow symlinks at the highest level it can:
 - Target dir doesn't exist → ONE folder symlink (`~/.config/niri` → `Juliet/symlinked/config/niri`). Files the app later creates inside land in the repo automatically.
@@ -33,7 +33,7 @@ Prefer folder symlinks: get stow to run before the app first launches, or adopt 
    ```
 
 2. **Add configuration files**
-   - Create config files inside `symlinked/config/<app-name>/`
+   - Create config files inside `~/.config/Juliet/symlinked/config/<app-name>/`
    - Use the app's expected filenames (e.g., `config`, `config.toml`, `settings.json`)
 
 3. **Run stow to create symlinks**
@@ -44,7 +44,7 @@ Prefer folder symlinks: get stow to run before the app first launches, or adopt 
 4. **Apply Bamboo theme** (if applicable)
    - Check if app supports Bamboo theme
    - Apply consistent colors: dark green-tinted background, soft white foreground
-   - Document theme setting in `.claude/rules/theming.md`
+   - Document theme setting in `~/.config/Juliet/.claude/rules/theming.md`
 
 ## Pre-flight Check
 
@@ -98,6 +98,6 @@ ls -la ~/.config/fuzzel  # Should show symlink to Juliet
 
 ## Common Mistakes
 
-- Creating files directly in `~/.config/` instead of `symlinked/config/`
+- Creating files directly in `~/.config/` instead of `~/.config/Juliet/symlinked/config/`
 - Forgetting to run `stow` after adding files
 - Not checking if target folder already exists (could overwrite user data)

@@ -10,6 +10,8 @@ symlinked/config/crush/crush.json
 symlinked/home/.claude/*
 !symlinked/home/.claude/settings.json
 !symlinked/home/.claude/mods/
+!symlinked/home/.claude/agents/
+!symlinked/home/.claude/skills/
 
 .claude/*.local.json
 .claude/worktrees
