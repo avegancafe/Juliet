@@ -25,11 +25,12 @@ Say which layer you picked and why. If a Juliet change is really personal (it na
 
 ## How the extension is wired
 
-- `JULIET_EXTENSION` in `~/.config/local/.env` names the extension. Don't read that file: it's denied and holds secrets. To see which mode is in use, run `readlink -f ~/.config/juliet-extension` instead:
-  - **URL mode** (the usual case): the link points to a **clone** at `~/.config/juliet-kyle`, which bootstrap pulls on every run.
-  - **Path mode**: the link points straight at a local checkout.
+- `JULIET_EXTENSION` in `~/.config/local/.env` names the extension. Don't read that file: it's denied and holds secrets. To see which mode is in use, run `ls -ld ~/.config/juliet-extension` instead:
+  - **URL mode**: `~/.config/juliet-extension` is itself a git clone (a real directory), and bootstrap fast-forwards it on every run.
+  - **Path mode**: `~/.config/juliet-extension` is a symlink to a local checkout (`readlink -f` shows which one), and **bootstrap never pulls it**. If that checkout isn't `~/workspace/juliet-kyle` (for example `~/.config/juliet-kyle`), it only changes when someone runs `git -C <checkout> pull --ff-only`.
 - In bootstrap steps and in configs that point at extension files, use `$EXTENSION_DIR`, which is `~/.config/juliet-extension`. Never use the clone's or checkout's own path.
-- **Edit `~/workspace/juliet-kyle`, never the clone.** In URL mode, an edit takes effect only after it's pushed and `juliet-bootstrap --enable=extension` has pulled it. Until then `~/.config/juliet-extension` still holds the old files. Say this in the report.
+- **Edit `~/workspace/juliet-kyle`, never a live copy.** Unless the live extension is that same checkout, an edit takes effect only after you push it and the live copy picks it up: bootstrap pulls it in URL mode, but in path mode you pull it yourself. Then run `juliet-bootstrap --enable=extension`. Say which of these applies in the report.
+- Claude Desktop rewrites `claude_desktop_config.json` while it's running, so a step that edits that file can be undone. Quit Desktop before running such a step, and re-run the step if the entry disappears.
 
 ## Where each kind of change goes in the extension
 
@@ -56,4 +57,4 @@ Extension steps may use only the stable helpers listed in EXTENSIONS.md (`spin`,
 
 Add these to the `juliet-config` report:
 - which layer the change went in, and why;
-- for juliet-kyle, the apply steps: commit and push `~/workspace/juliet-kyle` (only when the user asks), then run `juliet-bootstrap --enable=extension`.
+- for juliet-kyle, the apply steps: commit and push `~/workspace/juliet-kyle` (only when the user asks), update the live copy if it's a path-mode checkout elsewhere, then run `juliet-bootstrap --enable=extension`.
