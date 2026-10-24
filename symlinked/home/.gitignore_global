@@ -13,3 +13,5 @@ dbt/target
 .pi/artifacts/
 
 **/.claude/settings.local.json
+
+**/.claude/.cc-writes/
