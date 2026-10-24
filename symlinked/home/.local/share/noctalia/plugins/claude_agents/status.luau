@@ -9,7 +9,7 @@
 -- Nothing needs you but something is working: the die shuffles faces nonstop.
 -- Nothing running at all: sleeping robot with neon-sign z's (see NEON).
 -- A failed/blocked die bounces like a Dock icon asking for attention (failed faster). Next to it: Claude Code 5h / 7d usage
--- meters (dimmed when stale). Names, reasons and context fill live in the tooltip / panel.
+-- meters, each shown only above USAGE_SHOW_PCT (dimmed when stale; tooltip always has both). Names, reasons and context fill live in the tooltip / panel.
 --
 -- Data: `claude agents --json` is the roster (who is alive, names). Each session's
 -- agents-feed mod (symlinked/home/.claude/mods/agents-feed) writes
@@ -26,6 +26,7 @@ local ROLL_TICKS = 20 -- ~1.5s of tumbling before the die settles
 local DONE_FRESH_S = 30 * 60
 local INT_FRESH_S = 5 * 60 -- every interactive turn ends "done": let it go quickly
 local USAGE_STALE_S = 15 * 60
+local USAGE_SHOW_PCT = 35 -- the bar shows a usage meter only once it is above this
 local FEED_DIR = "~/.cache/claude-agents"
 local USAGE_PATHS = { FEED_DIR .. "/_usage.json" }
 
@@ -227,8 +228,10 @@ local function render()
 
   local nodes = { lead }
   for _, p in ipairs(usageParts()) do
-    table.insert(nodes, ui.label({ text = p[1], color = "on_surface_variant" }))
-    table.insert(nodes, ui.label({ text = `{meter(p[2])} {math.floor(p[2] + 0.5)}%`, color = usageColor(p[2], p[3]) }))
+    if p[2] > USAGE_SHOW_PCT then
+      table.insert(nodes, ui.label({ text = p[1], color = "on_surface_variant" }))
+      table.insert(nodes, ui.label({ text = `{meter(p[2])} {math.floor(p[2] + 0.5)}%`, color = usageColor(p[2], p[3]) }))
+    end
   end
   barWidget.render(ui.row({ gap = 6, align = "center" }, nodes))
 
