@@ -48,11 +48,11 @@ Portable development environment for Kyle's personal systems. The goal is that a
 - **macOS**: `brew bundle --file ~/.config/Juliet/Brewfile`
 - **Fedora**: Packages listed in `DNFfile`
 
-## Skills and the `juliet` agent
+## Skills and the `noelle` agent
 
 These are **global**: they live in `symlinked/home/.claude/` and are stowed into `~/.claude/`, so they work from any directory, not just this repo.
 
-- `juliet` agent (`symlinked/home/.claude/agents/juliet.md`): handles any question about or change to the computer config as "in Juliet, X", keeping macOS and Fedora in step. It preloads the skills below.
+- `noelle` agent (`symlinked/home/.claude/agents/noelle.md`): handles any question about or change to the computer config as "in Juliet, X", keeping macOS and Fedora in step. It preloads the skills below.
 - `juliet-cross-platform`: macOS ↔ Fedora mapping (Brewfile ↔ DNFfile/Flatpakfile, OS-gating, equivalent tools)
 - `juliet-bootstrap-step`: add or change a `setup-*` step in `bin/bootstrap.d/`
 - `add-app-config`: add configuration for a new application
