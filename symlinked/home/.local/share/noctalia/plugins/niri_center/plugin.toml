@@ -1,0 +1,16 @@
+# Bar widget showing whether niri centers the focused column
+# (center-focused-column "always" in niri/config.kdl). Click toggles it.
+id = "kyle/niri_center"
+name = "Niri Center"
+version = "0.1.0"
+plugin_api = 26
+author = "kyle"
+license = "MIT"
+dependencies = []
+tags = ["niri"]
+icon = "layout-align-center"
+description = "Shows and toggles niri's centered-focus mode."
+
+[[widget]]
+id = "status"
+entry = "status.luau"

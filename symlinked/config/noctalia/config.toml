@@ -45,6 +45,7 @@ background_opacity = 0.93
 start = ["launcher", "cpu", "ram", "active_window"]
 center = ["workspaces"]
 end = [
+  "niri_center",
   "claude",
   "audio_visualizer",
   "tray",
@@ -59,6 +60,10 @@ end = [
 [widget.claude]
 type = "kyle/claude_agents:status"
 
+# niri centered-focus indicator; click toggles (plugin: .../plugins/niri_center)
+[widget.niri_center]
+type = "kyle/niri_center:status"
+
 # Local plugins stowed from symlinked/home/.local/share/noctalia/plugins
 [plugins]
-enabled = ["kyle/claude_agents"]
+enabled = ["kyle/claude_agents", "kyle/niri_center"]
