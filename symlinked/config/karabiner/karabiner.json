@@ -304,7 +304,7 @@
                         ]
                     },
                     {
-                        "description": "CAPSLOCK + hjkl to arrow keys (Post F13 if press CAPSLOCK alone)",
+                        "description": "CAPSLOCK + hjkl to arrow keys (Post Cmd+Space if press CAPSLOCK alone)",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -387,7 +387,12 @@
                                         }
                                     }
                                 ],
-                                "to_if_alone": [{ "key_code": "f13" }],
+                                "to_if_alone": [
+                                    {
+                                        "key_code": "spacebar",
+                                        "modifiers": ["left_command"]
+                                    }
+                                ],
                                 "type": "basic"
                             }
                         ]
