@@ -18,9 +18,9 @@ const PANE = {
 const SURFACES = ['terminal', 'desktop'] as const
 
 /** The engine beneath the plugin: just enough of it to start a session. */
-const engine = (on: On) => {
+const engine = (on: On, stored: Record<string, unknown> = {}) => {
   const clock = mock.clock(on, { now: 1_000 })
-  mock.store(on)
+  mock.store(on, stored)
   on('command.register', () => ({ value: { command: 'task-graph' } }))
   on('tool.register', (_, e) => ({ value: { tool: `mcp__task-graph__${e.name}` } }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
@@ -28,6 +28,7 @@ const engine = (on: On) => {
   on('ui.status', () => ({ value: undefined }))
   on('ui.scroll', () => ({}))
   on('session.root', () => ({ value: '/repo' }))
+  on('session.id', () => ({ value: 'session-a' }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('tool.call', () => ({ result: 'ran' }))
 
@@ -246,4 +247,33 @@ test('the graph is drawn in the monospaced face, rails and titles alike', async 
   expect(texts.every(one => one.props.mono === true)).toBe(true)
   expect((await ui.find({ key: 'line-t4' }))?.text).toContain('└─ ○ Create models')
   await ui.unmount()
+})
+
+test('each session keeps its own graph; another session\'s and the old shared one stay out', async ($, on) => {
+  const other = (title: string) => ({
+    tasks: { t1: { id: 't1', parentId: null, title, description: '', acceptance: '', status: 'pending', order: 0, blockedBy: [], createdBy: 'claude', revision: 1, createdAt: 0, updatedAt: 0, notes: [] } },
+    rev: 1, nextId: 2, claim: null, nextUp: [], changes: [], claudeSeen: 1,
+  })
+  engine(on, {
+    'graph:/repo': { root: '/repo', graph: other('Old shared task'), savedAt: 1_000 },
+    'graph:session:session-b': { root: '/repo', sessionId: 'session-b', graph: other('Other session task'), savedAt: 1_000 },
+  })
+  await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
+  const next = (await tg($, 'tg_next')).result ?? ''
+  expect(next).not.toContain('Old shared task')
+  expect(next).not.toContain('Other session task')
+})
+
+test('a restarted session picks its own graph back up', async ($, on) => {
+  engine(on, {
+    'graph:session:session-a': {
+      root: '/repo', sessionId: 'session-a', savedAt: 1_000,
+      graph: {
+        tasks: { t1: { id: 't1', parentId: null, title: 'Mine from before', description: '', acceptance: '', status: 'pending', order: 0, blockedBy: [], createdBy: 'claude', revision: 1, createdAt: 0, updatedAt: 0, notes: [] } },
+        rev: 1, nextId: 2, claim: null, nextUp: [], changes: [], claudeSeen: 1,
+      },
+    },
+  })
+  await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
+  expect((await tg($, 'tg_next')).result).toContain('Mine from before')
 })

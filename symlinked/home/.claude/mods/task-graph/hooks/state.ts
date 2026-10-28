@@ -6,27 +6,54 @@ import { emptyGraph, markSeen } from './store'
 import type { Result } from './store'
 
 // The session's live copy lives in `$.state`; every graph write is mirrored to
-// `$.store` under the project root so a restart or a new session picks it up.
+// `$.store` under the session's id, so a restart or a resume of that session
+// picks it up and no other session sees it.
 
 export const graph = atom({ plugin: 'task-graph', key: 'graph' } as const, emptyGraph())
 export const newIds = atom({ plugin: 'task-graph', key: 'newIds' } as const, [])
 
 export const PANE = 'task-graph'
 const NEW_HIGHLIGHT_MS = 8000
+const KEY_PREFIX = 'graph:session:'
+// A session's saved graph outlives it this long; `$.store` is capped at 4 MiB.
+const KEEP_MS = 30 * 24 * 60 * 60 * 1000
 
-type Store = { root: string; graph: Graph; savedAt: number }
+type Store = { root: string; sessionId: string; graph: Graph; savedAt: number }
 
 async function storeKey($: EngineInterface): Promise<string> {
-  return `graph:${await $.session.root()}`
+  return `${KEY_PREFIX}${await $.session.id()}`
 }
 
 export async function persist($: EngineInterface, value: Graph): Promise<void> {
-  const saved: Store = { root: await $.session.root(), graph: value, savedAt: await $.clock.now() }
+  const saved: Store = {
+    root: await $.session.root(),
+    sessionId: await $.session.id(),
+    graph: value,
+    savedAt: await $.clock.now(),
+  }
   await $.store.set(await storeKey($), saved)
 }
 
-/** Loads the project's graph into the session, unless the session already holds one. */
+/**
+ * Drops the graphs of sessions idle past `KEEP_MS`, and the older per-project
+ * graphs (`graph:<root>`) every session in a directory used to share.
+ */
+async function prune($: EngineInterface): Promise<void> {
+  const now = await $.clock.now()
+  for (const key of await $.store.keys()) {
+    if (!key.startsWith('graph:')) continue
+    if (!key.startsWith(KEY_PREFIX)) {
+      await $.store.delete(key)
+      continue
+    }
+    const saved = (await $.store.get(key)) as Store | undefined
+    if (saved === undefined || now - saved.savedAt > KEEP_MS) await $.store.delete(key)
+  }
+}
+
+/** Loads this session's graph into the session, unless the session already holds one. */
 export async function hydrate($: EngineInterface): Promise<void> {
+  await prune($)
   const live = await read($, graph)
   if (live.rev > 0) return refreshStatus($, live)
   const saved = (await $.store.get(await storeKey($))) as Store | undefined
