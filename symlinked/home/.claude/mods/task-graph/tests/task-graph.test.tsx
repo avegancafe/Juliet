@@ -225,14 +225,16 @@ test('a click on a row opens its drawer of actions; a second click closes it', a
   for (const surface of SURFACES) {
     const ui = await $.ui.mount({ ...PANE, surface })
     await ui.press({ key: 'row-t2' })
-    for (const action of ['edit', 'next', 'done', 'cancel', 'up', 'down', 'fold']) {
+    for (const action of ['edit', 'next', 'done', 'cancel', 'up', 'down']) {
       expect(await ui.find({ key: `act-${action}-t2` })).toBeDefined()
     }
     expect(await ui.find({ type: 'Text', text: /created by claude/ })).toBeDefined()
-    await ui.press({ key: 'act-fold-t2' })
+    // The parent's dot folds the group; a leaf's dot is no control.
+    expect(await ui.find({ key: 'fold-t4' })).toBeUndefined()
+    await ui.press({ key: 'fold-t2' })
     expect(await ui.find({ key: 'row-t4' })).toBeUndefined()
-    expect(await ui.find({ key: 'act-fold-t2' })).toBeDefined()
-    await ui.press({ key: 'act-fold-t2' })
+    expect((await ui.find({ key: 'row-t2' }))?.text).toContain('(+1)')
+    await ui.press({ key: 'fold-t2' })
     await ui.press({ key: 'row-t2' })
     expect(await ui.find({ key: 'act-edit-t2' })).toBeUndefined()
     expect(await ui.find({ key: 'row-t4' })).toBeDefined()

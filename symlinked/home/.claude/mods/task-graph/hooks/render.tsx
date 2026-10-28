@@ -131,6 +131,7 @@ const statusColor: Record<Task['status'], string> = {
 const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean, isNew: boolean, isOpen: boolean) => {
   const { Box, Button, Text } = E as Elements & { Box: any; Button: any; Text: any }
   const { task } = row
+  const canFold = row.hasVisibleChildren || row.hidden > 0
   const parts = [
     <Text
       mono
@@ -149,11 +150,18 @@ const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean,
 
   return (
     <Box key={`line-${task.id}`} flexDirection="row">
-      <Text mono>
-        <Text mono dimColor>{row.prefix}</Text>
-        <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
-        <Text mono> </Text>
-      </Text>
+      <Text mono dimColor>{row.prefix}</Text>
+      {/* A parent's dot folds and unfolds its group; one cell wide either way so titles line up. */}
+      <Box width={1}>
+        {canFold ? (
+          <Button key={`fold-${task.id}`} plain onPress={() => toggleFold($, task.id)}>
+            <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
+          </Button>
+        ) : (
+          <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
+        )}
+      </Box>
+      <Text mono> </Text>
       <Button key={`row-${task.id}`} plain onPress={() => toggleDrawer($, task.id)}>
         {parts}
       </Button>
@@ -183,11 +191,13 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
     `created by ${task.createdBy}`,
     task.blockedBy.length === 0 ? '' : `blocked by ${task.blockedBy.join(', ')}`,
   ].filter(part => part !== '')
-  const act = (name: string, label: string, onPress: () => unknown, variant?: 'primary') => (
-    <Button key={`act-${name}-${task.id}`} label={label} variant={variant} onPress={onPress} />
+  // Actions read as a quiet row of text links: plain Buttons draw without
+  // chrome, dim at rest and full strength under the pointer.
+  const act = (name: string, label: string, onPress: () => unknown, loud = false) => (
+    <Button key={`act-${name}-${task.id}`} label={label} plain dimColor={!loud} onPress={onPress} />
   )
   const actions = [
-    act('edit', 'Edit', () => openModal($, task.id), 'primary'),
+    act('edit', 'Edit', () => openModal($, task.id)),
     ...(isDone
       ? [act('reopen', 'Reopen', () => human($, (g, now) => reopen(g, task.id, 'human', now)))]
       : [
@@ -195,15 +205,12 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
           act('done', 'Complete', () => human($, (g, now) => complete(g, task.id, 'human', now))),
           act('cancel', 'Cancel', () => human($, (g, now) => cancel(g, task.id, 'human', now))),
         ]),
-    act('up', 'Move up', () => human($, (g, now) => reorder(g, task.id, -1, 'human', now))),
-    act('down', 'Move down', () => human($, (g, now) => reorder(g, task.id, 1, 'human', now))),
-    ...(row.hasVisibleChildren || row.hidden > 0
-      ? [act('fold', row.hidden > 0 ? 'Unfold' : 'Fold', () => toggleFold($, task.id))]
-      : []),
+    act('up', 'Up', () => human($, (g, now) => reorder(g, task.id, -1, 'human', now))),
+    act('down', 'Down', () => human($, (g, now) => reorder(g, task.id, 1, 'human', now))),
     ...(task.status === 'canceled' && value.claim?.taskId === task.id && running !== null
-      ? [act('stop', 'Stop Claude now', () => stopNow($, task))]
+      ? [act('stop', 'Stop Claude now', () => stopNow($, task), true)]
       : []),
-  ]
+  ].flatMap((button, index) => (index === 0 ? [button] : [<Text dimColor> · </Text>, button]))
 
   return (
     <Box key={`drawer-${task.id}`} flexDirection="column">
@@ -213,7 +220,7 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
       {task.notes.length === 0 ? null : line('note', <Text dimColor wrap="wrap">Latest: {task.notes.at(-1)}</Text>)}
       {line(
         'actions',
-        <Box flexDirection="row" flexWrap="wrap" columnGap={1}>
+        <Box flexDirection="row" flexWrap="wrap">
           {actions}
         </Box>,
       )}
