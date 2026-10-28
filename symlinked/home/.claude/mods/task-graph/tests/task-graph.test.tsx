@@ -283,3 +283,24 @@ test('a restarted session picks its own graph back up', async ($, on) => {
   await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
   expect((await tg($, 'tg_next')).result).toContain('Mine from before')
 })
+
+test('a long description wraps inside the card, every line behind the rails', async ($, on) => {
+  engine(on)
+  await plan($)
+  await tg($, 'tg_add', { title: 'Create models', parentId: 't2' })
+  await tg($, 'tg_update', { id: 't4', description: 'word '.repeat(60).trim() })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop', viewport: { columns: 60, rows: 40 } } as any)
+  await ui.press({ key: 'row-t4' })
+  const lines = []
+  for (let index = 0; ; index++) {
+    const one = await ui.find({ key: `desc-${index}` })
+    if (one === undefined) break
+    lines.push(one)
+  }
+  expect(lines.length).toBeGreaterThan(3)
+  for (const one of lines) {
+    expect(one.text.startsWith("      ▏ word")).toBe(true)
+    expect(one.text.length).toBeLessThanOrEqual(60)
+  }
+  await ui.unmount()
+})

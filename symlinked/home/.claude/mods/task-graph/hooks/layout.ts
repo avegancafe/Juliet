@@ -85,3 +85,35 @@ export const toText = (rows: readonly Row[]): string =>
   rows
     .map(row => `${row.prefix}${row.glyph} ${row.task.title}${row.hidden > 0 ? ` (+${row.hidden})` : ''}${row.isHead ? '  ← HEAD' : ''}`)
     .join('\n')
+
+/**
+ * Breaks text into lines of at most `width` characters, at spaces where it can.
+ * The drawer wraps its own text so each line gets its own rails: a surface that
+ * wrapped it instead would leave the rails off every line but the first.
+ */
+export const wrapText = (text: string, width: number): string[] => {
+  const lines: string[] = []
+  for (const paragraph of text.split('\n')) {
+    let line = ''
+    for (const word of paragraph.split(' ')) {
+      let rest = word
+      while (rest.length > width) {
+        if (line !== '') {
+          lines.push(line)
+          line = ''
+        }
+        lines.push(rest.slice(0, width))
+        rest = rest.slice(width)
+      }
+      if (line === '') line = rest
+      else if (line.length + 1 + rest.length <= width) line += ` ${rest}`
+      else {
+        lines.push(line)
+        line = rest
+      }
+    }
+    lines.push(line)
+  }
+
+  return lines
+}

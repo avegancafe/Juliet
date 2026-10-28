@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, On } from 'claude-code'
 
 import type { Draft, DraftFields, Graph, Task } from '../types'
-import { layout } from './layout'
+import { layout, wrapText } from './layout'
 import type { Row } from './layout'
 import { stopNow } from './native'
 import { cancel, complete, emptyGraph, reopen, reorder, updateTask, workNext } from './store'
@@ -151,16 +151,14 @@ const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean,
   return (
     <Box key={`line-${task.id}`} flexDirection="row">
       <Text mono dimColor>{row.prefix}</Text>
-      {/* A parent's dot folds and unfolds its group; one cell wide either way so titles line up. */}
-      <Box width={1}>
-        {canFold ? (
-          <Button key={`fold-${task.id}`} plain onPress={() => toggleFold($, task.id)}>
-            <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
-          </Button>
-        ) : (
+      {/* A parent's dot folds and unfolds its group. */}
+      {canFold ? (
+        <Button key={`fold-${task.id}`} plain onPress={() => toggleFold($, task.id)}>
           <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
-        )}
-      </Box>
+        </Button>
+      ) : (
+        <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
+      )}
       <Text mono> </Text>
       <Button key={`row-${task.id}`} plain onPress={() => toggleDrawer($, task.id)}>
         {parts}
@@ -173,16 +171,37 @@ const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean,
  * The open row's drawer: its details and every action on it, drawn under the
  * row behind the same rails so the graph still reads as one tree.
  */
-const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, running: string | null) => {
+const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, running: string | null, columns: number) => {
   const { Box, Button, Text } = E as Elements & { Box: any; Button: any; Text: any }
   const { task } = row
+  // The drawer is a card: a dim bar down its left edge, behind the tree's rails.
+  // Every line, wrapped ones included, is its own row so the rails never break.
   const gutter = `${row.below}${row.hasVisibleChildren ? '│' : ' '}  `
+  const bar = '▏ '
+  const width = Math.max(20, columns - gutter.length - bar.length - 1)
   const line = (key: string, body: unknown) => (
     <Box key={key} flexDirection="row">
       <Text mono dimColor>{gutter}</Text>
+      <Text mono color="subtle">{bar}</Text>
       {body}
     </Box>
   )
+  const block = (key: string, text: string, style: Record<string, unknown> = {}, lead = '') =>
+    wrapText(lead + text, width).map((part, index) =>
+      line(
+        `${key}-${index}`,
+        index === 0 && lead !== '' ? (
+          <Text wrap="truncate-end" {...style}>
+            <Text bold>{lead}</Text>
+            {part.slice(lead.length)}
+          </Text>
+        ) : (
+          <Text wrap="truncate-end" {...style}>
+            {part}
+          </Text>
+        ),
+      ),
+    )
   const isDone = task.status === 'completed' || task.status === 'canceled'
   const meta = [
     task.id,
@@ -191,8 +210,6 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
     `created by ${task.createdBy}`,
     task.blockedBy.length === 0 ? '' : `blocked by ${task.blockedBy.join(', ')}`,
   ].filter(part => part !== '')
-  // Actions read as a quiet row of text links: plain Buttons draw without
-  // chrome, dim at rest and full strength under the pointer.
   const act = (name: string, label: string, onPress: () => unknown, loud = false) => (
     <Button key={`act-${name}-${task.id}`} label={label} plain dimColor={!loud} onPress={onPress} />
   )
@@ -214,16 +231,20 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
 
   return (
     <Box key={`drawer-${task.id}`} flexDirection="column">
-      {line('meta', <Text mono dimColor>{meta.join(' · ')}</Text>)}
-      {task.description === '' ? null : line('desc', <Text wrap="wrap">{task.description}</Text>)}
-      {task.acceptance === '' ? null : line('acc', <Text wrap="wrap"><Text bold>Done when: </Text>{task.acceptance}</Text>)}
-      {task.notes.length === 0 ? null : line('note', <Text dimColor wrap="wrap">Latest: {task.notes.at(-1)}</Text>)}
+      {wrapText(meta.join(' · '), width).map((part, index) => line(`meta-${index}`, <Text mono dimColor wrap="truncate-end">{part}</Text>))}
+      {task.description === '' ? null : block('desc', task.description)}
+      {task.acceptance === '' ? null : block('acc', task.acceptance, {}, 'Done when: ')}
+      {task.notes.length === 0 ? null : block('note', task.notes.at(-1) ?? '', { dimColor: true }, 'Latest: ')}
+      {line('actions-above', <Text> </Text>)}
       {line(
         'actions',
-        <Box flexDirection="row" flexWrap="wrap">
+        <Box flexDirection="row" flexWrap="nowrap">
           {actions}
         </Box>,
       )}
+      <Box key="after-card" flexDirection="row">
+        <Text mono dimColor>{gutter}</Text>
+      </Box>
     </Box>
   )
 }
@@ -268,7 +289,7 @@ export const renderPane = (on: On): void => {
           const isOpen = row.task.id === expanded
           const view = rowView(E, $, row, row.task.id === selected, fresh.includes(row.task.id), isOpen)
 
-          return isOpen ? [view, drawerView(E, $, row, value, running)] : [view]
+          return isOpen ? [view, drawerView(E, $, row, value, running, e.viewport?.columns ?? 80)] : [view]
         })}
       </Box>
     )
