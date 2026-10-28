@@ -117,7 +117,7 @@ test('6: a completed task stays visible and expanded', async ($, on) => {
   await tg($, 'tg_claim', { id: 't2' })
   await tg($, 'tg_complete', { id: 't2' })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect((await ui.find({ key: 'row-t2' }))?.text).toContain('✓')
+  expect((await ui.find({ key: 'line-t2' }))?.text).toContain('✓')
   expect((await ui.find({ key: 'row-t4' }))?.text).toContain('Create models')
   await ui.unmount()
 })
@@ -138,21 +138,20 @@ test('7: a change underneath an open draft shows a conflict and keeps the draft'
   await ui.unmount()
 })
 
-test('8: human and Claude tasks draw alike; provenance is in the modal', async ($, on) => {
+test('8: tasks draw alike whatever made them; provenance is in the drawer', async ($, on) => {
   engine(on)
   await plan($)
+  await $.tool.call({ tool: 'TaskCreate', subject: 'Write docs', description: '' })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  await ui.press({ key: 'a' })
-  await ui.input({ key: 'm-title', text: 'Write docs', kind: 'change' })
-  await ui.press({ key: 'm-save' })
-  await ui.press({ key: 'm-close' })
-  expect((await ui.find({ key: 'row-t4' }))?.text).toContain('Write docs')
-  const human = await ui.find({ key: 'row-t4' })
-  const claude = await ui.find({ key: 'row-t3' })
-  expect(human?.type).toBe(claude?.type)
-  expect(human?.props.plain).toBe(claude?.props.plain)
+  const native = await ui.find({ key: 'row-t4' })
+  const graph = await ui.find({ key: 'row-t3' })
+  expect(native?.text).toContain('Write docs')
+  expect(native?.type).toBe(graph?.type)
+  expect(native?.props.plain).toBe(graph?.props.plain)
   await ui.press({ key: 'row-t4' })
-  expect(await ui.find({ type: 'Text', text: /created by human/ })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /created by claude/ })).toBeDefined()
+  expect(await ui.find({ key: 'a' })).toBeUndefined()
+  expect(await ui.find({ key: 'act-sub-t4' })).toBeUndefined()
   await ui.unmount()
 })
 
@@ -221,7 +220,7 @@ test('a click on a row opens its drawer of actions; a second click closes it', a
   for (const surface of SURFACES) {
     const ui = await $.ui.mount({ ...PANE, surface })
     await ui.press({ key: 'row-t2' })
-    for (const action of ['edit', 'next', 'done', 'cancel', 'sub', 'up', 'down', 'fold']) {
+    for (const action of ['edit', 'next', 'done', 'cancel', 'up', 'down', 'fold']) {
       expect(await ui.find({ key: `act-${action}-t2` })).toBeDefined()
     }
     expect(await ui.find({ type: 'Text', text: /created by claude/ })).toBeDefined()
@@ -245,6 +244,6 @@ test('the graph is drawn in the monospaced face, rails and titles alike', async 
   const texts = await ui.findAll({ type: 'Text' })
   expect(texts.length).toBeGreaterThan(4)
   expect(texts.every(one => one.props.mono === true)).toBe(true)
-  expect((await ui.find({ key: 'row-t4' }))?.text).toContain('└─ ○ Create models')
+  expect((await ui.find({ key: 'line-t4' }))?.text).toContain('└─ ○ Create models')
   await ui.unmount()
 })

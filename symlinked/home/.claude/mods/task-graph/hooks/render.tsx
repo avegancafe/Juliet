@@ -5,7 +5,7 @@ import type { Draft, DraftFields, Graph, Task } from '../types'
 import { layout, step } from './layout'
 import type { Row } from './layout'
 import { stopNow } from './native'
-import { addTask, cancel, complete, emptyGraph, reopen, reorder, updateTask, workNext } from './store'
+import { cancel, complete, emptyGraph, reopen, reorder, updateTask, workNext } from './store'
 import type { Result } from './store'
 import { PANE, mutate } from './state'
 
@@ -121,20 +121,6 @@ async function takeTheirs($: EngineInterface): Promise<void> {
   await update($, draft, () => ({ taskId: task.id, baseRevision: task.revision, fields: fieldsOf(task), conflict: null }))
 }
 
-// A new task opens straight in the modal, its title field focused: typing goes
-// to the field, never to the graph's single-key controls (hidden while it is open).
-async function newTask($: EngineInterface, isChild: boolean): Promise<void> {
-  const parentId = isChild ? await read($, selectedId) : null
-  const now = await $.clock.now()
-  const result = await mutate($, value => addTask(value, { title: 'New task', parentId, createdBy: 'human' }, now))
-  if (!result.ok) {
-    $.ui.toast(result.error)
-
-    return
-  }
-  await openModal($, result.task.id)
-}
-
 type Elements = ReturnType<EngineInterface['ui']['resolve']>
 
 const statusColor: Record<Task['status'], string> = {
@@ -146,15 +132,14 @@ const statusColor: Record<Task['status'], string> = {
 
 // Every glyph, rail and title is drawn `mono`: the terminal always is, and a
 // desktop or IDE surface otherwise sets the rails in a proportional face where
-// `│` and `├─` no longer line up.
+// `│` and `├─` no longer line up. The rails and glyph sit outside the Button: a
+// desktop draws every Button natively, in its UI face, `mono` children or not,
+// so only the title is pressable.
 
 const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean, isNew: boolean, isOpen: boolean) => {
-  const { Button, Text } = E as Elements & { Button: any; Text: any }
+  const { Box, Button, Text } = E as Elements & { Box: any; Button: any; Text: any }
   const { task } = row
   const parts = [
-    <Text mono dimColor>{row.prefix}</Text>,
-    <Text mono color={statusColor[task.status]}>{row.glyph}</Text>,
-    <Text mono> </Text>,
     <Text
       mono
       inverse={isSelected}
@@ -171,9 +156,16 @@ const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean,
   if (isNew) parts.push(<Text mono color="suggestion"> new</Text>)
 
   return (
-    <Button key={`row-${task.id}`} plain onPress={() => toggleDrawer($, task.id)}>
-      {parts}
-    </Button>
+    <Box key={`line-${task.id}`} flexDirection="row">
+      <Text mono>
+        <Text mono dimColor>{row.prefix}</Text>
+        <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
+        <Text mono> </Text>
+      </Text>
+      <Button key={`row-${task.id}`} plain onPress={() => toggleDrawer($, task.id)}>
+        {parts}
+      </Button>
+    </Box>
   )
 }
 
@@ -211,7 +203,6 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
           act('done', 'Complete', () => human($, (g, now) => complete(g, task.id, 'human', now))),
           act('cancel', 'Cancel', () => human($, (g, now) => cancel(g, task.id, 'human', now))),
         ]),
-    act('sub', '+ Subtask', () => newTask($, true)),
     act('up', 'Move up', () => human($, (g, now) => reorder(g, task.id, -1, 'human', now))),
     act('down', 'Move down', () => human($, (g, now) => reorder(g, task.id, 1, 'human', now))),
     ...(row.hasVisibleChildren || row.hidden > 0
@@ -257,8 +248,6 @@ export const renderPane = (on: On): void => {
     const toolbar =
       openId !== null ? null : (
         <Box flexDirection="row" flexWrap="wrap" columnGap={1}>
-          <Button key="a" label="add" hotkey="a" plain onPress={() => newTask($, false)} />
-          <Button key="s" label="sub" hotkey="s" plain onPress={() => (current === undefined ? undefined : newTask($, true))} />
           <Button key="k" label="↑" hotkey="k" plain onPress={() => move($, -1)} />
           <Button key="j" label="↓" hotkey="j" plain onPress={() => move($, 1)} />
           <Button key="o" label="details" hotkey="o" plain onPress={() => (current === undefined ? undefined : toggleDrawer($, current.id))} />
