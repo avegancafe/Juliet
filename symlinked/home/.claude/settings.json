@@ -181,7 +181,8 @@
     "playwright@claude-plugins-official": true,
     "cc-plugin-you-should-know@builtin": true,
     "avegancafe@avegancafe-marketplace": true,
-    "session-management@avegancafe-marketplace": true
+    "session-management@avegancafe-marketplace": true,
+    "compliance@j2-claude-plugins": true
   },
   "extraKnownMarketplaces": {
     "avegancafe-marketplace": {
