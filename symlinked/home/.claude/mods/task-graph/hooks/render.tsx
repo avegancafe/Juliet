@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, On } from 'claude-code'
 
 import type { Draft, DraftFields, Graph, Task } from '../types'
-import { layout, step } from './layout'
+import { layout } from './layout'
 import type { Row } from './layout'
 import { stopNow } from './native'
 import { cancel, complete, emptyGraph, reopen, reorder, updateTask, workNext } from './store'
@@ -17,6 +17,7 @@ const modalId = atom({ plugin: 'task-graph', key: 'modalId' } as const, null)
 const expandedId = atom({ plugin: 'task-graph', key: 'expandedId' } as const, null)
 const draft = atom({ plugin: 'task-graph', key: 'draft' } as const, null)
 const turnId = atom({ plugin: 'task-graph', key: 'turnId' } as const, null)
+const showCanceled = atom({ plugin: 'task-graph', key: 'showCanceled' } as const, false)
 
 // The pane: a git-log-style graph of rows, a row of single-key controls, and a
 // task modal drawn over the graph (never instead of it), its draft kept in
@@ -39,15 +40,6 @@ async function human($: EngineInterface, op: (value: Graph, now: number) => Resu
 
 function scrollTo($: EngineInterface, id: string | null): void {
   if (id !== null) void $.ui.scroll({ to: { key: `row-${id}` }, in: PANE }).catch(() => undefined)
-}
-
-async function move($: EngineInterface, delta: number): Promise<void> {
-  const rows = layout(await read($, graph), await read($, collapsed))
-  const to = step(rows, await read($, selectedId), delta)
-  await update($, selectedId, () => to)
-  // An open drawer follows the selection, so j/k walks the details too.
-  await update($, expandedId, open => (open === null ? null : to))
-  scrollTo($, to)
 }
 
 /** A click on a row (or Enter on it) selects it and opens its drawer; a second click closes it. */
@@ -241,36 +233,30 @@ export const renderPane = (on: On): void => {
     const expanded = await read($, expandedId)
     const held = await read($, draft)
     const running = await read($, turnId)
-    const rows = layout(value, folded)
+    const withCanceled = await read($, showCanceled)
+    const rows = layout(value, folded, { hideCanceled: !withCanceled })
+    const canceledCount = Object.values(value.tasks).filter(task => task.status === 'canceled').length
     const current = selected === null ? undefined : value.tasks[selected]
     const hasInput = Input !== undefined
 
+    // The pane's one standing control: every action on a task lives in its
+    // drawer, so the top row only toggles the canceled tasks, when there are any.
     const toolbar =
-      openId !== null ? null : (
-        <Box flexDirection="row" flexWrap="wrap" columnGap={1}>
-          <Button key="k" label="↑" hotkey="k" plain onPress={() => move($, -1)} />
-          <Button key="j" label="↓" hotkey="j" plain onPress={() => move($, 1)} />
-          <Button key="o" label="details" hotkey="o" plain onPress={() => (current === undefined ? undefined : toggleDrawer($, current.id))} />
-          <Button key="e" label="edit" hotkey="e" plain onPress={() => (current === undefined ? undefined : openModal($, current.id))} />
-          <Button key="n" label="next" hotkey="n" plain onPress={() => (current === undefined ? undefined : human($, (g, now) => workNext(g, current.id, 'human', now)))} />
-          <Button key="c" label="done" hotkey="c" plain onPress={() => (current === undefined ? undefined : human($, (g, now) => complete(g, current.id, 'human', now)))} />
-          <Button key="x" label="cancel" hotkey="x" plain onPress={() => (current === undefined ? undefined : human($, (g, now) => cancel(g, current.id, 'human', now)))} />
-          <Button key="r" label="reopen" hotkey="r" plain onPress={() => (current === undefined ? undefined : human($, (g, now) => reopen(g, current.id, 'human', now)))} />
-          <Button key="u" label="up" hotkey="u" plain onPress={() => (current === undefined ? undefined : human($, (g, now) => reorder(g, current.id, -1, 'human', now)))} />
-          <Button key="d" label="down" hotkey="d" plain onPress={() => (current === undefined ? undefined : human($, (g, now) => reorder(g, current.id, 1, 'human', now)))} />
+      openId !== null || canceledCount === 0 ? null : (
+        <Box flexDirection="row">
           <Button
-            key="z"
-            label="fold"
-            hotkey="z"
+            key="toggle-canceled"
+            label={withCanceled ? `hide canceled (${canceledCount})` : `show canceled (${canceledCount})`}
             plain
-            onPress={() => (current === undefined ? undefined : toggleFold($, current.id))}
+            dimColor
+            onPress={() => update($, showCanceled, shown => !shown)}
           />
         </Box>
       )
 
     const graphView = (
       <Box flexDirection="column">
-        {rows.length === 0 ? <Text dimColor>No tasks yet. Ask Claude for a plan, or press a to add one.</Text> : null}
+        {rows.length === 0 ? <Text dimColor>No tasks yet. Ask Claude for a plan.</Text> : null}
         {rows.flatMap(row => {
           const isOpen = row.task.id === expanded
           const view = rowView(E, $, row, row.task.id === selected, fresh.includes(row.task.id), isOpen)

@@ -70,6 +70,8 @@ declare module 'claude-code' {
       modalId: string | null
       /** The task whose inline drawer of details and actions is open. */
       expandedId: string | null
+      /** Whether canceled tasks are drawn; hidden by default. */
+      showCanceled: boolean
       draft: Draft | null
       turnId: string | null
     }
