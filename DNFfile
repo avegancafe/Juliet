@@ -124,12 +124,9 @@ brightnessctl
 pavucontrol
 
 # Applications
-discord
-steam
 vlc
 nautilus
 firefox
-alacritty
 
 # Utilities
 bat

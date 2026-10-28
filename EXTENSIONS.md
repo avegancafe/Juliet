@@ -48,7 +48,7 @@ Every file is optional.
 | File | Effect |
 |------|--------|
 | `Brewfile`, `DNFfile`, `Flatpakfile` | Appended to Juliet's. Declare taps/coprs/remotes you use: bootstrap prunes undeclared ones |
-| `exclude` | Juliet packages to skip, one name per line (`cursor`, or `someone/tap/thing`). Stops installs only; never uninstalls |
+| `exclude` | Juliet packages to skip, one name per line (`codex`, or `someone/tap/thing`). Stops installs only; never uninstalls |
 | `home/<path>`, `config/<path>` | Replaces Juliet's copy of `~/<path>` / `~/.config/<path>`. The whole file is replaced: you stop getting Juliet's changes to it |
 | `claude/settings.json` | Merged into the generated `~/.claude/settings.json` (see below) |
 | `gitconfig` | Included by Juliet's `~/.gitconfig`, before `~/.config/local/gitconfig` |
@@ -120,7 +120,7 @@ Changes that used to live on a personal branch, and where they go now:
 | Branch change | Extension home |
 |---------------|----------------|
 | Extra `brew`/`cask`/`vscode` lines in the Brewfile | `Brewfile` |
-| Removing Juliet casks you don't want (`cursor`, …) | `exclude` |
+| Removing Juliet casks you don't want (`codex`, …) | `exclude` |
 | `[github] user = you` in `.gitconfig` | `gitconfig` |
 | A PATH line in `fish/config.fish` (e.g. Docker Desktop) | `fish/config.fish`, written with `~` rather than an absolute home path |
 | Extra Claude plugins, marketplaces or permissions | `claude/settings.json` (a fragment) |

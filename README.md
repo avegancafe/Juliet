@@ -90,7 +90,6 @@ $ ~/.config/Juliet/bin/juliet-bootstrap
 **Editor Tools:**
 - **`nv`** - Launch Neovide GUI editor, auto-installs if missing
 - **`vim`** - Alias for nvim
-- **`cursor`** - Launch Cursor editor
 
 **Neovim Management:**
 - **`nvim-refresh-plugins`** - Neovim plugin manager

@@ -66,13 +66,6 @@
       "mcp__github__get_teams",
       "mcp__github__pull_request_read",
       "mcp__github__issue_read",
-      "mcp__claude_ai_Linear__get_issue",
-      "mcp__notion__notion-search",
-      "mcp__notion__notion-fetch",
-      "mcp__notion__notion-get-comments",
-      "mcp__notion__notion-get-teams",
-      "mcp__notion__notion-get-users",
-      "mcp__claude_ai_Granola__*",
       "mcp__playwright__*",
       "Read(*)",
       "WebSearch",
@@ -99,12 +92,10 @@
       "Read(//**/.env.test)"
     ],
     "ask": [],
-    "defaultMode": "plan",
     "additionalDirectories": [
       "~/.config/Juliet/"
     ]
   },
-  "model": "opus",
   "hooks": {
     "SessionStart": [
       {
@@ -129,22 +120,11 @@
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
     "beads@sttts-beads-skill": true,
-    "kitchen-brigade@avegancafe-marketplace": true,
-    "beadwork@avegancafe-marketplace": true,
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
-    "cc-plugin-you-should-know@builtin": true,
-    "avegancafe@avegancafe-marketplace": true,
-    "session-management@avegancafe-marketplace": true
+    "cc-plugin-you-should-know@builtin": true
   },
   "extraKnownMarketplaces": {
-    "avegancafe-marketplace": {
-      "source": {
-        "source": "git",
-        "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
-      },
-      "autoUpdate": true
-    },
     "sttts-beads-skill": {
       "source": {
         "source": "github",
@@ -158,44 +138,6 @@
       }
     }
   },
-  "outputStyle": "Concise",
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "medium",
-  "modelSettings": {
-    "claude-opus-5": {
-      "effortLevel": "xhigh"
-    },
-    "claude-fable-5": {
-      "effortLevel": "xhigh"
-    },
-    "claude-fable-5-1": {
-      "effortLevel": "medium"
-    },
-    "claude-opus-5-5": {
-      "effortLevel": "medium"
-    }
-  },
-  "advisorModel": "opus",
-  "promptSuggestionEnabled": false,
-  "awaySummaryEnabled": false,
-  "askUserQuestionTimeout": "never",
-  "pluginConfigs": {
-    "beadwork@avegancafe-marketplace": {
-      "options": {
-        "openOnStart": true
-      }
-    }
-  },
-  "tui": "fullscreen",
-  "skipDangerousModePermissionPrompt": true,
-  "skipWorkflowUsageWarning": true,
-  "theme": "dark-daltonized",
-  "verbose": true,
-  "fileCheckpointingEnabled": false,
-  "remoteControlAtStartup": false,
-  "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
   "autoMode": {
     "allow": [
       "$defaults",
@@ -204,8 +146,5 @@
     "soft_deny": [
       "$defaults"
     ]
-  },
-  "feedbackSurveyState": {
-    "lastShownTime": 1754002642696
   }
 }

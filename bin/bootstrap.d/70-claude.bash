@@ -208,8 +208,8 @@ setup-claude-code() {
   fi
 
   # Configure git to authenticate GitHub over HTTPS via the gh CLI. Claude Code
-  # clones marketplaces/plugins over HTTPS, so private ones (e.g. the
-  # avegancafe-marketplace referenced in settings.json) fail to clone without an
+  # clones marketplaces/plugins over HTTPS, so private ones (e.g. one an
+  # extension's claude/settings.json references) fail to clone without an
   # HTTPS credential helper. We write it to the machine-local gitconfig (included
   # by the tracked ~/.gitconfig) rather than running `gh auth setup-git`, which
   # would bake a machine-specific absolute gh path into the tracked dotfile. The

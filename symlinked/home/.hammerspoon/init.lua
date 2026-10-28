@@ -17,23 +17,6 @@ local open_terminal = function()
 	end
 end
 
-local open_chatgpt_prompt = function()
-	local app = hs.application.get('ChatGPT')
-
-	if app == nil then
-		hs.application.open('ChatGPT')
-	end
-
-	hs.eventtap.event.newKeyEvent(hs.keycodes.map.alt, true):post()
-	hs.eventtap.event.newKeyEvent(hs.keycodes.map.shift, true):post()
-	hs.eventtap.event.newKeyEvent(hs.keycodes.map.space, true):post()
-	hs.eventtap.event.newKeyEvent(hs.keycodes.map.space, false):post()
-	hs.eventtap.event.newKeyEvent(hs.keycodes.map.shift, true):post()
-	hs.eventtap.event.newKeyEvent(hs.keycodes.map.alt, false):post()
-end
-
-hs.hotkey.bind({}, 'f14', open_chatgpt_prompt)
-hs.hotkey.bind({ 'option' }, 'space', open_chatgpt_prompt)
 hs.hotkey.bind({ 'ctrl' }, 'space', open_terminal)
 
 local focus_waiting_claude = function()

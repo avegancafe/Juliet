@@ -5,12 +5,3 @@
 
 # Remotes
 remote flathub https://flathub.org/repo/flathub.flatpakrepo
-
-# Music
-com.spotify.Client
-
-# Communication
-com.slack.Slack
-
-# Browsers
-app.zen_browser.zen

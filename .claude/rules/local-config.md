@@ -6,7 +6,7 @@ Machine-local config and secrets live in `~/.config/local/`. It is **outside thi
 
 | File | Purpose | Loaded by |
 |------|---------|-----------|
-| `.env` | Local secrets and per-machine values (`JULIET_EXTENSION`, `SENTRY_ACCESS_TOKEN`, `LINEAR_API_KEY`, …). Seeded and topped up from Juliet's and the extension's `.env.template` by bootstrap (missing keys only) | `~/.config/fish/config.fish` → `envsource ~/.config/local/.env` (the `# Local environment variables` block) |
+| `.env` | Local secrets and per-machine values (`JULIET_EXTENSION`, `GIT_INITIALS`, `LINEAR_API_KEY`, …). Seeded and topped up from Juliet's and the extension's `.env.template` by bootstrap (missing keys only) | `~/.config/fish/config.fish` → `envsource ~/.config/local/.env` (the `# Local environment variables` block) |
 | `fish/config.fish` | Fish settings that only make sense on this machine | `~/.config/fish/initializers/local.fish` sources it when present |
 | `gitconfig` | Per-machine git identity and credential helpers | `~/.gitconfig` → `[include] path = ~/.config/local/gitconfig` |
 | other files | Machine-local artifacts that would be noise (or a secret) in git — e.g. `slack-mcp-app-manifest.yaml` | whatever tool owns them |
@@ -27,8 +27,8 @@ Loaded line-by-line by `envsource` (`symlinked/config/fish/functions/aliases/env
 ## Propagation and restarts
 
 - **New fish shells** pick up `.env` automatically; no action needed.
-- **Long-running processes keep the environment they started with.** After editing `.env`, restart every consumer. For example, `SENTRY_ACCESS_TOKEN` feeds the Sentry MCP through the OpenCode service — restart it from a fresh shell (`opencode service stop && opencode service start`; a soft restart may not adopt a changed environment).
-- Consuming config references the variable **name**, never the value. Example: `opencode/config.json` sends `"Authorization": "Sentry-Bearer {env:SENTRY_ACCESS_TOKEN}"`.
+- **Long-running processes keep the environment they started with.** After editing `.env`, restart every consumer. For example, an API token that feeds an MCP server through the OpenCode service only reaches it after a restart from a fresh shell (`opencode service stop && opencode service start`; a soft restart may not adopt a changed environment).
+- Consuming config references the variable **name**, never the value. Example: an opencode MCP server entry sends `"Authorization": "Bearer {env:SOME_API_TOKEN}"`.
 
 ## Adding or rotating a value
 
