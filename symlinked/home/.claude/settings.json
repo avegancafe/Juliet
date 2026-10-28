@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy:~/.claude/mods/agents-feed"
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy:~/.claude/mods/agents-feed:~/.claude/mods/task-graph"
   },
   "permissions": {
     "allow": [

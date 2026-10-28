@@ -1,0 +1,6 @@
+{
+  "name": "task-graph",
+  "version": "0.1.0",
+  "description": "A live git-log-style task graph that you and Claude edit together, backed by one shared task store.",
+  "types": "./types/index.d.ts"
+}
