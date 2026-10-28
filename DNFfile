@@ -43,7 +43,6 @@ rbenv
 cmake
 python3-pip
 docker-cli
-kubernetes-client
 deno
 ruff
 # golang: needed directly, not just as a lint-tool dependency — the

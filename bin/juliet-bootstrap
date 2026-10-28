@@ -90,12 +90,17 @@ JULIET_DIR="$HOME/.config/Juliet"
 # Machine-local secrets and settings (never committed). Bootstrap reads single
 # keys from it and appends missing ones, but never prints its contents.
 LOCAL_ENV="$HOME/.config/local/.env"
-# Where the active extension is exposed (a symlink to a local path, or a clone
-# of a git URL), so static hooks (.gitconfig, fish) can find it. See EXTENSIONS.md.
-EXTENSION_DIR="$HOME/.config/juliet-extension"
+# Where active extensions are exposed, one per name (a symlink to a local path,
+# or a clone of a git URL), with .order and a generated gitconfig so static
+# hooks (.gitconfig, fish) can find them. See EXTENSIONS.md.
+EXTENSIONS_ROOT="$HOME/.config/juliet-extensions"
+# Active extensions' directories, in JULIET_EXTENSION order.
+EXTENSION_DIRS=()
+# The extension whose bootstrap.bash is running (set per extension).
+EXTENSION_DIR=""
 EXTENSION_ACTIVE="false"
 # Package files bootstrap installs from. setup-extension swaps in combined
-# copies (Juliet's minus the extension's `exclude`, plus the extension's own).
+# copies (Juliet's minus the extensions' `exclude`, plus each extension's own).
 JULIET_BREWFILE="$JULIET_DIR/Brewfile"
 JULIET_DNFFILE="$JULIET_DIR/DNFfile"
 JULIET_FLATPAKFILE="$JULIET_DIR/Flatpakfile"

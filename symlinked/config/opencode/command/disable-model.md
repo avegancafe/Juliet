@@ -24,8 +24,8 @@ Steps:
    legacy singular `provider` key loses `disabled` in that same translation,
    so it must live under the native `providers` map. `enabled_providers`
    still translates fine, into `provider.use` policies.)
-   - Never edit the dev-env global file
-     (`~/.config/opencode/opencode.json`) — it's org-managed.
+   - Never edit the global file (`~/.config/opencode/opencode.json`) — a
+     work tool or extension may manage it.
    - If the provider is absent from `enabled_providers`, every model on it is
      already unavailable — say so and stop.
 4. Validate the JSON:

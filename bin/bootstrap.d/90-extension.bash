@@ -1,9 +1,9 @@
 # shellcheck shell=bash disable=SC2034  # globals are shared across modules
 # Sourced by bin/juliet-bootstrap (never run directly).
-# extension: loading the user's extension repo (a core phase) and running
+# extension: loading the user's extension repos (a core phase) and running
 # its own setup steps (the last category).
 
-# The extension's own steps (its bootstrap.bash defines extension-setup). Runs
+# The extensions' own steps (each bootstrap.bash defines extension-setup). Runs
 # last, after packages and symlinks have been layered.
 category extension rlog "🧩 Running extension setup..." \
   "Run your extension's setup steps?" \
@@ -14,9 +14,10 @@ category extension rlog "🧩 Running extension setup..." \
 # =============================================================================
 # An extension is someone's own repo layered on top of Juliet: extra packages,
 # packages to leave out, per-file config overrides, a gitconfig, fish config,
-# .env template keys, and setup steps. JULIET_EXTENSION (env or
-# ~/.config/local/.env) names it as a git URL or a local path. EXTENSIONS.md is
-# the contract; extension-template/ is a starting point.
+# .env template keys, a Claude settings fragment, and setup steps.
+# JULIET_EXTENSION (env or ~/.config/local/.env) lists one or more, in order,
+# as git URLs or local paths; each is exposed at ~/.config/juliet-extensions/<name>.
+# EXTENSIONS.md is the contract; extension-template/ is a starting point.
 #
 # .env files hold secrets. Nothing here prints a value from one: keys are read
 # one at a time with sed, compared by name, and appended straight to the file.
@@ -85,34 +86,44 @@ is-git-url() {
   [[ "$1" =~ ^(https?://|ssh://|git://|git@) ]]
 }
 
-# Expose the extension at $EXTENSION_DIR: clone (then fast-forward) a git URL,
-# or symlink a local path. Never deletes a real directory.
+# An extension's name: its URL or path basename, minus any .git suffix.
+extension-name() {
+  local src="${1%/}"
+  src="${src%.git}"
+  printf '%s\n' "${src##*/}"
+}
+
+# Expose one extension at $dir (~/.config/juliet-extensions/<name>): clone
+# (then fast-forward) a git URL, or symlink a local path. Never deletes a real
+# directory.
 link-extension() {
-  local src="$1"
+  local src="$1" dir="$2" shown
+  # shellcheck disable=SC2088  # a display path, not one to expand
+  shown="~/.config/juliet-extensions/$(basename "$dir")"
   if is-git-url "$src"; then
-    if [[ -L "$EXTENSION_DIR" ]]; then
-      rm "$EXTENSION_DIR"
+    if [[ -L "$dir" ]]; then
+      rm "$dir"
     fi
-    if [[ -d "$EXTENSION_DIR/.git" ]]; then
+    if [[ -d "$dir/.git" ]]; then
       local origin
-      origin=$(git -C "$EXTENSION_DIR" remote get-url origin 2> /dev/null || true)
+      origin=$(git -C "$dir" remote get-url origin 2> /dev/null || true)
       if [[ "$origin" != "$src" ]]; then
-        bootstrap_error "~/.config/juliet-extension is a clone of $origin, but JULIET_EXTENSION is $src." \
+        bootstrap_error "$shown is a clone of $origin, but JULIET_EXTENSION lists $src." \
           "Move it aside (or fix JULIET_EXTENSION), then re-run: juliet-bootstrap"
         return 1
       fi
-      if ! git -C "$EXTENSION_DIR" diff --quiet 2> /dev/null; then
-        skip "unstaged changes in ~/.config/juliet-extension — not pulling"
+      if ! git -C "$dir" diff --quiet 2> /dev/null; then
+        skip "unstaged changes in $shown — not pulling"
       else
-        spin "Updating extension..." git -C "$EXTENSION_DIR" pull --ff-only -q \
-          || warn "Could not fast-forward ~/.config/juliet-extension — using it as is."
+        spin "Updating extension $(basename "$dir")..." git -C "$dir" pull --ff-only -q \
+          || warn "Could not fast-forward $shown — using it as is."
       fi
-    elif [[ -e "$EXTENSION_DIR" ]]; then
-      bootstrap_error "~/.config/juliet-extension exists but isn't a git clone." \
+    elif [[ -e "$dir" ]]; then
+      bootstrap_error "$shown exists but isn't a git clone." \
         "Move it aside, then re-run: juliet-bootstrap"
       return 1
     else
-      spin "Cloning extension $src..." git clone -q "$src" "$EXTENSION_DIR" || {
+      spin "Cloning extension $src..." git clone -q "$src" "$dir" || {
         bootstrap_error "Failed to clone extension $src" \
           "Check the URL and your git access, then re-run: juliet-bootstrap"
         return 1
@@ -121,24 +132,44 @@ link-extension() {
   else
     local path="${src/#\~/$HOME}"
     if [[ ! -d "$path" ]]; then
-      bootstrap_error "JULIET_EXTENSION points at $path, which isn't a directory." \
+      bootstrap_error "JULIET_EXTENSION lists $path, which isn't a directory." \
         "Fix JULIET_EXTENSION in ~/.config/local/.env, then re-run: juliet-bootstrap"
       return 1
     fi
-    if [[ -L "$EXTENSION_DIR" || ! -e "$EXTENSION_DIR" ]]; then
-      ln -sfn "$path" "$EXTENSION_DIR"
+    if [[ -L "$dir" || ! -e "$dir" ]]; then
+      ln -sfn "$path" "$dir"
     else
-      bootstrap_error "~/.config/juliet-extension is a real directory, but JULIET_EXTENSION is a local path." \
+      bootstrap_error "$shown is a real directory, but JULIET_EXTENSION lists a local path for it." \
         "Move it aside, then re-run: juliet-bootstrap"
       return 1
     fi
   fi
 }
 
+# Before multi-extension support, the one extension lived at
+# ~/.config/juliet-extension. Drop that symlink; move a clone into the new
+# root when JULIET_EXTENSION still lists its origin, otherwise leave it alone.
+migrate-legacy-extension() {
+  local legacy="$HOME/.config/juliet-extension" src
+  [[ -L "$legacy" ]] && { rm "$legacy"; return 0; }
+  [[ -d "$legacy/.git" ]] || return 0
+  local origin
+  origin=$(git -C "$legacy" remote get-url origin 2> /dev/null || true)
+  for src in "$@"; do
+    if [[ "$src" == "$origin" && ! -e "$EXTENSIONS_ROOT/$(extension-name "$src")" ]]; then
+      mv "$legacy" "$EXTENSIONS_ROOT/$(extension-name "$src")"
+      notice "Moved ~/.config/juliet-extension to ~/.config/juliet-extensions/$(extension-name "$src")"
+      return 0
+    fi
+  done
+  # shellcheck disable=SC2088
+  warn "~/.config/juliet-extension is an old extension clone that JULIET_EXTENSION no longer lists; delete it when you're done with it."
+}
+
 # .env files an extension repo commits, other than .env.template (names only).
 extension-tracked-env-files() {
-  git -C "$EXTENSION_DIR" rev-parse --git-dir &> /dev/null || return 0
-  git -C "$EXTENSION_DIR" ls-files \
+  git -C "$1" rev-parse --git-dir &> /dev/null || return 0
+  git -C "$1" ls-files \
     | grep -E '(^|/)\.env($|\.)' \
     | grep -vE '(^|/)\.env\.template$' \
     || true
@@ -146,111 +177,174 @@ extension-tracked-env-files() {
 
 # Excludes match a line's package name: its first quoted string (Brewfile) or
 # first word (DNFfile/Flatpakfile); copr/remote/tap lines are never dropped.
-# Prints the combined file's path: Juliet's file minus the extension's
-# `exclude` names, plus the extension's own file. Juliet's path when the
-# extension changes nothing.
+# Prints the combined file's path: Juliet's file minus every extension's
+# `exclude` names, plus each extension's own file in order. Juliet's path when
+# no extension changes anything.
 build-package-file() {
-  local base="$1" name="$2"
-  local ext="$EXTENSION_DIR/$name" exclude="$EXTENSION_DIR/exclude"
-  if [[ ! -f "$ext" && ! -f "$exclude" ]]; then
+  local base="$1" name="$2" dir any="false"
+  for dir in ${EXTENSION_DIRS[@]+"${EXTENSION_DIRS[@]}"}; do
+    [[ -f "$dir/$name" || -f "$dir/exclude" ]] && any="true"
+  done
+  if [[ "$any" != "true" ]]; then
     printf '%s\n' "$base"
     return
   fi
-  local out
+  local out exclude
   out=$(mktemp "${TMPDIR:-/tmp}/juliet-$name.XXXXXX")
+  exclude=$(mktemp "${TMPDIR:-/tmp}/juliet-exclude.XXXXXX")
+  for dir in ${EXTENSION_DIRS[@]+"${EXTENSION_DIRS[@]}"}; do
+    [[ -f "$dir/exclude" ]] && { cat "$dir/exclude"; printf '\n'; }
+  done > "$exclude"
   {
-    if [[ -f "$exclude" ]]; then
-      awk '
-        NR == FNR {
-          sub(/#.*/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, "")
-          if ($0 != "") drop[$0] = 1
-          next
+    awk '
+      NR == FNR {
+        sub(/#.*/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, "")
+        if ($0 != "") drop[$0] = 1
+        next
+      }
+      {
+        line = $0; pkg = ""
+        if (line ~ /^[[:space:]]*(brew|cask|vscode|mas)[[:space:]]+"/) {
+          pkg = line; sub(/^[^"]*"/, "", pkg); sub(/".*/, "", pkg)
+        } else if (line !~ /^[[:space:]]*(#|$|copr[[:space:]]|remote[[:space:]]|tap[[:space:]])/) {
+          pkg = line; sub(/^[[:space:]]+/, "", pkg); sub(/[[:space:]].*/, "", pkg)
         }
-        {
-          line = $0; pkg = ""
-          if (line ~ /^[[:space:]]*(brew|cask|vscode|mas)[[:space:]]+"/) {
-            pkg = line; sub(/^[^"]*"/, "", pkg); sub(/".*/, "", pkg)
-          } else if (line !~ /^[[:space:]]*(#|$|copr[[:space:]]|remote[[:space:]]|tap[[:space:]])/) {
-            pkg = line; sub(/^[[:space:]]+/, "", pkg); sub(/[[:space:]].*/, "", pkg)
-          }
-          short = pkg; sub(/.*\//, "", short)
-          if (pkg != "" && (pkg in drop || short in drop)) next
-          print
-        }' "$exclude" "$base"
-    else
-      cat "$base"
-    fi
-    if [[ -f "$ext" ]]; then
-      printf '\n# --- from the extension (%s) ---\n' "$name"
-      cat "$ext"
-    fi
+        short = pkg; sub(/.*\//, "", short)
+        if (pkg != "" && (pkg in drop || short in drop)) next
+        print
+      }' "$exclude" "$base"
+    for dir in ${EXTENSION_DIRS[@]+"${EXTENSION_DIRS[@]}"}; do
+      if [[ -f "$dir/$name" ]]; then
+        printf '\n# --- from the %s extension (%s) ---\n' "$(basename "$dir")" "$name"
+        cat "$dir/$name"
+      fi
+    done
   } > "$out"
+  rm -f "$exclude"
   printf '%s\n' "$out"
 }
 
+# Static hooks (~/.gitconfig, fish) read these instead of knowing the list:
+# .order names each active extension in order; gitconfig includes theirs.
+write-extension-index() {
+  local dir
+  mkdir -p "$EXTENSIONS_ROOT"
+  {
+    for dir in ${EXTENSION_DIRS[@]+"${EXTENSION_DIRS[@]}"}; do
+      basename "$dir"
+    done
+  } > "$EXTENSIONS_ROOT/.order"
+  {
+    printf '# Written by juliet-bootstrap: one include per active extension, in order.\n'
+    for dir in ${EXTENSION_DIRS[@]+"${EXTENSION_DIRS[@]}"}; do
+      [[ -f "$dir/gitconfig" ]] && printf '[include]\n\tpath = %s/gitconfig\n' "$dir"
+    done
+  } > "$EXTENSIONS_ROOT/gitconfig"
+}
+
 setup-extension() {
-  substep "Checking Juliet extension..."
+  substep "Checking Juliet extensions..."
   local first_run="false"
   local-env-has-key JULIET_EXTENSION || first_run="true"
   merge-env-template "$JULIET_DIR/.env.template" "Juliet"
 
-  local src="${JULIET_EXTENSION:-$(read-local-env JULIET_EXTENSION)}"
+  local srcs="${JULIET_EXTENSION:-$(read-local-env JULIET_EXTENSION)}"
   # Ask once, on the run that first adds the key, so machines without an
   # extension aren't asked every time.
-  if [[ -z "$src" && "$first_run" == "true" && -t 0 && "$YES_ALL" != "true" && "$NO_ALL" != "true" ]] \
+  if [[ -z "$srcs" && "$first_run" == "true" && -t 0 && "$YES_ALL" != "true" && "$NO_ALL" != "true" ]] \
     && should-run-step extension && command -v gum &> /dev/null; then
     _step_close
-    src=$(gum input --header "Juliet extension (git URL or path) — Enter to skip; see EXTENSIONS.md" \
-      --placeholder "https://github.com/you/juliet-you.git") || src=""
-    [[ -n "$src" ]] && set-local-env JULIET_EXTENSION "$src"
+    srcs=$(gum input --header "Juliet extensions (git URLs or paths, space-separated) — Enter to skip; see EXTENSIONS.md" \
+      --placeholder "https://github.com/you/juliet-you.git") || srcs=""
+    [[ -n "$srcs" ]] && set-local-env JULIET_EXTENSION "$srcs"
   fi
+  # Strip surrounding quotes a hand-edited .env may carry.
+  srcs="${srcs#\"}"; srcs="${srcs%\"}"
 
-  if [[ -z "$src" ]]; then
-    if [[ -L "$EXTENSION_DIR" ]]; then
-      rm "$EXTENSION_DIR"
-      notice "Unlinked ~/.config/juliet-extension (JULIET_EXTENSION is empty)"
-    elif [[ -d "$EXTENSION_DIR" ]]; then
-      warn "JULIET_EXTENSION is empty but ~/.config/juliet-extension is still there; its gitconfig and fish hooks stay active until you remove it."
+  local -a list=()
+  local src
+  for src in $srcs; do list+=("$src"); done
+
+  mkdir -p "$EXTENSIONS_ROOT"
+  migrate-legacy-extension ${list[@]+"${list[@]}"}
+
+  # Unlink extensions no longer listed (symlinks only; clones are left, with a warning).
+  local entry wanted
+  for entry in "$EXTENSIONS_ROOT"/*; do
+    [[ -e "$entry" || -L "$entry" ]] || continue
+    wanted="false"
+    for src in ${list[@]+"${list[@]}"}; do
+      [[ "$(extension-name "$src")" == "$(basename "$entry")" ]] && wanted="true"
+    done
+    [[ "$wanted" == "true" ]] && continue
+    if [[ -L "$entry" ]]; then
+      rm "$entry"
+      notice "Unlinked extension $(basename "$entry") (no longer in JULIET_EXTENSION)"
+    elif [[ -d "$entry" ]]; then
+      # shellcheck disable=SC2088
+      warn "~/.config/juliet-extensions/$(basename "$entry") is no longer in JULIET_EXTENSION; delete it when you're done with it."
     fi
+  done
+
+  EXTENSION_DIRS=()
+  local seen=" " name dir tracked
+  for src in ${list[@]+"${list[@]}"}; do
+    name=$(extension-name "$src")
+    if [[ "$seen" == *" $name "* ]]; then
+      bootstrap_error "Two extensions in JULIET_EXTENSION are both named $name." \
+        "Rename one repo or checkout, then re-run: juliet-bootstrap"
+      continue
+    fi
+    seen+="$name "
+    dir="$EXTENSIONS_ROOT/$name"
+    link-extension "$src" "$dir" || continue
+    tracked=$(extension-tracked-env-files "$dir")
+    if [[ -n "$tracked" ]]; then
+      bootstrap_error "The $name extension commits .env files — refusing to use it: $(paste -sd ' ' - <<< "$tracked")" \
+        "Untrack them (git rm --cached), add them to its .gitignore, and rotate any secrets they held." \
+        "Commit a .env.template with blank values instead."
+      continue
+    fi
+    EXTENSION_DIRS+=("$dir")
+    merge-env-template "$dir/.env.template" "$name"
+  done
+  write-extension-index
+
+  if (( ${#EXTENSION_DIRS[@]} == 0 )); then
     unchanged "no extension"
     return
   fi
-
-  link-extension "$src" || return 0
-
-  local tracked
-  tracked=$(extension-tracked-env-files)
-  if [[ -n "$tracked" ]]; then
-    bootstrap_error "The extension commits .env files — refusing to use it: $(paste -sd ' ' - <<< "$tracked")" \
-      "Untrack them (git rm --cached), add them to its .gitignore, and rotate any secrets they held." \
-      "Commit a .env.template with blank values instead."
-    return 0
-  fi
-
   EXTENSION_ACTIVE="true"
-  merge-env-template "$EXTENSION_DIR/.env.template" "$(basename "${src%.git}")"
   JULIET_BREWFILE=$(build-package-file "$JULIET_DIR/Brewfile" Brewfile)
   JULIET_DNFFILE=$(build-package-file "$JULIET_DIR/DNFfile" DNFfile)
   JULIET_FLATPAKFILE=$(build-package-file "$JULIET_DIR/Flatpakfile" Flatpakfile)
-  if [[ -f "$EXTENSION_DIR/bootstrap.bash" ]]; then
-    # shellcheck source=/dev/null
-    source "$EXTENSION_DIR/bootstrap.bash"
-  fi
-  unchanged "using $(basename "${src%.git}")"
+  local names=""
+  for dir in "${EXTENSION_DIRS[@]}"; do names+="${names:+, }$(basename "$dir")"; done
+  unchanged "using $names"
 }
 
 # Extension override files ("home/<path>" → ~/<path>, "config/<path>" →
 # ~/.config/<path>), one "source<TAB>target<TAB>relpath<TAB>package" per line.
+# When two extensions override the same file, the later one wins (with a
+# warning), so each target appears once.
 extension-overrides() {
   [[ "$EXTENSION_ACTIVE" == "true" ]] || return 0
-  local pkg target_root f rel
-  for pkg in home config; do
-    [[ -d "$EXTENSION_DIR/$pkg" ]] || continue
-    [[ "$pkg" == home ]] && target_root="$HOME" || target_root="$HOME/.config"
-    while IFS= read -r f; do
-      rel="${f#"$EXTENSION_DIR/$pkg/"}"
-      printf '%s\t%s\t%s\t%s\n' "$f" "$target_root/$rel" "$rel" "$pkg"
-    done < <(find "$EXTENSION_DIR/$pkg/" -type f ! -name .DS_Store ! -name .gitkeep)
+  local i dir pkg target_root f rel seen=$'\n'
+  for (( i = ${#EXTENSION_DIRS[@]} - 1; i >= 0; i-- )); do
+    dir="${EXTENSION_DIRS[$i]}"
+    for pkg in home config; do
+      [[ -d "$dir/$pkg" ]] || continue
+      [[ "$pkg" == home ]] && target_root="$HOME" || target_root="$HOME/.config"
+      while IFS= read -r f; do
+        rel="${f#"$dir/$pkg/"}"
+        if [[ "$seen" == *$'\n'"$pkg/$rel"$'\n'* ]]; then
+          warn "Both extensions override $pkg/$rel; using the later one's, not $(basename "$dir")'s." >&2
+          continue
+        fi
+        seen+="$pkg/$rel"$'\n'
+        printf '%s\t%s\t%s\t%s\n' "$f" "$target_root/$rel" "$rel" "$pkg"
+      done < <(find "$dir/$pkg/" -type f ! -name .DS_Store ! -name .gitkeep)
+    done
   done
 }
 
@@ -264,7 +358,7 @@ prepare-extension-overrides() {
     STOW_IGNORES+=(--ignore="^$(printf '%s' "$rel" | sed 's/[][\.*^$+?(){}|]/\\&/g')\$")
     parent=$(dirname "$target")
     [[ -e "$parent" ]] || mkdir -p "$parent"
-  done < <(extension-overrides)
+  done < <(extension-overrides 2> /dev/null)
 }
 
 # After stowing: link each override into place. Skips any target whose parent
@@ -291,8 +385,8 @@ link-extension-overrides() {
 }
 
 setup-extension-steps-applicable() {
-  # --list runs before setup-extension loads the extension, so only the
-  # configured URL/path is known; whether it defines steps is decided at run time.
+  # --list runs before setup-extension loads the extensions, so only the
+  # configured list is known; whether they define steps is decided at run time.
   if [[ "$LIST_ONLY" == "true" ]]; then
     # A blank `JULIET_EXTENSION=` (the .env.template placeholder) means none.
     [[ -f "$LOCAL_ENV" ]] && grep -qE '^JULIET_EXTENSION=.' "$LOCAL_ENV" && return 0
@@ -303,10 +397,29 @@ setup-extension-steps-applicable() {
     NA_REASON="no extension — set JULIET_EXTENSION in ~/.config/local/.env"
     return 1
   fi
-  if ! declare -F extension-setup > /dev/null; then
-    NA_REASON="the extension defines no extension-setup"
-    return 1
-  fi
+  local dir
+  for dir in "${EXTENSION_DIRS[@]}"; do
+    [[ -f "$dir/bootstrap.bash" ]] && return 0
+  done
+  NA_REASON="no extension has a bootstrap.bash"
+  return 1
 }
 
-setup-extension-steps() { extension-setup; }
+# Each extension's bootstrap.bash defines its own extension-setup, so load and
+# run them one at a time, in order, with $EXTENSION_DIR pointing at that one.
+setup-extension-steps() {
+  local dir
+  for dir in "${EXTENSION_DIRS[@]}"; do
+    [[ -f "$dir/bootstrap.bash" ]] || continue
+    unset -f extension-setup
+    EXTENSION_DIR="$dir"
+    # shellcheck source=/dev/null
+    source "$dir/bootstrap.bash"
+    if declare -F extension-setup > /dev/null; then
+      extension-setup
+    else
+      substep "$(basename "$dir")"
+      skip "its bootstrap.bash defines no extension-setup"
+    fi
+  done
+}

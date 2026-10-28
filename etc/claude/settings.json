@@ -1,0 +1,211 @@
+{
+  "env": {
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy:~/.claude/mods/agents-feed:~/.claude/mods/task-graph"
+  },
+  "permissions": {
+    "allow": [
+      "SendMessage",
+      "Bash(git *)",
+      "Bash(gh *)",
+      "Bash(docker *)",
+      "Bash(npm *)",
+      "Bash(pip *)",
+      "Bash(bd update:*)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(claude *)",
+      "mcp__github__search_code",
+      "mcp__github__search_commits",
+      "mcp__github__search_issues",
+      "mcp__github__search_orgs",
+      "mcp__github__search_pull_requests",
+      "mcp__github__search_repositories",
+      "mcp__github__search_users",
+      "mcp__github__list_branches",
+      "mcp__github__list_code_scanning_alerts",
+      "mcp__github__list_commits",
+      "mcp__github__list_copilot_spaces",
+      "mcp__github__list_dependabot_alerts",
+      "mcp__github__list_discussion_categories",
+      "mcp__github__list_discussions",
+      "mcp__github__list_gists",
+      "mcp__github__list_global_security_advisories",
+      "mcp__github__list_issue_types",
+      "mcp__github__list_issues",
+      "mcp__github__list_labeled_repositories",
+      "mcp__github__list_notifications",
+      "mcp__github__list_org_repository_security_advisories",
+      "mcp__github__list_pull_requests",
+      "mcp__github__list_releases",
+      "mcp__github__list_repository_collaborators",
+      "mcp__github__list_repository_security_advisories",
+      "mcp__github__list_secret_scanning_alerts",
+      "mcp__github__list_starred_repositories",
+      "mcp__github__list_tags",
+      "mcp__github__get_code_scanning_alert",
+      "mcp__github__get_commit",
+      "mcp__github__get_copilot_space",
+      "mcp__github__get_dependabot_alert",
+      "mcp__github__get_discussion",
+      "mcp__github__get_discussion_comments",
+      "mcp__github__get_file_contents",
+      "mcp__github__get_gist",
+      "mcp__github__get_global_security_advisory",
+      "mcp__github__get_job_logs",
+      "mcp__github__get_label",
+      "mcp__github__get_latest_release",
+      "mcp__github__get_me",
+      "mcp__github__get_notification_details",
+      "mcp__github__get_release_by_tag",
+      "mcp__github__get_repository_tree",
+      "mcp__github__get_secret_scanning_alert",
+      "mcp__github__get_tag",
+      "mcp__github__get_team_members",
+      "mcp__github__get_teams",
+      "mcp__github__pull_request_read",
+      "mcp__github__issue_read",
+      "mcp__claude_ai_Linear__get_issue",
+      "mcp__notion__notion-search",
+      "mcp__notion__notion-fetch",
+      "mcp__notion__notion-get-comments",
+      "mcp__notion__notion-get-teams",
+      "mcp__notion__notion-get-users",
+      "mcp__claude_ai_Granola__*",
+      "mcp__playwright__*",
+      "Read(*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:tanstack.com)",
+      "WebFetch(domain:docs.getdbt.com)",
+      "WebFetch(domain:auth0.com)",
+      "WebFetch(domain:docs.cypress.io)",
+      "WebFetch(domain:docs.python.org)",
+      "WebFetch(domain:developer.mozilla.org)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:npmjs.com)",
+      "WebFetch(domain:pypi.org)",
+      "Skill(*)"
+    ],
+    "deny": [
+      "Read(~/.config/local/.env)",
+      "Read(//**/.env)",
+      "Read(//**/.env.local)",
+      "Read(//**/.env.development)",
+      "Read(//**/.env.production)",
+      "Read(//**/.env.staging)",
+      "Read(//**/.env.test)"
+    ],
+    "ask": [],
+    "defaultMode": "plan",
+    "additionalDirectories": [
+      "~/.config/Juliet/"
+    ]
+  },
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if command -v bd >/dev/null 2>&1; then bd prime --hook-json; fi"
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "enableWorkflows": true,
+  "statusLine": {
+    "type": "command",
+    "command": "claude-statusline"
+  },
+  "enabledPlugins": {
+    "frontend-design@claude-plugins-official": true,
+    "beads@sttts-beads-skill": true,
+    "kitchen-brigade@avegancafe-marketplace": true,
+    "beadwork@avegancafe-marketplace": true,
+    "superpowers@superpowers-marketplace": true,
+    "playwright@claude-plugins-official": true,
+    "cc-plugin-you-should-know@builtin": true,
+    "avegancafe@avegancafe-marketplace": true,
+    "session-management@avegancafe-marketplace": true
+  },
+  "extraKnownMarketplaces": {
+    "avegancafe-marketplace": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
+      },
+      "autoUpdate": true
+    },
+    "sttts-beads-skill": {
+      "source": {
+        "source": "github",
+        "repo": "sttts/beads-skill"
+      }
+    },
+    "superpowers-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "obra/superpowers-marketplace"
+      }
+    }
+  },
+  "outputStyle": "Concise",
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5": {
+      "effortLevel": "xhigh"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
+  "advisorModel": "opus",
+  "promptSuggestionEnabled": false,
+  "awaySummaryEnabled": false,
+  "askUserQuestionTimeout": "never",
+  "pluginConfigs": {
+    "beadwork@avegancafe-marketplace": {
+      "options": {
+        "openOnStart": true
+      }
+    }
+  },
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark-daltonized",
+  "verbose": true,
+  "fileCheckpointingEnabled": false,
+  "remoteControlAtStartup": false,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Bash(ruff format:*) and Bash(npx prettier:*) on changed files per repo lint rules"
+    ],
+    "soft_deny": [
+      "$defaults"
+    ]
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1754002642696
+  }
+}

@@ -1,5 +1,4 @@
-# claude-statusline — bamboo lualine blocks, matching the dev-env bash script
-# (~/.claude/statusline-command.sh; contract: dev-env/tests/statusline_spec.md).
+# claude-statusline — bamboo lualine blocks.
 #
 #   [repo][branch]   <transparent gap>   [ctx  5h  ↻][model]
 #

@@ -143,7 +143,7 @@ symlink-dotfiles() {
   # content (plugins/cmux.js) into it; opencode writes node_modules/
   # package.json (its own bun-managed plugin deps) at that root, which must
   # stay out of the repo. opencode.json and tui.json are deliberately NOT
-  # stowed — opencode/dev-env both write config files, and a write through a
+  # stowed — opencode (and tools managing its global file) write config files, and a write through a
   # symlink would dirty this repo (see setup-opencode for the layering).
   mkdir -p ~/.config/opencode 2>/dev/null || true
   reclaim-stow-casualties

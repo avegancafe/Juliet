@@ -14,9 +14,9 @@ setup-opencode() {
   fi
 
   # Config layering (Juliet does NOT stow opencode.json or tui.json):
-  #   global  ~/.config/opencode/opencode.json   owned by dev-env's `j2 bootstrap`
-  #           (fill-undefined merge: pinned j2 plugins, team MCP servers,
-  #           permission baseline, mcp/lsp fragments — yields to local values)
+  #   global  ~/.config/opencode/opencode.json   yours, or owned by a work tool
+  #           (e.g. an org config laid down by a work extension — pinned
+  #           plugins, team MCP servers, LSPs)
   #   custom  $OPENCODE_CONFIG                    Juliet's opencode/config.json,
   #           exported from fish/env.fish (opencode.json-space keys only —
   #           NEVER the deprecated theme/tui/keybinds keys: opencode rewrites
@@ -24,18 +24,18 @@ setup-opencode() {
   #           this repo; verified on 1.18.0)
   #   project <repo>/opencode.json                per-repo overrides
   # opencode loads them in that precedence order, so Juliet's keys override the
-  # dev-env defaults without either bootstrap touching the other's file.
+  # global defaults without either side touching the other's file.
   # plugins/cmux.js stays stow-symlinked (immutable content — nothing writes
   # to plugins/). Interactive theme picks persist to
   # ~/.local/state/opencode/kv.json, never a config file.
 
   # Migration: an earlier revision of this branch stow-symlinked opencode.json
-  # into ~/.config/opencode. dev-env's jq merges write via mv(1), which would
-  # silently replace that symlink with a real file and break the stow link.
-  # Remove the stale Juliet-owned link so dev-env can manage the global file.
+  # into ~/.config/opencode. Tools that manage the global file write it via
+  # mv(1), which would silently replace that symlink with a real file and break
+  # the stow link. Remove the stale Juliet-owned link so the global file is free.
   local oc_json="$HOME/.config/opencode/opencode.json"
   if [[ -L "$oc_json" ]] && readlink "$oc_json" | grep -q "$HOME/.config/Juliet/"; then
-    rlog "Removing stale Juliet stow link for opencode.json (now layered via OPENCODE_CONFIG; run 'j2 bootstrap' to lay down the dev-env global file)"
+    rlog "Removing stale Juliet stow link for opencode.json (now layered via OPENCODE_CONFIG)"
     rm "$oc_json"
   fi
 

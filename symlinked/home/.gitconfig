@@ -64,10 +64,11 @@
 	prune = true
 [user]
 	signingkey = ~/.ssh/id_ed25519
-# Extension first (per-person settings such as [github] user — see
-# EXTENSIONS.md), then machine-local, so local wins. Missing files are ignored.
+# Extensions first, in order (per-person settings such as [github] user —
+# juliet-bootstrap writes one include per extension; see EXTENSIONS.md), then
+# machine-local, so local wins. Missing files are ignored.
 [include]
-	path = ~/.config/juliet-extension/gitconfig
+	path = ~/.config/juliet-extensions/gitconfig
 [include]
 	path = ~/.config/local/gitconfig
 [difftool "sourcetree"]

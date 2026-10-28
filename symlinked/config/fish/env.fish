@@ -57,12 +57,11 @@ set -gx NEOVIDE_TITLE_HIDDEN 1
 set -gx NEOVIDE_FRAME buttonless
 
 # Juliet-local opencode overrides, layered by opencode BETWEEN the global
-# ~/.config/opencode/opencode.json (symlinked by dev-env's `j2 bootstrap` to
-# the org config: pinned j2 plugins, team MCP servers, permission baseline,
-# LSPs, default_agent — org-managed, read-only) and per-project configs.
-# Two rules for Juliet's file:
+# ~/.config/opencode/opencode.json (yours, or laid down by a work tool or
+# extension, e.g. an org config with pinned plugins, MCP servers and LSPs)
+# and per-project configs. Two rules for Juliet's file:
 #   1. Only Juliet-owned opencode.json keys — do NOT add plugin/mcp/lsp keys,
-#      that forks the dev-env org config.
+#      that would fork whatever owns the global config.
 #   2. NEVER add the deprecated theme/tui/keybinds keys — opencode rewrites
 #      any config file containing them in place (verified on 1.18.0), which
 #      would dirty this repo. Theme lives in the seeded tui.json instead

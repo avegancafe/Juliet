@@ -28,10 +28,7 @@ if command -v fortune 2&> /dev/null && test -n "$FORTUNE" && status --is-interac
     fortune
 end
 
-# J2 Initializers
-for file in ~/workspace/dev-env/initializers/fish/*; source $file; end
-
-# J2 Man Pages
+# Man pages installed under ~/.local
 set -gx MANPATH "$HOME/.local/share/man" $MANPATH
 
 # Local environment variables
