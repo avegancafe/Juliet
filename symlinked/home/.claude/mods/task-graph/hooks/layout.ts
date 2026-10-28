@@ -22,6 +22,19 @@ export const UNICODE: Glyphs = {
   folded: '▸',
 }
 
+/**
+ * Indentation alone, for a surface that spaces its lines: there `│` and `├─`
+ * stop short of the next line and the rails read as dashes, never as lines.
+ */
+export const INDENT: Glyphs = {
+  status: UNICODE.status,
+  rail: '  ',
+  gap: '  ',
+  branch: '  ',
+  last: '  ',
+  folded: '▸',
+}
+
 export const ASCII: Glyphs = {
   status: { pending: 'o', in_progress: '*', completed: '+', canceled: 'x' },
   rail: '|  ',

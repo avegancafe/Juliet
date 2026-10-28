@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, On } from 'claude-code'
 
 import type { Draft, DraftFields, Graph, Task } from '../types'
-import { layout, wrapText } from './layout'
+import { INDENT, UNICODE, layout, wrapText } from './layout'
 import type { Row } from './layout'
 import { stopNow } from './native'
 import { cancel, complete, emptyGraph, reopen, reorder, updateTask, workNext } from './store'
@@ -128,7 +128,7 @@ const statusColor: Record<Task['status'], string> = {
 // desktop draws every Button natively, in its UI face, `mono` children or not,
 // so only the title is pressable.
 
-const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean, isNew: boolean, isOpen: boolean) => {
+const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean, isNew: boolean, isOpen: boolean, outline: boolean) => {
   const { Box, Button, Text } = E as Elements & { Box: any; Button: any; Text: any }
   const { task } = row
   const canFold = row.hasVisibleChildren || row.hidden > 0
@@ -147,22 +147,28 @@ const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean,
   if (row.hidden > 0) parts.push(<Text mono dimColor> (+{row.hidden})</Text>)
   if (row.isHead) parts.push(<Text mono color="claude"> ← HEAD</Text>)
   if (isNew) parts.push(<Text mono color="suggestion"> new</Text>)
+  const dot = <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
 
+  // The terminal folds a group from its dot. A desktop draws a Button in its own
+  // face and size, so there the dot stays text and the fold control trails the
+  // title, where a wider glyph shifts nothing.
   return (
     <Box key={`line-${task.id}`} flexDirection="row">
       <Text mono dimColor>{row.prefix}</Text>
-      {/* A parent's dot folds and unfolds its group. */}
-      {canFold ? (
+      {canFold && !outline ? (
         <Button key={`fold-${task.id}`} plain onPress={() => toggleFold($, task.id)}>
-          <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
+          {dot}
         </Button>
       ) : (
-        <Text mono color={statusColor[task.status]}>{row.glyph}</Text>
+        dot
       )}
       <Text mono> </Text>
       <Button key={`row-${task.id}`} plain onPress={() => toggleDrawer($, task.id)}>
         {parts}
       </Button>
+      {canFold && outline ? (
+        <Button key={`fold-${task.id}`} label={row.hidden > 0 ? ' ▸' : ' ▾'} plain dimColor onPress={() => toggleFold($, task.id)} />
+      ) : null}
     </Box>
   )
 }
@@ -171,12 +177,13 @@ const rowView = (E: Elements, $: EngineInterface, row: Row, isSelected: boolean,
  * The open row's drawer: its details and every action on it, drawn under the
  * row behind the same rails so the graph still reads as one tree.
  */
-const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, running: string | null, columns: number) => {
+const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, running: string | null, columns: number, outline: boolean) => {
   const { Box, Button, Text } = E as Elements & { Box: any; Button: any; Text: any }
   const { task } = row
   // The drawer is a card: a dim bar down its left edge, behind the tree's rails.
   // Every line, wrapped ones included, is its own row so the rails never break.
-  const gutter = `${row.below}${row.hasVisibleChildren ? '│' : ' '}  `
+  // Under the title: past the rails and the dot, or in an outline past the indent.
+  const gutter = outline ? `${row.prefix}  ` : `${row.below}${row.hasVisibleChildren ? '│' : ' '}  `
   const bar = '▏ '
   const width = Math.max(20, columns - gutter.length - bar.length - 1)
   const line = (key: string, body: unknown) => (
@@ -229,6 +236,36 @@ const drawerView = (E: Elements, $: EngineInterface, row: Row, value: Graph, run
       : []),
   ].flatMap((button, index) => (index === 0 ? [button] : [<Text dimColor> · </Text>, button]))
 
+  // An outline has no rails to keep beside the card, so a desktop gets a real
+  // bordered Box and wraps the text itself: a `▏` column breaks into dashes
+  // there, as the rails did.
+  if (outline) {
+    return (
+      <Box
+        key={`drawer-${task.id}`}
+        flexDirection="column"
+        marginLeft={gutter.length}
+        marginBottom={1}
+        borderStyle="round"
+        borderDimColor
+        paddingX={1}
+      >
+        <Text mono dimColor wrap="wrap">{meta.join(' · ')}</Text>
+        {task.description === '' ? null : <Text wrap="wrap">{task.description}</Text>}
+        {task.acceptance === '' ? null : (
+          <Text wrap="wrap">
+            <Text bold>Done when: </Text>
+            {task.acceptance}
+          </Text>
+        )}
+        {task.notes.length === 0 ? null : <Text dimColor wrap="wrap">Latest: {task.notes.at(-1)}</Text>}
+        <Box flexDirection="row" flexWrap="wrap" marginTop={1}>
+          {actions}
+        </Box>
+      </Box>
+    )
+  }
+
   return (
     <Box key={`drawer-${task.id}`} flexDirection="column">
       {wrapText(meta.join(' · '), width).map((part, index) => line(`meta-${index}`, <Text mono dimColor wrap="truncate-end">{part}</Text>))}
@@ -262,7 +299,8 @@ export const renderPane = (on: On): void => {
     const held = await read($, draft)
     const running = await read($, turnId)
     const withCanceled = await read($, showCanceled)
-    const rows = layout(value, folded, { hideCanceled: !withCanceled })
+    const outline = e.surface !== 'terminal'
+    const rows = layout(value, folded, { hideCanceled: !withCanceled, glyphs: outline ? INDENT : UNICODE })
     const canceledCount = Object.values(value.tasks).filter(task => task.status === 'canceled').length
     const current = selected === null ? undefined : value.tasks[selected]
     const hasInput = Input !== undefined
@@ -287,9 +325,9 @@ export const renderPane = (on: On): void => {
         {rows.length === 0 ? <Text dimColor>No tasks yet. Ask Claude for a plan.</Text> : null}
         {rows.flatMap(row => {
           const isOpen = row.task.id === expanded
-          const view = rowView(E, $, row, row.task.id === selected, fresh.includes(row.task.id), isOpen)
+          const view = rowView(E, $, row, row.task.id === selected, fresh.includes(row.task.id), isOpen, outline)
 
-          return isOpen ? [view, drawerView(E, $, row, value, running, e.viewport?.columns ?? 80)] : [view]
+          return isOpen ? [view, drawerView(E, $, row, value, running, e.viewport?.columns ?? 80, outline)] : [view]
         })}
       </Box>
     )

@@ -251,8 +251,12 @@ test('the graph is drawn in the monospaced face, rails and titles alike', async 
   const texts = await ui.findAll({ type: 'Text' })
   expect(texts.length).toBeGreaterThan(4)
   expect(texts.every(one => one.props.mono === true)).toBe(true)
-  expect((await ui.find({ key: 'line-t4' }))?.text).toContain('└─ ○ Create models')
+  // A desktop spaces its lines, so it draws the tree as indentation alone.
+  expect((await ui.find({ key: 'line-t4' }))?.text).toMatch(/^  ○ Create models/)
   await ui.unmount()
+  const terminal = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect((await terminal.find({ key: 'line-t4' }))?.text).toContain('└─ ○ Create models')
+  await terminal.unmount()
 })
 
 test('each session keeps its own graph; another session\'s and the old shared one stay out', async ($, on) => {
@@ -284,12 +288,12 @@ test('a restarted session picks its own graph back up', async ($, on) => {
   expect((await tg($, 'tg_next')).result).toContain('Mine from before')
 })
 
-test('a long description wraps inside the card, every line behind the rails', async ($, on) => {
+test('in the terminal a long description wraps inside the card, every line behind the rails', async ($, on) => {
   engine(on)
   await plan($)
   await tg($, 'tg_add', { title: 'Create models', parentId: 't2' })
   await tg($, 'tg_update', { id: 't4', description: 'word '.repeat(60).trim() })
-  const ui = await $.ui.mount({ ...PANE, surface: 'desktop', viewport: { columns: 60, rows: 40 } } as any)
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal', viewport: { columns: 60, rows: 40 } } as any)
   await ui.press({ key: 'row-t4' })
   const lines = []
   for (let index = 0; ; index++) {
@@ -302,5 +306,17 @@ test('a long description wraps inside the card, every line behind the rails', as
     expect(one.text.startsWith("      ▏ word")).toBe(true)
     expect(one.text.length).toBeLessThanOrEqual(60)
   }
+  await ui.unmount()
+})
+
+test('on a desktop the drawer is a bordered card with no rail column', async ($, on) => {
+  engine(on)
+  await plan($)
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  await ui.press({ key: 'row-t2' })
+  const card = await ui.find({ key: 'drawer-t2' })
+  expect(card?.props.borderStyle).toBe('round')
+  expect(card?.text).not.toContain('▏')
+  expect(await ui.find({ key: 'act-edit-t2' })).toBeDefined()
   await ui.unmount()
 })
