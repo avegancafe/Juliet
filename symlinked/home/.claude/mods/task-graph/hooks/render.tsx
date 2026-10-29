@@ -71,7 +71,7 @@ export const renderPane = (on: On): void => {
           if (isTerminal) {
             const view = terminalRow(E, $, row, isSelected, isNew, isOpen)
 
-            return isOpen ? [view, terminalDrawer(E, $, row, value, running, e.viewport?.columns ?? 80)] : [view]
+            return isOpen ? [view, terminalDrawer(E, $, row, value, running, e.props.bodyColumns)] : [view]
           }
           const view = desktopRow(E, $, row, isSelected, isNew, isOpen)
 

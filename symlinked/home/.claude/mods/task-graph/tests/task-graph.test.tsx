@@ -297,12 +297,12 @@ test('a restarted session picks its own graph back up', async ($, on) => {
   expect((await tg($, 'tg_next')).result).toContain('Mine from before')
 })
 
-test('in the terminal a long description wraps inside the card, every line behind the rails', async ($, on) => {
+test('in the terminal a long description wraps to the pane, not the terminal, every line behind the rails', async ($, on) => {
   engine(on)
   await plan($)
   await tg($, 'tg_add', { title: 'Create models', parentId: 't2' })
   await tg($, 'tg_update', { id: 't4', description: 'word '.repeat(60).trim() })
-  const ui = await $.ui.mount({ ...PANE, surface: 'terminal', viewport: { columns: 60, rows: 40 } } as any)
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal', props: { ...PANE.props, bodyColumns: 60 }, viewport: { columns: 200, rows: 40 } } as any)
   await ui.press({ key: 'row-t4' })
   const lines = []
   for (let index = 0; ; index++) {

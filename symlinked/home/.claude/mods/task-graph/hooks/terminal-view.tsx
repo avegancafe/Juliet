@@ -58,8 +58,10 @@ export function terminalDrawer(E: Elements, $: EngineInterface, row: Row, value:
   const width = Math.max(20, columns - gutter.length - bar.length - 1)
   const line = (key: string, body: unknown) => (
     <Box key={key} flexDirection="row">
-      <Text mono dimColor>{gutter}</Text>
-      <Text mono color="subtle">{bar}</Text>
+      <Box flexShrink={0}>
+        <Text mono dimColor>{gutter}</Text>
+        <Text mono color="subtle">{bar}</Text>
+      </Box>
       {body}
     </Box>
   )
