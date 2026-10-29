@@ -35,7 +35,7 @@ const TOOLS = [
   {
     name: 'tg_add',
     description:
-      'Add a task, or a subtask with `parentId`, as you discover work. `blockedBy` lists task ids that must finish first.',
+      'Add a task, or a subtask with `parentId`: an outcome the human would recognize, titled by its result, never a step of your own checklist. `blockedBy` lists task ids that must finish first.',
     inputSchema: {
       type: 'object',
       properties: {

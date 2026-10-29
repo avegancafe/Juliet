@@ -11,7 +11,8 @@ const turnId = atom({ plugin: 'task-graph', key: 'turnId' } as const, null)
 
 // Claude Code's own task tools answered from the graph, so there is one store:
 // TaskCreate/TaskUpdate/TaskList/TaskGet and TodoWrite never reach the engine's
-// list. The desktop app's plan list keeps working and is mirrored in.
+// list. The desktop app's plan list is Claude's step checklist and stays out:
+// the graph holds the outcomes, not the steps toward them.
 
 type NativeStatus = 'pending' | 'in_progress' | 'completed'
 
@@ -192,42 +193,15 @@ export const translateNative = (on: On): void => {
       ]),
     }
   })
-
-  // The desktop app's plan list: mirrored in one way, its own list left working.
-  on('tool.call', { tool: 'mcp__ccd_turn__update_plan' }, async ($, e, next) => {
-    const items = (e as Record<string, unknown>).items
-    if (Array.isArray(items)) {
-      const now = await $.clock.now()
-      await mutate($, value => {
-        let graphNow = value
-        for (const item of items as { content?: unknown; status?: unknown }[]) {
-          if (typeof item.content !== 'string') continue
-          let task = byTitle(graphNow, item.content)
-          if (task === undefined) {
-            const added = addTask(graphNow, { title: item.content, createdBy: 'claude' }, now)
-            if (!added.ok) continue
-            graphNow = added.graph
-            task = added.task
-          }
-          if (typeof item.status === 'string' && item.status !== task.status) {
-            const moved = toStatus(graphNow, task.id, item.status, now)
-            if (moved.ok) graphNow = moved.graph
-          }
-        }
-
-        return { ok: true, graph: graphNow, task: Object.values(graphNow.tasks)[0]! }
-      })
-    }
-
-    return next(e)
-  })
 }
 
 const PROTOCOL = [
   'A shared task graph is open beside this conversation. The human edits it too, and it is the authoritative plan.',
   '- Use the mcp__task-graph__tg_* tools (or TaskCreate/TaskUpdate/TaskList, which write to the same graph).',
+  '- Keep it high level: one task per outcome the human would recognize (a feature, a fix, a question answered), titled by the result, not the action. Add subtasks only for pieces the human might reorder, cancel or hand off on their own, rarely more than a handful.',
+  '- Never put your step-by-step checklist here (reading files, running tests, committing, re-checking state): that belongs in your own plan list, which the graph does not mirror.',
   '- Before choosing new work, call tg_next: the human may have canceled, edited or reordered tasks. Never work on a canceled task.',
-  '- Claim a task (tg_claim) before working on it, add subtasks as you discover them (tg_add with parentId), and complete with tg_complete.',
+  '- Claim a task (tg_claim) before working on it, add a subtask (tg_add with parentId) when a real piece of work turns up, and complete with tg_complete.',
   '- When a task changed while you worked on it, re-read it and meet its current acceptance criteria before completing it.',
 ].join('\n')
 
