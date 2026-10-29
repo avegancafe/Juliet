@@ -121,8 +121,13 @@ test('6: a completed task stays visible and expanded', async ($, on) => {
   await tg($, 'tg_complete', { id: 't4' })
   await tg($, 'tg_claim', { id: 't2' })
   await tg($, 'tg_complete', { id: 't2' })
+  const terminal = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect((await terminal.find({ key: 'line-t2' }))?.text).toContain('✓')
+  expect((await terminal.find({ key: 'row-t4' }))?.text).toContain('Create models')
+  await terminal.unmount()
+  // A desktop draws the status as an icon, named for a reader that cannot see it.
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
-  expect((await ui.find({ key: 'line-t2' }))?.text).toContain('✓')
+  expect((await ui.findAll({ type: 'Svg' })).filter(one => one.props.alt === 'Completed').length).toBe(2)
   expect((await ui.find({ key: 'row-t4' }))?.text).toContain('Create models')
   await ui.unmount()
 })
@@ -242,21 +247,25 @@ test('a click on a row opens its drawer of actions; a second click closes it', a
   }
 })
 
-test('the graph is drawn in the monospaced face, rails and titles alike', async ($, on) => {
+test('the terminal draws rails in characters; a desktop indents and draws icons', async ($, on) => {
   engine(on)
   await plan($)
   await tg($, 'tg_add', { title: 'Create models', parentId: 't2' })
-  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  const terminal = await $.ui.mount({ ...PANE, surface: 'terminal' })
   // With no drawer or modal open, every Text in the pane belongs to a graph row.
-  const texts = await ui.findAll({ type: 'Text' })
+  const texts = await terminal.findAll({ type: 'Text' })
   expect(texts.length).toBeGreaterThan(4)
   expect(texts.every(one => one.props.mono === true)).toBe(true)
-  // A desktop spaces its lines, so it draws the tree as indentation alone.
-  expect((await ui.find({ key: 'line-t4' }))?.text).toMatch(/^  ○ Create models/)
-  await ui.unmount()
-  const terminal = await $.ui.mount({ ...PANE, surface: 'terminal' })
   expect((await terminal.find({ key: 'line-t4' }))?.text).toContain('└─ ○ Create models')
   await terminal.unmount()
+  // A desktop spaces its lines, so drawn rails never meet: depth is indentation.
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  const line = await ui.find({ key: 'line-t4' })
+  expect(line?.props.paddingLeft).toBe(2)
+  expect(line?.text.trim().startsWith('Create models')).toBe(true)
+  expect(line?.text).not.toContain('○')
+  expect((await ui.findAll({ type: 'Svg' })).map(one => one.props.alt)).toContain('Pending')
+  await ui.unmount()
 })
 
 test('each session keeps its own graph; another session\'s and the old shared one stay out', async ($, on) => {
@@ -312,11 +321,17 @@ test('in the terminal a long description wraps inside the card, every line behin
 test('on a desktop the drawer is a bordered card with no rail column', async ($, on) => {
   engine(on)
   await plan($)
+  await tg($, 'tg_update', { id: 't2', description: '- one\n- two' })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
   await ui.press({ key: 'row-t2' })
   const card = await ui.find({ key: 'drawer-t2' })
   expect(card?.props.borderStyle).toBe('round')
   expect(card?.text).not.toContain('▏')
   expect(await ui.find({ key: 'act-edit-t2' })).toBeDefined()
+  // Native buttons, the edit marked as the one to press; prose as Markdown.
+  expect((await ui.find({ key: 'act-edit-t2' }))?.props.variant).toBe('primary')
+  expect((await ui.find({ key: 'act-done-t2' }))?.props.variant).toBe('secondary')
+  expect((await ui.find({ key: 'act-done-t2' }))?.props.plain).toBeUndefined()
+  expect((await ui.find({ key: 'desc-t2' }))?.props.text).toBe('- one\n- two')
   await ui.unmount()
 })
