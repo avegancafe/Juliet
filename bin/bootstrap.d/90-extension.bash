@@ -196,8 +196,10 @@ build-package-file() {
     [[ -f "$dir/exclude" ]] && { cat "$dir/exclude"; printf '\n'; }
   done > "$exclude"
   {
+    # FILENAME, not NR == FNR: with no excludes the first file is empty, and
+    # NR == FNR would then read every base line as an exclude and drop it.
     awk '
-      NR == FNR {
+      FILENAME == ARGV[1] {
         sub(/#.*/, ""); gsub(/^[[:space:]]+|[[:space:]]+$/, "")
         if ($0 != "") drop[$0] = 1
         next
