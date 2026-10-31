@@ -122,7 +122,8 @@
     "beads@sttts-beads-skill": true,
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
-    "cc-plugin-you-should-know@builtin": true
+    "cc-plugin-you-should-know@builtin": true,
+    "juliet@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
     "sttts-beads-skill": {
@@ -136,6 +137,13 @@
         "source": "github",
         "repo": "obra/superpowers-marketplace"
       }
+    },
+    "avegancafe-marketplace": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/avegancafe/avegancafe-marketplace.git"
+      },
+      "autoUpdate": true
     }
   },
   "autoMode": {

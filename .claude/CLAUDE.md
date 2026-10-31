@@ -50,13 +50,14 @@ Portable development environment for Kyle's personal systems. The goal is that a
 
 ## Skills and the `noelle` agent
 
-These are **global**: they live in `symlinked/home/.claude/` and are stowed into `~/.claude/`, so they work from any directory, not just this repo.
+These ship in the **`juliet` plugin** in Kyle's marketplace (`~/workspace/avegancafe-marketplace/plugins/juliet`, repo `avegancafe/avegancafe-marketplace`), enabled from `etc/claude/settings.json`. They are global, so they work from any directory.
 
-- `noelle` agent (`symlinked/home/.claude/agents/noelle.md`): a thin entry point. Invoking it says "I'm changing my computer config"; all behavior lives in the skills below, which it preloads.
+- `noelle` agent: a thin entry point. Invoking it says "I'm changing my computer config"; all behavior lives in the skills below, which it preloads.
 - `juliet-config`: the core workflow. It frames requests as "in Juliet, X", then covers orientation, the managed-vs-ad-hoc decision, both-OS coverage, the no-sudo rule, and the report.
+- `juliet-extension`: the Juliet vs extension-repo split (`juliet-kyle`, `juliet-j2`)
 - `juliet-cross-platform`: macOS ↔ Fedora mapping (Brewfile ↔ DNFfile/Flatpakfile, OS-gating, equivalent tools)
 - `juliet-bootstrap-step`: add or change a `setup-*` step in `bin/bootstrap.d/`
 - `add-app-config`: add configuration for a new application
 - `add-fish-alias`: create a new fish shell alias/function
 
-When you add a skill here, use absolute `~/.config/Juliet/...` paths, because it runs from any directory. Add it to the agent's `skills:` list if the agent should preload it.
+**Claude primitives don't go in Juliet.** Agents, skills, hooks, slash commands, mods, output styles and MCP/LSP config belong in a plugin in the marketplace, not under `symlinked/home/.claude/`: the shared Juliet baseline goes in `juliet`, Kyle's personal tooling in `avegancafe`, or a new plugin when neither fits (J2 work tooling goes in J2's `claude-plugins` marketplace). Follow that repo's `CLAUDE.md` for versioning. Always ask Kyle before publishing (pushing, opening a PR, releasing). Skills there should use absolute `~/.config/Juliet/...` paths; add a new one to Noelle's `skills:` list if it should preload it. The `symlinked/home/.claude/mods/` still here predate this rule and should move too.
