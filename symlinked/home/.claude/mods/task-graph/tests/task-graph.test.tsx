@@ -335,3 +335,15 @@ test('on a desktop the drawer is a bordered card with no rail column', async ($,
   expect((await ui.find({ key: 'desc-t2' }))?.props.text).toBe('- one\n- two')
   await ui.unmount()
 })
+
+test('an empty graph asks Claude to record the request; a filled one shows the graph instead', async ($, on) => {
+  engine(on)
+  on('prompt.submit', (_, e) => ({ text: e.text, context: e.context }))
+  await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
+  const empty = (await $.prompt.submit({ text: 'build the thing' })) as { context?: string[] }
+  expect(empty.context?.join('\n')).toContain('The shared task graph is empty')
+  await tg($, 'tg_add', { title: 'Build the thing' })
+  const filled = (await $.prompt.submit({ text: 'and more' })) as { context?: string[] }
+  expect(filled.context?.join('\n')).toContain('Shared task graph (authoritative')
+  expect(filled.context?.join('\n')).not.toContain('is empty')
+})

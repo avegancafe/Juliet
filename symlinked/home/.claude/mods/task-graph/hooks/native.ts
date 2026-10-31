@@ -198,12 +198,16 @@ export const translateNative = (on: On): void => {
 const PROTOCOL = [
   'A shared task graph is open beside this conversation. The human edits it too, and it is the authoritative plan.',
   '- Use the mcp__task-graph__tg_* tools (or TaskCreate/TaskUpdate/TaskList, which write to the same graph).',
+  "- Record work as you discover it: when the human asks for something, add it as a task (tg_add) before starting, unless it is a quick question or a few tool calls. When you find another outcome worth doing (a follow-up, a bug spotted in passing, a piece the human might hand off), add it then: don't wait to be asked, and don't start it unless it is in scope.",
   '- Keep it high level: one task per outcome the human would recognize (a feature, a fix, a question answered), titled by the result, not the action. Add subtasks only for pieces the human might reorder, cancel or hand off on their own, rarely more than a handful.',
   '- Never put your step-by-step checklist here (reading files, running tests, committing, re-checking state): that belongs in your own plan list, which the graph does not mirror.',
   '- Before choosing new work, call tg_next: the human may have canceled, edited or reordered tasks. Never work on a canceled task.',
   '- Claim a task (tg_claim) before working on it, add a subtask (tg_add with parentId) when a real piece of work turns up, and complete with tg_complete.',
   '- When a task changed while you worked on it, re-read it and meet its current acceptance criteria before completing it.',
 ].join('\n')
+
+const EMPTY =
+  'The shared task graph is empty. If this request is real work (not a quick question), add the outcome(s) it asks for with tg_add before starting.'
 
 /** Keeps Claude current with the graph at every boundary it has. */
 export const keepFresh = (on: On): void => {
@@ -216,7 +220,7 @@ export const keepFresh = (on: On): void => {
   on('prompt.submit', async ($, e, next) => {
     if (e.command !== undefined) return next(e)
     const value = await read($, graph)
-    if (Object.keys(value.tasks).length === 0) return next(e)
+    if (Object.keys(value.tasks).length === 0) return next({ ...e, context: [...(e.context ?? []), EMPTY] })
     const changes = unseen(value)
     const note = [
       'Shared task graph (authoritative; the human edits it too):',
