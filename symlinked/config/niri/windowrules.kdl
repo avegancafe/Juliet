@@ -10,6 +10,13 @@ window-rule {
     open-on-workspace "coding"
 }
 
+// Claude Duet: a Chromium app window that juliet-kyle autostarts at login.
+// Sits next to Ghostty. No-op on machines without it.
+window-rule {
+    match app-id="^chrome-claude\\.ai__duet-Default$"
+    open-on-workspace "coding"
+}
+
 window-rule {
     match app-id="^org.mozilla.firefox$"
     open-on-workspace "work"
