@@ -59,6 +59,7 @@ members = ["launcher", "spacer_3", "cpu", "ram"]
 fill = "surface"
 opacity = 0.93
 padding = 8.0
+radius = 4.0
 
 [[bar.default.capsule_group]]
 id = "middle"
@@ -66,6 +67,7 @@ members = ["active_window", "spacer_2", "workspaces"]
 fill = "surface"
 opacity = 0.93
 padding = 8.0
+radius = 4.0
 
 [[bar.default.capsule_group]]
 id = "right"
@@ -83,6 +85,7 @@ members = [
 fill = "surface"
 opacity = 0.93
 padding = 8.0
+radius = 4.0
 
 [widget.spacer_2]
 type = "spacer"
