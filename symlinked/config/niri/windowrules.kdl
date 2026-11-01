@@ -21,12 +21,3 @@ window-rule {
     match app-id="^org.mozilla.firefox$"
     open-on-workspace "work"
 }
-
-// At login, Ghostty and Duet split the coding workspace half and half.
-// at-startup only matches during the first 60s after niri starts, so
-// windows opened later keep the default width.
-window-rule {
-    match app-id="^com.mitchellh.ghostty$" at-startup=true
-    match app-id="^chrome-claude\\.ai__duet-Default$" at-startup=true
-    default-column-width { proportion 0.5; }
-}
