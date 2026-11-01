@@ -238,47 +238,36 @@ setup-fingerprint() {
     sudo systemctl stop fprintd.service &> /dev/null || true
   fi
 
-  # SDDM's PAM stack includes password-auth, which authselect deliberately keeps
-  # fingerprint-free (it also serves remote logins, where a reader makes no
-  # sense). system-auth already gets pam_fprintd from `authselect ...
-  # with-fingerprint`, which covers sudo and console login, so only the greeter
-  # needs wiring up by hand.
+  # Fingerprint OR password, with neither one slower.
   #
-  # sufficient, and placed first: a swipe logs you in, and any failure — no
-  # enrolled print, reader disabled in BIOS, driver broken by an update — falls
-  # straight through to the password prompt rather than locking you out.
-  #
-  # max-tries and timeout are load-bearing, not tuning. SDDM runs exactly one
-  # PAM conversation at a time, and pam_fprintd holds it open while waiting on
-  # the reader. With the stock retry count, a typed password therefore does
-  # NOTHING until the fingerprint attempts are exhausted — every Enter is
-  # discarded and the journal fills with "Existing authentication ongoing,
-  # aborting". Capping it at a single short attempt keeps swipe-to-login while
-  # letting the password through quickly. (pam_fprintd clamps a timeout below
-  # its own floor and logs that it did, so a low value is safe.)
+  # Lock screen: hyprlock reads the finger itself over D-Bus while the password
+  # box stays live, so its PAM stack must be password-only. The stock
+  # `auth include login` reaches system-auth, whose pam_fprintd runs before
+  # pam_unix: a typed password would wait on the reader (3 x 30s by default)
+  # and fight hyprlock for the device. See etc/pam/hyprlock.
+  if command -v hyprlock &> /dev/null; then
+    if [[ -f /etc/pam.d/hyprlock ]]; then
+      sudo cp -n /etc/pam.d/hyprlock /etc/pam.d/hyprlock.juliet-orig &> /dev/null || true
+    fi
+    install-system-file "$JULIET_DIR/etc/pam/hyprlock" /etc/pam.d/hyprlock
+    [[ $? -eq 1 ]] && unchanged "hyprlock PAM already password-only"
+  fi
+
+  # SDDM greeter: password only. SDDM runs exactly one PAM conversation, which
+  # starts when you press Enter, so it can never watch the reader and the
+  # password box at once: any pam_fprintd line there (even max-tries=1
+  # timeout=10, pam_fprintd's floor) makes every typed password wait ~10s.
+  # Older bootstraps added that line; strip it. The password-auth stack the
+  # greeter includes is already fingerprint-free.
   local pam_sddm="/etc/pam.d/sddm"
-  local fprintd_line="auth        sufficient    pam_fprintd.so max-tries=1 timeout=10"
-  if [[ -f "$pam_sddm" ]]; then
+  if [[ -f "$pam_sddm" ]] && grep -q 'pam_fprintd\.so' "$pam_sddm"; then
     # Keep a pristine copy: /etc/pam.d/sddm is package-owned, and a botched auth
     # stack is only fixable from a TTY.
     sudo cp -n "$pam_sddm" "$pam_sddm.juliet-orig" &> /dev/null || true
-
-    if ! grep -q "pam_fprintd.so" "$pam_sddm"; then
-      substep "Enabling fingerprint auth at the SDDM greeter..."
-      sudo sed -i \
-        "s|^auth\([[:space:]]\{1,\}\)substack\([[:space:]]\{1,\}\)password-auth|$fprintd_line\nauth\1substack\2password-auth|" \
-        "$pam_sddm" \
-        || bootstrap_error "Failed to add pam_fprintd to $pam_sddm" \
-          "Add this above the password-auth line: $fprintd_line"
-    elif [[ "$(grep -m1 'pam_fprintd\.so' "$pam_sddm")" != "$fprintd_line" ]]; then
-      # Converge a line written by an older bootstrap (or by hand) onto the
-      # current options, instead of leaving it stale because "some pam_fprintd
-      # line exists".
-      substep "Updating the SDDM fingerprint PAM options..."
-      sudo sed -i "s|^.*pam_fprintd\.so.*\$|$fprintd_line|" "$pam_sddm" \
-        || bootstrap_error "Failed to update pam_fprintd options in $pam_sddm" \
-          "Set the line to: $fprintd_line"
-    fi
+    substep "Removing fingerprint auth from the SDDM greeter (it delays the password)..."
+    sudo sed -i '/pam_fprintd\.so/d' "$pam_sddm" \
+      || bootstrap_error "Failed to remove pam_fprintd from $pam_sddm" \
+        "Delete the pam_fprintd.so line from $pam_sddm by hand"
   fi
 }
 
