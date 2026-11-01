@@ -715,6 +715,14 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 }
+
+// Named workspaces: the open-on-workspace rules in windowrules.kdl only work
+// for workspaces declared here. Declared ones are persistent and come first,
+// in this order.
+workspace "coding"
+workspace "gaming"
+workspace "work"
+
 include "windowrules.kdl"
 
 // Noctalia: allow notification actions and window activation from the shell.
