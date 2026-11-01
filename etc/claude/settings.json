@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy:~/.claude/mods/agents-feed:~/.claude/mods/task-graph"
+    "CLAUDE_CODE_PLUGIN_DIRS": "~/.claude/mods/buddy:~/.claude/mods/agents-feed"
   },
   "permissions": {
     "allow": [
@@ -123,7 +123,8 @@
     "superpowers@superpowers-marketplace": true,
     "playwright@claude-plugins-official": true,
     "cc-plugin-you-should-know@builtin": true,
-    "juliet@avegancafe-marketplace": true
+    "juliet@avegancafe-marketplace": true,
+    "task-graph@avegancafe-marketplace": true
   },
   "extraKnownMarketplaces": {
     "sttts-beads-skill": {
