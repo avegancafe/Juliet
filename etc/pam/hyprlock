@@ -1,0 +1,9 @@
+#%PAM-1.0
+# Installed by juliet-bootstrap (setup-fingerprint) from etc/pam/hyprlock.
+#
+# Password only. hyprlock reads the fingerprint itself over fprintd's D-Bus API
+# (hypr/hyprlock.conf), in parallel with the password box. The stock file
+# includes `login` -> system-auth, whose pam_fprintd runs BEFORE pam_unix: a
+# typed password would then wait on the reader, and both would fight over the
+# device. password-auth is authselect's fingerprint-free stack.
+auth        include     password-auth
