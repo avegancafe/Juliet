@@ -146,6 +146,14 @@ symlink-dotfiles() {
   # stowed — opencode (and tools managing its global file) write config files, and a write through a
   # symlink would dirty this repo (see setup-opencode for the layering).
   mkdir -p ~/.config/opencode 2>/dev/null || true
+  # Same for ~/.claude/mods: Claude Code writes type scaffolding for every
+  # mod it runs (marketplace ones too, e.g. task-graph) under
+  # ~/.claude/mods/<name>/. A folded stow link would put that in the repo, so
+  # unfold an old link and let stow link only the mods Juliet tracks.
+  if [[ -L ~/.claude/mods && "$(readlink -f ~/.claude/mods)" == "$HOME/.config/Juliet/symlinked/"* ]]; then
+    rm ~/.claude/mods
+  fi
+  mkdir -p ~/.claude/mods 2>/dev/null || true
   reclaim-stow-casualties
   prepare-extension-overrides
   local links=0
