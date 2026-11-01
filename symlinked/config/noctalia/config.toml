@@ -19,6 +19,11 @@ font_family = "Iosevka Nerd Font Mono"
 [shell.animation]
 enabled = false
 
+# Floating, not attached: an attached control center inherits the bar's
+# background, which is transparent (see [bar.default]).
+[shell.panel]
+control_center_placement = "floating"
+
 [wallpaper]
 directory = "~/.config/Juliet/etc/wallpaper"
 fill_mode = "crop"
@@ -68,7 +73,7 @@ widget_spacing = 6
 
 [[bar.default.capsule_group]]
 id = "middle"
-members = ["active_window", "spacer_2", "workspaces"]
+members = ["active_window", "spacer_2", "workspaces", "spacer_4", "niri_center"]
 fill = "surface"
 opacity = 0.93
 padding = 12.0
@@ -80,7 +85,6 @@ id = "right"
 members = [
   "claude",
   "audio_visualizer",
-  "niri_center",
   "tray",
   "power_profile",
   "network",
@@ -101,6 +105,10 @@ length = 24
 [widget.spacer_3]
 type = "spacer"
 length = 24
+
+[widget.spacer_4]
+type = "spacer"
+length = 16
 
 # Claude Code background agents (plugin: symlinked/home/.local/share/noctalia/plugins/claude_agents)
 [widget.claude]
