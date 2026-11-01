@@ -107,7 +107,7 @@ async function answer($: EngineInterface, result: Result, lead: (r: Extract<Resu
 
 export async function registerTools($: EngineInterface): Promise<void> {
   for (const tool of TOOLS) {
-    await $.tool.register({ ...tool, inputSchema: { ...tool.inputSchema }, isDeferred: false })
+    await $.tool.register({ ...tool, inputSchema: { ...tool.inputSchema }, isDeferred: true })
   }
 }
 

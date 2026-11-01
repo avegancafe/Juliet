@@ -197,7 +197,8 @@ export const translateNative = (on: On): void => {
 
 const PROTOCOL = [
   'A shared task graph is open beside this conversation. The human edits it too, and it is the authoritative plan.',
-  '- Use the mcp__task-graph__tg_* tools (or TaskCreate/TaskUpdate/TaskList, which write to the same graph).',
+  '- Use the mcp__task-graph__tg_* tools (or TaskCreate/TaskUpdate/TaskList, which write to the same graph). The tg_* tools are deferred: load them with ToolSearch ("select:mcp__task-graph__tg_next,mcp__task-graph__tg_add,...") before the first call.',
+  '- The graph is attached to a prompt only when it changed since you last saw it; call tg_next to read it any other time.',
   "- Record work as you discover it: when the human asks for something, add it as a task (tg_add) before starting, unless it is a quick question or a few tool calls. When you find another outcome worth doing (a follow-up, a bug spotted in passing, a piece the human might hand off), add it then: don't wait to be asked, and don't start it unless it is in scope.",
   '- Keep it high level: one task per outcome the human would recognize (a feature, a fix, a question answered), titled by the result, not the action. Add subtasks only for pieces the human might reorder, cancel or hand off on their own, rarely more than a handful.',
   '- Never put your step-by-step checklist here (reading files, running tests, committing, re-checking state): that belongs in your own plan list, which the graph does not mirror.',
@@ -211,6 +212,16 @@ const EMPTY =
 
 /** Keeps Claude current with the graph at every boundary it has. */
 export const keepFresh = (on: On): void => {
+  // Whether this conversation holds the graph as it stands. A fresh module (a new
+  // session or a reload) and a compaction or /clear each assume it doesn't.
+  let isShown = false
+
+  on('classic.SessionStart', async ($, e, next) => {
+    if (e.source === 'compact' || e.source === 'clear') isShown = false
+
+    return next(e)
+  })
+
   on('prompt.compose', async ($, e, next) => {
     const composed = await next(e)
 
@@ -220,6 +231,9 @@ export const keepFresh = (on: On): void => {
   on('prompt.submit', async ($, e, next) => {
     if (e.command !== undefined) return next(e)
     const value = await read($, graph)
+    // Unchanged since Claude last saw it: nothing to attach.
+    if (isShown && value.rev === value.claudeSeen) return next(e)
+    isShown = true
     if (Object.keys(value.tasks).length === 0) return next({ ...e, context: [...(e.context ?? []), EMPTY] })
     const changes = unseen(value)
     const note = [

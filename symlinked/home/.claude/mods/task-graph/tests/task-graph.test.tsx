@@ -18,11 +18,11 @@ const PANE = {
 const SURFACES = ['terminal', 'desktop'] as const
 
 /** The engine beneath the plugin: just enough of it to start a session. */
-const engine = (on: On, stored: Record<string, unknown> = {}) => {
+const engine = (on: On, stored: Record<string, unknown> = {}, registered: { isDeferred?: boolean }[] = []) => {
   const clock = mock.clock(on, { now: 1_000 })
   mock.store(on, stored)
   on('command.register', () => ({ value: { command: 'task-graph' } }))
-  on('tool.register', (_, e) => ({ value: { tool: `mcp__task-graph__${e.name}` } }))
+  on('tool.register', (_, e) => (registered.push(e), { value: { tool: `mcp__task-graph__${e.name}` } }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
   on('ui.focus', () => ({}))
   on('ui.status', () => ({ value: undefined }))
@@ -30,6 +30,7 @@ const engine = (on: On, stored: Record<string, unknown> = {}) => {
   on('session.root', () => ({ value: '/repo' }))
   on('session.id', () => ({ value: 'session-a' }))
   on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('classic.SessionStart', () => ({}))
   on('tool.call', () => ({ result: 'ran' }))
 
   return clock
@@ -336,14 +337,32 @@ test('on a desktop the drawer is a bordered card with no rail column', async ($,
   await ui.unmount()
 })
 
-test('an empty graph asks Claude to record the request; a filled one shows the graph instead', async ($, on) => {
+test('a prompt carries the graph only when it changed since Claude last saw it', async ($, on) => {
   engine(on)
   on('prompt.submit', (_, e) => ({ text: e.text, context: e.context }))
   await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
-  const empty = (await $.prompt.submit({ text: 'build the thing' })) as { context?: string[] }
-  expect(empty.context?.join('\n')).toContain('The shared task graph is empty')
+  const ask = async (text: string) => ((await $.prompt.submit({ text, wait: false, origin: { kind: 'composer' } })) as { context?: string[] }).context?.join('\n') ?? ''
+  expect(await ask('build the thing')).toContain('is empty')
+  expect(await ask('still empty')).toBe('')
+  // Claude's own change came back in its tool result: nothing to repeat.
   await tg($, 'tg_add', { title: 'Build the thing' })
-  const filled = (await $.prompt.submit({ text: 'and more' })) as { context?: string[] }
-  expect(filled.context?.join('\n')).toContain('Shared task graph (authoritative')
-  expect(filled.context?.join('\n')).not.toContain('is empty')
+  expect(await ask('and more')).toBe('')
+  // A human edit is attached once.
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  await ui.press({ key: 'row-t1' })
+  await ui.press({ key: 'act-cancel-t1' })
+  await ui.unmount()
+  expect(await ask('next')).toContain('canceled "Build the thing"')
+  expect(await ask('again')).toBe('')
+  // A compaction drops what Claude saw, so the next prompt carries the graph.
+  await $.classic.SessionStart({ source: 'compact' })
+  expect(await ask('after compact')).toContain('Shared task graph (authoritative')
+})
+
+test('the tg_* tools are deferred, behind ToolSearch', async ($, on) => {
+  const registered: { isDeferred?: boolean }[] = []
+  engine(on, {}, registered)
+  await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
+  expect(registered.length).toBeGreaterThan(0)
+  expect(registered.every(tool => tool.isDeferred === true)).toBe(true)
 })
