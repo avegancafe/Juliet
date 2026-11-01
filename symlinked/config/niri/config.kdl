@@ -721,7 +721,6 @@ binds {
 // in this order.
 workspace "coding"
 workspace "gaming"
-workspace "work"
 
 include "windowrules.kdl"
 
