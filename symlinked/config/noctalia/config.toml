@@ -42,7 +42,7 @@ temperature_night = 5535
 
 # The bar is three floating pills rather than one strip: the bar itself is
 # transparent and all three capsule groups sit together in the center lane,
-# 24px apart.
+# 16px apart.
 # Rearranging widgets in the Settings GUI writes lanes into
 # ~/.local/state/noctalia/settings.toml, which overrides the lanes here.
 [bar.default]
@@ -50,7 +50,7 @@ background_opacity = 0.0
 shadow = false
 compositor_blur = false  # else a blurred full-width strip shows behind the pills
 margin_edge = 6          # float the pills off the top edge
-widget_spacing = 24      # gap between the pills; groups set their own inner spacing
+widget_spacing = 16      # gap between the pills; groups set their own inner spacing
 start = []
 center = ["group:left", "group:middle", "group:right"]
 end = []
