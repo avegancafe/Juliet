@@ -119,9 +119,10 @@ setup-keyd() {
   # libinput treats as external, so niri's disable-while-typing never pauses
   # the touchpad. This quirk marks keyd's keyboard internal. libinput reads
   # quirks when a device appears, so it applies at the next login.
-  install-system-file "$JULIET_DIR/etc/libinput/local-overrides.quirks" \
-    /etc/libinput/local-overrides.quirks
-  (( $? == 0 )) && notice "Log out and back in for touchpad disable-while-typing to apply."
+  if install-system-file "$JULIET_DIR/etc/libinput/local-overrides.quirks" \
+    /etc/libinput/local-overrides.quirks; then
+    notice "Log out and back in for touchpad disable-while-typing to apply."
+  fi
 
   install-system-file "$JULIET_DIR/etc/keyd/default.conf" /etc/keyd/default.conf
   local rc=$?
