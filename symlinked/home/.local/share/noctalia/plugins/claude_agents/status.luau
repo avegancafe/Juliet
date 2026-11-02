@@ -403,7 +403,7 @@ function onIpc(event)
 end
 
 function onClick()
-  noctalia.togglePanel("kyle/claude_agents:panel")
+  noctalia.togglePanel("juliet/claude_agents:panel")
 end
 
 function onRightClick()

@@ -80,6 +80,16 @@ so bootstrap skips it with a warning. Bootstrap creates an override's parent
 folder before stowing, so this only happens for folders that already exist as
 a link.
 
+### Adding to the niri config
+
+`~/.config/niri` is one of those folded folders, so instead of replacing a
+file in it, ship `home/.config/niri-extension.kdl`. Juliet's `config.kdl`
+includes it with `include optional=true "~/.config/niri-extension.kdl"`,
+after Juliet's workspaces and window rules, so anything in it (workspaces,
+`spawn-at-startup`, window rules, binds) comes after those and overrides
+earlier settings where they overlap. It's a single
+file, so only one active extension can ship it.
+
 ### Helpers `bootstrap.bash` can use
 
 These are kept stable for extensions: `spin "Doing x..." cmd args`,

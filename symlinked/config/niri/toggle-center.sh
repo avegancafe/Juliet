@@ -11,5 +11,5 @@ else
     msg="Centered"
 fi
 # Update the Noctalia bar widget right away (plugin: noctalia/plugins/niri_center).
-command -v noctalia >/dev/null && noctalia msg plugin kyle/niri_center:status all refresh >/dev/null 2>&1 || true
+command -v noctalia >/dev/null && noctalia msg plugin juliet/niri_center:status all refresh >/dev/null 2>&1 || true
 command -v notify-send >/dev/null && notify-send -t 1500 "niri focus" "$msg" || true

@@ -297,10 +297,6 @@ spawn-at-startup "noctalia"
 // Locks with hyprlock before sleep (hypr/hypridle.conf)
 spawn-at-startup "hypridle"
 spawn-at-startup "ghostty"
-// Delay steam so noctalia can come up and paint the wallpaper first,
-// without competing for CPU/GPU/IO during login.
-spawn-sh-at-startup "sleep 8 && steam"
-// discord intentionally not autostarted
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
 // spawn-sh-at-startup "qs -c ~/source/qs/MyAwesomeShell"
@@ -720,9 +716,14 @@ binds {
 // for workspaces declared here. Declared ones are persistent and come first,
 // in this order.
 workspace "coding"
-workspace "gaming"
 
 include "windowrules.kdl"
+
+// A Juliet extension's additions (its own workspaces, startup apps, window
+// rules), stowed from the extension's home/.config/niri-extension.kdl. Lives
+// outside ~/.config/niri because stow links that folder whole. Optional, so
+// niri loads fine without it. See EXTENSIONS.md.
+include optional=true "~/.config/niri-extension.kdl"
 
 // Noctalia: allow notification actions and window activation from the shell.
 debug {
