@@ -10,10 +10,10 @@ window-rule {
     open-on-workspace "coding"
 }
 
-// Claude Duet: a Chromium app window that juliet-kyle autostarts at login.
+// Claude Duet: a GNOME Web app window that juliet-kyle autostarts at login.
 // Sits next to Ghostty. No-op on machines without it.
 window-rule {
-    match app-id="^chrome-claude\\.ai__duet-Default$"
+    match app-id="^org\\.gnome\\.Epiphany\\.WebApp_claudeduet$"
     open-on-workspace "coding"
 }
 
