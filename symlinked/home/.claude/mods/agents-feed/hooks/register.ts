@@ -53,7 +53,7 @@ async function ensure($: EngineInterface): Promise<Feed> {
 
 // Tell a running widget to re-read now; missing noctalia (macOS) just fails quietly.
 function ping($: EngineInterface) {
-  $.process.run(['noctalia', 'msg', 'plugin', 'kyle/claude_agents:status', 'all', 'refresh']).catch(() => {})
+  $.process.run(['noctalia', 'msg', 'plugin', 'juliet/claude_agents:status', 'all', 'refresh']).catch(() => {})
 }
 
 async function save($: EngineInterface, patch: Partial<Feed>) {

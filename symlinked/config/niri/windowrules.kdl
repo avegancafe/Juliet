@@ -1,19 +1,7 @@
 // Per-app workspace assignments (originally created via DMS, now hand-managed)
 
 window-rule {
-    match app-id="^steam$"
-    open-on-workspace "gaming"
-}
-
-window-rule {
     match app-id="^com.mitchellh.ghostty$"
-    open-on-workspace "coding"
-}
-
-// Claude Duet: a GNOME Web app window that juliet-kyle autostarts at login.
-// Sits next to Ghostty. No-op on machines without it.
-window-rule {
-    match app-id="^org\\.gnome\\.Epiphany\\.WebApp_claudeduet$"
     open-on-workspace "coding"
 }
 

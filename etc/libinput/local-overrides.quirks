@@ -1,0 +1,7 @@
+# keyd grabs the built-in keyboard and re-emits keys through its own virtual
+# device. libinput treats that device as external, so disable-while-typing
+# (niri's dwt/dwtp) never pauses the touchpad. Mark it internal so it does.
+[keyd virtual keyboard]
+MatchUdevType=keyboard
+MatchName=keyd virtual keyboard
+AttrKeyboardIntegration=internal

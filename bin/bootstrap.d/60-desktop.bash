@@ -1,15 +1,14 @@
 # shellcheck shell=bash disable=SC2034  # globals are shared across modules
 # Sourced by bin/juliet-bootstrap (never run directly).
-# desktop (Fedora): greeter, input remap, Plasma removal, crash hygiene,
-# nvidia, fingerprint reader.
+# desktop (Fedora): greeter, input remap, Plasma removal, and drivers for
+# hardware that is detected (nvidia GPU, Goodix fingerprint reader).
 
 # Order matters here: sddm must become the display manager before deplasma
 # removes plasma-login-manager (or there's no way to log in), and fingerprint
 # edits /etc/pam.d/sddm, which is only worth doing once sddm is the DM.
 category desktop log "🖥️ Configuring desktop..." "Configure desktop?" \
-  setup-sddm setup-deplasma setup-undms setup-coredump-limits \
-  setup-crash-purge setup-nvidia-secureboot setup-nvidia-powermgmt \
-  setup-keyd setup-fingerprint
+  setup-sddm setup-deplasma setup-nvidia setup-nvidia-secureboot \
+  setup-nvidia-powermgmt setup-keyd setup-fingerprint
 
 setup-sddm() {
   if ! is-fedora; then
@@ -116,6 +115,15 @@ setup-keyd() {
   fi
   substep "Setting up keyd (dual-role Super: hold=Mod, tap=noctalia menu)..."
 
+  # keyd re-emits the built-in keyboard through its own virtual device, which
+  # libinput treats as external, so niri's disable-while-typing never pauses
+  # the touchpad. This quirk marks keyd's keyboard internal. libinput reads
+  # quirks when a device appears, so it applies at the next login.
+  if install-system-file "$JULIET_DIR/etc/libinput/local-overrides.quirks" \
+    /etc/libinput/local-overrides.quirks; then
+    notice "Log out and back in for touchpad disable-while-typing to apply."
+  fi
+
   install-system-file "$JULIET_DIR/etc/keyd/default.conf" /etc/keyd/default.conf
   local rc=$?
   (( rc == 2 )) && return
@@ -133,7 +141,7 @@ setup-keyd() {
   sudo keyd reload &> /dev/null || true
 }
 
-# The Goodix 27c6:533c reader in this XPS 15 9500 is a match-on-chip sensor that
+# The Goodix 27c6:533c reader (as in the XPS 15 9500) is a match-on-chip sensor that
 # Fedora's libfprint cannot drive: the open goodixmoc driver doesn't cover the
 # 53xc family, so a stock install enumerates the hardware fine but fprintd still
 # reports "No devices available". The only working driver is Goodix's
@@ -399,80 +407,6 @@ setup-deplasma() {
   sudo sysctl --system &> /dev/null || true
 }
 
-# DankMaterialShell (dms) was the niri shell before noctalia, and it does not
-# step aside quietly: its user unit is enabled independently of niri's
-# spawn-at-startup, and it claims the org.freedesktop.Notifications bus name, so
-# leaving it installed means two bars and dms owning notifications no matter
-# what niri launches. Noctalia is the shell Juliet configures (DNFfile +
-# symlinked/config/noctalia + spawn-at-startup in the niri config), so retire
-# dms rather than leaving the two to race.
-setup-undms() {
-  if ! is-fedora; then
-    return
-  fi
-
-  # Never retire the old shell unless the replacement is actually installed —
-  # otherwise a half-bootstrapped machine logs in to a bare compositor.
-  if ! rpm -q noctalia &> /dev/null; then
-    if rpm -q dms &> /dev/null; then
-      warn "Keeping dms: noctalia is not installed yet (run the packages step first)."
-    fi
-    return
-  fi
-
-  # The unit was enabled by hand via `systemctl --user add-wants niri.service
-  # dms.service`, which drops a symlink into niri.service.wants — not the
-  # graphical-session.target.wants that [Install] declares. `disable` sweeps
-  # every symlink it finds, but clear the wants dir explicitly so the switch
-  # doesn't depend on that behaviour.
-  if systemctl --user list-unit-files dms.service &> /dev/null; then
-    if [[ "$(systemctl --user is-enabled dms.service 2> /dev/null)" != "disabled" ]]; then
-      substep "Disabling the dms user service (noctalia is the niri shell)..."
-      systemctl --user disable dms.service &> /dev/null \
-        || warn "Could not disable dms.service — check: systemctl --user status dms.service"
-    fi
-  fi
-  rm -f "$HOME"/.config/systemd/user/*.wants/dms.service
-  systemctl --user daemon-reload &> /dev/null || true
-
-  if rpm -q dms &> /dev/null; then
-    substep "Removing dms (DankMaterialShell)..."
-    sudo dnf remove -y dms \
-      || bootstrap_error "Failed to remove dms" \
-        "Inspect the transaction manually: sudo dnf remove --assumeno dms"
-  fi
-
-  # A dms already running in this session keeps going from its deleted binary
-  # until logout; killing it mid-session would leave the user barless if
-  # noctalia isn't up yet. Say so rather than doing it silently.
-  if pgrep -x dms &> /dev/null; then
-    notice "dms is still running in this session — it goes away at logout (or: systemctl --user stop dms.service)."
-  fi
-
-  # Its config is user data Juliet never managed, and telling a customised one
-  # from an untouched one isn't a call bootstrap should make. Same reasoning as
-  # the orphaned akonadi DB in setup-deplasma.
-  if [[ -d "$HOME/.config/DankMaterialShell" ]]; then
-    notice "Leftover dms config at ~/.config/DankMaterialShell — remove it by hand if you're done with dms."
-  fi
-}
-
-# Cap how much disk systemd-coredump may consume. The drkonqi crash loop wrote
-# 4.1GB of cores over ten days without anything noticing; the stock default
-# (10% of the filesystem) is far too generous to act as a warning signal.
-# This is a backstop, not the fix — see setup-deplasma for the actual cause.
-setup-coredump-limits() {
-  if ! is-fedora; then
-    return
-  fi
-
-  # The caps themselves live in etc/coredump/juliet.conf.
-  substep "Capping systemd-coredump disk usage..."
-  install-system-file "$JULIET_DIR/etc/coredump/juliet.conf" \
-    /etc/systemd/coredump.conf.d/juliet.conf
-  [[ $? -eq 1 ]] && unchanged "caps current"
-}
-
 # Install fonts and refresh the font cache. Two sources:
 #   1. Small TTF/OTFs vendored in etc/fonts (3270, Berkeley Mono, JetBrains
 #      Mono, MonoLisa) — copied straight in.
@@ -482,6 +416,52 @@ setup-coredump-limits() {
 #      the pinned Nerd Fonts release and cached. The 374MB zip is only fetched
 #      when Iosevka isn't already installed, so re-runs are cheap.
 # Everything lands in <font-dir>/Juliet so the repo owns that subtree.
+# An NVIDIA GPU: PCI vendor 0x10de with a display class (0x03xxxx). Read from
+# sysfs rather than lspci so this doesn't depend on pciutils. The HDMI audio
+# function on the same card (class 0x0403) doesn't count.
+has-nvidia-gpu() {
+  local dev
+  for dev in /sys/bus/pci/devices/*/; do
+    if [[ "$(cat "$dev/vendor" 2>/dev/null)" == "0x10de" \
+      && "$(cat "$dev/class" 2>/dev/null)" == 0x03* ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# The proprietary nvidia driver, from RPM Fusion nonfree (setup-dnf enables
+# it). Installed here rather than from the DNFfile because it only belongs on
+# machines with an NVIDIA GPU. akmod-nvidia pulls the whole driver stack
+# (xorg-x11-drv-nvidia + -libs, kmodsrc, nvidia-modprobe, nvidia-settings,
+# nvidia-persistenced) and rebuilds the kernel module on every kernel bump; the
+# -cuda subpackage adds nvidia-smi and the CUDA runtime. mokutil stages the
+# Secure Boot key enrollment in setup-nvidia-secureboot.
+NVIDIA_PACKAGES=(akmod-nvidia xorg-x11-drv-nvidia-cuda mokutil)
+
+setup-nvidia() {
+  if ! is-fedora || ! has-nvidia-gpu; then
+    return
+  fi
+
+  local missing=() pkg
+  for pkg in "${NVIDIA_PACKAGES[@]}"; do
+    rpm -q "$pkg" &> /dev/null || missing+=("$pkg")
+  done
+  if (( ${#missing[@]} == 0 )); then
+    unchanged "nvidia driver installed"
+    return
+  fi
+
+  substep "Installing the nvidia driver (${missing[*]})..."
+  if sudo dnf install -y "${missing[@]}"; then
+    notice "akmods builds the nvidia module in the background; reboot once it finishes."
+  else
+    bootstrap_error "Failed to install the nvidia driver" \
+      "Install it manually: sudo dnf install ${NVIDIA_PACKAGES[*]}"
+  fi
+}
+
 # The RPMFusion nvidia driver is compiled locally by akmods and signed with a
 # key this machine generates itself (/etc/pki/akmods/certs/public_key.der). With
 # Secure Boot on, the kernel refuses to load a module whose key isn't enrolled in
@@ -509,7 +489,7 @@ setup-nvidia-secureboot() {
   fi
   # The proprietary module loading at all proves the key is already trusted.
   # Tested via /proc/driver/nvidia rather than lsmod: the in-tree
-  # nvidia-wmi-ec-backlight module (present on this Dell) loads as
+  # nvidia-wmi-ec-backlight module (present on Dell laptops) loads as
   # "nvidia_wmi_ec_backlight" and would false-match a /^nvidia/ grep, silently
   # skipping enrollment forever. Only the real driver creates this directory.
   if [[ -d /proc/driver/nvidia ]]; then
@@ -544,11 +524,10 @@ setup-nvidia-secureboot() {
 
 # The nvidia driver ships Runtime D3 disabled — /proc/driver/nvidia/gpus/*/power
 # reports "Runtime D3 status: Disabled by default" — so on a laptop the dGPU
-# stays powered from boot even when nothing is using it. Under nouveau this
-# machine's GTX 1650 Ti idled in D3cold; the first boot on the proprietary
+# stays powered from boot even when nothing is using it. On an XPS 15 9500, under
+# nouveau its GTX 1650 Ti idled in D3cold; the first boot on the proprietary
 # driver had it in D0 for the entire session (runtime_suspended_time 0, active
-# 555s). That is pure battery drain and heat on a box whose history includes a
-# 100°C thermal runaway — so enabling RTD3 is part of switching drivers, not an
+# 555s). That is pure battery drain and heat, so enabling RTD3 is part of switching drivers, not an
 # optional extra.
 #
 # 0x02 is NVIDIA's most aggressive tier: power the GPU down, video memory
@@ -579,64 +558,15 @@ setup-nvidia-powermgmt() {
   esac
 }
 
-# How long crash evidence is worth keeping. Long enough to debug something that
-# happened "the other day", short enough that a crash loop can't quietly hoard
-# disk between bootstrap runs.
-CRASH_RETENTION_DAYS=7
-
-# Age-based purge of accumulated crash data. setup-coredump-limits already caps
-# systemd-coredump's *size*, but nothing bounded abrt's spool: the drkonqi loop
-# left 45 stale reports there, one with a repeat count of 46515. Expressed as a
-# retention window rather than a one-shot wipe so it stays idempotent and keeps
-# converging on every run.
-setup-crash-purge() {
-  if ! is-fedora; then
-    return
-  fi
-
-  # abrt problem directories are named ccpp-<date>-... and owned by root; -mtime
-  # is what decides, not the name, so a clock skew can't delete recent evidence.
-  if [[ -d /var/spool/abrt ]]; then
-    local stale
-    stale=$(sudo find /var/spool/abrt -mindepth 1 -maxdepth 1 -type d \
-      -mtime +"$CRASH_RETENTION_DAYS" 2> /dev/null | wc -l)
-    if [[ "$stale" -gt 0 ]]; then
-      substep "Purging $stale abrt report(s) older than ${CRASH_RETENTION_DAYS}d..."
-      sudo find /var/spool/abrt -mindepth 1 -maxdepth 1 -type d \
-        -mtime +"$CRASH_RETENTION_DAYS" -exec rm -rf {} + \
-        || bootstrap_error "Failed to purge the stale abrt spool" \
-          "Inspect it manually: sudo du -sh /var/spool/abrt/*"
-    fi
-  fi
-
-  # coredumpctl has no age-based vacuum of its own, so drive it off the files.
-  if [[ -d /var/lib/systemd/coredump ]]; then
-    local cores
-    cores=$(find /var/lib/systemd/coredump -type f \
-      -mtime +"$CRASH_RETENTION_DAYS" 2> /dev/null | wc -l)
-    if [[ "$cores" -gt 0 ]]; then
-      substep "Purging $cores core dump(s) older than ${CRASH_RETENTION_DAYS}d..."
-      sudo find /var/lib/systemd/coredump -type f \
-        -mtime +"$CRASH_RETENTION_DAYS" -delete \
-        || bootstrap_error "Failed to purge old core dumps" \
-          "Inspect them manually: coredumpctl list"
-    fi
-  fi
-}
-
 setup-sddm-applicable() { is-fedora && command -v sddm &> /dev/null; }
 
 setup-deplasma-applicable() { is-fedora; }
 
-setup-undms-applicable() { is-fedora; }
+setup-nvidia-applicable() { is-fedora && has-nvidia-gpu; }
 
-setup-coredump-limits-applicable() { is-fedora; }
+setup-nvidia-secureboot-applicable() { is-fedora && has-nvidia-gpu; }
 
-setup-crash-purge-applicable() { is-fedora; }
-
-setup-nvidia-secureboot-applicable() { is-fedora && rpm -q akmod-nvidia &> /dev/null; }
-
-setup-nvidia-powermgmt-applicable() { is-fedora && rpm -q akmod-nvidia &> /dev/null; }
+setup-nvidia-powermgmt-applicable() { is-fedora && has-nvidia-gpu; }
 
 setup-keyd-applicable() { is-fedora && command -v keyd &> /dev/null; }
 

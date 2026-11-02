@@ -1,10 +1,10 @@
 # Bar widget showing Claude Code session status: `claude agents --json` roster joined
 # with the agents-feed mod's snapshots (~/.cache/claude-agents/).
-id = "kyle/claude_agents"
+id = "juliet/claude_agents"
 name = "Claude Agents"
 version = "0.1.0"
 plugin_api = 26
-author = "kyle"
+author = "Juliet"
 license = "MIT"
 dependencies = []
 tags = ["claude"]

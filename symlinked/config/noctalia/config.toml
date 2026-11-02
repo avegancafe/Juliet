@@ -119,12 +119,12 @@ length = 16
 
 # Claude Code background agents (plugin: symlinked/home/.local/share/noctalia/plugins/claude_agents)
 [widget.claude]
-type = "kyle/claude_agents:status"
+type = "juliet/claude_agents:status"
 
 # niri centered-focus indicator; click toggles (plugin: .../plugins/niri_center)
 [widget.niri_center]
-type = "kyle/niri_center:status"
+type = "juliet/niri_center:status"
 
 # Local plugins stowed from symlinked/home/.local/share/noctalia/plugins
 [plugins]
-enabled = ["kyle/claude_agents", "kyle/niri_center"]
+enabled = ["juliet/claude_agents", "juliet/niri_center"]
