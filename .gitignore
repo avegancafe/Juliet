@@ -17,6 +17,11 @@ symlinked/home/.claude/*
 # pi (~/.pi is symlinked file-by-file via stow; settings.json IS tracked)
 symlinked/home/.pi/agent/auth.json
 symlinked/home/.pi/agent/sessions/
+# Skills installers (e.g. `npx skills add`) write vendor skills here through
+# the stow link; only Juliet's own skills are tracked.
+symlinked/home/.pi/agent/skills/*
+!symlinked/home/.pi/agent/skills/.gitkeep
+!symlinked/home/.pi/agent/skills/chef/
 .pi/artifacts/
 plans/
 
