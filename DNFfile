@@ -34,6 +34,7 @@ neovide
 # Development
 git
 gh
+awscli2
 git-delta
 git-lfs
 rustup
