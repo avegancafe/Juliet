@@ -139,6 +139,13 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // The companion note rides on a prompt's context, not a `prompt.compose`
+  // section: on a managed machine the built-in sec-default plugin sends
+  // `prompt.compose` past every user-tier mod, so a section never lands, while
+  // `prompt.submit` context is left alone. It stays in the transcript, so it is
+  // sent once per buddy: again only after a hatch (a new name) or a nap ends.
+  let noteSentFor: string | null = null
+
   on('command.run', { command: 'buddy' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     const mine = await read($, pet)
@@ -150,6 +157,8 @@ export const register: Register = on => {
     if (arg === 'off' || arg === 'on') {
       await update($, isHidden, () => arg === 'off')
       await $.store.set('isHidden', arg === 'off')
+      // A nap ends with the note sent again, even with no prompt in between.
+      if (arg === 'off') noteSentFor = null
       if (arg === 'off') await $.ui.close({ id: PANE })
       else await openPane($)
       return { text: arg === 'off' ? `${mine.name} is napping. /buddy on to wake them.` : `${mine.name} is back!` }
@@ -170,13 +179,6 @@ export const register: Register = on => {
     await openPane($)
     return { text: card(mine) }
   })
-
-  // The companion note rides on a prompt's context, not a `prompt.compose`
-  // section: on a managed machine the built-in sec-default plugin sends
-  // `prompt.compose` past every user-tier mod, so a section never lands, while
-  // `prompt.submit` context is left alone. It stays in the transcript, so it is
-  // sent once per buddy: again only after a hatch (a new name) or a nap ends.
-  let noteSentFor: string | null = null
 
   on('prompt.submit', async ($, e, next) => {
     lastPrompt = e.text
