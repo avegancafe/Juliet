@@ -239,3 +239,36 @@ test('the pane waits for /buddy instead of opening at session start', async ($, 
   await $.command.run({ command: 'buddy', args: '' } as never)
   expect(opened).toEqual(['buddy'])
 })
+
+// sec-default sends `prompt.compose` past user-tier mods on managed machines,
+// so the companion note rides on prompt context, which it leaves alone.
+test('the companion note reaches the model once, and again after the buddy wakes', async ($, on) => {
+  mock.clock(on)
+  mock.store(on, { pet: { species: 'duck', name: 'Pip' } })
+  on('command.register', (_, e) => ({ value: { command: e.name } }))
+  on('command.run', () => ({ text: '' }))
+  on('model.complete', () => ({ value: { isAnswered: false, reason: 'empty-reply' } }) as never)
+  on('ui.open', () => ({ value: { isPlaced: false } }) as never)
+  on('ui.close', () => ({ value: undefined }) as never)
+  on('ui.panes', () => ({ value: [] }) as never)
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  const seen: (readonly string[] | undefined)[] = []
+  on('prompt.submit', (_, e) => {
+    seen.push(e.context)
+    return { text: e.text }
+  })
+  await $.session.start({ cwd: '/', surface: 'terminal', isInteractive: true })
+  const send = (text: string) => $.prompt.submit({ text, origin: { kind: 'composer' }, wait: false } as never)
+
+  await send('hi')
+  await send('again')
+  await $.command.run({ command: 'buddy', args: 'off' } as never)
+  await send('while napping')
+  await $.command.run({ command: 'buddy', args: 'on' } as never)
+  await send('welcome back')
+
+  expect(seen[0]?.join('\n')).toContain('A small ASCII punk named Pip')
+  expect(seen[1]).toBeUndefined()
+  expect(seen[2]).toBeUndefined()
+  expect(seen[3]?.join('\n')).toContain('A small ASCII punk named Pip')
+})
