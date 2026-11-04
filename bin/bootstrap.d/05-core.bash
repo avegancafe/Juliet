@@ -140,7 +140,7 @@ symlink-dotfiles() {
   substep "Symlinking dotfiles..."
   mkdir ~/.claude 2>/dev/null || true
   # Keep ~/.config/opencode a real dir so stow file-links only our tracked
-  # content (plugins/cmux.js) into it; opencode writes node_modules/
+  # content (commands/, plugins/) into it; opencode writes node_modules/
   # package.json (its own bun-managed plugin deps) at that root, which must
   # stay out of the repo. opencode.json and tui.json are deliberately NOT
   # stowed — opencode (and tools managing its global file) write config files, and a write through a

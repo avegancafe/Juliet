@@ -25,8 +25,8 @@ setup-opencode() {
   #   project <repo>/opencode.json                per-repo overrides
   # opencode loads them in that precedence order, so Juliet's keys override the
   # global defaults without either side touching the other's file.
-  # plugins/cmux.js stays stow-symlinked (immutable content — nothing writes
-  # to plugins/). Interactive theme picks persist to
+  # config/opencode content (commands/, plugins/) stays stow-symlinked — it's
+  # immutable, nothing writes to it. Interactive theme picks persist to
   # ~/.local/state/opencode/kv.json, never a config file.
 
   # Migration: an earlier revision of this branch stow-symlinked opencode.json
@@ -59,14 +59,5 @@ setup-opencode() {
   # shells started after the stow run, so hint when the current shell lacks it.
   if [[ -z "${OPENCODE_CONFIG:-}" ]]; then
     warn "OPENCODE_CONFIG not set in this shell yet — open a new shell (or 'source ~/.config/fish/env.fish') so opencode picks up Juliet's override layer."
-  fi
-
-  # The cmux notification plugin (plugins/cmux.js) auto-loads and rings the
-  # cmux workspace tab when the agent goes idle or errors. It's a no-op
-  # outside a cmux session, but warn if the cmux CLI is missing so the user
-  # knows notifications won't fire.
-  # cmux is macOS-only (a Brewfile cask), so there's nothing to install on Linux.
-  if is-macos && ! command -v cmux &> /dev/null; then
-    warn "cmux CLI not found — opencode→cmux notifications stay inactive until cmux is installed."
   fi
 }
