@@ -33,6 +33,13 @@ let fit: Fit = { width: 12, lines: 6 }
 const MAX_BUBBLE_LINES = 6
 let lastPrompt = ''
 
+/** What Claude is told about the buddy beside the input box. */
+const companionNote = (name: string) =>
+  `A small ASCII punk named ${name} sits beside the user's input box and occasionally comments in a speech bubble. ` +
+  `You are not ${name}; it is a separate watcher with its own voice. When the user addresses ${name} directly, ` +
+  `its bubble answers. Keep your own reply to one short line then, or answer only the part meant for you. ` +
+  `Don't explain that you aren't ${name}, and never speak for it.`
+
 async function say($: EngineInterface, text: string) {
   if (await read($, isMuted)) return
   bubbleUntil = (await $.clock.now()) + BUBBLE_MS
@@ -132,6 +139,13 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // The companion note rides on a prompt's context, not a `prompt.compose`
+  // section: on a managed machine the built-in sec-default plugin sends
+  // `prompt.compose` past every user-tier mod, so a section never lands, while
+  // `prompt.submit` context is left alone. It stays in the transcript, so it is
+  // sent once per buddy: again only after a hatch (a new name) or a nap ends.
+  let noteSentFor: string | null = null
+
   on('command.run', { command: 'buddy' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     const mine = await read($, pet)
@@ -143,6 +157,8 @@ export const register: Register = on => {
     if (arg === 'off' || arg === 'on') {
       await update($, isHidden, () => arg === 'off')
       await $.store.set('isHidden', arg === 'off')
+      // A nap ends with the note sent again, even with no prompt in between.
+      if (arg === 'off') noteSentFor = null
       if (arg === 'off') await $.ui.close({ id: PANE })
       else await openPane($)
       return { text: arg === 'off' ? `${mine.name} is napping. /buddy on to wake them.` : `${mine.name} is back!` }
@@ -164,25 +180,20 @@ export const register: Register = on => {
     return { text: card(mine) }
   })
 
-  on('prompt.compose', async ($, e, next) => {
-    const result = await next(e)
-    const mine = await read($, pet)
-    if (!mine || (await read($, isHidden))) return result
-    const text =
-      `A small ASCII punk named ${mine.name} sits beside the user's input box and occasionally comments in a speech bubble. ` +
-      `You are not ${mine.name}; it is a separate watcher with its own voice. When the user addresses ${mine.name} directly, ` +
-      `its bubble answers. Keep your own reply to one short line then, or answer only the part meant for you. ` +
-      `Don't explain that you aren't ${mine.name}, and never speak for it.`
-    return { ...result, sections: [...result.sections, { id: 'buddy:companion', text, scope: 'session' as const }] }
-  })
-
   on('prompt.submit', async ($, e, next) => {
     lastPrompt = e.text
     const mine = await read($, pet)
     if (mine && new RegExp(`\\b${mine.name.replace(/\W/g, '')}\\b`, 'i').test(e.text)) {
       void chirp($, `The developer just said to you: "${e.text.slice(0, 500)}". Answer them.`, true)
     }
-    return next(e)
+    if (!mine || (await read($, isHidden))) {
+      noteSentFor = null
+      return next(e)
+    }
+    if (e.command !== undefined || noteSentFor === mine.name) return next(e)
+    const result = await next({ ...e, context: [...(e.context ?? []), companionNote(mine.name)] })
+    if (result.drop === undefined) noteSentFor = mine.name
+    return result
   })
 
   on('tool.call', async ($, e, next) => {
