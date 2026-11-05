@@ -1,0 +1,16 @@
+# The Rex rpm repository (https://pkgs.superlogical.com/rex/rex.repo), installed to
+# /etc/yum.repos.d/rex.repo by setup-rex.
+#
+# Rex has no stable release yet, and the stable channel's repodata 404s, which would
+# make every dnf command fail. So this follows preview. Once stable exists, switch
+# both lines to:
+#
+#   name=Rex (stable)
+#   baseurl=https://pkgs.superlogical.com/rex/rpm/stable/$basearch
+[rex]
+name=Rex (preview)
+baseurl=https://pkgs.superlogical.com/rex/rpm/preview/$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://pkgs.superlogical.com/rex/keys/rex.asc
