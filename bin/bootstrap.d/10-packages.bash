@@ -60,17 +60,19 @@ prune-undeclared-taps() {
       continue
     fi
 
-    # A cask that MOVED taps is the one case `brew untap` can't classify: cmux
-    # migrated from manaflow-ai/cmux to homebrew/cask, so no installed full
-    # name matches the old tap's token anymore — but untap still matches the
-    # installed cask by bare token, loads the tap's stale copy to check whether
-    # it's installed (which the trust gate refuses; jq is in both the Brewfile
-    # and the DNFfile), and, even trusted, would refuse non-interactively or
-    # uninstall the installed cask with --force because it believes the tap
-    # owns it. Nothing of the tap's is actually installed, so delete the
-    # directory untap would have deleted instead. No keg links, manpages, or
-    # completions need cleaning up: the ownership check above already ruled out
-    # installed formulae, and no installed full name matches a tap token.
+    # A package that MOVED taps is the one case `brew untap` can't classify:
+    # the cask cmux migrated from manaflow-ai/cmux to homebrew/cask, and the
+    # formula firectl from fw-ai-external/firectl to fw-ai/firectl, so no
+    # installed full name matches the old tap's name anymore — but untap still
+    # matches the installed package by bare name, loads the tap's stale copy to
+    # check whether it's installed (which the trust gate refuses, even with
+    # --force; jq is in both the Brewfile and the DNFfile), and, even trusted,
+    # would refuse non-interactively or uninstall the installed package with
+    # --force because it believes the tap owns it. Nothing of the tap's is
+    # actually installed, so delete the directory untap would have deleted
+    # instead. No keg links, manpages, or completions need cleaning up: the
+    # ownership check above already ruled out the tap's installed formulae, and
+    # no installed full name matches a tap token.
     local token name phantom=""
     if command -v jq &> /dev/null; then
       while IFS= read -r token; do
@@ -79,13 +81,14 @@ prune-undeclared-taps() {
         printf '%s\n' "$installed_names" | grep -qE "(^|/)$name\$" || continue
         printf '%s\n' "$installed_names" | grep -qxF "$token" && continue
         phantom=1
-      done < <(brew tap-info --json=v1 "$installed" 2> /dev/null | jq -r '.[0].cask_tokens[]?')
+      done < <(brew tap-info --json=v1 "$installed" 2> /dev/null \
+        | jq -r '.[0] | .formula_names[]?, .cask_tokens[]?')
     fi
 
     if [[ -n "$phantom" ]]; then
       local tap_path
       tap_path=$(brew --repository "$installed" 2> /dev/null || true)
-      spin "Removing the obsolete $installed tap (its casks live in another tap)..." \
+      spin "Removing the obsolete $installed tap (its packages live in another tap)..." \
         rm -rf "$tap_path" \
         || bootstrap_error "Failed to remove the obsolete $installed tap." \
           "Remove its directory by hand: $tap_path"
