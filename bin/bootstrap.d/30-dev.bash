@@ -4,7 +4,7 @@
 
 category dev rlog "🛠️ Installing dev tools..." "Install dev tools?" \
   setup-cargo setup-rust setup-go-tools setup-python setup-nodenv setup-node-tools \
-  setup-flyctl setup-beads
+  setup-flyctl setup-beads setup-rex
 
 setup-cargo() {
   substep "Checking cargo..."
@@ -141,3 +141,42 @@ setup-beads() {
 }
 
 setup-beads-applicable() { is-fedora; }
+
+# Rex (superlogical.com/rex) server and CLI. On macOS Rex is a self-contained
+# app with its own local server, so there's nothing to script there. On Fedora
+# it comes from Superlogical's own signed dnf repo; the repo file is tracked in
+# etc/rex/ so its channel is pinned here rather than by the upstream script.
+# Its systemd units ship disabled; enabling one is a per-machine choice.
+setup-rex() {
+  is-fedora || return 0
+  substep "Checking Rex..."
+
+  # Fedora's unrelated Perl tool (R)?ex is packaged as "Rex" (capital R) and
+  # also owns /usr/bin/rex, so dnf would fail with a bare file conflict.
+  if rpm -q Rex &> /dev/null; then
+    bootstrap_error "Fedora's unrelated 'Rex' package (the Perl tool (R)?ex) owns /usr/bin/rex" \
+      "Remove it, then rerun: sudo dnf remove Rex && juliet-bootstrap --enable=rex"
+    return
+  fi
+
+  install-system-file "$JULIET_DIR/etc/rex/rex.repo" /etc/yum.repos.d/rex.repo
+  local rc=$?
+  (( rc == 2 )) && return
+
+  if rpm -q rex &> /dev/null; then
+    if (( rc == 1 )); then
+      unchanged "already installed"
+    else
+      # The repo file changed (e.g. a new channel); pick up its build.
+      sudo dnf upgrade -y --refresh rex \
+        || bootstrap_error "Failed to upgrade rex" "Retry manually: sudo dnf upgrade --refresh rex"
+    fi
+    return
+  fi
+
+  substep "Installing Rex..."
+  sudo dnf install -y rex \
+    || bootstrap_error "Failed to install rex" "Retry manually: sudo dnf install -y rex"
+}
+
+setup-rex-applicable() { is-fedora; }
