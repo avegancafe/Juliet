@@ -135,6 +135,20 @@ reclaim-stow-casualties() {
 # gitignored, but stow doesn't know that: a stray .DS_Store in symlinked/home
 # collides with the real ~/.DS_Store and aborts stowing the entire home tree.
 STOW_IGNORES=(--ignore='\.DS_Store')
+# Files an extension overrides, as absolute target paths (set by
+# prepare-extension-overrides). stow must skip each one, or it sees the
+# extension's link as a foreign file and aborts the whole package.
+EXTENSION_OVERRIDE_TARGETS=()
+
+# Print one stow --ignore per override target under the target root $1,
+# relative to it: stow matches `^rel$` against the path from the package top.
+stow-override-ignores() {
+  local root="$1" target
+  for target in ${EXTENSION_OVERRIDE_TARGETS[@]+"${EXTENSION_OVERRIDE_TARGETS[@]}"}; do
+    [[ "$target" == "$root/"* ]] || continue
+    printf -- '--ignore=^%s$\n' "$(printf '%s' "${target#"$root/"}" | sed 's/[][\.*^$+?(){}|]/\\&/g')"
+  done
+}
 
 symlink-dotfiles() {
   substep "Symlinking dotfiles..."
@@ -175,8 +189,12 @@ symlink-dotfiles() {
 # stow one package verbosely, adding the links it made to the caller's
 # `links` count. Output stays hidden unless stow fails (conflict details).
 stow-package() {
-  local out rc=0
-  out=$(stow -v "${STOW_IGNORES[@]}" --target="$2" --dir="$HOME/.config/Juliet/symlinked" "$1" 2>&1) || rc=$?
+  local out rc=0 ignore
+  local -a ignores=("${STOW_IGNORES[@]}")
+  while IFS= read -r ignore; do
+    [[ -n "$ignore" ]] && ignores+=("$ignore")
+  done < <(stow-override-ignores "$2")
+  out=$(stow -v "${ignores[@]}" --target="$2" --dir="$HOME/.config/Juliet/symlinked" "$1" 2>&1) || rc=$?
   links=$(( links + $(grep -c '^LINK:' <<< "$out") ))
   if (( rc != 0 )); then
     _step_close

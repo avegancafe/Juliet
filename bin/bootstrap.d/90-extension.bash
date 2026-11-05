@@ -339,11 +339,12 @@ extension-overrides() {
       [[ "$pkg" == home ]] && target_root="$HOME" || target_root="$HOME/.config"
       while IFS= read -r f; do
         rel="${f#"$dir/$pkg/"}"
-        if [[ "$seen" == *$'\n'"$pkg/$rel"$'\n'* ]]; then
+        # Keyed by target: home/.config/x and config/x are the same file.
+        if [[ "$seen" == *$'\n'"$target_root/$rel"$'\n'* ]]; then
           warn "Both extensions override $pkg/$rel; using the later one's, not $(basename "$dir")'s." >&2
           continue
         fi
-        seen+="$pkg/$rel"$'\n'
+        seen+="$target_root/$rel"$'\n'
         printf '%s\t%s\t%s\t%s\n' "$f" "$target_root/$rel" "$rel" "$pkg"
       done < <(find "$dir/$pkg/" -type f ! -name .DS_Store ! -name .gitkeep)
     done
@@ -354,10 +355,14 @@ extension-overrides() {
 # extension's link as a foreign file and abort the whole tree), and make each
 # override's parent a real directory so stow doesn't fold it into a symlink to
 # Juliet (writing the override there would land it in the repo).
+# The ignores are kept by target path, not by the extension's relpath:
+# `home/.config/x` and `config/x` both override ~/.config/x, which Juliet
+# ships in its `config` package, so stow-package derives each package's ignore
+# from the target (see stow-override-ignores).
 prepare-extension-overrides() {
   local src target rel pkg parent
   while IFS=$'\t' read -r src target rel pkg; do
-    STOW_IGNORES+=(--ignore="^$(printf '%s' "$rel" | sed 's/[][\.*^$+?(){}|]/\\&/g')\$")
+    EXTENSION_OVERRIDE_TARGETS+=("$target")
     parent=$(dirname "$target")
     [[ -e "$parent" ]] || mkdir -p "$parent"
   done < <(extension-overrides 2> /dev/null)
