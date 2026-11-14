@@ -3,7 +3,7 @@ hs.application.enableSpotlightForNameSearches(true)
 -- Terminal preference for the ctrl+space toggle: bundle IDs, comma- or
 -- space-separated, first installed one wins. Set JULIET_TERMINALS in
 -- ~/.config/local/.env (an extension's .env.template can seed it).
-local DEFAULT_TERMINALS = 'com.mitchellh.ghostty'
+local DEFAULT_TERMINALS = 'com.superlogical.rex com.mitchellh.ghostty'
 
 -- Hammerspoon is a GUI app, so it doesn't inherit fish's environment: fall
 -- back to reading the one key from ~/.config/local/.env directly.
@@ -55,6 +55,8 @@ local toggle_terminal = function()
 end
 
 hs.hotkey.bind({ 'ctrl' }, 'space', toggle_terminal)
+-- Ghostty's global quick-terminal key; Rex has no global bindings of its own.
+hs.hotkey.bind({ 'ctrl', 'shift' }, 'g', toggle_terminal)
 
 hs.hotkey.bind({}, 'f15', function()
 	hs.caffeinate.lockScreen()

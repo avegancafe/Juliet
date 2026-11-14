@@ -13,6 +13,7 @@ Bamboo theme is applied consistently across all applications.
 | Application | Config Location | Theme Setting |
 |-------------|-----------------|---------------|
 | Neovim | `symlinked/config/nvim/fnl/Juliet/plugins/theme.fnl` | Bamboo colorscheme |
+| Rex | Rex Settings (not a file) | Bamboo theme imported by hand via Settings > Theme > Import from `symlinked/config/ghostty/themes/bamboo`; font set in Settings |
 | Ghostty | `symlinked/config/ghostty/config` | Bamboo theme |
 | Helix | `symlinked/config/helix/config.toml` | Bamboo theme |
 | Btop | `symlinked/config/btop/btop.conf` | Bamboo theme |

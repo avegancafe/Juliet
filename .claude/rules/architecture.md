@@ -43,6 +43,7 @@ stow --target=$HOME --dir=$HOME/.config/Juliet/symlinked home
 |--------|-------------|-------|
 | Neovim | `symlinked/config/nvim/init.lua` | Config in Fennel (`fnl/Juliet/`) |
 | Fish | `symlinked/config/fish/config.fish` | Aliases in `functions/aliases/` |
-| Ghostty | `symlinked/config/ghostty/config` | Primary terminal |
+| Rex | `symlinked/config/rex/init.lua` | Primary terminal (multiplexer); stow links the file into a real `~/.config/rex` |
+| Ghostty | `symlinked/config/ghostty/config` | Fallback terminal |
 | Niri | `symlinked/config/niri/config.kdl` | Wayland compositor |
 | Local overrides + secrets | `~/.config/local/` | Outside the repo, never committed — see `rules/local-config.md` |
