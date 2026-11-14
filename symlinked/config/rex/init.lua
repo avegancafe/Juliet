@@ -1,0 +1,3 @@
+-- Rex configuration, migrated from Ghostty (~/.config/ghostty/config).
+-- Every Ghostty keybinding is either already a Rex default or has no Rex
+-- counterpart, so no bindings are needed here yet.
