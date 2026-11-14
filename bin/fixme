@@ -8,11 +8,11 @@
 #                       repeat to join files in order (empty values are skipped)
 #   note                free-text hint passed along to Claude, e.g. `fixme the brew step failed`
 #
-# Works in cmux and in Ghostty on macOS. In Ghostty on Linux, press
+# Works in cmux, Rex, and Ghostty on macOS. In Ghostty on Linux, press
 # super+ctrl+shift+f at a prompt instead (it runs fixme with this pane's
-# scrollback; that also works on macOS). Claude opens in a split to the right, except in
-# Ghostty on Linux, where it opens in a new window (niri puts it in the next
-# column) since Ghostty's GTK build can't split from a script.
+# scrollback; that also works on macOS). Claude opens in a split to the right,
+# except in Ghostty on Linux, where it opens in a new window (niri puts it in
+# the next column) since Ghostty's GTK build can't split from a script.
 set -euo pipefail
 
 lines=5000
@@ -31,6 +31,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 in_cmux() { [[ -n "${CMUX_SURFACE_ID:-}" ]] && command -v cmux >/dev/null; }
+in_rex() { [[ -n "${REX_BLOCK:-}" ]] && command -v rex >/dev/null; }
 in_ghostty() { [[ "${TERM_PROGRAM:-}" == ghostty ]]; }
 
 # Pressing super+ctrl+shift+f at a prompt types `fixme --scrollback=<file> `
@@ -86,7 +87,7 @@ APPLESCRIPT
   scrollback+=("$file")
 }
 
-if [[ ${#scrollback[@]} -eq 0 ]] && ! in_cmux; then
+if [[ ${#scrollback[@]} -eq 0 ]] && ! in_cmux && ! in_rex; then
   if in_ghostty && [[ "$(uname -s)" != Darwin ]]; then
     echo "fixme: in Ghostty on Linux, press super+ctrl+shift+f at a shell prompt instead (type an optional note first)." >&2
     echo "       (If nothing happens, reload Ghostty's config: ctrl+shift+,)" >&2
@@ -94,7 +95,7 @@ if [[ ${#scrollback[@]} -eq 0 ]] && ! in_cmux; then
   elif in_ghostty && [[ -t 0 ]]; then
     ghostty_capture_macos
   else
-    echo "fixme: must be run inside cmux or Ghostty" >&2
+    echo "fixme: must be run inside cmux, Rex, or Ghostty" >&2
     exit 1
   fi
 fi
@@ -113,8 +114,10 @@ prompt_file="$dir/$stamp-prompt.md"
 
 if [[ ${#scrollback[@]} -gt 0 ]]; then
   cat "${scrollback[@]}" | tail -n "$lines" >"$capture"
-else
+elif in_cmux; then
   cmux read-screen --surface "$CMUX_SURFACE_ID" --lines "$lines" >"$capture"
+else
+  rex capture -b "$REX_BLOCK" --unwrap --trim | tail -n "$lines" >"$capture"
 fi
 
 prompt="Read the terminal session capture at $capture (the last $lines lines of scrollback from the pane I was just working in; my working directory was $PWD).
@@ -144,6 +147,12 @@ cmd="cd $(sq "$PWD") && claude --permission-mode plan $(sq "Read $prompt_file an
 
 if in_cmux; then
   cmux new-split right --surface "$CMUX_SURFACE_ID" --focus true --command "$cmd" >/dev/null
+elif in_rex; then
+  # Like the Linux branch below: a login+interactive shell runs $cmd, then
+  # stays as the split's shell once Claude exits.
+  shell="${SHELL:-/bin/bash}"
+  rex split -b "$REX_BLOCK" --split=right -c "$PWD" --shell=none \
+    -- "$shell" -lic "$cmd; exec $(sq "$shell") -l" >/dev/null
 elif [[ "$(uname -s)" == Darwin ]]; then
   # Ghostty 1.3+ AppleScript: split the focused terminal (the one the keybind
   # fired in) and type $cmd into the new split's shell, like cmux --command.
