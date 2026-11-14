@@ -3,7 +3,7 @@ hs.application.enableSpotlightForNameSearches(true)
 -- Terminal preference for the ctrl+space toggle: bundle IDs, comma- or
 -- space-separated, first installed one wins. Set JULIET_TERMINALS in
 -- ~/.config/local/.env (an extension's .env.template can seed it).
-local DEFAULT_TERMINALS = 'com.superlogical.rex com.mitchellh.ghostty'
+local DEFAULT_TERMINALS = 'com.superlogical.rex com.cmuxterm.app com.mitchellh.ghostty net.kovidgoyal.kitty com.googlecode.iterm2'
 
 -- Hammerspoon is a GUI app, so it doesn't inherit fish's environment: fall
 -- back to reading the one key from ~/.config/local/.env directly.
