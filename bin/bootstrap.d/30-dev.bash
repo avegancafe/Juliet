@@ -4,7 +4,7 @@
 
 category dev rlog "🛠️ Installing dev tools..." "Install dev tools?" \
   setup-cargo setup-rust setup-go-tools setup-python setup-nodenv setup-node-tools \
-  setup-flyctl setup-beads setup-rex
+  setup-flyctl setup-beads setup-rex setup-rex-theme
 
 setup-cargo() {
   substep "Checking cargo..."
@@ -180,3 +180,79 @@ setup-rex() {
 }
 
 setup-rex-applicable() { is-fedora; }
+
+# Bamboo in Rex.app, from the same Ghostty theme file Ghostty itself uses.
+# Rex.app imports a theme through its client.theme.import action, which it only
+# accepts with Remote Control on (Settings → Rex Server), so this turns that on
+# first: it lets local processes running as you drive Rex.app. Imported themes
+# live as JSON in the app's Workspace.customThemes default; finding "bamboo"
+# there means it's already imported, and then it's only (re)selected.
+REX_BUNDLE_ID="com.superlogical.rex"
+
+rex-app-client() {
+  rex client ls --json 2> /dev/null \
+    | jq -r 'first(.clients[] | select(.info.kind == "app" and .info.platform == "macos") | .client_id) // empty'
+}
+
+rex-has-custom-theme() {
+  local plist
+  plist=$(mktemp) || return 1
+  defaults export "$REX_BUNDLE_ID" "$plist" 2> /dev/null \
+    && /usr/libexec/PlistBuddy -c 'Print :Workspace.customThemes' "$plist" 2> /dev/null \
+      | grep -q "\"name\":\"$1\""
+  local rc=$?
+  rm -f "$plist"
+  return $rc
+}
+
+setup-rex-theme() {
+  local theme="$JULIET_DIR/symlinked/config/ghostty/themes/bamboo"
+  substep "Checking Rex theme..."
+
+  if [[ "$(defaults read "$REX_BUNDLE_ID" rex.client.remoteControl 2> /dev/null)" != "1" ]]; then
+    substep "Turning on Rex Remote Control..."
+    defaults write "$REX_BUNDLE_ID" rex.client.remoteControl -bool true
+  fi
+
+  # The action goes to the running app; start it in the background if needed.
+  local client="" i
+  client=$(rex-app-client)
+  if [[ -z "$client" ]]; then
+    open -gb "$REX_BUNDLE_ID" 2> /dev/null
+    for i in {1..20}; do
+      client=$(rex-app-client)
+      [[ -n "$client" ]] && break
+      sleep 0.5
+    done
+  fi
+  if [[ -z "$client" ]]; then
+    bootstrap_error "Rex.app isn't running, so its theme can't be set" \
+      "Open Rex, then rerun: juliet-bootstrap --enable=rex-theme"
+    return
+  fi
+
+  if rex-has-custom-theme bamboo; then
+    unchanged "bamboo already imported"
+  else
+    substep "Importing bamboo into Rex..."
+    rex -C "$client" "do" client.theme.import path="$theme" || {
+      bootstrap_error "Failed to import bamboo into Rex" \
+        "Check Remote Control is on in Rex Settings → Rex Server" \
+        "Then rerun: juliet-bootstrap --enable=rex-theme"
+      return
+    }
+  fi
+
+  rex -C "$client" "do" client.theme.change name=bamboo \
+    || bootstrap_error "Failed to select bamboo in Rex" \
+      "Pick it in Rex: Change Theme… → bamboo"
+}
+
+setup-rex-theme-applicable() {
+  is-macos || return 1
+  if ! command -v rex &> /dev/null \
+    || [[ -z "$(mdfind "kMDItemCFBundleIdentifier == '$REX_BUNDLE_ID'" 2> /dev/null)" ]]; then
+    NA_REASON="Rex.app not installed"
+    return 1
+  fi
+}
