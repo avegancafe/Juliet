@@ -67,7 +67,7 @@
       "mcp__github__pull_request_read",
       "mcp__github__issue_read",
       "mcp__playwright__*",
-      "Read(*)",
+      "Read",
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:docs.github.com)",
