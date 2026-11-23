@@ -16,17 +16,24 @@ describe('background session', () => {
     on('fs.read', () => ({ deny: 'no such file' }))
     on('turn.complete', ($, e) => ({ text: e.answer }))
     on('session.measure', ($, e) => ({ changed: e.changed }))
-    on('classic.Notification', () => ({}))
+    on('tool.check', () => ({ decision: 'ask' }))
+    on('tool.call', () => ({ result: 'ok' }))
 
     await $.turn.complete({ answer: 'Looked around.\nneeds input: which color should the die be?', durationMs: 5, isAborted: false, turnId: 't1', reason: 'answer' })
     expect(JSON.parse(writes.at(-1)!.text)).toMatchObject({ kind: 'background', jobId: 'abc123', state: 'blocked', reason: 'which color should the die be?' })
 
-    // The idle notice that follows must not overwrite the real reason...
-    await $.classic.Notification({ message: 'Claude is waiting for your input', notification_type: 'idle_prompt' })
+    // A check with nothing to prompt for keeps the real reason: a query (no call),
+    // a subagent's call, a call nobody can be asked about...
+    await $.tool.check({ tool: 'Bash', input: { command: 'ls' }, approver: 'person' })
+    await $.tool.check({ tool: 'Bash', input: { command: 'ls' }, tool_use_id: 'u0', agentId: 'sub-1', approver: 'person' })
+    await $.tool.check({ tool: 'Bash', input: { command: 'ls' }, tool_use_id: 'u0' })
     expect(JSON.parse(writes.at(-1)!.text).reason).toBe('which color should the die be?')
-    // ...but a permission prompt does block.
-    await $.classic.Notification({ message: 'Claude needs your permission to use Bash', notification_type: 'permission_prompt' })
-    expect(JSON.parse(writes.at(-1)!.text)).toMatchObject({ state: 'blocked', reason: 'Claude needs your permission to use Bash' })
+    // ...but a permission prompt on the session's own call blocks it,
+    await $.tool.check({ tool: 'Bash', input: { command: 'rm -rf build' }, tool_use_id: 'u1', approver: 'person' })
+    expect(JSON.parse(writes.at(-1)!.text)).toMatchObject({ state: 'blocked', reason: 'permission: Bash' })
+    // and the call running means it was answered.
+    await $.tool.call({ tool: 'Bash', command: 'rm -rf build' })
+    expect(JSON.parse(writes.at(-1)!.text)).toMatchObject({ state: 'working' })
 
     await $.session.measure({
       context: { tokens: 50_000, window: 200_000, percent: 25 },
