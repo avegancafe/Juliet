@@ -14,8 +14,6 @@ let dir = ''
 // the call itself starting means you answered it.
 let isAwaitingPermission = false
 
-const IGNORED_NOTIFICATIONS = new Set(['idle_prompt', 'auth_success'])
-
 // The session's file as last written, so a reload of this module (which runs
 // session.start again with fresh variables) picks up where it left off.
 async function previous($: EngineInterface, path: string, sessionId: string): Promise<Partial<Feed>> {
@@ -105,10 +103,15 @@ export const register: Register = (on) => {
     return result
   }).catch(($, e, next) => next(e))
 
-  // A permission prompt: the check answered `ask`. Read the verdict, never change it.
+  // A permission prompt: the check on the session's own call answered `ask` and
+  // someone can be asked. A query (no tool_use_id) or a check nobody answers
+  // (no approver) shows no prompt. Read the verdict, never change it.
+  // (A classic.Notification hook did this before; an organization's built-in
+  // guard skips classic.* hooks on installed mods, so it never ran there.)
   on('tool.check', async ($, e, next) => {
     const verdict = await next(e)
-    if (e.agentId === undefined && verdict.decision === 'ask') {
+    const isPrompt = e.tool_use_id !== undefined && e.approver !== undefined && e.op === undefined
+    if (e.agentId === undefined && isPrompt && verdict.decision === 'ask') {
       isAwaitingPermission = true
       await setState($, 'blocked', `permission: ${e.tool}`)
     }
@@ -121,15 +124,6 @@ export const register: Register = (on) => {
       isAwaitingPermission = false
       await setState($, 'working')
     }
-    return next(e)
-  }).catch(($, e, next) => next(e))
-
-  // Permission prompts and the like, where classic hooks reach installed plugins (an
-  // organization's managed settings can withhold them). The idle "waiting for your
-  // input" notice is skipped: turn.complete already said why the turn ended, and
-  // that reason is the useful one.
-  on('classic.Notification', async ($, e, next) => {
-    if (!IGNORED_NOTIFICATIONS.has(e.notification_type)) await setState($, 'blocked', e.message)
     return next(e)
   }).catch(($, e, next) => next(e))
 
