@@ -156,6 +156,7 @@ cask "hammerspoon"
 cask "karabiner-elements"
 cask "neovide-app"
 cask "ngrok"
+cask "openlogi"
 cask "sol"
 cask "visual-studio-code"
 cask "vlc", args: { appdir: "/Applications" }
