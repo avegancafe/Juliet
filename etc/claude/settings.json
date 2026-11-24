@@ -120,8 +120,6 @@
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
     "beads@sttts-beads-skill": true,
-    "superpowers@superpowers-marketplace": true,
-    "playwright@claude-plugins-official": true,
     "cc-plugin-you-should-know@builtin": true,
     "juliet@avegancafe-marketplace": true,
     "task-graph@avegancafe-marketplace": true
@@ -131,12 +129,6 @@
       "source": {
         "source": "github",
         "repo": "sttts/beads-skill"
-      }
-    },
-    "superpowers-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "obra/superpowers-marketplace"
       }
     },
     "avegancafe-marketplace": {
