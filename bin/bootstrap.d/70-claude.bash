@@ -243,15 +243,17 @@ setup-claude-code() {
   # Define marketplaces to add
   # Format: "name:id" pairs (bash 3.2 compatible)
   marketplaces=(
-    "superpowers-marketplace:obra/superpowers-marketplace"
     "claude-plugins-official:anthropics/claude-plugins-official"
   )
 
   # Add marketplaces if not already registered. Match against --json output:
   # the default text listing also names claude.ai-hosted marketplaces that are
-  # NOT configured ("... — not added"), so grepping the whole listing made
-  # superpowers-marketplace look registered — its add was skipped and every
-  # plugin install from it failed with "Plugin not found in marketplace".
+  # NOT configured ("... — not added"), so grepping the whole listing can make
+  # an unregistered marketplace look registered — its add is skipped and every
+  # plugin install from it fails with "Plugin not found in marketplace".
+  # superpowers and playwright are deliberately absent: on J2 machines
+  # j2-eng@j2-claude-plugins supplies them, and j2 bootstrap uninstalls these
+  # upstream copies as duplicates — installing them here made the two fight.
   for marketplace_pair in "${marketplaces[@]}"; do
     marketplace_name="${marketplace_pair%%:*}"
     marketplace_id="${marketplace_pair#*:}"
@@ -263,11 +265,9 @@ setup-claude-code() {
 
   # Define plugins to install
   plugins=(
-    "superpowers@superpowers-marketplace"
     "frontend-design@claude-plugins-official"
     "context7@claude-plugins-official"
     "linear@claude-plugins-official"
-    "playwright@claude-plugins-official"
   )
 
   # Install plugins if not already installed
