@@ -1,17 +1,33 @@
 #!/bin/sh
-# Text for hyprlock's fingerprint label. hyprlock substitutes $FPRINTPROMPT
-# before running the label's cmd[], so $1 is the reader's live prompt.
+# Text for hyprlock's fingerprint label. hyprlock substitutes $FPRINTPROMPT and
+# $FPRINTFAIL before running the label's cmd[], so $1 is the reader's live
+# prompt and $2 is the last fingerprint failure (empty if none).
 #
+# - A failure that means hyprlock has given up on the reader for this lock
+#   ("Fingerprint device disconnected", "Fingerprint auth disabled (...)")
+#   becomes "Fingerprint unavailable — type password". hyprlock never clears the
+#   prompt in that case, so "Scan fingerprint to unlock" would otherwise linger.
+#   The usual cause isn't a real disconnect: libfprint's simulated-heat cutoff
+#   stops the Goodix reader after 180 s of continuous verify, fprintd reports it
+#   as verify-disconnected, and hyprlock 0.9.x never re-arms the reader, even
+#   after a suspend/resume. Any lock left awake for over ~3 min ends up here.
 # - "Reading" (auth:fingerprint:present_message, a finger is on the sensor)
 #   gets dots cycling 1 -> 2 -> 3, so a touch visibly registers.
 # - Empty means hyprlock hasn't armed the reader yet (e.g. the first ~2s after
 #   waking from suspend); touches are ignored then, so say it's still waking.
 # - Anything else (ready, retry, no-match) passes through unchanged.
 prompt=$1
+fail=$2
 dots() {
     n=$(( $(date +%s%N) / 400000000 % 3 + 1 ))
     printf '%.*s' "$n" '...'
 }
+case $fail in
+    'Fingerprint device disconnected' | 'Fingerprint auth disabled'*)
+        printf '%s\n' 'Fingerprint unavailable — type password'
+        exit 0
+        ;;
+esac
 case $prompt in
     Reading) printf 'Reading%s\n' "$(dots)" ;;
     '') printf 'Waking fingerprint reader%s\n' "$(dots)" ;;
