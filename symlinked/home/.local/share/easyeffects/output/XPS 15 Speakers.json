@@ -8,7 +8,7 @@
         ],
         "equalizer#0": {
             "bypass": false,
-            "input-gain": -4.0,
+            "input-gain": -6.0,
             "output-gain": 0.0,
             "mode": "IIR",
             "num-bands": 5,
@@ -30,7 +30,7 @@
                 },
                 "band1": {
                     "frequency": 180.0,
-                    "gain": 3.0,
+                    "gain": 5.0,
                     "q": 0.7,
                     "type": "Lo-shelf",
                     "mode": "APO (DR)",
@@ -87,7 +87,7 @@
                 },
                 "band1": {
                     "frequency": 180.0,
-                    "gain": 3.0,
+                    "gain": 5.0,
                     "q": 0.7,
                     "type": "Lo-shelf",
                     "mode": "APO (DR)",
@@ -135,9 +135,9 @@
             "bypass": false,
             "input-gain": 0.0,
             "output-gain": 0.0,
-            "amount": 4.0,
+            "amount": 8.0,
             "harmonics": 8.5,
-            "scope": 150.0,
+            "scope": 180.0,
             "floor": 40.0,
             "floor-active": true,
             "blend": 0.0
