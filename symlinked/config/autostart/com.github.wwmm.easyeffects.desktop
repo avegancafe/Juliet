@@ -2,10 +2,11 @@
 # Managed by Juliet. Starts EasyEffects in the background at login so the
 # "XPS 15 Speakers" preset autoloads on the built-in speakers (see
 # ~/.local/share/easyeffects/autoload/output). Same entry EasyEffects writes
-# for its own "Launch service at system startup" toggle.
+# for its own "Launch service at system startup" toggle (same file name, so
+# the toggle sees it instead of writing a second one).
 Name=Easy Effects
 Comment=Easy Effects Service
-Exec=easyeffects --hide-window
+Exec=easyeffects --hide-window --service-mode
 Icon=com.github.wwmm.easyeffects
 StartupNotify=false
 Terminal=false
