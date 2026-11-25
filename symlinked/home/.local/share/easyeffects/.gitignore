@@ -1,0 +1,10 @@
+# Stow folds this whole directory into the repo, so EasyEffects writes its
+# runtime files (impulse responses, rnnoise models, other presets) here too.
+# Track only the speaker preset and its autoload rule.
+*
+!.gitignore
+!output/
+!output/XPS 15 Speakers.json
+!autoload/
+!autoload/output/
+!autoload/output/*.json

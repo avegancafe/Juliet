@@ -120,6 +120,11 @@ pavucontrol
 # what decides whether browser video runs on the GPU or burns CPU.
 powertop
 libva-utils
+# easyeffects: PipeWire DSP. On the XPS 15 9500 it stands in for Waves
+# MaxxAudio, the speaker tuning Dell ships only for Windows; without it the
+# built-in speakers play raw and sound thin. The preset and the speaker-only
+# autoload live in symlinked/home/.local/share/easyeffects.
+easyeffects
 
 # Applications
 vlc

@@ -1,0 +1,14 @@
+[Desktop Entry]
+# Managed by Juliet. Starts EasyEffects in the background at login so the
+# "XPS 15 Speakers" preset autoloads on the built-in speakers (see
+# ~/.local/share/easyeffects/autoload/output). Same entry EasyEffects writes
+# for its own "Launch service at system startup" toggle.
+Name=Easy Effects
+Comment=Easy Effects Service
+Exec=easyeffects --hide-window
+Icon=com.github.wwmm.easyeffects
+StartupNotify=false
+Terminal=false
+Type=Application
+X-GNOME-Autostart-Phase=Application
+X-KDE-autostart-phase=2
