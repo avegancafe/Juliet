@@ -91,6 +91,12 @@ rofimoji
 # choice in sway/hyprland guides — was retired from Fedora, and Plasma's
 # polkit-kde only runs inside a Plasma session.
 lxqt-policykit
+# gnome-keyring-pam: the PAM module that unlocks the login keyring with the
+# SDDM password. /etc/pam.d/sddm already references pam_gnome_keyring.so with
+# a leading "-" (silently skipped when missing), but the KDE spin doesn't ship
+# the module — Plasma used kwallet. Without it the keyring stays locked and the
+# first app wanting a secret pops an "unlock Default keyring" prompt each boot.
+gnome-keyring-pam
 # bolt: Thunderbolt device authorization daemon (boltd/boltctl). Thunderbolt
 # controllers at security level "user" (the XPS 15 9500's, for one) refuse
 # devices until they're authorized. Plasma pulls bolt in through
