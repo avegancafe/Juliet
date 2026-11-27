@@ -107,6 +107,13 @@ cava
 playerctl
 brightnessctl
 pavucontrol
+# Battery diagnostics, not tuning (tuned does that; see setup-battery-profile).
+# powertop: `sudo powertop` shows discharge watts and how deep the CPU package
+# idles, the two numbers that say whether a power change helped.
+# libva-utils: `vainfo` lists what the GPU can decode in hardware, which is
+# what decides whether browser video runs on the GPU or burns CPU.
+powertop
+libva-utils
 
 # Applications
 vlc
