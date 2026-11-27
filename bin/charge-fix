@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# charge-fix — try to clear the "USB-C power connected but not charging" lockup
+# without a reboot (Linux only). Run when charge-watch alerts:
+#
+#   sudo ~/.config/Juliet/bin/charge-fix
+#
+# Keep the charger plugged in. Each step asks the embedded controller to look at
+# the charger again; the script stops as soon as the AC adapter comes online.
+# If nothing works, only a full power-off clears it.
+
+set -uo pipefail
+
+PS=/sys/class/power_supply
+AC_DEV=ACPI0003:00
+AC_DRV=/sys/bus/platform/drivers/ac
+
+if [[ $(uname) != Linux || ! -e $PS/AC/online ]]; then
+  echo "charge-fix: no ACPI AC adapter here; nothing to do." >&2
+  exit 0
+fi
+if ((EUID != 0)); then
+  echo "charge-fix: needs root. Run: sudo $0" >&2
+  exit 1
+fi
+
+state() {
+  printf '  AC online=%s  battery=%s %s%%\n' "$(cat $PS/AC/online)" \
+    "$(cat $PS/BAT0/status 2> /dev/null)" "$(cat $PS/BAT0/capacity 2> /dev/null)"
+}
+charging() { [[ $(cat $PS/AC/online) == 1 ]]; }
+check() {
+  sleep 10
+  state
+  if charging; then
+    echo "Charging now."
+    exit 0
+  fi
+}
+
+echo "Before:"
+state
+if charging; then
+  echo "Already charging; nothing to fix."
+  exit 0
+fi
+
+if [[ -e $AC_DRV/$AC_DEV ]]; then
+  echo "1) Rebind the ACPI AC-adapter driver"
+  echo "$AC_DEV" > "$AC_DRV/unbind"
+  sleep 2
+  echo "$AC_DEV" > "$AC_DRV/bind"
+  check
+else
+  echo "1) Skipped: $AC_DEV isn't bound to the ac driver"
+fi
+
+echo "2) Light sleep (s2idle) for 20 s, auto-wake"
+rtcwake -m freeze -s 20 > /dev/null
+check
+
+echo "3) Deep sleep (S3) for 20 s, auto-wake"
+prev=$(grep -o '\[[a-z0-9]*\]' /sys/power/mem_sleep | tr -d '[]')
+if grep -qw deep /sys/power/mem_sleep; then
+  echo deep > /sys/power/mem_sleep
+  rtcwake -m mem -s 20 > /dev/null
+  echo "$prev" > /sys/power/mem_sleep
+  check
+else
+  echo "   Skipped: deep sleep isn't supported here"
+fi
+
+echo
+echo "Still not charging. Only a full power-off clears it:"
+echo "shut down, unplug everything, hold the power button 30 s, boot on a 20 V charger."
+exit 1

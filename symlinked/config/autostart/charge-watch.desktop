@@ -1,0 +1,12 @@
+[Desktop Entry]
+# Managed by Juliet. Runs bin/charge-watch at login: a critical notification
+# when USB-C power is connected but the laptop isn't charging (the XPS 15
+# embedded-controller wedge). Linux only; the script exits at once on machines
+# without a battery or UCSI USB-C ports. macOS ignores ~/.config/autostart.
+Name=Charge Watch
+Comment=Warn when plugged in but not charging
+Exec=sh -c "exec ~/.config/Juliet/bin/charge-watch"
+NoDisplay=true
+StartupNotify=false
+Terminal=false
+Type=Application

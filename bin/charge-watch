@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# charge-watch — warn when a USB-C power source is connected but the laptop
+# isn't charging from it (Linux only; started at login by
+# symlinked/config/autostart/charge-watch.desktop).
+#
+# Why: the XPS 15 9500's embedded controller can wedge so that every USB-C
+# charger negotiates (UCSI shows online=1) yet the AC adapter stays offline and
+# the battery drains. Only a full power reset clears it: shut down, unplug
+# everything, hold the power button 30 s. This turns a silently draining
+# battery into a notification. A genuinely underpowered source (a 5/15 V phone
+# charger or power strip port) trips it too, so the message reports the voltage.
+#
+# Usage: charge-watch [--once]   (--once: check now, print state, exit)
+
+set -euo pipefail
+
+PS=/sys/class/power_supply
+INTERVAL=60
+STRIKES_NEEDED=2
+
+# Prints "<volts>" of the first online UCSI source when we're connected but
+# not charging; prints nothing otherwise.
+stuck_voltage() {
+  local ac bat src uv
+  ac=$(cat "$PS/AC/online" 2> /dev/null || echo 1)
+  bat=$(cat "$PS/BAT0/status" 2> /dev/null || echo Unknown)
+  [[ $ac == 0 && $bat == Discharging ]] || return 0
+  for src in "$PS"/ucsi-source-psy-*; do
+    [[ $(cat "$src/online" 2> /dev/null) == 1 ]] || continue
+    uv=$(cat "$src/voltage_now" 2> /dev/null || echo 0)
+    printf '%s\n' "$((uv / 1000000))"
+    return 0
+  done
+}
+
+# Nothing to watch on machines without a battery or UCSI USB-C ports.
+compgen -G "$PS/ucsi-source-psy-*" > /dev/null && [[ -e $PS/BAT0 ]] || exit 0
+
+if [[ ${1-} == --once ]]; then
+  v=$(stuck_voltage)
+  if [[ -n $v ]]; then echo "STUCK: USB-C source online at ${v} V, not charging"; else echo "ok"; fi
+  exit 0
+fi
+
+# Single instance per session.
+exec 9> "${XDG_RUNTIME_DIR:-/tmp}/charge-watch.lock"
+flock -n 9 || exit 0
+
+strikes=0
+notified=0
+while true; do
+  v=$(stuck_voltage)
+  if [[ -n $v ]]; then
+    strikes=$((strikes + 1))
+    if ((strikes >= STRIKES_NEEDED && !notified)); then
+      notify-send -u critical -a charge-watch "Plugged in but not charging" \
+        "USB-C power is connected at ${v} V but the battery is draining. If this is a 20 V charger, the embedded controller is stuck. Try first: sudo ~/.config/Juliet/bin/charge-fix. Otherwise shut down, unplug everything, hold power 30 s."
+      notified=1
+    fi
+  else
+    strikes=0
+    notified=0
+  fi
+  sleep "$INTERVAL"
+done
