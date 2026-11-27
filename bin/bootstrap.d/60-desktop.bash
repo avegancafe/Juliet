@@ -1,14 +1,16 @@
 # shellcheck shell=bash disable=SC2034  # globals are shared across modules
 # Sourced by bin/juliet-bootstrap (never run directly).
-# desktop (Fedora): greeter, input remap, Plasma removal, and drivers for
-# hardware that is detected (nvidia GPU, Goodix fingerprint reader).
+# desktop (Fedora): greeter, input remap, Plasma removal, drivers for hardware
+# that is detected (nvidia GPU, Goodix fingerprint reader), and battery power
+# settings on laptops.
 
 # Order matters here: sddm must become the display manager before deplasma
 # removes plasma-login-manager (or there's no way to log in), and fingerprint
 # edits /etc/pam.d/sddm, which is only worth doing once sddm is the DM.
 category desktop log "🖥️ Configuring desktop..." "Configure desktop?" \
   setup-sddm setup-deplasma setup-nvidia setup-nvidia-secureboot \
-  setup-nvidia-powermgmt setup-keyd setup-fingerprint
+  setup-nvidia-powermgmt setup-battery-profile setup-deep-sleep \
+  setup-keyd setup-fingerprint
 
 setup-sddm() {
   if ! is-fedora; then
@@ -558,6 +560,98 @@ setup-nvidia-powermgmt() {
   esac
 }
 
+# A laptop: the kernel lists a battery (BAT0, BAT1, ...) under power_supply.
+has-battery() {
+  local supply
+  for supply in /sys/class/power_supply/BAT*; do
+    [[ -e "$supply" ]] && return 0
+  done
+  return 1
+}
+
+# On battery, Fedora's tuned-ppd swaps "balanced" for its balanced-battery
+# profile, which only nudges the CPU's energy preference and leaves turbo on.
+# This maps it to Juliet's own profile instead: turbo off, the CPU told to
+# favour power, and runtime PM turned on for the PCI devices that default to
+# always-on. The trade is speed: on battery the CPU stays at its base clock.
+# Choosing "performance" in the power-profile switch brings turbo back, and
+# tuned undoes all of it on AC.
+#
+# The profile is etc/tuned/juliet-battery/tuned.conf; etc/tuned/ppd.conf is
+# tuned-ppd's stock mapping with the one battery line changed. Check it with
+# `tuned-adm active` while unplugged.
+setup-battery-profile() {
+  if ! is-fedora; then
+    return
+  fi
+  if ! rpm -q tuned-ppd &> /dev/null; then
+    return
+  fi
+
+  substep "Installing the juliet-battery tuned profile (no turbo on battery)..."
+  local rc changed=0
+  # Profile first: tuned-ppd refuses a mapping that names a missing profile.
+  install-system-file "$JULIET_DIR/etc/tuned/juliet-battery/tuned.conf" \
+    /etc/tuned/profiles/juliet-battery/tuned.conf
+  rc=$?
+  (( rc == 2 )) && return
+  (( rc == 0 )) && changed=1
+
+  install-system-file "$JULIET_DIR/etc/tuned/ppd.conf" /etc/tuned/ppd.conf
+  rc=$?
+  (( rc == 2 )) && return
+  (( rc == 0 )) && changed=1
+
+  if (( ! changed )); then
+    unchanged "profile and battery mapping current"
+    return
+  fi
+
+  sudo systemctl restart tuned tuned-ppd \
+    || bootstrap_error "Failed to restart tuned" \
+      "Restart it manually: sudo systemctl restart tuned tuned-ppd"
+}
+
+# Suspend to RAM (S3, "deep") instead of s2idle, on laptops whose firmware
+# offers both. s2idle keeps the platform half awake and costs several times
+# the power, which adds up when the laptop sleeps for a day at a stretch;
+# hibernate isn't an option under Secure Boot lockdown with zram-only swap.
+# Resume takes a few seconds longer.
+#
+# Try it before making it the default (this lasts until the next reboot):
+#   echo deep | sudo tee /sys/power/mem_sleep && systemctl suspend
+# Undo:
+#   sudo grubby --update-kernel=ALL --remove-args=mem_sleep_default=deep
+#
+# grubby also writes the argument to /etc/default/grub, so kernels installed
+# later inherit it. bin/sleep-drain-log (journalctl -t sleep-drain) shows what
+# each sleep cost, for comparing the two.
+setup-deep-sleep() {
+  if ! is-fedora; then
+    return
+  fi
+
+  local info
+  if ! info="$(sudo grubby --info=ALL 2> /dev/null)" \
+    || ! grep -q '^args=' <<< "$info"; then
+    bootstrap_error "Could not read the kernel arguments from grubby" \
+      "Check it manually: sudo grubby --info=ALL"
+    return
+  fi
+  if ! grep '^args=' <<< "$info" | grep -qv 'mem_sleep_default=deep'; then
+    unchanged "mem_sleep_default=deep already set"
+    return
+  fi
+
+  substep "Making S3 (deep) the default sleep state..."
+  if sudo grubby --update-kernel=ALL --args=mem_sleep_default=deep; then
+    notice "Deep sleep takes effect on the next reboot."
+  else
+    bootstrap_error "Failed to set mem_sleep_default=deep" \
+      "Set it manually: sudo grubby --update-kernel=ALL --args=mem_sleep_default=deep"
+  fi
+}
+
 setup-sddm-applicable() { is-fedora && command -v sddm &> /dev/null; }
 
 setup-deplasma-applicable() { is-fedora; }
@@ -567,6 +661,14 @@ setup-nvidia-applicable() { is-fedora && has-nvidia-gpu; }
 setup-nvidia-secureboot-applicable() { is-fedora && has-nvidia-gpu; }
 
 setup-nvidia-powermgmt-applicable() { is-fedora && has-nvidia-gpu; }
+
+setup-battery-profile-applicable() {
+  is-fedora && has-battery && rpm -q tuned-ppd &> /dev/null
+}
+
+setup-deep-sleep-applicable() {
+  is-fedora && has-battery && grep -qw deep /sys/power/mem_sleep 2> /dev/null
+}
 
 setup-keyd-applicable() { is-fedora && command -v keyd &> /dev/null; }
 

@@ -1,0 +1,99 @@
+#!/usr/bin/env bash
+# sleep-drain-log pre|post — log what a suspend cost the battery.
+#
+# hypridle runs `pre` just before sleep and `post` just after resume
+# (symlinked/config/hypr/hypridle.conf). `post` writes one line to the journal:
+#
+#   journalctl -t sleep-drain
+#
+# with the sleep's length, the battery percent and Wh it lost, the average
+# draw in watts, and (for s2idle) how much of the sleep the hardware spent in
+# its low-power state. Needs no root. It must never hold up a suspend, so
+# every failure path exits 0 quietly.
+
+set -u
+
+state="${XDG_RUNTIME_DIR:-/tmp}/sleep-drain.pre"
+
+battery=""
+for dir in /sys/class/power_supply/BAT*; do
+  [[ -r "$dir/capacity" ]] && battery="$dir" && break
+done
+[[ -n "$battery" ]] || exit 0
+
+# Energy left, in µWh. Some batteries report energy directly; others (the
+# XPS 15's) report charge in µAh, which times the design voltage gives energy.
+energy-uwh() {
+  if [[ -r "$battery/energy_now" ]]; then
+    cat "$battery/energy_now"
+  elif [[ -r "$battery/charge_now" && -r "$battery/voltage_min_design" ]]; then
+    awk -v c="$(cat "$battery/charge_now")" -v v="$(cat "$battery/voltage_min_design")" \
+      'BEGIN { printf "%.0f\n", c * v / 1e6 }'
+  else
+    echo 0
+  fi
+}
+
+# The sleep state a suspend will use: the bracketed word in mem_sleep.
+sleep-mode() {
+  sed -nE 's/.*\[([a-z0-9]+)\].*/\1/p' /sys/power/mem_sleep 2> /dev/null
+}
+
+# How many suspends have succeeded since boot.
+suspend-count() {
+  cat /sys/power/suspend_stats/success 2> /dev/null || echo 0
+}
+
+case "${1:-}" in
+  pre)
+    printf '%s %s %s %s %s %s\n' \
+      "$(date +%s)" "$(cat "$battery/capacity")" "$(energy-uwh)" \
+      "$(sleep-mode)" "$(suspend-count)" "$(cat "$battery/status")" \
+      > "$state" 2> /dev/null
+    ;;
+  post)
+    [[ -r "$state" ]] || exit 0
+    read -r start pct_before uwh_before mode count_before status_before < "$state"
+    rm -f "$state"
+    [[ -n "${status_before:-}" ]] || exit 0
+
+    # last_hw_sleep keeps the previous suspend's figure until a new one
+    # succeeds, so only trust it when the suspend counter moved.
+    hw_us=-1
+    if (( $(suspend-count) > count_before )); then
+      hw_us="$(cat /sys/power/suspend_stats/last_hw_sleep 2> /dev/null || echo -1)"
+    fi
+    line="$(awk \
+      -v start="$start" -v now="$(date +%s)" \
+      -v pct_before="$pct_before" -v pct_after="$(cat "$battery/capacity")" \
+      -v uwh_before="$uwh_before" -v uwh_after="$(energy-uwh)" \
+      -v mode="${mode:-unknown}" -v hw_us="$hw_us" \
+      -v status_before="$status_before" -v status_after="$(cat "$battery/status")" \
+      'BEGIN {
+        secs = now - start
+        if (secs < 1) secs = 1
+        hours = secs / 3600
+        wh = (uwh_before - uwh_after) / 1e6
+        out = sprintf("slept %.2fh (%s): %d%% -> %d%%, %.2f Wh", \
+          hours, mode, pct_before, pct_after, wh)
+        # Watts only mean something when the battery was draining throughout.
+        if (status_before == "Discharging" && status_after == "Discharging")
+          out = out sprintf(", avg %.2f W, %.1f%%/h", wh / hours, (pct_before - pct_after) / hours)
+        else
+          out = out sprintf(", on AC (%s -> %s), no drain figure", status_before, status_after)
+        # last_hw_sleep is only filled in for s2idle.
+        if (mode == "s2idle" && hw_us >= 0) {
+          share = 100 * (hw_us / 1e6) / secs
+          if (share > 100) share = 100
+          out = out sprintf(", hw sleep %.0f%%", share)
+        }
+        print out
+      }')"
+    logger -t sleep-drain -- "$line"
+    ;;
+  *)
+    echo "usage: sleep-drain-log pre|post" >&2
+    exit 64
+    ;;
+esac
+exit 0
