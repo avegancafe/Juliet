@@ -570,8 +570,8 @@ has-battery() {
 
 # On battery, Fedora's tuned-ppd swaps "balanced" for its balanced-battery
 # profile, which only nudges the CPU's energy preference and leaves turbo on.
-# This maps it to Juliet's own profile instead: turbo off, the CPU told to
-# favour power, and runtime PM turned on for the PCI devices that default to
+# This maps it to Juliet's own profile instead: the same energy preference,
+# plus turbo off and runtime PM turned on for the PCI devices that default to
 # always-on. The trade is speed: on battery the CPU stays at its base clock.
 # Choosing "performance" in the power-profile switch brings turbo back, and
 # tuned undoes all of it on AC.
