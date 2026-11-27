@@ -106,6 +106,15 @@
             "command": "if command -v bd >/dev/null 2>&1; then bd prime --hook-json; fi"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
+            "timeout": 5
+          }
+        ]
       }
     ]
   },
