@@ -9,8 +9,7 @@
 # edits /etc/pam.d/sddm, which is only worth doing once sddm is the DM.
 category desktop log "🖥️ Configuring desktop..." "Configure desktop?" \
   setup-sddm setup-deplasma setup-nvidia setup-nvidia-secureboot \
-  setup-nvidia-powermgmt setup-battery-profile setup-deep-sleep \
-  setup-keyd setup-fingerprint
+  setup-nvidia-powermgmt setup-battery-profile setup-keyd setup-fingerprint
 
 setup-sddm() {
   if ! is-fedora; then
@@ -612,45 +611,13 @@ setup-battery-profile() {
       "Restart it manually: sudo systemctl restart tuned tuned-ppd"
 }
 
-# Suspend to RAM (S3, "deep") instead of s2idle, on laptops whose firmware
-# offers both. s2idle keeps the platform half awake and costs several times
-# the power, which adds up when the laptop sleeps for a day at a stretch;
-# hibernate isn't an option under Secure Boot lockdown with zram-only swap.
-# Resume takes a few seconds longer.
-#
-# Try it before making it the default (this lasts until the next reboot):
-#   echo deep | sudo tee /sys/power/mem_sleep && systemctl suspend
-# Undo:
-#   sudo grubby --update-kernel=ALL --remove-args=mem_sleep_default=deep
-#
-# grubby also writes the argument to /etc/default/grub, so kernels installed
-# later inherit it. bin/sleep-drain-log (journalctl -t sleep-drain) shows what
-# each sleep cost, for comparing the two.
-setup-deep-sleep() {
-  if ! is-fedora; then
-    return
-  fi
-
-  local info
-  if ! info="$(sudo grubby --info=ALL 2> /dev/null)" \
-    || ! grep -q '^args=' <<< "$info"; then
-    bootstrap_error "Could not read the kernel arguments from grubby" \
-      "Check it manually: sudo grubby --info=ALL"
-    return
-  fi
-  if ! grep '^args=' <<< "$info" | grep -qv 'mem_sleep_default=deep'; then
-    unchanged "mem_sleep_default=deep already set"
-    return
-  fi
-
-  substep "Making S3 (deep) the default sleep state..."
-  if sudo grubby --update-kernel=ALL --args=mem_sleep_default=deep; then
-    notice "Deep sleep takes effect on the next reboot."
-  else
-    bootstrap_error "Failed to set mem_sleep_default=deep" \
-      "Set it manually: sudo grubby --update-kernel=ALL --args=mem_sleep_default=deep"
-  fi
-}
+# Sleep stays on s2idle, on purpose. The XPS 15 9500's firmware also lists S3
+# ("deep" in /sys/power/mem_sleep), which would draw less asleep, but the
+# machine never came back from it: a trial on 2026-11-27 (kernel 7.2.13,
+# nvidia 615.78) logged "PM: suspend entry (deep)" and nothing after, and
+# needed a hard power-off. Don't set mem_sleep_default=deep here.
+# bin/sleep-drain-log (journalctl -t sleep-drain) records what each s2idle
+# sleep costs.
 
 setup-sddm-applicable() { is-fedora && command -v sddm &> /dev/null; }
 
@@ -664,10 +631,6 @@ setup-nvidia-powermgmt-applicable() { is-fedora && has-nvidia-gpu; }
 
 setup-battery-profile-applicable() {
   is-fedora && has-battery && rpm -q tuned-ppd &> /dev/null
-}
-
-setup-deep-sleep-applicable() {
-  is-fedora && has-battery && grep -qw deep /sys/power/mem_sleep 2> /dev/null
 }
 
 setup-keyd-applicable() { is-fedora && command -v keyd &> /dev/null; }
